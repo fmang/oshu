@@ -13,6 +13,8 @@ AC_PROG_CC_C99
 
 # Checks for libraries.
 PKG_CHECK_MODULES([SDL2], [sdl2])
+PKG_CHECK_MODULES([LAVF], [libavformat])
+PKG_CHECK_MODULES([LAVC], [libavcodec])
 
 # Checks for header files.
 
