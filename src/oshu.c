@@ -9,6 +9,7 @@ int main(int argc, char **argv)
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) != 0) {
 		return 1;
 	}
+	oshu_audio_init();
 	oshu_log_debug("successfully initialized");
 	SDL_Quit();
 	return 0;

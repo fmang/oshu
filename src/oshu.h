@@ -7,6 +7,7 @@
 
 struct oshu_audio_stream {};
 
+int oshu_audio_init();
 int oshu_audio_open(const char *url, struct oshu_audio_stream **stream);
 int oshu_audio_play(struct oshu_audio_stream *stream);
 int oshu_audio_close(struct oshu_audio_stream *stream);
