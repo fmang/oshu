@@ -1,3 +1,5 @@
+#include "oshu.h"
+
 #include <SDL2/SDL.h>
 
 int main(int argc, char **argv)
@@ -7,7 +9,7 @@ int main(int argc, char **argv)
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) != 0) {
 		return 1;
 	}
-	SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "successfully initialized");
+	oshu_log_debug("successfully initialized");
 	SDL_Quit();
 	return 0;
 }
