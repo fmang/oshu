@@ -11,7 +11,7 @@
 #define oshu_log_critical(...) SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, __VA_ARGS__)
 
 struct oshu_audio_stream {
-	AVFormatContext *context;
+	AVFormatContext *demuxer;
 	AVCodec *decoder;
 };
 

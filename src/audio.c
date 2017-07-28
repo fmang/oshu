@@ -15,11 +15,11 @@ void oshu_audio_init()
 int oshu_audio_open(const char *url, struct oshu_audio_stream **stream)
 {
 	*stream = calloc(1, sizeof(**stream));
-	int rc = avformat_open_input(&(*stream)->context, url, NULL, NULL);
+	int rc = avformat_open_input(&(*stream)->demuxer, url, NULL, NULL);
 	if (rc)
 		goto fail;
 	rc = av_find_best_stream(
-		(*stream)->context,
+		(*stream)->demuxer,
 		AVMEDIA_TYPE_AUDIO,
 		-1, -1,
 		&(*stream)->decoder,
@@ -41,7 +41,7 @@ int oshu_audio_play(struct oshu_audio_stream *stream)
 
 void oshu_audio_close(struct oshu_audio_stream **stream)
 {
-	avformat_close_input(&(*stream)->context);
+	avformat_close_input(&(*stream)->demuxer);
 	free(*stream);
 	*stream = NULL;
 }
