@@ -53,6 +53,13 @@ int open_decoder(struct oshu_audio_stream *stream)
 	return 0;
 }
 
+void dump_stream_info(struct oshu_audio_stream *stream)
+{
+	oshu_log_info("audio codec: %s", stream->codec->long_name);
+	oshu_log_info("sample rate: %d", stream->decoder->sample_rate);
+	oshu_log_info("number of channels: %d", stream->decoder->channels);
+}
+
 int oshu_audio_open(const char *url, struct oshu_audio_stream **stream)
 {
 	*stream = calloc(1, sizeof(**stream));
@@ -62,6 +69,7 @@ int oshu_audio_open(const char *url, struct oshu_audio_stream **stream)
 	rc = open_decoder(*stream);
 	if (rc < 0)
 		goto fail;
+	dump_stream_info(*stream);
 	return 0;
 fail:
 	log_av_error(rc);
