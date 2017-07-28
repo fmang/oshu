@@ -36,6 +36,12 @@ int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 
 int open_decoder(struct oshu_audio_stream *stream)
 {
+	stream->decoder = avcodec_alloc_context3(stream->codec);
+	int rc = avcodec_open2(stream->decoder, stream->codec, NULL);
+	if (rc < 0) {
+		oshu_log_error("error opening the codec");
+		return rc;
+	}
 	return 0;
 }
 
@@ -62,6 +68,7 @@ int oshu_audio_play(struct oshu_audio_stream *stream)
 
 void oshu_audio_close(struct oshu_audio_stream **stream)
 {
+	avcodec_close((*stream)->decoder);
 	avformat_close_input(&(*stream)->demuxer);
 	free(*stream);
 	*stream = NULL;
