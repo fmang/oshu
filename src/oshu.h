@@ -12,6 +12,7 @@
 
 struct oshu_audio_stream {
 	AVFormatContext *context;
+	AVCodec *decoder;
 };
 
 void oshu_audio_init();
