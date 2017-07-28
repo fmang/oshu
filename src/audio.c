@@ -12,7 +12,7 @@ void oshu_audio_init()
 	av_register_all();
 }
 
-int open_demuxer(const char *url, struct oshu_audio_stream *stream)
+static int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 {
 	int rc = avformat_open_input(&stream->demuxer, url, NULL, NULL);
 	if (rc < 0) {
@@ -34,7 +34,7 @@ int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 	return 0;
 }
 
-int open_decoder(struct oshu_audio_stream *stream)
+static int open_decoder(struct oshu_audio_stream *stream)
 {
 	stream->decoder = avcodec_alloc_context3(stream->codec);
 	int rc = avcodec_parameters_to_context(
@@ -53,7 +53,7 @@ int open_decoder(struct oshu_audio_stream *stream)
 	return 0;
 }
 
-void dump_stream_info(struct oshu_audio_stream *stream)
+static void dump_stream_info(struct oshu_audio_stream *stream)
 {
 	oshu_log_info("audio codec: %s", stream->codec->long_name);
 	oshu_log_info("sample rate: %d", stream->decoder->sample_rate);
