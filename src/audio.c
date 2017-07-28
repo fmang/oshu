@@ -16,17 +16,22 @@ int oshu_audio_open(const char *url, struct oshu_audio_stream **stream)
 {
 	*stream = calloc(1, sizeof(**stream));
 	int rc = avformat_open_input(&(*stream)->demuxer, url, NULL, NULL);
-	if (rc)
+	if (rc < 0) {
+		oshu_log_error("failed opening the audio file");
 		goto fail;
+	}
 	rc = av_find_best_stream(
 		(*stream)->demuxer,
 		AVMEDIA_TYPE_AUDIO,
 		-1, -1,
-		&(*stream)->decoder,
+		&(*stream)->codec,
 		0
 	);
-	if (rc)
+	if (rc < 0 || (*stream)->codec == NULL) {
+		oshu_log_error("error finding the best audio stream");
 		goto fail;
+	}
+	(*stream)->stream_id = rc;
 	return 0;
 fail:
 	log_av_error(rc);

@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 
 	struct oshu_audio_stream *stream;
 	if (oshu_audio_open("test.ogg", &stream)) {
-		oshu_log_error("failed opening the audio stream");
+		oshu_log_error("no audio, aborting");
 		return 2;
 	}
 	oshu_log_debug("audio opened");
