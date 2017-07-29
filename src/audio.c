@@ -178,7 +178,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	int sample_size = av_get_bytes_per_sample(frame->format);
 	int planar = av_sample_fmt_is_planar(frame->format);
 	int left = len;
-	for (; left > 0 && !stream->finished; next_frame(stream)) {
+	while (left > 0 && !stream->finished) {
 		while (left > 0 && stream->sample_index < frame->nb_samples) {
 			if (planar) {
 				size_t offset = sample_size * stream->sample_index;
@@ -194,6 +194,8 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 			left -= sample_size * frame->channels;
 			stream->sample_index++;
 		}
+		if (stream->sample_index >= frame->nb_samples)
+			next_frame(stream);
 	}
 	assert (left >= 0);
 	memset(buffer, left, stream->device_spec.silence);
