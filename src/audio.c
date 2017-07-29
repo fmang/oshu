@@ -1,8 +1,9 @@
 #include "oshu.h"
 
 #include <assert.h>
+#include <libavutil/time.h>
 
-#define SAMPLE_BUFFER_SIZE 4096 /* # of samples */
+#define SAMPLE_BUFFER_SIZE 2048 /* # of samples */
 
 static void log_av_error(int rc)
 {
@@ -70,6 +71,7 @@ static void next_frame(struct oshu_audio_stream *stream)
 	while (!stream->finished) {
 		int rc = avcodec_receive_frame(stream->decoder, stream->frame);
 		if (rc == 0) {
+			stream->relative_timestamp = av_gettime_relative();
 			stream->sample_index = 0;
 			return;
 		} else if (rc == AVERROR(EAGAIN)) {
@@ -175,10 +177,17 @@ fail:
 	return -1;
 }
 
-int oshu_audio_play(struct oshu_audio_stream *stream)
+void oshu_audio_play(struct oshu_audio_stream *stream)
 {
 	SDL_PauseAudioDevice(stream->device_id, 0);
-	return 0;
+}
+
+double oshu_audio_position(struct oshu_audio_stream *stream)
+{
+	double base = av_q2d(stream->decoder->time_base);
+	double timestamp = stream->frame->best_effort_timestamp;
+	double delta_us = av_gettime_relative() - stream->relative_timestamp;
+	return (timestamp * base) + (delta_us / 1e6);
 }
 
 void oshu_audio_close(struct oshu_audio_stream **stream)

@@ -18,11 +18,13 @@ struct oshu_audio_stream {
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
 	AVFrame *frame;
+	int64_t relative_timestamp;
 	int sample_index;
 	int finished;
 };
 
 void oshu_audio_init();
 int oshu_audio_open(const char *url, struct oshu_audio_stream **stream);
-int oshu_audio_play(struct oshu_audio_stream *stream);
+void oshu_audio_play(struct oshu_audio_stream *stream);
+double oshu_audio_position(struct oshu_audio_stream *stream);
 void oshu_audio_close(struct oshu_audio_stream **stream);
