@@ -41,7 +41,7 @@ static int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 		oshu_log_error("error finding the best audio stream");
 		return rc;
 	}
-	stream->stream_id = rc;
+	stream->stream_index = rc;
 	return 0;
 }
 
@@ -57,20 +57,19 @@ static void next_page(struct oshu_audio_stream *stream)
 	AVPacket packet;
 	for (;;) {
 		rc = av_read_frame(stream->demuxer, &packet);
-		if (rc == 0) {
-			if (packet.stream_index == stream->stream_id) {
-				if ((rc = avcodec_send_packet(stream->decoder, &packet)))
-					goto fail;
-				return;
-			}
-		} else if (rc == AVERROR_EOF) {
+		if (rc == AVERROR_EOF) {
 			oshu_log_debug("reached the last page, flushing");
 			if ((rc = avcodec_send_packet(stream->decoder, NULL)))
 				goto fail;
 			else
 				return;
-		} else {
+		} else if (rc < 0) {
 			goto fail;
+		}
+		if (packet.stream_index == stream->stream_index) {
+			if ((rc = avcodec_send_packet(stream->decoder, &packet)))
+				goto fail;
+			return;
 		}
 	}
 fail:
@@ -113,7 +112,7 @@ static int open_decoder(struct oshu_audio_stream *stream)
 	stream->decoder = avcodec_alloc_context3(stream->codec);
 	int rc = avcodec_parameters_to_context(
 		stream->decoder,
-		stream->demuxer->streams[stream->stream_id]->codecpar
+		stream->demuxer->streams[stream->stream_index]->codecpar
 	);
 	if (rc < 0) {
 		oshu_log_error("error copying the codec context");
@@ -145,16 +144,17 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
 	struct oshu_audio_stream *stream;
 	stream = (struct oshu_audio_stream*) userdata;
+	AVFrame *frame = stream->frame;
+	int sample_size = av_get_bytes_per_sample(frame->format);
 	int left = len;
 	for (; left > 0 && !stream->finished; next_frame(stream)) {
-		int ch;
-		int sample_size = av_get_bytes_per_sample(stream->frame->format);
-		while (left > 0 && stream->sample_index < stream->frame->nb_samples) {
-			for (ch = 0; ch < stream->frame->channels; ch++) {
-				memcpy(buffer, stream->frame->data[ch] + sample_size * stream->sample_index, sample_size);
+		while (left > 0 && stream->sample_index < frame->nb_samples) {
+			size_t offset = sample_size * stream->sample_index;
+			for (int ch = 0; ch < frame->channels; ch++) {
+				memcpy(buffer, frame->data[ch] + offset, sample_size);
 				buffer += sample_size;
-				left -= sample_size;
 			}
+			left -= sample_size * frame->channels;
 			stream->sample_index++;
 		}
 	}

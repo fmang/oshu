@@ -79,16 +79,31 @@
  * @{
  */
 
+/**
+ * An audio stream.
+ *
+ * This includes everything related to the playback of an audio file, from the
+ * demuxer and decoder to the audio device that will output the sound.
+ *
+ * This structure is mainly accessed through an audio thread, and should be
+ * locked using SDL's `SDL_LockAudio` and `SDL_UnlockAudio` procedures in order
+ * to be accessed peacefully.
+ */
 struct oshu_audio_stream {
 	AVFormatContext *demuxer;
 	AVCodec *codec;
-	int stream_id;
+	int stream_index;
 	AVCodecContext *decoder;
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
 	AVFrame *frame;
+	/** When the last frame was decoded, according to
+	 *  `av_gettime_relative`. */
 	int64_t relative_timestamp;
+	/** Current position in the decoded frame's buffer.
+	 *  Multiply it by the sample size to get the position in bytes. */
 	int sample_index;
+	/** When true, stop decoding the stream and output silence. */
 	int finished;
 };
 
@@ -123,6 +138,8 @@ void oshu_audio_play(struct oshu_audio_stream *stream);
  *
  * The time is computed from the best effort timestamp of the last decoded
  * frame, and the time elasped between it was decoded.
+ *
+ * You *should* lock the audio using `SDL_LockAudio` when accessing it.
  */
 double oshu_audio_position(struct oshu_audio_stream *stream);
 
