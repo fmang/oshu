@@ -4,10 +4,9 @@ Oshu!
 Welcome to Oshu!
 
 This project was born out of frustration from not being able to play Osu! on a
-little Linux box with no graphics card whatsoever.
-
-It's aimed at minimalistic people and probably will never contain a hundredth
-of the official client's features.
+little Linux box with no graphics card whatsoever.  It's aimed at minimalistic
+people and probably will never contain a hundredth of the official client's
+features.
 
 Osu! is that PC clone of the Osu! Tatakae! Ouendan DS rhythm game,
 occidentalized as Elite Beat Agents.
@@ -19,7 +18,7 @@ The main problem with Osu! is that it required Windows and a graphics card.
 Even with that, it sometimes get slow unless the computer is a beast… Hell, the
 mania and taiko mode could be played in a terminal!
 
-Let's make a lightweight version of the game!
+Let's make a compatible lightweight version of the game!
 
 
 Technical choices
