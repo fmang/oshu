@@ -30,6 +30,11 @@ static int open_demuxer(const char *url, struct oshu_audio *stream)
 		oshu_log_error("failed opening the audio file");
 		return rc;
 	}
+	rc = avformat_find_stream_info(stream->demuxer, NULL);
+	if (rc < 0) {
+		oshu_log_error("error reading the stream headers");
+		return rc;
+	}
 	rc = av_find_best_stream(
 		stream->demuxer,
 		AVMEDIA_TYPE_AUDIO,
