@@ -36,6 +36,11 @@ static int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 	return 0;
 }
 
+static void next_frame(struct oshu_audio_stream *stream)
+{
+	stream->finished = 1;
+}
+
 static int open_decoder(struct oshu_audio_stream *stream)
 {
 	stream->decoder = avcodec_alloc_context3(stream->codec);
@@ -52,6 +57,8 @@ static int open_decoder(struct oshu_audio_stream *stream)
 		oshu_log_error("error opening the codec");
 		return rc;
 	}
+	stream->current_frame = av_frame_alloc();
+	next_frame(stream);
 	return 0;
 }
 
@@ -67,7 +74,12 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
 	struct oshu_audio_stream *stream;
 	stream = (struct oshu_audio_stream*) userdata;
-	memset(stream, len, stream->device_spec.silence);
+	int cursor = 0;
+	while (cursor < len && !stream->finished) {
+		next_frame(stream);
+	}
+	if (cursor < len)
+		memset(stream, len - cursor, stream->device_spec.silence);
 }
 
 static int open_device(struct oshu_audio_stream *stream)
@@ -119,6 +131,7 @@ void oshu_audio_close(struct oshu_audio_stream **stream)
 {
 	if ((*stream)->device_id)
 		SDL_CloseAudioDevice((*stream)->device_id);
+	av_frame_free(&(*stream)->current_frame);
 	avcodec_close((*stream)->decoder);
 	avformat_close_input(&(*stream)->demuxer);
 	free(*stream);
