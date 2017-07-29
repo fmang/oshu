@@ -65,20 +65,12 @@ fail:
 	stream->finished = 1;
 }
 
-static int frame_size(AVFrame *frame)
-{
-	return av_samples_get_buffer_size(
-		NULL, frame->channels, frame->nb_samples, frame->format, 1
-	);
-}
-
 static void next_frame(struct oshu_audio_stream *stream)
 {
 	while (!stream->finished) {
 		int rc = avcodec_receive_frame(stream->decoder, stream->frame);
 		if (rc == 0) {
-			stream->frame_buffer_size = frame_size(stream->frame);
-			stream->frame_buffer_position = 0;
+			stream->sample_index = 0;
 			return;
 		} else if (rc == AVERROR(EAGAIN)) {
 			next_page(stream);
@@ -126,21 +118,20 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
 	struct oshu_audio_stream *stream;
 	stream = (struct oshu_audio_stream*) userdata;
-	int cursor = 0;
-	for (; cursor < len && !stream->finished; next_frame(stream)) {
-		int left_sdl = len - cursor;
-		int left_av = stream->frame_buffer_size - stream->frame_buffer_position;
-		int consume = (left_sdl < left_av) ? left_sdl : left_av;
-		memcpy(
-			buffer + cursor,
-			stream->frame->data[0] + stream->frame_buffer_position,
-			consume
-		);
-		stream->frame_buffer_position += consume;
-		cursor += consume;
+	int left = len;
+	for (; left > 0 && !stream->finished; next_frame(stream)) {
+		int ch;
+		int sample_size = av_get_bytes_per_sample(stream->frame->format);
+		while (left > 0 && stream->sample_index < stream->frame->nb_samples) {
+			for (ch = 0; ch < stream->frame->channels; ch++) {
+				memcpy(buffer, stream->frame->data[ch] + sample_size * stream->sample_index, sample_size);
+				buffer += sample_size;
+				left -= sample_size;
+			}
+			stream->sample_index++;
+		}
 	}
-	if (cursor < len)
-		memset(stream, len - cursor, stream->device_spec.silence);
+	memset(buffer, left, stream->device_spec.silence);
 }
 
 static int open_device(struct oshu_audio_stream *stream)

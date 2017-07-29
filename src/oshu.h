@@ -18,8 +18,7 @@ struct oshu_audio_stream {
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
 	AVFrame *frame;
-	int frame_buffer_size;
-	int frame_buffer_position;
+	int sample_index;
 	int finished;
 };
 
