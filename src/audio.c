@@ -140,6 +140,17 @@ static void dump_stream_info(struct oshu_audio_stream *stream)
 	oshu_log_info("format: %s", av_get_sample_fmt_name(stream->decoder->sample_fmt));
 }
 
+/**
+ * Fill SDL's audio buffer, while requesting more frames as needed.
+ *
+ * libavcodec organize frames by channel (LLLLRRRR), while we'd like them to be
+ * interleaved as SDL requires (LRLRLRLR). This makes a intricate nesting of
+ * loops. In that order: frame loop, sample loop, channel loop. Makes sense.
+ *
+ * When the stream is finished, fill what remains of the buffer with silence,
+ * because you never know what SDL might do with a left-over buffer. Most
+ * likely, it would play the previous buffer over, and over again.
+ */
 static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
 	struct oshu_audio_stream *stream;
