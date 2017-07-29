@@ -1,3 +1,58 @@
+/**
+ * Oshu's audio module.
+ *
+ * Open and decode any kind of audio file using ffmpeg. libavformat does the
+ * demuxing, libavcodec decodes. Then feed the decoded samples to SDL's audio
+ * device.
+ *
+ * Given this level of control, we aim to synchronize as well as we can to the
+ * audio playback. This is a rhythm game after all. However, determining what
+ * part of the audio the sound card is playing is actually a tough task,
+ * because there are many buffers in the audio chain, and each step adds some
+ * lag. Usually, this lag is in the order of 10 milliseconds, which is about 1
+ * image frame in 60 FPS!
+ *
+ * The playback is handled as follows:
+ *
+ * 1. SDL requests for audio samples by calling the callback function
+ *    mentionned on device initialization.
+ * 2. The callback function copies data from the current frame into SDL's
+ *    supplied buffer, and requests more frames until the buffer is full.
+ * 3. Frames are read from libavcodec, which keeps returning frames until the
+ *    current page is completely read. Request a new page is the current one is
+ *    completely consumed.
+ * 4. Packets are read from libavformat, which reads data from the audio file,
+ *    and returns pages until EOF. The packets are then passed to libavcodec
+ *    for decoding.
+ *
+ * If this is not clear, here a few elements of structure and ffmpeg
+ * terminology you should know:
+ *
+ * - A file contains streams. Audio, video, subtitles are all streams.
+ * - Each stream is split into packets.
+ * - Files are serialized by interleaving packets in chronological order.
+ * - Each packet is decoded into one or more frames.
+ * - A frame, in the case of audio, is a buffer of decoded samples.
+ * - Samples are organized into channels. 2 channels for stereo.
+ *
+ * The presentation timestamp (PTS) is the time a frame should be displayed.
+ * It's the job of the container format to maintain it, and is printed into
+ * every packet. ffmpeg insert a more precise timestamp into every frame called
+ * the best effort timestamp. This is what we'll use.
+ *
+ * Once a frame is decoded, and at the time we know its PTS, its samples are
+ * sent into SDL's audio samples buffer, which are relayed to the sound card.
+ * The elapsed time between the frame decoding and its actual playback cannot
+ * easily be determined, so we'll get a consistent lag, sadly. This consistent
+ * lag can be rectified with a voluntary bias on the computed position.
+ *
+ * Playing a random file, I noticed the SDL callback for a buffer of 2048
+ * samples is called about every 20 or 30 ms, which was mapped nicely to a
+ * single frame. This is unfortunately too coarse under 60 FPS, so time we'll
+ * use for the game is corrected with the delta between the frame decoding
+ * timestamp and the current timestamp.
+ */
+
 #include "oshu.h"
 
 #include <assert.h>
