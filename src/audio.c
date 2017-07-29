@@ -159,9 +159,12 @@ static void dump_stream_info(struct oshu_audio *stream)
 /**
  * Fill SDL's audio buffer, while requesting more frames as needed.
  *
- * libavcodec organize frames by channel (LLLLRRRR), while we'd like them to be
- * interleaved as SDL requires (LRLRLRLR). This makes a intricate nesting of
- * loops. In that order: frame loop, sample loop, channel loop. Makes sense.
+ * libavcodec organize frames by channel in planar mode (LLLLRRRR), while we'd
+ * like them to be interleaved as SDL requires (LRLRLRLR). This makes a
+ * intricate nesting of loops. In that order: frame loop, sample loop, channel
+ * loop. Makes sense.
+ *
+ * When frames are interleaved, a coarser memcpy does the trick.
  *
  * When the stream is finished, fill what remains of the buffer with silence,
  * because you never know what SDL might do with a left-over buffer. Most
@@ -173,13 +176,20 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	stream = (struct oshu_audio*) userdata;
 	AVFrame *frame = stream->frame;
 	int sample_size = av_get_bytes_per_sample(frame->format);
+	int planar = av_sample_fmt_is_planar(frame->format);
 	int left = len;
 	for (; left > 0 && !stream->finished; next_frame(stream)) {
 		while (left > 0 && stream->sample_index < frame->nb_samples) {
-			size_t offset = sample_size * stream->sample_index;
-			for (int ch = 0; ch < frame->channels; ch++) {
-				memcpy(buffer, frame->data[ch] + offset, sample_size);
-				buffer += sample_size;
+			if (planar) {
+				size_t offset = sample_size * stream->sample_index;
+				for (int ch = 0; ch < frame->channels; ch++) {
+					memcpy(buffer, frame->data[ch] + offset, sample_size);
+					buffer += sample_size;
+				}
+			} else {
+				size_t offset = sample_size * stream->sample_index * frame->channels;
+				memcpy(buffer, frame->data[0] + offset, sample_size * frame->channels);
+				buffer += sample_size * frame->channels;
 			}
 			left -= sample_size * frame->channels;
 			stream->sample_index++;
