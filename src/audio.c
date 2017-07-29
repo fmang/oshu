@@ -111,6 +111,7 @@ fail:
 
 int oshu_audio_play(struct oshu_audio_stream *stream)
 {
+	SDL_PauseAudioDevice(stream->device_id, 0);
 	return 0;
 }
 

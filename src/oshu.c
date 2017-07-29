@@ -19,6 +19,10 @@ int main(int argc, char **argv)
 	}
 	oshu_log_debug("audio opened");
 
+	oshu_log_info("starting the playback");
+	oshu_audio_play(stream);
+	SDL_Delay(10000);
+
 	oshu_audio_close(&stream);
 	SDL_Quit();
 	return 0;
