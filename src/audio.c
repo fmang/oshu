@@ -40,6 +40,28 @@ static int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 
 static void next_page(struct oshu_audio_stream *stream)
 {
+	int rc;
+	AVPacket packet;
+	for (;;) {
+		rc = av_read_frame(stream->demuxer, &packet);
+		if (rc == 0) {
+			if (packet.stream_index == stream->stream_id) {
+				if ((rc = avcodec_send_packet(stream->decoder, &packet)))
+					goto fail;
+				return;
+			}
+		} else if (rc == AVERROR_EOF) {
+			oshu_log_debug("reached the last page, flushing");
+			if ((rc = avcodec_send_packet(stream->decoder, NULL)))
+				goto fail;
+			else
+				return;
+		} else {
+			goto fail;
+		}
+	}
+fail:
+	log_av_error(rc);
 	stream->finished = 1;
 }
 
@@ -52,6 +74,7 @@ static void next_frame(struct oshu_audio_stream *stream)
 		} else if (rc == AVERROR(EAGAIN)) {
 			next_page(stream);
 		} else if (rc == AVERROR_EOF) {
+			oshu_log_debug("reached the last frame");
 			stream->finished = 1;
 		} else {
 			/* Abandon all hope */
