@@ -15,6 +15,8 @@ struct oshu_audio_stream {
 	AVCodec *codec;
 	int stream_id;
 	AVCodecContext *decoder;
+	SDL_AudioDeviceID device_id;
+	SDL_AudioSpec device_spec;
 };
 
 void oshu_audio_init();
