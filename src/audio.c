@@ -9,8 +9,10 @@
  * audio playback. This is a rhythm game after all. However, determining what
  * part of the audio the sound card is playing is actually a tough task,
  * because there are many buffers in the audio chain, and each step adds some
- * lag. Usually, this lag is in the order of 10 milliseconds, which is about 1
- * image frame in 60 FPS!
+ * lag. If you take only the SDL buffer, this lag is in the order of 10
+ * milliseconds, which is already about 1 image frame in 60 FPS! However, we
+ * should at least guarantee the game won't drift away from the audio playback,
+ * even if for some reason the audio thread fails to decode a frame on time.
  *
  * The playback is handled as follows:
  *
@@ -58,7 +60,9 @@
 #include <assert.h>
 #include <libavutil/time.h>
 
-#define SAMPLE_BUFFER_SIZE 2048 /* # of samples */
+/** Size of the SDL audio buffer, in samples.
+ *  This is 23 ms in 44.1 KHz stereo. */
+#define SAMPLE_BUFFER_SIZE 2048
 
 static void log_av_error(int rc)
 {
@@ -67,11 +71,19 @@ static void log_av_error(int rc)
 	oshu_log_error("ffmpeg error: %s", errbuf);
 }
 
+/**
+ * Initialize ffmpeg.
+ * Make sure you call it once at the beginning of the program.
+ */
 void oshu_audio_init()
 {
 	av_register_all();
 }
 
+/**
+ * Open the libavformat demuxer, and find the best audio stream.
+ * Returns 0 on success and an ffmpeg error code on failure.
+ */
 static int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 {
 	int rc = avformat_open_input(&stream->demuxer, url, NULL, NULL);
@@ -94,6 +106,12 @@ static int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 	return 0;
 }
 
+/**
+ * Read a page for the stream and feed it to the decoder.
+ * When reaching EOF, feed the decoder a NULL packet to flush it.
+ * On error, log a message and mark the stream as finished to stop the
+ * playback.
+ */
 static void next_page(struct oshu_audio_stream *stream)
 {
 	int rc;
@@ -121,6 +139,11 @@ fail:
 	stream->finished = 1;
 }
 
+/**
+ * Decode a frame into stream->frame.
+ * Request a new page when the decoder needs more data.
+ * Mark the stream as finished on EOF or on ERROR.
+ */
 static void next_frame(struct oshu_audio_stream *stream)
 {
 	while (!stream->finished) {
@@ -142,6 +165,10 @@ static void next_frame(struct oshu_audio_stream *stream)
 	}
 }
 
+/**
+ * Initialize the libavcodec decoder.
+ * Return an ffmpeg error code on failure, and 0 on success.
+ */
 static int open_decoder(struct oshu_audio_stream *stream)
 {
 	stream->decoder = avcodec_alloc_context3(stream->codec);
@@ -163,10 +190,14 @@ static int open_decoder(struct oshu_audio_stream *stream)
 	return 0;
 }
 
+/**
+ * Log some helpful information about the decoded audio stream.
+ * Meant for debugging more than anything else.
+ */
 static void dump_stream_info(struct oshu_audio_stream *stream)
 {
 	oshu_log_info("audio codec: %s", stream->codec->long_name);
-	oshu_log_info("sample rate: %d", stream->decoder->sample_rate);
+	oshu_log_info("sample rate: %d Hz", stream->decoder->sample_rate);
 	oshu_log_info("number of channels: %d", stream->decoder->channels);
 	oshu_log_info("format: %s", av_get_sample_fmt_name(stream->decoder->sample_fmt));
 }
@@ -192,6 +223,10 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	memset(buffer, left, stream->device_spec.silence);
 }
 
+/**
+ * Initialize the SDL audio device.
+ * Returns 0 on success, -1 on error.
+ */
 static int open_device(struct oshu_audio_stream *stream)
 {
 	SDL_AudioSpec want;
@@ -209,6 +244,14 @@ static int open_device(struct oshu_audio_stream *stream)
 	return 0;
 }
 
+/**
+ * Opens a file and initialize everything needed to play it.
+ *
+ * The oshu_audio_stream is allocated and its pointer returned through the
+ * stream argument. Call oshu_audio_close to free the structure.
+ *
+ * Returns 0 on success. On error, -1 is returned and everything is free'd.
+ */
 int oshu_audio_open(const char *url, struct oshu_audio_stream **stream)
 {
 	*stream = calloc(1, sizeof(**stream));
@@ -232,11 +275,19 @@ fail:
 	return -1;
 }
 
+/**
+ * Start playing!
+ */
 void oshu_audio_play(struct oshu_audio_stream *stream)
 {
 	SDL_PauseAudioDevice(stream->device_id, 0);
 }
 
+/**
+ * Return the current position in the stream in seconds.
+ * The time is computed from the best effort timestamp of the last decoded
+ * frame, and the time elasped between it was decoded.
+ */
 double oshu_audio_position(struct oshu_audio_stream *stream)
 {
 	double base = av_q2d(stream->decoder->time_base);
@@ -245,6 +296,10 @@ double oshu_audio_position(struct oshu_audio_stream *stream)
 	return (timestamp * base) + (delta_us / 1e6);
 }
 
+/**
+ * Close the audio stream and free everything associated to it.
+ * Set *stream to NULL.
+ */
 void oshu_audio_close(struct oshu_audio_stream **stream)
 {
 	if ((*stream)->device_id)
