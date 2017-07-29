@@ -1,5 +1,7 @@
 #include "oshu.h"
 
+#include <assert.h>
+
 #define SAMPLE_BUFFER_SIZE 4096 /* # of samples */
 
 static void log_av_error(int rc)
@@ -87,7 +89,8 @@ static int open_device(struct oshu_audio_stream *stream)
 	SDL_AudioSpec want;
 	SDL_zero(want);
 	want.freq = stream->decoder->sample_rate;
-	want.format = AUDIO_F32SYS; /* TODO Remove this assumption */
+	assert(stream->decoder->sample_fmt == AV_SAMPLE_FMT_FLTP); /* TODO */
+	want.format = AUDIO_F32SYS;
 	want.channels = stream->decoder->channels;
 	want.samples = SAMPLE_BUFFER_SIZE;
 	want.callback = audio_callback;
