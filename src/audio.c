@@ -7,6 +7,16 @@
  *  This is 23 ms in 44.1 KHz stereo. */
 #define SAMPLE_BUFFER_SIZE 2048
 
+/**
+ * Conversion map from ffmpeg's audio formats to SDL's.
+ *
+ * ffmpeg's format may be planar or not, while SDL only accepts interleaved
+ * samples. The planar to interleaved conversion is performed by the audio
+ * callback when filling SDL's buffer.
+ *
+ * 64-bit or double samples are not supported by SDL, so they're omitted here
+ * and implicitly filled with zero's.
+ */
 static SDL_AudioFormat format_map[AV_SAMPLE_FMT_NB] = {
 	[AV_SAMPLE_FMT_U8] = AUDIO_U8,
 	[AV_SAMPLE_FMT_S16] = AUDIO_S16SYS,
