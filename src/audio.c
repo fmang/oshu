@@ -7,6 +7,17 @@
  *  This is 23 ms in 44.1 KHz stereo. */
 #define SAMPLE_BUFFER_SIZE 2048
 
+static SDL_AudioFormat format_map[AV_SAMPLE_FMT_NB] = {
+	[AV_SAMPLE_FMT_U8] = AUDIO_U8,
+	[AV_SAMPLE_FMT_S16] = AUDIO_S16SYS,
+	[AV_SAMPLE_FMT_S32] = AUDIO_S32SYS,
+	[AV_SAMPLE_FMT_FLT] = AUDIO_F32,
+	[AV_SAMPLE_FMT_U8P] = AUDIO_U8,
+	[AV_SAMPLE_FMT_S16P] = AUDIO_S16SYS,
+	[AV_SAMPLE_FMT_S32P] = AUDIO_S32SYS,
+	[AV_SAMPLE_FMT_FLTP] = AUDIO_F32,
+};
+
 static void log_av_error(int rc)
 {
 	char errbuf[256];
@@ -187,8 +198,12 @@ static int open_device(struct oshu_audio *stream)
 	SDL_AudioSpec want;
 	SDL_zero(want);
 	want.freq = stream->decoder->sample_rate;
-	assert(stream->decoder->sample_fmt == AV_SAMPLE_FMT_FLTP); /* TODO */
-	want.format = AUDIO_F32SYS;
+	SDL_AudioFormat fmt = format_map[stream->decoder->sample_fmt];
+	if (!fmt) {
+		oshu_log_error("unsupported sample format");
+		return -1;
+	}
+	want.format = fmt;
 	want.channels = stream->decoder->channels;
 	want.samples = SAMPLE_BUFFER_SIZE;
 	want.callback = audio_callback;
