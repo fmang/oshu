@@ -131,6 +131,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 			stream->sample_index++;
 		}
 	}
+	assert (left >= 0);
 	memset(buffer, left, stream->device_spec.silence);
 }
 
