@@ -1,60 +1,3 @@
-/**
- * Oshu's audio module.
- *
- * Open and decode any kind of audio file using ffmpeg. libavformat does the
- * demuxing, libavcodec decodes. Then feed the decoded samples to SDL's audio
- * device.
- *
- * Given this level of control, we aim to synchronize as well as we can to the
- * audio playback. This is a rhythm game after all. However, determining what
- * part of the audio the sound card is playing is actually a tough task,
- * because there are many buffers in the audio chain, and each step adds some
- * lag. If you take only the SDL buffer, this lag is in the order of 10
- * milliseconds, which is already about 1 image frame in 60 FPS! However, we
- * should at least guarantee the game won't drift away from the audio playback,
- * even if for some reason the audio thread fails to decode a frame on time.
- *
- * The playback is handled as follows:
- *
- * 1. SDL requests for audio samples by calling the callback function
- *    mentionned on device initialization.
- * 2. The callback function copies data from the current frame into SDL's
- *    supplied buffer, and requests more frames until the buffer is full.
- * 3. Frames are read from libavcodec, which keeps returning frames until the
- *    current page is completely read. Request a new page is the current one is
- *    completely consumed.
- * 4. Packets are read from libavformat, which reads data from the audio file,
- *    and returns pages until EOF. The packets are then passed to libavcodec
- *    for decoding.
- *
- * If this is not clear, here a few elements of structure and ffmpeg
- * terminology you should know:
- *
- * - A file contains streams. Audio, video, subtitles are all streams.
- * - Each stream is split into packets.
- * - Files are serialized by interleaving packets in chronological order.
- * - Each packet is decoded into one or more frames.
- * - A frame, in the case of audio, is a buffer of decoded samples.
- * - Samples are organized into channels. 2 channels for stereo.
- *
- * The presentation timestamp (PTS) is the time a frame should be displayed.
- * It's the job of the container format to maintain it, and is printed into
- * every packet. ffmpeg insert a more precise timestamp into every frame called
- * the best effort timestamp. This is what we'll use.
- *
- * Once a frame is decoded, and at the time we know its PTS, its samples are
- * sent into SDL's audio samples buffer, which are relayed to the sound card.
- * The elapsed time between the frame decoding and its actual playback cannot
- * easily be determined, so we'll get a consistent lag, sadly. This consistent
- * lag can be rectified with a voluntary bias on the computed position.
- *
- * Playing a random file, I noticed the SDL callback for a buffer of 2048
- * samples is called about every 20 or 30 ms, which was mapped nicely to a
- * single frame. This is unfortunately too coarse under 60 FPS, so time we'll
- * use for the game is corrected with the delta between the frame decoding
- * timestamp and the current timestamp.
- */
-
 #include "oshu.h"
 
 #include <assert.h>
@@ -71,10 +14,6 @@ static void log_av_error(int rc)
 	oshu_log_error("ffmpeg error: %s", errbuf);
 }
 
-/**
- * Initialize ffmpeg.
- * Make sure you call it once at the beginning of the program.
- */
 void oshu_audio_init()
 {
 	av_register_all();
@@ -82,7 +21,7 @@ void oshu_audio_init()
 
 /**
  * Open the libavformat demuxer, and find the best audio stream.
- * Returns 0 on success and an ffmpeg error code on failure.
+ * @return 0 on success and an ffmpeg error code on failure.
  */
 static int open_demuxer(const char *url, struct oshu_audio_stream *stream)
 {
@@ -167,7 +106,7 @@ static void next_frame(struct oshu_audio_stream *stream)
 
 /**
  * Initialize the libavcodec decoder.
- * Return an ffmpeg error code on failure, and 0 on success.
+ * @return an ffmpeg error code on failure, and 0 on success.
  */
 static int open_decoder(struct oshu_audio_stream *stream)
 {
@@ -225,7 +164,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 
 /**
  * Initialize the SDL audio device.
- * Returns 0 on success, -1 on error.
+ * @return 0 on success, -1 on error.
  */
 static int open_device(struct oshu_audio_stream *stream)
 {
@@ -244,14 +183,6 @@ static int open_device(struct oshu_audio_stream *stream)
 	return 0;
 }
 
-/**
- * Opens a file and initialize everything needed to play it.
- *
- * The oshu_audio_stream is allocated and its pointer returned through the
- * stream argument. Call oshu_audio_close to free the structure.
- *
- * Returns 0 on success. On error, -1 is returned and everything is free'd.
- */
 int oshu_audio_open(const char *url, struct oshu_audio_stream **stream)
 {
 	*stream = calloc(1, sizeof(**stream));
@@ -275,19 +206,11 @@ fail:
 	return -1;
 }
 
-/**
- * Start playing!
- */
 void oshu_audio_play(struct oshu_audio_stream *stream)
 {
 	SDL_PauseAudioDevice(stream->device_id, 0);
 }
 
-/**
- * Return the current position in the stream in seconds.
- * The time is computed from the best effort timestamp of the last decoded
- * frame, and the time elasped between it was decoded.
- */
 double oshu_audio_position(struct oshu_audio_stream *stream)
 {
 	double base = av_q2d(stream->decoder->time_base);
@@ -296,10 +219,6 @@ double oshu_audio_position(struct oshu_audio_stream *stream)
 	return (timestamp * base) + (delta_us / 1e6);
 }
 
-/**
- * Close the audio stream and free everything associated to it.
- * Set *stream to NULL.
- */
 void oshu_audio_close(struct oshu_audio_stream **stream)
 {
 	if ((*stream)->device_id)
