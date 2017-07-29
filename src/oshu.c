@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	oshu_audio_init();
 	oshu_log_debug("initialized the audio module");
 
-	struct oshu_audio_stream *stream;
+	struct oshu_audio *stream;
 	if (oshu_audio_open("test.ogg", &stream)) {
 		oshu_log_error("no audio, aborting");
 		return 2;

@@ -66,7 +66,7 @@
  *
  * ```
  * oshu_audio_init();
- * struct oshu_audio_stream *stream;
+ * struct oshu_audio *stream;
  * oshu_audio_open("file.ogg", &stream);
  * oshu_audio_play(stream);
  * do_things();
@@ -89,7 +89,7 @@
  * locked using SDL's `SDL_LockAudio` and `SDL_UnlockAudio` procedures in order
  * to be accessed peacefully.
  */
-struct oshu_audio_stream {
+struct oshu_audio {
 	AVFormatContext *demuxer;
 	AVCodec *codec;
 	int stream_index;
@@ -123,7 +123,7 @@ void oshu_audio_init();
  *
  * @return 0 on success. On error, -1 is returned and everything is free'd.
  */
-int oshu_audio_open(const char *url, struct oshu_audio_stream **stream);
+int oshu_audio_open(const char *url, struct oshu_audio **stream);
 
 /**
  * Start playing!
@@ -131,7 +131,7 @@ int oshu_audio_open(const char *url, struct oshu_audio_stream **stream);
  * The SDL plays audio in a separate thread, so you need not worry about
  * calling this function regularily or anything. Don't bother, it's magic!
  */
-void oshu_audio_play(struct oshu_audio_stream *stream);
+void oshu_audio_play(struct oshu_audio *stream);
 
 /**
  * Compute the current position in the stream in seconds.
@@ -141,13 +141,13 @@ void oshu_audio_play(struct oshu_audio_stream *stream);
  *
  * You *should* lock the audio using `SDL_LockAudio` when accessing it.
  */
-double oshu_audio_position(struct oshu_audio_stream *stream);
+double oshu_audio_position(struct oshu_audio *stream);
 
 /**
  * Close the audio stream and free everything associated to it.
  *
  * Set `*stream` to *NULL*.
  */
-void oshu_audio_close(struct oshu_audio_stream **stream);
+void oshu_audio_close(struct oshu_audio **stream);
 
 /** @} */
