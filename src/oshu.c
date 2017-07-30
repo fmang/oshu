@@ -1,7 +1,10 @@
 #include "oshu.h"
 
-static int test_audio()
+int main(int argc, char **argv)
 {
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
+
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) != 0) {
 		return 1;
 	}
@@ -17,27 +20,34 @@ static int test_audio()
 	}
 	oshu_log_debug("audio opened");
 
+	struct oshu_sample *sample;
+	if (oshu_sample_load("hit.wav", &stream->device_spec, &sample)) {
+		oshu_log_error("no sample, aborting");
+		return 3;
+	}
+
+	struct oshu_beatmap *beatmap;
+	int rc = oshu_beatmap_load("beatmap.osu", &beatmap);
+	if (rc < 0)
+		return 4;
+
 	oshu_log_info("starting the playback");
 	oshu_audio_play(stream);
-	SDL_Delay(10000);
+
+	for (int i = 0; i < 100; i++) {
+		SDL_LockAudio();
+		double pos = oshu_audio_position(stream);
+		int now = pos * 1000;
+		oshu_log_debug("now: %f", pos);
+		while (beatmap->hit_cursor && beatmap->hit_cursor->time < now) {
+			oshu_audio_play_sample(stream, sample);
+			beatmap->hit_cursor = beatmap->hit_cursor->next;
+		}
+		SDL_UnlockAudio();
+		SDL_Delay(100);
+	}
 
 	oshu_audio_close(&stream);
 	SDL_Quit();
 	return 0;
-}
-
-static int test_beatmap()
-{
-	struct oshu_beatmap *beatmap;
-	int rc = oshu_beatmap_load("beatmap.osu", &beatmap);
-	if (rc < 0)
-		return 1;
-	return 0;
-}
-
-int main(int argc, char **argv)
-{
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
-	return test_audio();
 }
