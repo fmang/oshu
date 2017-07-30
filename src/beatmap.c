@@ -38,26 +38,25 @@ static int parse_header(char *line, struct parser_state *parser)
 
 static int parse_section(char *line, struct parser_state *parser)
 {
-	const char *begin, *end;
+	char *section, *end;
 	if (*line != '[')
 		goto fail;
-	begin = line + 1;
-	for (end = begin; *end && *end != ']'; end++);
+	section = line + 1;
+	for (end = section; *end && *end != ']'; end++);
 	if (*end != ']')
 		goto fail;
-	if (end[1] != '\n' && end[1] != '\0')
-		goto fail;
-	size_t len = end - begin;
-	if (!strncmp(begin, "General", len)) {
+	*end = '\0';
+	if (!strcmp(section, "General")) {
 		parser->section = BEATMAP_GENERAL;
-	} else if (!strncmp(begin, "Metadata", len)) {
+	} else if (!strcmp(section, "Metadata")) {
 		parser->section = BEATMAP_METADATA;
 	} else {
+		oshu_log_debug("unknown section %s", section);
 		parser->section = BEATMAP_UNKNOWN;
 	}
 	return 0;
 fail:
-	oshu_log_error("misformed section");
+	oshu_log_error("misformed section: %s", line);
 	return -1;
 }
 
