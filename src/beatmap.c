@@ -238,6 +238,8 @@ static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 	while ((nread = getline(&line, &len, input)) != -1) {
 		if (nread > 0 && line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
+		if (nread > 1 && line[nread - 2] == '\r')
+			line[nread - 2] = '\0';
 		if (parse_line(line, &parser) < 0) {
 			free(line);
 			return -1;
