@@ -208,13 +208,43 @@ static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
 	memset(buffer, left, stream->device_spec.silence);
 }
 
+/**
+ * Mix the already present data in the buffer with the sample.
+ */
+static void sample_mix(Uint8 *buffer, int len, struct oshu_sample *sample)
+{
+	while (len > 0) {
+		if (sample->cursor >= sample->length) {
+			if (sample->loop)
+				sample->cursor = 0;
+			else
+				break;
+		}
+		size_t left = sample->length - sample->cursor;
+		size_t block = (left < len) ? left : len;
+		SDL_MixAudioFormat(
+			buffer,
+			sample->buffer + sample->cursor,
+			sample->spec->format,
+			block,
+			SDL_MIX_MAXVOLUME
+		);
+		sample->cursor += block;
+		buffer += block;
+		len -= block;
+	}
+}
+
+/**
+ * Fill the audio buffer with the song data, then optionally add a sample.
+ */
 static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
 	struct oshu_audio *stream;
 	stream = (struct oshu_audio*) userdata;
 	fill_audio(stream, buffer, len);
 	if (stream->overlay != NULL)
-		oshu_sample_mix(buffer, len, stream->overlay);
+		sample_mix(buffer, len, stream->overlay);
 }
 
 /**
@@ -293,4 +323,23 @@ void oshu_audio_close(struct oshu_audio **stream)
 	avformat_close_input(&(*stream)->demuxer);
 	free(*stream);
 	*stream = NULL;
+}
+
+int oshu_sample_load(const char *path, SDL_AudioSpec *spec, struct oshu_sample **sample)
+{
+	*sample = calloc(1, sizeof(**sample));
+	(*sample)->spec = spec;
+	SDL_AudioSpec *wav = SDL_LoadWAV(path, spec, &(*sample)->buffer, &(*sample)->length);
+	if (wav == NULL) {
+		free(*sample);
+		*sample = NULL;
+		return -1;
+	}
+	return 0;
+}
+
+void oshu_sample_free(struct oshu_sample **sample)
+{
+	SDL_FreeWAV((*sample)->buffer);
+	*sample = NULL;
 }
