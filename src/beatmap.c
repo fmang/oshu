@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define OSU_FILE_HEADER "osu file format v"
+static const char *osu_file_header = "\xef\xbb\xbfosu file format v";
 
 enum beatmap_section {
 	BEATMAP_HEADER = 0,
@@ -20,8 +20,8 @@ struct parser_state {
 
 static int parse_header(char *line, struct parser_state *parser)
 {
-	if (strncmp(line, OSU_FILE_HEADER, strlen(OSU_FILE_HEADER)) == 0) {
-		line += strlen(OSU_FILE_HEADER);
+	if (strncmp(line, osu_file_header, strlen(osu_file_header)) == 0) {
+		line += strlen(osu_file_header);
 		int version = atoi(line);
 		if (version) {
 			parser->beatmap->version = version;
