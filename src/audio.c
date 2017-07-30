@@ -180,10 +180,8 @@ static void dump_stream_info(struct oshu_audio *stream)
  * because you never know what SDL might do with a left-over buffer. Most
  * likely, it would play the previous buffer over, and over again.
  */
-static void audio_callback(void *userdata, Uint8 *buffer, int len)
+static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
 {
-	struct oshu_audio *stream;
-	stream = (struct oshu_audio*) userdata;
 	AVFrame *frame = stream->frame;
 	int sample_size = av_get_bytes_per_sample(frame->format);
 	int planar = av_sample_fmt_is_planar(frame->format);
@@ -209,6 +207,15 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	}
 	assert (left >= 0);
 	memset(buffer, left, stream->device_spec.silence);
+}
+
+static void audio_callback(void *userdata, Uint8 *buffer, int len)
+{
+	struct oshu_audio *stream;
+	stream = (struct oshu_audio*) userdata;
+	fill_audio(stream, buffer, len);
+	if (stream->overlay != NULL)
+		oshu_sample_mix(buffer, len, stream->overlay);
 }
 
 /**

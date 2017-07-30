@@ -105,6 +105,8 @@ struct oshu_audio {
 	int sample_index;
 	/** When true, stop decoding the stream and output silence. */
 	int finished;
+	/** Sound sample to play on top of the audio stream. */
+	struct oshu_sample *overlay;
 };
 
 /**
