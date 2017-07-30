@@ -5,7 +5,7 @@
 
 /** Size of the SDL audio buffer, in samples.
  *  This is 23 ms in 44.1 KHz stereo. */
-#define SAMPLE_BUFFER_SIZE 2048
+static const int sample_buffer_size = 2048;
 
 /**
  * Conversion map from ffmpeg's audio formats to SDL's.
@@ -227,7 +227,7 @@ static int open_device(struct oshu_audio *stream)
 	}
 	want.format = fmt;
 	want.channels = stream->decoder->channels;
-	want.samples = SAMPLE_BUFFER_SIZE;
+	want.samples = sample_buffer_size;
 	want.callback = audio_callback;
 	want.userdata = (void*) stream;
 	stream->device_id = SDL_OpenAudioDevice(NULL, 0, &want, &stream->device_spec, 0);
