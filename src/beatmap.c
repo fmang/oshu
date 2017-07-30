@@ -102,7 +102,7 @@ static int parse_line(char *line, struct parser_state *parser)
 	int rc = 0;
 	/* skip spaces */
 	for (; *line == ' '; line++);
-	if (*line == '\0' || *line == '\n') {
+	if (*line == '\0') {
 		/* skip empty lines */
 	} else if (line[0] == '/' && line[1] == '/') {
 		/* skip comments */
@@ -125,6 +125,8 @@ static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 	size_t len = 0;
 	ssize_t nread;
 	while ((nread = getline(&line, &len, input)) != -1) {
+		if (nread > 0 && line[nread - 1] == '\n')
+			line[nread - 1] = '\0';
 		if (parse_line(line, &parser) < 0) {
 			free(line);
 			return -1;
