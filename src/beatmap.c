@@ -9,7 +9,7 @@
  *
  * Beware the first three non-printable bytes!
  */
-static const char *osu_file_header = "\xef\xbb\xbfosu file format v";
+static const char *osu_file_header = "osu file format v";
 
 /**
  * Enumeration to keep track of the section we're currently in.

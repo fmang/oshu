@@ -56,9 +56,7 @@
  *
  * Playing a random file, I noticed the SDL callback for a buffer of 2048
  * samples is called about every 20 or 30 ms, which was mapped nicely to a
- * single frame. This is unfortunately too coarse under 60 FPS, so time we'll
- * use for the game is corrected with the delta between the frame decoding
- * timestamp and the current timestamp.
+ * single frame.
  *
  * To use this module, first call \ref oshu_audio_init. Then open streams using
  * \ref oshu_audio_open, and play them using \ref oshu_audio_play. When you're
@@ -97,9 +95,6 @@ struct oshu_audio {
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
 	AVFrame *frame;
-	/** When the last frame was decoded, according to
-	 *  `av_gettime_relative`. */
-	int64_t relative_timestamp;
 	/** Current position in the decoded frame's buffer.
 	 *  Multiply it by the sample size to get the position in bytes. */
 	int sample_index;

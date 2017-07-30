@@ -5,7 +5,7 @@
 
 /** Size of the SDL audio buffer, in samples.
  *  This is 23 ms in 44.1 KHz stereo. */
-static const int sample_buffer_size = 2048;
+static const int sample_buffer_size = 1024;
 
 /**
  * Conversion map from ffmpeg's audio formats to SDL's.
@@ -113,7 +113,6 @@ static void next_frame(struct oshu_audio *stream)
 	while (!stream->finished) {
 		int rc = avcodec_receive_frame(stream->decoder, stream->frame);
 		if (rc == 0) {
-			stream->relative_timestamp = av_gettime_relative();
 			stream->sample_index = 0;
 			return;
 		} else if (rc == AVERROR(EAGAIN)) {
@@ -273,10 +272,9 @@ void oshu_audio_play(struct oshu_audio *stream)
 
 double oshu_audio_position(struct oshu_audio *stream)
 {
-	double base = av_q2d(stream->decoder->time_base);
-	double timestamp = stream->frame->best_effort_timestamp;
-	double delta_us = av_gettime_relative() - stream->relative_timestamp;
-	return (timestamp * base) + (delta_us / 1e6);
+	double base = av_q2d(stream->demuxer->streams[stream->stream_index]->time_base);
+	double timestamp = stream->frame->pkt_dts;
+	return timestamp * base;
 }
 
 void oshu_audio_play_sample(struct oshu_audio *stream, struct oshu_sample *sample)
