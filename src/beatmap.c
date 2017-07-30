@@ -85,6 +85,8 @@ static void key_value(char *line, char **key, char **value)
  */
 static int parse_header(char *line, struct parser_state *parser)
 {
+	/* skip some binary noise: */
+	for (; *line && *line != 'o'; line++);
 	if (strncmp(line, osu_file_header, strlen(osu_file_header)) == 0) {
 		line += strlen(osu_file_header);
 		int version = atoi(line);
