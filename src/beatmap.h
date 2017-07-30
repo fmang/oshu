@@ -16,6 +16,34 @@ enum oshu_mode {
 	OSHU_MODE_OSU = 0,
 };
 
+struct oshu_timing_point {
+	int offset; /* ms */
+	float ms_per_beat;
+	int meter;
+	int sample_type;
+	int sample_set;
+	int volume; /* 0-100 */
+	int inherited;
+	int kiai;
+};
+
+enum oshu_hit_type {
+	OSHU_HIT_CIRCLE = 0b1,
+	OSHU_HIT_SLIDER = 0b10,
+	OSHU_HIT_NEW_COMBO = 0b100,
+	OSHU_HIT_SPINNER = 0b1000,
+	OSHU_HIT_COMBO_MASK = 0b1110000,
+	OSHU_HIT_HOLD = 0b10000000,
+};
+
+struct oshu_hit {
+	int x; /* 0-512 */
+	int y; /* 0-384 */
+	int time; /* ms */
+	int type;
+	struct oshu_hit *next;
+};
+
 /**
  * One beatmap, from its metadata to hit objects.
  *
