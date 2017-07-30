@@ -255,6 +255,30 @@ static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 	oshu_log_info("audio filename: %s", beatmap->general.audio_filename);
 }
 
+/**
+ * Perform a variety of checks on a beatmap file to ensure it was parsed well
+ * enough to be played.
+ */
+static int validate(struct oshu_beatmap *beatmap)
+{
+	if (beatmap->general.mode != OSHU_MODE_OSU) {
+		oshu_log_error("unsupported mode");
+		return -1;
+	}
+	if (!beatmap->general.audio_filename) {
+		oshu_log_error("no audio file mentionned");
+		return -1;
+	} else if (strchr(beatmap->general.audio_filename, '/') != NULL) {
+		oshu_log_error("slashes are forbidden in audio file names");
+		return -1;
+	}
+	if (!beatmap->hits) {
+		oshu_log_error("no hit objectings found");
+		return -1;
+	}
+	return 0;
+}
+
 int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 {
 	FILE *input = fopen(path, "r");
@@ -263,14 +287,18 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 		return -1;
 	}
 	*beatmap = calloc(1, sizeof(**beatmap));
-	if (parse_file(input, *beatmap) < 0) {
-		oshu_log_error("error parsing the beatmap file");
-		fclose(input);
-		oshu_beatmap_free(beatmap);
-		return -1;
-	}
+	int rc = parse_file(input, *beatmap);
+	fclose(input);
+	if (rc < 0)
+		goto fail;
 	dump_beatmap_info(*beatmap);
+	if (validate(*beatmap) < 0)
+		goto fail;
 	return 0;
+fail:
+	oshu_log_error("error loading the beatmap file");
+	oshu_beatmap_free(beatmap);
+	return -1;
 }
 
 void oshu_beatmap_free(struct oshu_beatmap **beatmap)
