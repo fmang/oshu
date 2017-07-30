@@ -1,5 +1,6 @@
 #include "oshu.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -10,6 +11,7 @@ enum beatmap_section {
 	BEATMAP_ROOT,
 	BEATMAP_GENERAL,
 	BEATMAP_METADATA,
+	BEATMAP_HIT_OBJECTS,
 	BEATMAP_UNKNOWN,
 };
 
@@ -73,6 +75,8 @@ static int parse_section(char *line, struct parser_state *parser)
 		parser->section = BEATMAP_GENERAL;
 	} else if (!strcmp(section, "Metadata")) {
 		parser->section = BEATMAP_METADATA;
+	} else if (!strcmp(section, "HitObjects")) {
+		parser->section = BEATMAP_HIT_OBJECTS;
 	} else {
 		oshu_log_debug("unknown section %s", section);
 		parser->section = BEATMAP_UNKNOWN;
@@ -97,6 +101,42 @@ static int parse_general(char *line, struct parser_state *parser)
 	return 0;
 }
 
+static int parse_one_hit(char *line, struct oshu_hit **hit)
+{
+	char *x = strsep(&line, ",");
+	char *y = strsep(&line, ",");
+	char *time = strsep(&line, ",");
+	char *type = strsep(&line, ",");
+	if (!type) {
+		oshu_log_warn("invalid hit object");
+		*hit = NULL;
+		return 0;
+	}
+	*hit = calloc(1, sizeof(**hit));
+	(*hit)->x = atoi(x);
+	(*hit)->y = atoi(y);
+	(*hit)->time = atoi(time);
+	(*hit)->type = atoi(type);
+	return 0;
+}
+
+static int parse_hit_object(char *line, struct parser_state *parser)
+{
+	struct oshu_hit *hit;
+	if (parse_one_hit(line, &hit) < 0)
+		return -1;
+	if (hit) {
+		if (!parser->beatmap->hits)
+			parser->beatmap->hits = hit;
+		if (parser->beatmap->hit_cursor) {
+			assert(parser->beatmap->hit_cursor->time < hit->time);
+			parser->beatmap->hit_cursor->next = hit;
+		}
+		parser->beatmap->hit_cursor = hit;
+	}
+	return 0;
+}
+
 static int parse_line(char *line, struct parser_state *parser)
 {
 	int rc = 0;
@@ -112,6 +152,8 @@ static int parse_line(char *line, struct parser_state *parser)
 		rc = parse_section(line, parser);
 	} else if (parser->section == BEATMAP_GENERAL) {
 		rc = parse_general(line, parser);
+	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
+		rc = parse_hit_object(line, parser);
 	}
 	return rc;
 }
@@ -162,6 +204,14 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 
 void oshu_beatmap_free(struct oshu_beatmap **beatmap)
 {
+	if ((*beatmap)->hits) {
+		struct oshu_hit *current = (*beatmap)->hits;
+		while (current != NULL) {
+			struct oshu_hit *next = current->next;
+			free(current);
+			current = next;
+		}
+	}
 	free((*beatmap)->general.audio_filename);
 	free(*beatmap);
 	*beatmap = NULL;

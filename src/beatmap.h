@@ -62,6 +62,8 @@ struct oshu_beatmap {
 		char *audio_filename;
 		enum oshu_mode mode;
 	} general;
+	struct oshu_hit *hits;
+	struct oshu_hit *hit_cursor;
 };
 
 int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap);
