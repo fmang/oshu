@@ -34,17 +34,16 @@ int main(int argc, char **argv)
 	oshu_log_info("starting the playback");
 	oshu_audio_play(stream);
 
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 12000; i++) {
 		SDL_LockAudio();
 		double pos = oshu_audio_position(stream);
 		int now = pos * 1000;
-		oshu_log_debug("now: %f", pos);
 		while (beatmap->hit_cursor && beatmap->hit_cursor->time < now) {
 			oshu_audio_play_sample(stream, sample);
 			beatmap->hit_cursor = beatmap->hit_cursor->next;
 		}
 		SDL_UnlockAudio();
-		SDL_Delay(100);
+		SDL_Delay(10);
 	}
 
 	oshu_audio_close(&stream);

@@ -6,8 +6,6 @@
 
 /**
  * Every osu beatmap file must begin with this.
- *
- * Beware the first three non-printable bytes!
  */
 static const char *osu_file_header = "osu file format v";
 
