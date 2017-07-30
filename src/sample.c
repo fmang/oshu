@@ -7,6 +7,7 @@ int oshu_sample_load(const char *path, SDL_AudioSpec *spec, struct oshu_sample *
 	SDL_AudioSpec *wav = SDL_LoadWAV(path, spec, &(*sample)->buffer, &(*sample)->length);
 	if (wav == NULL) {
 		free(*sample);
+		*sample = NULL;
 		return -1;
 	}
 	return 0;

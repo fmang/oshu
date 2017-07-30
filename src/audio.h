@@ -146,6 +146,11 @@ void oshu_audio_play(struct oshu_audio *stream);
 double oshu_audio_position(struct oshu_audio *stream);
 
 /**
+ * Play a sample on top of the stream.
+ */
+void oshu_audio_play_sample(struct oshu_audio *stream, struct oshu_sample *sample);
+
+/**
  * Close the audio stream and free everything associated to it.
  *
  * Set `*stream` to *NULL*.
