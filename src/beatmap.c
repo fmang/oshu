@@ -87,8 +87,12 @@ static int parse_general(char *line, struct parser_state *parser)
 {
 	char *key, *value;
 	key_value(line, &key, &value);
-	if (value && !strcmp(key, "AudioFilename")) {
+	if (!value)
+		return 0;
+	if (!strcmp(key, "AudioFilename")) {
 		parser->beatmap->general.audio_filename = strdup(value);
+	} else if (!strcmp(key, "Mode")) {
+		parser->beatmap->general.mode = atoi(value);
 	}
 	return 0;
 }

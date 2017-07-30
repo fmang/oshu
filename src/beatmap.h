@@ -12,6 +12,10 @@
  * @{
  */
 
+enum oshu_mode {
+	OSHU_MODE_OSU = 0,
+};
+
 /**
  * One beatmap, from its metadata to hit objects.
  *
@@ -28,6 +32,7 @@ struct oshu_beatmap {
 	int version;
 	struct {
 		char *audio_filename;
+		enum oshu_mode mode;
 	} general;
 };
 
