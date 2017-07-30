@@ -18,7 +18,7 @@ struct parser_state {
 	enum beatmap_section section;
 };
 
-int parse_header(char *line, struct parser_state *parser)
+static int parse_header(char *line, struct parser_state *parser)
 {
 	if (strncmp(line, OSU_FILE_HEADER, strlen(OSU_FILE_HEADER)) == 0) {
 		line += strlen(OSU_FILE_HEADER);
@@ -36,7 +36,7 @@ int parse_header(char *line, struct parser_state *parser)
 	return -1;
 }
 
-int parse_line(char *line, struct parser_state *parser)
+static int parse_line(char *line, struct parser_state *parser)
 {
 	/* skip spaces */
 	for (; *line == ' '; line++);
@@ -52,7 +52,7 @@ int parse_line(char *line, struct parser_state *parser)
 	return 0;
 }
 
-int parse_file(FILE *input, struct oshu_beatmap *beatmap)
+static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 {
 	struct parser_state parser;
 	memset(&parser, 0, sizeof(parser));
@@ -70,6 +70,11 @@ int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 	return 0;
 }
 
+static void dump_beatmap_info(struct oshu_beatmap *beatmap)
+{
+	oshu_log_info("beatmap version: %d", beatmap->version);
+}
+
 int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 {
 	FILE *input = fopen(path, "r");
@@ -83,6 +88,7 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 		oshu_beatmap_free(beatmap);
 		return -1;
 	}
+	dump_beatmap_info(*beatmap);
 	return 0;
 }
 
