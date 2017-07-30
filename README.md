@@ -21,6 +21,35 @@ mania and taiko mode could be played in a terminal!
 Let's make a compatible lightweight version of the game!
 
 
+Goals
+-----
+
+Let's clarify the goals before we stray too far away from them.
+
+These things are the *raison d'être* of oshu:
+
+- All the Osu beatmaps should be playable.
+- The game should run on the lowest-end millenial computer one can find.
+
+This means if you find an unsupported beatmap or a computer too slow to run
+oshu, feel free to submit a bug report.
+
+The first versions are going to focus on the regular game mode, and hopefully
+oshu will support more game modes someday.
+
+Since it's a hobby project, the feature set will be probably be quite limited
+for a while. For example:
+
+- No health bar.
+- No spinner. (I hate those.)
+- No network play.
+- No video background.
+- No fancy graphics.
+
+But it just means I probably won't have the time to work on these. These
+limitations are *not* a design choice. Contributions are welcome!
+
+
 Technical choices
 -----------------
 
