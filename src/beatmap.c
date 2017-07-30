@@ -36,20 +36,26 @@ static int parse_header(char *line, struct parser_state *parser)
 	return -1;
 }
 
+static int parse_section(char *line, struct parser_state *parser)
+{
+	return 0;
+}
+
 static int parse_line(char *line, struct parser_state *parser)
 {
+	int rc = 0;
 	/* skip spaces */
 	for (; *line == ' '; line++);
-	/* skip empty lines */
-	if (*line == '\0' || *line == '\n')
-		return 0;
-	if (parser->section == BEATMAP_HEADER) {
-		if (parse_header(line, parser) < 0)
-			return -1;
+	if (*line == '\0' || *line == '\n') {
+		/* skip empty lines */
+	} else if (line[0] == '/' && line[1] == '/') {
+		/* skip comments */
+	} else if (parser->section == BEATMAP_HEADER) {
+		rc = parse_header(line, parser);
 	} else if (*line == '[') {
-		parser->section = BEATMAP_UNKNOWN;
+		rc = parse_section(line, parser);
 	}
-	return 0;
+	return rc;
 }
 
 static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
