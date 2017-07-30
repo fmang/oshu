@@ -1,9 +1,13 @@
 #include "oshu.h"
 
 #include <stdio.h>
+#include <string.h>
+
+#define OSU_FILE_HEADER "osu file format v"
 
 enum beatmap_section {
-	BEATMAP_HEADER,
+	BEATMAP_HEADER = 0,
+	BEATMAP_ROOT,
 	BEATMAP_GENERAL,
 	BEATMAP_METADATA,
 	BEATMAP_UNKNOWN,
@@ -14,8 +18,37 @@ struct parser_state {
 	enum beatmap_section section;
 };
 
+int parse_header(char *line, struct parser_state *parser)
+{
+	if (strncmp(line, OSU_FILE_HEADER, strlen(OSU_FILE_HEADER)) == 0) {
+		line += strlen(OSU_FILE_HEADER);
+		int version = atoi(line);
+		if (version) {
+			parser->beatmap->version = version;
+			parser->section = BEATMAP_ROOT;
+			return 0;
+		} else {
+			oshu_log_error("invalid osu version");
+		}
+	} else {
+		oshu_log_error("invalid or missing osu file header");
+	}
+	return -1;
+}
+
 int parse_line(char *line, struct parser_state *parser)
 {
+	/* skip spaces */
+	for (; *line == ' '; line++);
+	/* skip empty lines */
+	if (*line == '\0' || *line == '\n')
+		return 0;
+	if (parser->section == BEATMAP_HEADER) {
+		if (parse_header(line, parser) < 0)
+			return -1;
+	} else if (*line == '[') {
+		parser->section = BEATMAP_UNKNOWN;
+	}
 	return 0;
 }
 
