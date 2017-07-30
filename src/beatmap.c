@@ -18,6 +18,29 @@ struct parser_state {
 	enum beatmap_section section;
 };
 
+static void trim(char **str)
+{
+	for (; **str == ' '; (*str)++);
+	char *rev = *str + strlen(*str) - 1;
+	for (; rev >= *str && *rev == ' '; rev--);
+}
+
+static void key_value(char *line, char **key, char **value)
+{
+	char *colon = strchr(line, ':');
+	if (colon) {
+		*colon = '\0';
+		*key = line;
+		*value = colon + 1;
+		trim(key);
+		trim(value);
+	} else {
+		*key = line;
+		*value = NULL;
+		trim(key);
+	}
+}
+
 static int parse_header(char *line, struct parser_state *parser)
 {
 	if (strncmp(line, osu_file_header, strlen(osu_file_header)) == 0) {
@@ -60,6 +83,16 @@ fail:
 	return -1;
 }
 
+static int parse_general(char *line, struct parser_state *parser)
+{
+	char *key, *value;
+	key_value(line, &key, &value);
+	if (value && !strcmp(key, "AudioFilename")) {
+		parser->beatmap->general.audio_filename = strdup(value);
+	}
+	return 0;
+}
+
 static int parse_line(char *line, struct parser_state *parser)
 {
 	int rc = 0;
@@ -73,6 +106,8 @@ static int parse_line(char *line, struct parser_state *parser)
 		rc = parse_header(line, parser);
 	} else if (*line == '[') {
 		rc = parse_section(line, parser);
+	} else if (parser->section == BEATMAP_GENERAL) {
+		rc = parse_general(line, parser);
 	}
 	return rc;
 }
@@ -98,6 +133,7 @@ static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 {
 	oshu_log_info("beatmap version: %d", beatmap->version);
+	oshu_log_info("audio filename: %s", beatmap->general.audio_filename);
 }
 
 int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
@@ -120,6 +156,7 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 
 void oshu_beatmap_free(struct oshu_beatmap **beatmap)
 {
+	free((*beatmap)->general.audio_filename);
 	free(*beatmap);
 	*beatmap = NULL;
 }

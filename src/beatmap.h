@@ -26,6 +26,9 @@
  */
 struct oshu_beatmap {
 	int version;
+	struct {
+		char *audio_filename;
+	} general;
 };
 
 int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap);
