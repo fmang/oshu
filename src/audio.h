@@ -131,6 +131,14 @@ int oshu_audio_open(const char *url, struct oshu_audio **stream);
 void oshu_audio_play(struct oshu_audio *stream);
 
 /**
+ * Pause the stream.
+ *
+ * Calling \ref oshu_audio_play will resume the audio playback where it was
+ * left playing.
+ */
+void oshu_audio_play(struct oshu_audio *stream);
+
+/**
  * Compute the current position in the stream in seconds.
  *
  * The time is computed from the best effort timestamp of the last decoded
@@ -139,15 +147,6 @@ void oshu_audio_play(struct oshu_audio *stream);
  * You *should* lock the audio using `SDL_LockAudio` when accessing it.
  */
 double oshu_audio_position(struct oshu_audio *stream);
-
-/**
- * Play a sample on top of the stream.
- *
- * Only one sample can be played at a time.
- *
- * To stop playing any sample, call this function with `sample` as NULL.
- */
-void oshu_audio_play_sample(struct oshu_audio *stream, struct oshu_sample *sample);
 
 /**
  * Close the audio stream and free everything associated to it.
@@ -164,7 +163,8 @@ void oshu_audio_close(struct oshu_audio **stream);
  * loader.
  *
  * A sample is a short sound played when the user hits something. To be fast
- * and reactive, the samples are always stored in-memory.
+ * and reactive, the samples are always stored in-memory. Do not confuse it
+ * with a PCM sample.
  *
  * Use \ref oshu_audio_play_sample to start playing a sample on top of the
  * currently playing audio.
@@ -176,7 +176,6 @@ void oshu_audio_close(struct oshu_audio **stream);
  * An in-memory audio sample.
  */
 struct oshu_sample {
-	SDL_AudioSpec *spec;
 	Uint8 *buffer;
 	Uint32 length;
 	Uint32 cursor;
@@ -187,7 +186,9 @@ struct oshu_sample {
  * Open a WAV file and store it into a newly-allocated structure.
  *
  * The specs of the SDL audio device is required in order to convert the
- * samples into the apprioriate format.
+ * samples into the apprioriate format, which is why the stream argument is
+ * required. Note that this means the sample will be specific to that stream
+ * only.
  *
  * On success, you must free the sample object with \ref oshu_sample_free. On
  * failure, the object is already free'd.
@@ -195,8 +196,19 @@ struct oshu_sample {
  * @param sample Receive the sample object.
  * @return 0 on success, -1 on failure.
  */
-int oshu_sample_load(const char *path, SDL_AudioSpec *spec, struct oshu_sample **sample);
+int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sample **sample);
 
+/**
+ * Play a sample on top of a stream.
+ *
+ * Only one sample can be played at a time. Calling this function while a
+ * sample is playing with interrupt the previous sample.
+ *
+ * Note that the sample must have been loaded for that specific audio stream.
+ *
+ * To stop playing any sample, call this function with `sample` as NULL.
+ */
+void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample);
 
 /**
  * Free the sample object along with its buffer data.

@@ -211,7 +211,7 @@ static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
 /**
  * Mix the already present data in the buffer with the sample.
  */
-static void sample_mix(Uint8 *buffer, int len, struct oshu_sample *sample)
+static void mix_sample(Uint8 *buffer, int len, struct oshu_audio *stream, struct oshu_sample *sample)
 {
 	while (len > 0) {
 		if (sample->cursor >= sample->length) {
@@ -225,7 +225,7 @@ static void sample_mix(Uint8 *buffer, int len, struct oshu_sample *sample)
 		SDL_MixAudioFormat(
 			buffer,
 			sample->buffer + sample->cursor,
-			sample->spec->format,
+			stream->device_spec.format,
 			block,
 			SDL_MIX_MAXVOLUME
 		);
@@ -244,7 +244,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	stream = (struct oshu_audio*) userdata;
 	fill_audio(stream, buffer, len);
 	if (stream->overlay != NULL)
-		sample_mix(buffer, len, stream->overlay);
+		mix_sample(buffer, len, stream, stream->overlay);
 }
 
 /**
@@ -300,6 +300,11 @@ void oshu_audio_play(struct oshu_audio *stream)
 	SDL_PauseAudioDevice(stream->device_id, 0);
 }
 
+void oshu_audio_pause(struct oshu_audio *stream)
+{
+	SDL_PauseAudioDevice(stream->device_id, 1);
+}
+
 double oshu_audio_position(struct oshu_audio *stream)
 {
 	double base = av_q2d(stream->demuxer->streams[stream->stream_index]->time_base);
@@ -307,7 +312,7 @@ double oshu_audio_position(struct oshu_audio *stream)
 	return timestamp * base;
 }
 
-void oshu_audio_play_sample(struct oshu_audio *stream, struct oshu_sample *sample)
+void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample)
 {
 	stream->overlay = sample;
 	if (sample)
@@ -325,11 +330,10 @@ void oshu_audio_close(struct oshu_audio **stream)
 	*stream = NULL;
 }
 
-int oshu_sample_load(const char *path, SDL_AudioSpec *spec, struct oshu_sample **sample)
+int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sample **sample)
 {
 	*sample = calloc(1, sizeof(**sample));
-	(*sample)->spec = spec;
-	SDL_AudioSpec *wav = SDL_LoadWAV(path, spec, &(*sample)->buffer, &(*sample)->length);
+	SDL_AudioSpec *wav = SDL_LoadWAV(path, &stream->device_spec, &(*sample)->buffer, &(*sample)->length);
 	if (wav == NULL) {
 		free(*sample);
 		*sample = NULL;

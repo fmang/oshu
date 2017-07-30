@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	oshu_log_debug("audio opened");
 
 	struct oshu_sample *sample;
-	if (oshu_sample_load("hit.wav", &stream->device_spec, &sample)) {
+	if (oshu_sample_load("hit.wav", stream, &sample)) {
 		oshu_log_error("no sample, aborting");
 		return 3;
 	}
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 		double pos = oshu_audio_position(stream);
 		int now = pos * 1000;
 		while (beatmap->hit_cursor && beatmap->hit_cursor->time < now) {
-			oshu_audio_play_sample(stream, sample);
+			oshu_sample_play(stream, sample);
 			beatmap->hit_cursor = beatmap->hit_cursor->next;
 		}
 		SDL_UnlockAudio();
