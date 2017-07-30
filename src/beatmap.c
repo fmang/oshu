@@ -38,7 +38,27 @@ static int parse_header(char *line, struct parser_state *parser)
 
 static int parse_section(char *line, struct parser_state *parser)
 {
+	const char *begin, *end;
+	if (*line != '[')
+		goto fail;
+	begin = line + 1;
+	for (end = begin; *end && *end != ']'; end++);
+	if (*end != ']')
+		goto fail;
+	if (end[1] != '\n' && end[1] != '\0')
+		goto fail;
+	size_t len = end - begin;
+	if (!strncmp(begin, "General", len)) {
+		parser->section = BEATMAP_GENERAL;
+	} else if (!strncmp(begin, "Metadata", len)) {
+		parser->section = BEATMAP_METADATA;
+	} else {
+		parser->section = BEATMAP_UNKNOWN;
+	}
 	return 0;
+fail:
+	oshu_log_error("misformed section");
+	return -1;
 }
 
 static int parse_line(char *line, struct parser_state *parser)
@@ -90,6 +110,7 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 	}
 	*beatmap = calloc(1, sizeof(**beatmap));
 	if (parse_file(input, *beatmap) < 0) {
+		oshu_log_error("error parsing the beatmap file");
 		fclose(input);
 		oshu_beatmap_free(beatmap);
 		return -1;
