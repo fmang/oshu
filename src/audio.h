@@ -142,6 +142,10 @@ double oshu_audio_position(struct oshu_audio *stream);
 
 /**
  * Play a sample on top of the stream.
+ *
+ * Only one sample can be played at a time.
+ *
+ * To stop playing any sample, call this function with `sample` as NULL.
  */
 void oshu_audio_play_sample(struct oshu_audio *stream, struct oshu_sample *sample);
 

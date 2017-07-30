@@ -279,8 +279,9 @@ double oshu_audio_position(struct oshu_audio *stream)
 
 void oshu_audio_play_sample(struct oshu_audio *stream, struct oshu_sample *sample)
 {
-	sample->cursor = 0;
 	stream->overlay = sample;
+	if (sample)
+		sample->cursor = 0;
 }
 
 void oshu_audio_close(struct oshu_audio **stream)
