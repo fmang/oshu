@@ -1,7 +1,26 @@
 #include "oshu.h"
 
+#include <signal.h>
+
+static volatile int stop;
+
+static void signal_handler(int signum)
+{
+	stop = 1;
+}
+
 int main(int argc, char **argv)
 {
+	if (argc != 2) {
+		puts("Usage: oshu beatmap.osu");
+		return 5;
+	}
+
+	signal(SIGTERM, signal_handler);
+	signal(SIGINT, signal_handler);
+
+	char *beatmap_file = argv[1];
+
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
@@ -13,8 +32,13 @@ int main(int argc, char **argv)
 	oshu_audio_init();
 	oshu_log_debug("initialized the audio module");
 
+	struct oshu_beatmap *beatmap;
+	int rc = oshu_beatmap_load(beatmap_file, &beatmap);
+	if (rc < 0)
+		return 4;
+
 	struct oshu_audio *stream;
-	if (oshu_audio_open("test.ogg", &stream)) {
+	if (oshu_audio_open(beatmap->general.audio_filename, &stream)) {
 		oshu_log_error("no audio, aborting");
 		return 2;
 	}
@@ -26,15 +50,10 @@ int main(int argc, char **argv)
 		return 3;
 	}
 
-	struct oshu_beatmap *beatmap;
-	int rc = oshu_beatmap_load("beatmap.osu", &beatmap);
-	if (rc < 0)
-		return 4;
-
 	oshu_log_info("starting the playback");
 	oshu_audio_play(stream);
 
-	for (int i = 0; i < 12000; i++) {
+	while (!stream->finished && !stop) {
 		SDL_LockAudio();
 		double pos = oshu_audio_position(stream);
 		int now = pos * 1000;
