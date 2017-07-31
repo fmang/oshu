@@ -7,5 +7,5 @@ oshu_SOURCES = \
 	graphics.c graphics.h \
 	log.h
 
-oshu_CFLAGS = $(SDL2_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LAVU_CFLAGS)
-oshu_LDADD = $(SDL2_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LAVU_LIBS)
+oshu_CFLAGS = $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LAVU_CFLAGS)
+oshu_LDADD = $(SDL2_LIBS) $(SDL2_image_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LAVU_LIBS)
