@@ -21,6 +21,7 @@
 struct oshu_display {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
+	SDL_Texture *hit_mark;
 };
 
 /**
