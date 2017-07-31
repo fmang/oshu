@@ -50,6 +50,12 @@ int main(int argc, char **argv)
 		return 3;
 	}
 
+	struct oshu_display *display;
+	if (oshu_display_init(&display)) {
+		oshu_log_error("no display, aborting");
+		return 7;
+	}
+
 	oshu_log_info("starting the playback");
 	oshu_audio_play(stream);
 
@@ -61,11 +67,16 @@ int main(int argc, char **argv)
 			oshu_sample_play(stream, sample);
 			beatmap->hit_cursor = beatmap->hit_cursor->next;
 		}
+		oshu_draw_beatmap(display, beatmap, now);
 		SDL_UnlockAudio();
-		SDL_Delay(10);
+		SDL_Delay(20);
 	}
 
 	oshu_audio_close(&stream);
+	oshu_sample_free(&sample);
+	oshu_beatmap_free(&beatmap);
+	oshu_display_destroy(&display);
+
 	SDL_Quit();
 	return 0;
 }

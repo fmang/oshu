@@ -19,6 +19,8 @@
  * game.
  */
 struct oshu_display {
+	SDL_Window *window;
+	SDL_Renderer *renderer;
 };
 
 /**
