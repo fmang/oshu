@@ -157,7 +157,6 @@ void oshu_audio_close(struct oshu_audio **stream);
 
 /**
  * @defgroup sample Sample
- * @ingroup audio
  *
  * This sample module provides a means to load WAV files using SDL's WAV
  * loader.
@@ -216,6 +215,63 @@ void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample);
  * Set `*sample` to *NULL.
  */
 void oshu_sample_free(struct oshu_sample **sample);
+
+
+/** @}
+ *
+ * @defgroup sampleset Sample set
+ *
+ * A sample set is a collection of all the samples needed to play a beatmap.
+ *
+ * It is stored as an array of pointers to sample, whose index is a combination
+ * of flags from the structure below.
+ *
+ * @{
+ */
+
+enum oshu_sampleset_index {
+	OSHU_SAMPLESET_CUSTOM_INDEX_MASK = 0b11,
+	OSHU_SAMPLESET_SET_AUTO   = 0,
+	OSHU_SAMPLESET_SET_NORMAL = 0b0100,
+	OSHU_SAMPLESET_SET_SOFT   = 0b1000,
+	OSHU_SAMPLESET_SET_DRUM   = 0b1100,
+	OSHU_SAMPLESET_SET_MASK   = 0b1100,
+	OSHU_SAMPLESET_SET_OFFSET = 2,
+	OSHU_SAMPLESET_ADDITION_NONE    = 0,
+	OSHU_SAMPLESET_ADDITION_WHISTLE = 0b010000,
+	OSHU_SAMPLESET_ADDITION_FISNISH = 0b100000,
+	OSHU_SAMPLESET_ADDITION_CLAP    = 0b110000,
+	OSHU_SAMPLESET_ADDITION_MASK    = 0b110000,
+	OSHU_SAMPLESET_ADDITION_OFFSET  = 4,
+	OSHU_SAMPLESET_SIZE = 64,
+};
+
+int oshu_sampleset_new(struct oshu_sample **set);
+
+/**
+ * Try to load a sample found on the filesystem, trying the directories in that
+ * order:
+ *
+ * 1. The current directory.
+ * 2. The user's home oshu directory, like ~/.config/oshu/samples/.
+ * 3. The oshu installation's share directory, like /usr/share/oshu/samples/.
+ *
+ * When a sample wasn't found, return 0 and leave the entry in the sample set
+ * to *NULL*.
+ */
+int oshu_sampleset_load(struct oshu_sample *set, int index);
+
+/**
+ * Call \ref oshu_sampleset_load for every possible sample.
+ */
+int oshu_sampleset_all(struct oshu_sample *set);
+
+/**
+ * Free the sample set and all the samples it contains.
+ *
+ * Set `*set` to *NULL*.
+ */
+void oshu_sampleset_free(struct oshu_sample **set);
 
 /** @} */
 
