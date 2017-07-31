@@ -330,16 +330,42 @@ void oshu_audio_close(struct oshu_audio **stream)
 	*stream = NULL;
 }
 
-int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sample **sample)
+static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, struct oshu_sample *sample)
 {
-	*sample = calloc(1, sizeof(**sample));
-	SDL_AudioSpec *wav = SDL_LoadWAV(path, &stream->device_spec, &(*sample)->buffer, &(*sample)->length);
-	if (wav == NULL) {
-		free(*sample);
-		*sample = NULL;
+	SDL_AudioCVT converter;
+	int rc = SDL_BuildAudioCVT(&converter,
+		wav_spec->format, wav_spec->channels, wav_spec->freq,
+		device_spec->format, device_spec->channels, device_spec->freq
+	);
+	if (rc == 0) {
+		/* no conversion needed */
+		return 0;
+	} else if (rc < 0) {
+		oshu_log_error("SDL audio conversion error: %s", SDL_GetError());
 		return -1;
 	}
+	sample->buffer = realloc(sample->buffer, sample->length * converter.len_mult);
+	converter.buf = sample->buffer;
+	converter.len = sample->length;
+	SDL_ConvertAudio(&converter);
+	sample->length = converter.len_cvt;
 	return 0;
+}
+
+int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sample **sample)
+{
+	SDL_AudioSpec spec;
+	*sample = calloc(1, sizeof(**sample));
+	SDL_AudioSpec *wav = SDL_LoadWAV(path, &spec, &(*sample)->buffer, &(*sample)->length);
+	if (wav == NULL)
+		goto fail;
+	if (convert_audio(&stream->device_spec, wav, *sample) < 0)
+		goto fail;
+	return 0;
+fail:
+	free(*sample);
+	*sample = NULL;
+	return -1;
 }
 
 void oshu_sample_free(struct oshu_sample **sample)
