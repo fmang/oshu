@@ -3,8 +3,10 @@
 #include <assert.h>
 #include <libavutil/time.h>
 
-/** Size of the SDL audio buffer, in samples.
- *  This is 23 ms in 44.1 KHz stereo. */
+/**
+ * Size of the SDL audio buffer, in samples.
+ * The smaller it is, the less lag.
+ */
 static const int sample_buffer_size = 1024;
 
 /**
@@ -330,6 +332,12 @@ void oshu_audio_close(struct oshu_audio **stream)
 	*stream = NULL;
 }
 
+/**
+ * Convert a sample loaded from a WAV file in order to play it on the currently
+ * opened device.
+ *
+ * Trust me, your ears don't want you to overlap two incompatible streams.
+ */
 static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, struct oshu_sample *sample)
 {
 	SDL_AudioCVT converter;

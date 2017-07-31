@@ -24,9 +24,12 @@
 #define oshu_log_debug(...)    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "[" __FILE__ "] " __VA_ARGS__)
 
 /**
- * Informational messages are things that we'd like most users to see. They
- * give relevant information about things one might like to know. For example,
- * information about the audio file, and beatmap metadata.
+ * Informational messages are things that we'd like the techniest users to see,
+ * like the fact the loaded audio file is made of signed 16-bit little-endian
+ * PCM samples. It won't be shown to the regular user.
+ *
+ * To show information to the regular user, use a regular printing routing to
+ * standard output.
  */
 #define oshu_log_info(...)     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, __VA_ARGS__)
 
