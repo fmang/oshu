@@ -97,6 +97,21 @@ struct oshu_beatmap {
 		char *audio_filename;
 		enum oshu_mode mode;
 	} general;
+	struct {
+		/**
+		 * Makes the link between a slider's pixel length and the time.
+		 * 1 beat maps to 100 pixels multiplied by this factor.
+		 *
+		 * Therefore, the total duration in beats of a slider is
+		 * `pixel_length / (100 * slider_multiplier)`. Multiply this by
+		 * the milliseconds per beat of of the beatmap and you'll get
+		 * that duration is milliseconds.
+		 *
+		 * According to the official documentation, its default value
+		 * is 1.4.
+		 */
+		float slider_multiplier;
+	} difficulty;
 	struct oshu_hit *hits;
 	struct oshu_hit *hit_cursor;
 };
