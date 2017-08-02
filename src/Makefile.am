@@ -5,6 +5,7 @@ oshu_SOURCES = \
 	audio.c audio.h \
 	beatmap.c beatmap.h \
 	graphics.c graphics.h \
+	geometry.h geometry.c \
 	log.h
 
 oshu_CFLAGS = $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LAVU_CFLAGS)

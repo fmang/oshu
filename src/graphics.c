@@ -62,11 +62,6 @@ void oshu_display_destroy(struct oshu_display **display)
 	*display = NULL;
 }
 
-void set_playzone_viewport()
-{
-	/* TODO */
-}
-
 void draw_circle(struct oshu_display *display, int x, int y, int radius)
 {
 	/* TODO */
