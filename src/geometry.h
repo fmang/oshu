@@ -1,17 +1,20 @@
 #pragma once
 
-#include <SDL2/SDL.h>
-
 /**
  * @defgroup geometry Geometry
  *
  * @{
  */
 
+struct oshu_point {
+	double x;
+	double y;
+};
+
 /**
  * Normalize a vector, making its norm equal to 1.
  */
-SDL_Point oshu_normalize(SDL_Point p);
+struct oshu_point oshu_normalize(struct oshu_point p);
 
 enum oshu_curve_type {
 	OSHU_CURVE_BEZIER,
@@ -29,7 +32,7 @@ struct oshu_segment {
 	double length;
 	/** How many control points the segment has. */
 	int size;
-	SDL_Point *points;
+	struct oshu_point *points;
 };
 
 /**
@@ -40,12 +43,12 @@ struct oshu_segment {
  * All the segments are merged together in that [0, 1] segment according to
  * their lengths.
  */
-SDL_Point oshu_segment_at(struct oshu_segment *segment, double t);
+struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t);
 
 /**
  * Return the derivative vector of the segment at point t in t-coordinates.
  */
-SDL_Point oshu_segment_derive(struct oshu_segment *segment, double t);
+struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t);
 
 /**
  * A path represents many segments joined together.
@@ -72,11 +75,11 @@ struct oshu_path {
  * All the segments are merged together in that [0, 1] segment according to
  * their lengths.
  */
-SDL_Point oshu_path_at(struct oshu_path *path, double t);
+struct oshu_point oshu_path_at(struct oshu_path *path, double t);
 
 /**
  * Return the derivative vector of the path at point t in t-coordinates.
  */
-SDL_Point oshu_path_derive(struct oshu_path *path, double t);
+struct oshu_point oshu_path_derive(struct oshu_path *path, double t);
 
 /** @} */

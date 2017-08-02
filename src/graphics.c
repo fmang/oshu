@@ -89,8 +89,11 @@ void draw_segment(struct oshu_display *display, struct oshu_segment *segment)
 	static int resolution = 30;
 	SDL_Point points[resolution];
 	double step = 1. / (resolution - 1);
-	for (int i = 0; i < resolution; i++)
-		points[i] = oshu_segment_at(segment, i * step);
+	for (int i = 0; i < resolution; i++) {
+		struct oshu_point p = oshu_segment_at(segment, i * step);
+		points[i].x = p.x;
+		points[i].y = p.y;
+	}
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
@@ -100,14 +103,15 @@ void draw_thick_segment(struct oshu_display *display, struct oshu_segment *segme
 	SDL_Point left[resolution];
 	SDL_Point right[resolution];
 	double step = 1. / (resolution - 1);
+	double radius = width / 2.;
 	for (int i = 0; i < resolution; i++) {
-		SDL_Point p = oshu_segment_at(segment, i * step);
-		SDL_Point d = oshu_segment_derive(segment, i * step);
+		struct oshu_point p = oshu_segment_at(segment, i * step);
+		struct oshu_point d = oshu_segment_derive(segment, i * step);
 		d = oshu_normalize(d);
-		left[i].x = p.x - (width / 2) * d.y;
-		left[i].y = p.y + (width / 2) * d.x;
-		right[i].x = p.x + (width / 2) * d.y;
-		right[i].y = p.y - (width / 2) * d.x;
+		left[i].x = p.x - radius* d.y;
+		left[i].y = p.y + radius* d.x;
+		right[i].x = p.x + radius * d.y;
+		right[i].y = p.y - radius * d.x;
 	}
 	SDL_RenderDrawLines(display->renderer, left, resolution);
 	SDL_RenderDrawLines(display->renderer, right, resolution);
@@ -117,11 +121,11 @@ struct oshu_segment sample_segment = {
 	.type = OSHU_CURVE_BEZIER,
 	.length = 0,
 	.size = 4,
-	.points = (SDL_Point[]) {
-		{ 100, 100 },
-		{ 100, 400 },
-		{ 200, 0 },
-		{ 200, 200 },
+	.points = (struct oshu_point[]) {
+		{ 100., 100. },
+		{ 100., 400. },
+		{ 200., 0. },
+		{ 200., 200. },
 	}
 };
 
@@ -134,6 +138,6 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 	draw_segment(display, &sample_segment);
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 0, 255);
-	draw_thick_segment(display, &sample_segment, 20);
+	draw_thick_segment(display, &sample_segment, 40);
 	SDL_RenderPresent(display->renderer);
 }
