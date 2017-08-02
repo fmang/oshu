@@ -7,8 +7,8 @@
  */
 
 struct oshu_point {
-	int x;
-	int y;
+	double x;
+	double y;
 };
 
 enum oshu_curve_type {
@@ -26,10 +26,31 @@ struct oshu_segment {
 	 */
 	double length;
 	/** How many control points the segment has. */
-	size_t size;
+	int size;
 	struct oshu_point *points;
 };
 
+/**
+ * Express the segment in [0, 1] floating t-coordinates.
+ *
+ * You should probably use \ref oshu_path_at.
+ *
+ * All the segments are merged together in that [0, 1] segment according to
+ * their lengths.
+ */
+struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t);
+
+/**
+ * Return the derivative vector of the segment at point t in t-coordinates.
+ */
+struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t);
+
+/**
+ * A path represents many segments joined together.
+ *
+ * To make a continous path, the end point of a segment should be the same as
+ * the beginning point of the next one.
+ */
 struct oshu_path {
 	/**
 	 * Length of the segment, in an arbitrary unit.
@@ -39,5 +60,21 @@ struct oshu_path {
 	size_t size; /**< How many segments. */
 	struct oshu_segment *segments;
 };
+
+/**
+ * Express the path in [0, 1] floating t-coordinates.
+ *
+ * t=0 is the starting point, t=1 is the end point. Calling this function n
+ * times with t=k/n will give an approximation of the curve.
+ *
+ * All the segments are merged together in that [0, 1] segment according to
+ * their lengths.
+ */
+struct oshu_point oshu_path_at(struct oshu_path *path, double t);
+
+/**
+ * Return the derivative vector of the path at point t in t-coordinates.
+ */
+struct oshu_point oshu_path_derive(struct oshu_path *path, double t);
 
 /** @} */
