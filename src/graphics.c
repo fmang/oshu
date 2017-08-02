@@ -67,11 +67,6 @@ void draw_circle(struct oshu_display *display, int x, int y, int radius)
 	/* TODO */
 }
 
-void draw_path(struct oshu_display *display, struct oshu_path *path)
-{
-	/* TODO */
-}
-
 void draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 {
 	int horizontal_margin = (window_width - game_width) / 2;
@@ -84,29 +79,29 @@ void draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 	SDL_RenderCopy(display->renderer, display->hit_mark, NULL, &where);
 }
 
-void draw_segment(struct oshu_display *display, struct oshu_segment *segment)
+void draw_path(struct oshu_display *display, struct oshu_path *path)
 {
 	static int resolution = 30;
 	SDL_Point points[resolution];
 	double step = 1. / (resolution - 1);
 	for (int i = 0; i < resolution; i++) {
-		struct oshu_point p = oshu_segment_at(segment, i * step);
+		struct oshu_point p = oshu_path_at(path, i * step);
 		points[i].x = p.x;
 		points[i].y = p.y;
 	}
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
-void draw_thick_segment(struct oshu_display *display, struct oshu_segment *segment, int width)
+void draw_thick_path(struct oshu_display *display, struct oshu_path *path, int width)
 {
-	static int resolution = 30;
+	static int resolution = 100;
 	SDL_Point left[resolution];
 	SDL_Point right[resolution];
 	double step = 1. / (resolution - 1);
 	double radius = width / 2.;
 	for (int i = 0; i < resolution; i++) {
-		struct oshu_point p = oshu_segment_at(segment, i * step);
-		struct oshu_point d = oshu_segment_derive(segment, i * step);
+		struct oshu_point p = oshu_path_at(path, i * step);
+		struct oshu_point d = oshu_path_derive(path, i * step);
 		d = oshu_normalize(d);
 		left[i].x = p.x - radius* d.y;
 		left[i].y = p.y + radius* d.x;
@@ -117,16 +112,32 @@ void draw_thick_segment(struct oshu_display *display, struct oshu_segment *segme
 	SDL_RenderDrawLines(display->renderer, right, resolution);
 }
 
-struct oshu_segment sample_segment = {
-	.type = OSHU_CURVE_BEZIER,
-	.length = 0,
-	.size = 4,
-	.points = (struct oshu_point[]) {
-		{ 100., 100. },
-		{ 100., 400. },
-		{ 200., 0. },
-		{ 200., 200. },
-	}
+struct oshu_path sample_path = {
+	.length = 100.,
+	.size = 2,
+	.segments = (struct oshu_segment[]) {
+		{
+			.type = OSHU_CURVE_BEZIER,
+			.length = 50.,
+			.size = 4,
+			.points = (struct oshu_point[]) {
+				{ 100., 100. },
+				{ 100., 400. },
+				{ 200., 0. },
+				{ 200., 200. },
+			}
+		},
+		{
+			.type = OSHU_CURVE_BEZIER,
+			.length = 50.,
+			.size = 3,
+			.points = (struct oshu_point[]) {
+				{ 200., 200. },
+				{ 500., 600. },
+				{ 400., 200. },
+			}
+		},
+	},
 };
 
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, int msecs)
@@ -136,8 +147,8 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 	if (beatmap->hit_cursor)
 		draw_hit(display, beatmap->hit_cursor);
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
-	draw_segment(display, &sample_segment);
+	draw_path(display, &sample_path);
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 0, 255);
-	draw_thick_segment(display, &sample_segment, 40);
+	draw_thick_path(display, &sample_path, 40);
 	SDL_RenderPresent(display->renderer);
 }

@@ -50,3 +50,34 @@ struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t)
 	p.y *= n;
 	return p;
 }
+
+
+struct oshu_point oshu_path_at(struct oshu_path *path, double t)
+{
+	double cursor = 0;
+	double step;
+	int i;
+	for (i = 0; i < path->size - 1; i++) {
+		step = path->segments[i].length / path->length;
+		if (cursor + step > t)
+			break;
+		cursor += step;
+	}
+	double sub_t = (t - cursor) / step;
+	return oshu_segment_at(&path->segments[i], sub_t);
+}
+
+struct oshu_point oshu_path_derive(struct oshu_path *path, double t)
+{
+	double cursor = 0;
+	double step;
+	int i;
+	for (i = 0; i < path->size - 1; i++) {
+		step = path->segments[i].length / path->length;
+		if (cursor + step > t)
+			break;
+		cursor += step;
+	}
+	double sub_t = (t - cursor) / step;
+	return oshu_segment_derive(&path->segments[i], sub_t);
+}
