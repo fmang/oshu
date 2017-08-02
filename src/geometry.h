@@ -1,15 +1,12 @@
 #pragma once
 
+#include <SDL2/SDL.h>
+
 /**
  * @defgroup geometry Geometry
  *
  * @{
  */
-
-struct oshu_point {
-	double x;
-	double y;
-};
 
 enum oshu_curve_type {
 	OSHU_CURVE_BEZIER,
@@ -27,7 +24,7 @@ struct oshu_segment {
 	double length;
 	/** How many control points the segment has. */
 	int size;
-	struct oshu_point *points;
+	SDL_Point *points;
 };
 
 /**
@@ -38,12 +35,12 @@ struct oshu_segment {
  * All the segments are merged together in that [0, 1] segment according to
  * their lengths.
  */
-struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t);
+SDL_Point oshu_segment_at(struct oshu_segment *segment, double t);
 
 /**
  * Return the derivative vector of the segment at point t in t-coordinates.
  */
-struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t);
+SDL_Point oshu_segment_derive(struct oshu_segment *segment, double t);
 
 /**
  * A path represents many segments joined together.
@@ -70,11 +67,11 @@ struct oshu_path {
  * All the segments are merged together in that [0, 1] segment according to
  * their lengths.
  */
-struct oshu_point oshu_path_at(struct oshu_path *path, double t);
+SDL_Point oshu_path_at(struct oshu_path *path, double t);
 
 /**
  * Return the derivative vector of the path at point t in t-coordinates.
  */
-struct oshu_point oshu_path_derive(struct oshu_path *path, double t);
+SDL_Point oshu_path_derive(struct oshu_path *path, double t);
 
 /** @} */

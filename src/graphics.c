@@ -84,11 +84,35 @@ void draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 	SDL_RenderCopy(display->renderer, display->hit_mark, NULL, &where);
 }
 
+void draw_segment(struct oshu_display *display, struct oshu_segment *segment)
+{
+	static int resolution = 30;
+	SDL_Point points[resolution];
+	double step = 1. / (resolution - 1);
+	for (int i = 0; i < resolution; i++)
+		points[i] = oshu_segment_at(segment, i * step);
+	SDL_RenderDrawLines(display->renderer, points, resolution);
+}
+
+struct oshu_segment sample_segment = {
+	.type = OSHU_CURVE_BEZIER,
+	.length = 0,
+	.size = 4,
+	.points = (SDL_Point[]) {
+		{ 100, 100 },
+		{ 100, 400 },
+		{ 200, 0 },
+		{ 200, 200 },
+	}
+};
+
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, int msecs)
 {
 	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
 	SDL_RenderClear(display->renderer);
 	if (beatmap->hit_cursor)
 		draw_hit(display, beatmap->hit_cursor);
+	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
+	draw_segment(display, &sample_segment);
 	SDL_RenderPresent(display->renderer);
 }
