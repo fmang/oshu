@@ -8,6 +8,11 @@
  * @{
  */
 
+/**
+ * Normalize a vector, making its norm equal to 1.
+ */
+SDL_Point oshu_normalize(SDL_Point p);
+
 enum oshu_curve_type {
 	OSHU_CURVE_BEZIER,
 };
