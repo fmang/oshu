@@ -62,6 +62,21 @@ void oshu_display_destroy(struct oshu_display **display)
 	*display = NULL;
 }
 
+void set_playzone_viewport()
+{
+	/* TODO */
+}
+
+void draw_circle(struct oshu_display *display, int x, int y, int radius)
+{
+	/* TODO */
+}
+
+void draw_path(struct oshu_display *display, struct oshu_path *path)
+{
+	/* TODO */
+}
+
 void draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 {
 	int horizontal_margin = (window_width - game_width) / 2;
