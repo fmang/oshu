@@ -65,7 +65,14 @@ void oshu_display_destroy(struct oshu_display **display)
 
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)
 {
-	/* TODO */
+	static int resolution = 30;
+	SDL_Point points[resolution];
+	double step = 2 * M_PI / (resolution - 1);
+	for (int i = 0; i < resolution; i++) {
+		points[i].x = x + radius * cos(i * step);
+		points[i].y = y + radius * sin(i * step);
+	}
+	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
 void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit)
@@ -117,6 +124,7 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 {
 	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
 	SDL_RenderClear(display->renderer);
+	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 	if (beatmap->hit_cursor)
 		oshu_draw_hit(display, beatmap->hit_cursor);
 	SDL_RenderPresent(display->renderer);
