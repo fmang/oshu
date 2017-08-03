@@ -54,7 +54,7 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 /**
  * Draw a hit object.
  */
-void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit);
+void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, int msecs);
 
 /**
  * Draw a 1-pixel aliased stroke following the path.
