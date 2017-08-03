@@ -93,7 +93,7 @@ void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
-void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, int width)
+void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, double width)
 {
 	static int resolution = 100;
 	SDL_Point left[resolution];
