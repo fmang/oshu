@@ -113,43 +113,11 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 	SDL_RenderDrawLines(display->renderer, right, resolution);
 }
 
-struct oshu_path sample_path = {
-	.length = 100.,
-	.size = 2,
-	.segments = (struct oshu_segment[]) {
-		{
-			.type = OSHU_CURVE_BEZIER,
-			.length = 50.,
-			.size = 4,
-			.points = (struct oshu_point[]) {
-				{ 100., 100. },
-				{ 100., 400. },
-				{ 200., 0. },
-				{ 200., 200. },
-			}
-		},
-		{
-			.type = OSHU_CURVE_BEZIER,
-			.length = 50.,
-			.size = 3,
-			.points = (struct oshu_point[]) {
-				{ 200., 200. },
-				{ 500., 600. },
-				{ 400., 200. },
-			}
-		},
-	},
-};
-
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, int msecs)
 {
 	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
 	SDL_RenderClear(display->renderer);
 	if (beatmap->hit_cursor)
 		oshu_draw_hit(display, beatmap->hit_cursor);
-	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
-	oshu_draw_path(display, &sample_path);
-	SDL_SetRenderDrawColor(display->renderer, 255, 255, 0, 255);
-	oshu_draw_thick_path(display, &sample_path, 40);
 	SDL_RenderPresent(display->renderer);
 }
