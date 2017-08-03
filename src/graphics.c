@@ -63,12 +63,12 @@ void oshu_display_destroy(struct oshu_display **display)
 	*display = NULL;
 }
 
-void draw_circle(struct oshu_display *display, int x, int y, int radius)
+void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)
 {
 	/* TODO */
 }
 
-void draw_hit(struct oshu_display *display, struct oshu_hit *hit)
+void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 {
 	int horizontal_margin = (window_width - game_width) / 2;
 	int vertical_margin = (window_height - game_height) / 2;
@@ -80,7 +80,7 @@ void draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 	SDL_RenderCopy(display->renderer, display->hit_mark, NULL, &where);
 }
 
-void draw_path(struct oshu_display *display, struct oshu_path *path)
+void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
 {
 	static int resolution = 30;
 	SDL_Point points[resolution];
@@ -93,7 +93,7 @@ void draw_path(struct oshu_display *display, struct oshu_path *path)
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
-void draw_thick_path(struct oshu_display *display, struct oshu_path *path, int width)
+void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, int width)
 {
 	static int resolution = 100;
 	SDL_Point left[resolution];
@@ -146,10 +146,10 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
 	SDL_RenderClear(display->renderer);
 	if (beatmap->hit_cursor)
-		draw_hit(display, beatmap->hit_cursor);
+		oshu_draw_hit(display, beatmap->hit_cursor);
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
-	draw_path(display, &sample_path);
+	oshu_draw_path(display, &sample_path);
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 0, 255);
-	draw_thick_path(display, &sample_path, 40);
+	oshu_draw_thick_path(display, &sample_path, 40);
 	SDL_RenderPresent(display->renderer);
 }
