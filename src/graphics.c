@@ -1,8 +1,6 @@
 #include "graphics.h"
 #include "log.h"
 
-#include <SDL2/SDL_image.h>
-
 static const int window_width = 640; /* px */
 static const int window_height = 480; /* px */
 
@@ -32,11 +30,6 @@ fail:
 
 int load_textures(struct oshu_display *display)
 {
-	display->hit_mark = IMG_LoadTexture(display->renderer, "hit.png");
-	if (display->hit_mark == NULL) {
-		oshu_log_error("error load the textures: %s", SDL_GetError());
-		return -1;
-	}
 	return 0;
 }
 
@@ -63,13 +56,18 @@ void oshu_display_destroy(struct oshu_display **display)
 	*display = NULL;
 }
 
+static void view_xy(struct oshu_display *display, int *x, int *y)
+{
+	*x += (window_width - game_width) / 2;
+	*y += (window_height - game_height) / 2;
+}
+
 /**
  * Translate a point from game zone coordinates to window coordinates.
  */
 static void view_point(struct oshu_display *display, SDL_Point *p)
 {
-	p->x += (window_width - game_width) / 2;
-	p->y += (window_height - game_height) / 2;
+	view_xy(display, &p->x, &p->y);
 }
 
 /**
@@ -77,8 +75,7 @@ static void view_point(struct oshu_display *display, SDL_Point *p)
  */
 static void view_rect(struct oshu_display *display, SDL_Rect *r)
 {
-	r->x += (window_width - game_width) / 2;
-	r->y += (window_height - game_height) / 2;
+	view_xy(display, &r->x, &r->y);
 }
 
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)
@@ -94,15 +91,21 @@ void oshu_draw_circle(struct oshu_display *display, double x, double y, double r
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
+
+void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2)
+{
+	view_xy(display, &x1, &y1);
+	view_xy(display, &x2, &y2);
+	SDL_RenderDrawLine(display->renderer, x1, y1, x2, y2);
+}
+
 void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 {
-	SDL_Rect where;
-	where.x = hit->x - hit_radius;
-	where.y = hit->y - hit_radius;
-	where.w = hit_radius * 2;
-	where.h = hit_radius * 2;
-	view_rect(display, &where);
-	SDL_RenderCopy(display->renderer, display->hit_mark, NULL, &where);
+	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
+	oshu_draw_circle(display, hit->x, hit->y, hit_radius);
+	oshu_draw_circle(display, hit->x, hit->y, hit_radius - 2);
+	oshu_draw_line(display, hit->x - hit_radius, hit->y, hit->x + hit_radius, hit->y);
+	oshu_draw_line(display, hit->x, hit->y - hit_radius, hit->x, hit->y + hit_radius);
 }
 
 void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
@@ -145,7 +148,6 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 {
 	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
 	SDL_RenderClear(display->renderer);
-	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 	if (beatmap->hit_cursor)
 		oshu_draw_hit(display, beatmap->hit_cursor);
 	SDL_RenderPresent(display->renderer);

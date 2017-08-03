@@ -22,7 +22,6 @@
 struct oshu_display {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-	SDL_Texture *hit_mark;
 };
 
 /**
@@ -74,6 +73,13 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
  * Draw a regular polyline that should look like a circle.
  */
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius);
+
+/**
+ * Draw one line, plain and simple.
+ *
+ * Perform coordinate translation, unlike its SDL counterpart.
+ */
+void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2);
 
 /** @} */
 
