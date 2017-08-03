@@ -63,6 +63,24 @@ void oshu_display_destroy(struct oshu_display **display)
 	*display = NULL;
 }
 
+/**
+ * Translate a point from game zone coordinates to window coordinates.
+ */
+static void view_point(struct oshu_display *display, SDL_Point *p)
+{
+	p->x += (window_width - game_width) / 2;
+	p->y += (window_height - game_height) / 2;
+}
+
+/**
+ * Translate a rectangle from game zone coordinates to window coordinates.
+ */
+static void view_rect(struct oshu_display *display, SDL_Rect *r)
+{
+	r->x += (window_width - game_width) / 2;
+	r->y += (window_height - game_height) / 2;
+}
+
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)
 {
 	static int resolution = 30;
@@ -71,19 +89,19 @@ void oshu_draw_circle(struct oshu_display *display, double x, double y, double r
 	for (int i = 0; i < resolution; i++) {
 		points[i].x = x + radius * cos(i * step);
 		points[i].y = y + radius * sin(i * step);
+		view_point(display, &points[i]);
 	}
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
 void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit)
 {
-	int horizontal_margin = (window_width - game_width) / 2;
-	int vertical_margin = (window_height - game_height) / 2;
 	SDL_Rect where;
-	where.x = horizontal_margin + hit->x - hit_radius;
-	where.y = vertical_margin + hit->y - hit_radius;
+	where.x = hit->x - hit_radius;
+	where.y = hit->y - hit_radius;
 	where.w = hit_radius * 2;
 	where.h = hit_radius * 2;
+	view_rect(display, &where);
 	SDL_RenderCopy(display->renderer, display->hit_mark, NULL, &where);
 }
 
@@ -96,6 +114,7 @@ void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
 		struct oshu_point p = oshu_path_at(path, i * step);
 		points[i].x = p.x;
 		points[i].y = p.y;
+		view_point(display, &points[i]);
 	}
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
@@ -115,6 +134,8 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 		left[i].y = p.y + radius* d.x;
 		right[i].x = p.x + radius * d.y;
 		right[i].y = p.y - radius * d.x;
+		view_point(display, &left[i]);
+		view_point(display, &right[i]);
 	}
 	SDL_RenderDrawLines(display->renderer, left, resolution);
 	SDL_RenderDrawLines(display->renderer, right, resolution);
