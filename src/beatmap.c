@@ -1,6 +1,8 @@
-#include "oshu.h"
+#include "beatmap.h"
+#include "log.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 

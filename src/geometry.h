@@ -62,7 +62,7 @@ struct oshu_path {
 	 * The sum of the length of all its segment should be equal to this.
 	 */
 	double length;
-	size_t size; /**< How many segments. */
+	int size; /**< How many segments. */
 	struct oshu_segment *segments;
 };
 

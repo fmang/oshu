@@ -1,4 +1,5 @@
-#include "oshu.h"
+#include "graphics.h"
+#include "log.h"
 
 #include <SDL2/SDL_image.h>
 

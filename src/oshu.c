@@ -1,4 +1,7 @@
-#include "oshu.h"
+#include "beatmap.h"
+#include "log.h"
+#include "audio.h"
+#include "graphics.h"
 
 #include <signal.h>
 

@@ -1,4 +1,5 @@
-#include "oshu.h"
+#include "geometry.h"
+#include "log.h"
 
 /**
  * Pre-computed factorial values, for speed.

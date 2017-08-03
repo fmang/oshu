@@ -1,4 +1,5 @@
-#include "oshu.h"
+#include "audio.h"
+#include "log.h"
 
 #include <assert.h>
 #include <libavutil/time.h>
