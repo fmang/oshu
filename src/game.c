@@ -45,6 +45,14 @@ fail:
 	return -1;
 }
 
+/**
+ * Find the first clickable hit object that contains the given x/y coordinates.
+ *
+ * A hit object is clickable if it is close enough in time and not already
+ * clicked.
+ *
+ * If two hit objects overlap, yield the oldest unclicked one.
+ */
 static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
 {
 	int now = game->audio->current_timestamp * 1000;
@@ -64,6 +72,11 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
 	return NULL;
 }
 
+/**
+ * Get the current mouse position, get the hit object, and change its state.
+ *
+ * Play a sample depending on what was clicked, and when.
+ */
 static void hit(struct oshu_game *game)
 {
 	int x, y;
@@ -95,6 +108,9 @@ static void toggle_pause(struct oshu_game *game)
 	SDL_UnlockAudio();
 }
 
+/**
+ * React to an event got from SDL.
+ */
 static void handle_event(struct oshu_game *game, SDL_Event *event)
 {
 	switch (event->type) {
@@ -113,6 +129,15 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	}
 }
 
+/**
+ * Get the audio position and deduce events from it.
+ *
+ * For example, when the audio is past a hit object and beyond the threshold of
+ * tolerance, mark that hit as missed.
+ *
+ * Also move the beatmap's hit cursor to optimize the beatmap manipulation
+ * routines.
+ */
 static void check_audio(struct oshu_game *game)
 {
 	int now = game->audio->current_timestamp * 1000;
