@@ -7,6 +7,9 @@
 
 /** \defgroup beatmap Beatmap
  *
+ * \brief
+ * Define and load \e .osu beatmap files.
+ *
  * Check there for the format reference:
  * https://osu.ppy.sh/help/wiki/osu!_File_Formats
  *
@@ -17,7 +20,7 @@
  * Osu! website. The .osz files are just ZIP files. After you extract them,
  * you'll find the .osu files we're going to parse in this module.
  *
- * An *.osu* file is some kind of pseudo-ini, with sections written like
+ * A \e .osu file is some kind of pseudo-INI, with sections written like
  * `[Metadata]` and key values, except they're written `key: value`. Some
  * sections are completely unlike INI, but pretty something like CSV.
  *
@@ -122,7 +125,7 @@ struct oshu_beatmap {
 };
 
 /**
- * Take a path to a *.osu* file, open it and parse it.
+ * Take a path to a \e .osu file, open it and parse it.
  *
  * The parsed beatmap is returned by setting `*beatmap` to point to a newly
  * allocated beatmap object.

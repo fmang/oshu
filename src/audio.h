@@ -10,8 +10,7 @@
 
 /** \defgroup audio Audio
  *
- * Oshu's audio module.
- *
+ * \brief
  * Open and decode any kind of audio file using ffmpeg. libavformat does the
  * demuxing, libavcodec decodes. Then feed the decoded samples to SDL's audio
  * device.
@@ -173,8 +172,9 @@ void oshu_audio_close(struct oshu_audio **stream);
 /**
  * \defgroup sample Sample
  *
- * This sample module provides a means to load WAV files using SDL's WAV
- * loader.
+ * \brief
+ * Load WAV files using SDL's WAV loader in order to play them over an audio
+ * stream as sound effects.
  *
  * A sample is a short sound played when the user hits something. To be fast
  * and reactive, the samples are always stored in-memory. Do not confuse it
@@ -236,7 +236,8 @@ void oshu_sample_free(struct oshu_sample **sample);
  *
  * \defgroup sampleset Sample set
  *
- * A sample set is a collection of all the samples needed to play a beatmap.
+ * \brief
+ * Manage the set of samples a beatmap uses.
  *
  * It is stored as an array of pointers to sample, whose index is a combination
  * of flags from the structure below.

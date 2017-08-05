@@ -9,6 +9,9 @@
  * \defgroup geometry Geometry
  * \ingroup beatmap
  *
+ * \brief
+ * Bézier paths, among other things.
+ *
  * \{
  */
 

@@ -13,7 +13,8 @@
 /**
  * \defgroup graphics Graphics
  *
- * Oshu's display-related routines and structure.
+ * \brief
+ * Manage a window and draw beatmaps.
  *
  * \{
  */
@@ -44,7 +45,8 @@ void oshu_display_destroy(struct oshu_display **display);
 /**
  * \defgroup draw Draw
  *
- * Rendering functions, from the main \ref oshu_draw_beatmap to line drawing
+ * \brief
+ * Rendering functions, from the main beatmap drawing routine to line drawing
  * helpers.
  */
 

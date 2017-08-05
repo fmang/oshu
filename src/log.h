@@ -9,6 +9,9 @@
 
 /** \defgroup log Log
  *
+ * \brief
+ * Macros for logging messages.
+ *
  * This module provides a set of macros to avoid mentionning the verbosely
  * named `SDL_LOG_CATEGORY_APPLICATION` parameter when using SDL's logging
  * facility.
