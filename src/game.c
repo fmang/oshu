@@ -79,6 +79,8 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
  */
 static void hit(struct oshu_game *game)
 {
+	if (game->paused)
+		return;
 	int x, y;
 	oshu_get_mouse(game->display, &x, &y);
 	int now = game->audio->current_timestamp * 1000;
@@ -125,6 +127,9 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			game->stop = 1;
 		else if (event->key.keysym.sym == SDLK_ESCAPE)
 			toggle_pause(game);
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		hit(game);
 		break;
 	}
 }
