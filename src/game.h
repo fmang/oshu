@@ -27,7 +27,10 @@
 struct oshu_game {
 	struct oshu_beatmap *beatmap;
 	struct oshu_audio *audio;
+	struct oshu_sample *hit_sound;
 	struct oshu_display *display;
+	/** Will stop a the next iteration if this is true. */
+	int stop;
 };
 
 /**
@@ -38,7 +41,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game);
 /**
  * Free the memory for everything, and set `*game` to *NULL*.
  */
-int oshu_game_destroy(struct oshu_game **game);
+void oshu_game_destroy(struct oshu_game **game);
 
 /**
  * Start the main event loop.
