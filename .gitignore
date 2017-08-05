@@ -17,7 +17,6 @@ Makefile.in
 /stamp-h1
 
 /docs/Doxyfile
-/docs/doxyfile.stamp
 /docs/html
 /docs/latex
 
