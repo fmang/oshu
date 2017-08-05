@@ -1,7 +1,7 @@
-Oshu!
+oshu!
 =====
 
-Welcome to Oshu!
+Welcome to oshu!
 
 This project was born out of frustration from not being able to play Osu! on a
 little Linux box with no graphics card whatsoever.  It's aimed at minimalistic

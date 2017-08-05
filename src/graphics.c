@@ -16,7 +16,7 @@ static const int hit_time_out = 0; /* ms */
 int create_window(struct oshu_display *display)
 {
 	display->window = SDL_CreateWindow(
-		"Oshu!",
+		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		window_width, window_height,
 		0
