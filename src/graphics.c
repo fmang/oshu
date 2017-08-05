@@ -186,8 +186,7 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 			SDL_SetRenderDrawColor(display->renderer, 128, 128, 128, 255);
 			oshu_draw_line(display, prev->x, prev->y, hit->x, hit->y);
 		}
-		if (hit->time > msecs - hit_time_out)
-			oshu_draw_hit(display, hit, msecs);
+		oshu_draw_hit(display, hit, msecs);
 		prev = hit;
 	}
 	SDL_RenderPresent(display->renderer);

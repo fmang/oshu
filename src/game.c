@@ -10,7 +10,7 @@
 
 /** How long before or after the hit time a click event is considered on the
  *  mark. */
-static int hit_tolerance = 200 ; /* ms */
+static int hit_tolerance = 100 ; /* ms */
 
 /** How long before or after the hit time a hit object is clickable. */
 static int hit_clickable = 1000 ; /* ms */
@@ -58,7 +58,6 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
 		int dx = x - hit->x;
 		int dy = y - hit->y;
 		int dist = sqrt(dx * dx + dy * dy);
-		oshu_log_debug("dist=%d", dist);
 		if (dist <= oshu_hit_radius)
 			return hit;
 	}
@@ -72,10 +71,14 @@ static void hit(struct oshu_game *game)
 	int now = game->audio->current_timestamp * 1000;
 	struct oshu_hit *hit = find_hit(game, x, y);
 	if (hit) {
-		if (abs(hit->time - now) < hit_tolerance)
+		if (abs(hit->time - now) < hit_tolerance) {
 			hit->state = OSHU_HIT_GOOD;
-		else
+			SDL_LockAudio();
+			oshu_sample_play(game->audio, game->hit_sound);
+			SDL_UnlockAudio();
+		} else {
 			hit->state = OSHU_HIT_MISSED;
+		}
 	}
 }
 
@@ -113,12 +116,17 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 static void check_audio(struct oshu_game *game)
 {
 	int now = game->audio->current_timestamp * 1000;
-	while (game->beatmap->hit_cursor && game->beatmap->hit_cursor->time < now) {
-		SDL_LockAudio();
-		oshu_sample_play(game->audio, game->hit_sound);
-		SDL_UnlockAudio();
-		game->beatmap->hit_cursor = game->beatmap->hit_cursor->next;
+	for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
+		if (hit->time > now - hit_tolerance)
+			break;
+		if (hit->state == OSHU_HIT_INITIAL)
+			hit->state = OSHU_HIT_MISSED;
 	}
+	for (
+		struct oshu_hit **hit = &game->beatmap->hit_cursor;
+		*hit && (*hit)->time < now - hit_clickable;
+		*hit = (*hit)->next
+	);
 }
 
 int oshu_game_run(struct oshu_game *game)
