@@ -1,9 +1,15 @@
+/**
+ * \file geometry.h
+ * \ingroup geometry
+ */
+
 #pragma once
 
 /**
- * @defgroup geometry Geometry
+ * \defgroup geometry Geometry
+ * \ingroup beatmap
  *
- * @{
+ * \{
  */
 
 struct oshu_point {
@@ -82,4 +88,4 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t);
  */
 struct oshu_point oshu_path_derive(struct oshu_path *path, double t);
 
-/** @} */
+/** \} */

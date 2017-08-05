@@ -1,3 +1,8 @@
+/**
+ * \file geometry.c
+ * \ingroup geometry
+ */
+
 #include "geometry.h"
 #include "log.h"
 
