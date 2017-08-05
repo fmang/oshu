@@ -71,6 +71,7 @@ static int open_demuxer(const char *url, struct oshu_audio *stream)
 		return rc;
 	}
 	stream->stream_index = rc;
+	stream->time_base = av_q2d(stream->demuxer->streams[stream->stream_index]->time_base);
 	return 0;
 }
 
@@ -116,6 +117,9 @@ static void next_frame(struct oshu_audio *stream)
 	while (!stream->finished) {
 		int rc = avcodec_receive_frame(stream->decoder, stream->frame);
 		if (rc == 0) {
+			int64_t ts = stream->frame->best_effort_timestamp;
+			if (ts > 0)
+				stream->current_timestamp = stream->time_base * ts;
 			stream->sample_index = 0;
 			return;
 		} else if (rc == AVERROR(EAGAIN)) {
@@ -306,13 +310,6 @@ void oshu_audio_play(struct oshu_audio *stream)
 void oshu_audio_pause(struct oshu_audio *stream)
 {
 	SDL_PauseAudioDevice(stream->device_id, 1);
-}
-
-double oshu_audio_position(struct oshu_audio *stream)
-{
-	double base = av_q2d(stream->demuxer->streams[stream->stream_index]->time_base);
-	double timestamp = stream->frame->pkt_dts;
-	return timestamp * base;
 }
 
 void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample)

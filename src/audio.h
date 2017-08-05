@@ -95,6 +95,26 @@ struct oshu_audio {
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
 	AVFrame *frame;
+	/** The factor by which we must multiply ffmpeg timestamps to obtain
+	 *  seconds. Because it won't change for a given stream, compute it
+	 *  once and make it easily accessible.
+	 */
+	double time_base;
+	/** The current temporal position in the playing stream, expressed in
+	 *  floating seconds.
+	 *
+	 * Sometimes the best_effort_timestamp computed from a frame is
+	 *  erroneous. Rather than break everything, let's try to rely on the
+	 *  previous frame's timestamp, and therefore keep the timestamp in our
+	 *  structure, rather than using only ffmpeg's AVFrame.
+	 *
+	 *  In order to do that, the frame decoding routine will update the
+	 *  current_timestamp field whenever it reads a frame with a reasonable
+	 *  timestamp. It is field with the best_effort_timestamp, which means
+	 *  it must be multiplied by the time base in order to get a duration
+	 *  in seconds.
+	 */
+	double current_timestamp;
 	/** Current position in the decoded frame's buffer.
 	 *  Multiply it by the sample size to get the position in bytes. */
 	int sample_index;
@@ -137,16 +157,6 @@ void oshu_audio_play(struct oshu_audio *stream);
  * left playing.
  */
 void oshu_audio_play(struct oshu_audio *stream);
-
-/**
- * Compute the current position in the stream in seconds.
- *
- * The time is computed from the best effort timestamp of the last decoded
- * frame, and the time elasped between it was decoded.
- *
- * You *should* lock the audio using `SDL_LockAudio` when accessing it.
- */
-double oshu_audio_position(struct oshu_audio *stream);
 
 /**
  * Close the audio stream and free everything associated to it.

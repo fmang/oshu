@@ -64,8 +64,7 @@ int main(int argc, char **argv)
 
 	while (!stream->finished && !stop) {
 		SDL_LockAudio();
-		double pos = oshu_audio_position(stream);
-		int now = pos * 1000;
+		int now = stream->current_timestamp * 1000;
 		while (beatmap->hit_cursor && beatmap->hit_cursor->time < now) {
 			oshu_sample_play(stream, sample);
 			beatmap->hit_cursor = beatmap->hit_cursor->next;
