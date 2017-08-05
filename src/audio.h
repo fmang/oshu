@@ -163,7 +163,7 @@ void oshu_audio_play(struct oshu_audio *stream);
  * Calling \ref oshu_audio_play will resume the audio playback where it was
  * left playing.
  */
-void oshu_audio_play(struct oshu_audio *stream);
+void oshu_audio_pause(struct oshu_audio *stream);
 
 /**
  * Close the audio stream and free everything associated to it.

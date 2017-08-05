@@ -31,6 +31,7 @@ struct oshu_game {
 	struct oshu_display *display;
 	/** Will stop a the next iteration if this is true. */
 	int stop;
+	int paused;
 };
 
 /**
