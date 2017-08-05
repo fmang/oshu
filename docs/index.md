@@ -30,6 +30,21 @@ SDL2_image library, which is really lightweight and fits our needs.
 Code structure
 --------------
 
+\dot
+digraph modules {
+	rankdir=BT;
+	graph [splines=line];
+	node [shape=rect];
+	Audio;
+	Beatmap;
+	Graphics -> Beatmap;
+	Game -> Audio;
+	Game -> Beatmap;
+	Game -> Graphics;
+	Main -> Game;
+}
+\enddot
+
 The \ref log module provides a wrapper around SDL's logging facility and is
 used about everywhere in the code. It's an implicit dependency of all the
 modules.
