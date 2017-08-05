@@ -270,10 +270,6 @@ static void dump_beatmap_info(struct oshu_beatmap *beatmap)
  */
 static int validate(struct oshu_beatmap *beatmap)
 {
-	if (beatmap->general.mode != OSHU_MODE_OSU) {
-		oshu_log_error("unsupported mode");
-		return -1;
-	}
 	if (!beatmap->general.audio_filename) {
 		oshu_log_error("no audio file mentionned");
 		return -1;
