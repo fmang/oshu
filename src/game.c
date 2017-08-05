@@ -8,6 +8,8 @@
 #include "log.h"
 #include "game.h"
 
+#include <unistd.h>
+
 /** How long before or after the hit time a click event is considered on the
  *  mark. */
 static int hit_tolerance = 100 ; /* ms */
@@ -33,7 +35,11 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		goto fail;
 	}
 
-	if (oshu_sample_load("hit.wav", (*game)->audio, &(*game)->hit_sound) < 0) {
+	const char *hit_path = "hit.wav";
+	if (access(hit_path, F_OK) != 0)
+		hit_path = DATADIR "/hit.wav";
+	oshu_log_debug("loading %s", hit_path);
+	if (oshu_sample_load(hit_path, (*game)->audio, &(*game)->hit_sound) < 0) {
 		oshu_log_error("could not load hit.wav, aborting");
 		goto fail;
 	}

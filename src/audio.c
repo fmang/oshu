@@ -374,6 +374,7 @@ int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sa
 		goto fail;
 	return 0;
 fail:
+	oshu_log_error("SDL error when loading sample: %s", SDL_GetError());
 	free(*sample);
 	*sample = NULL;
 	return -1;
