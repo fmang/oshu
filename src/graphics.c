@@ -117,14 +117,24 @@ void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2
 
 void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, int msecs)
 {
-	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
-	oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius);
-	oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius - 2);
-	oshu_draw_line(display, hit->x - oshu_hit_radius, hit->y, hit->x + oshu_hit_radius, hit->y);
-	oshu_draw_line(display, hit->x, hit->y - oshu_hit_radius, hit->x, hit->y + oshu_hit_radius);
-	if (hit->time > msecs) {
-		double ratio = (double) (hit->time - msecs) / hit_time_in;
-		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius + ratio * hit_hint);
+	if (hit->state == OSHU_HIT_INITIAL) {
+		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
+		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius);
+		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius - 2);
+		oshu_draw_line(display, hit->x - oshu_hit_radius, hit->y, hit->x + oshu_hit_radius, hit->y);
+		oshu_draw_line(display, hit->x, hit->y - oshu_hit_radius, hit->x, hit->y + oshu_hit_radius);
+		if (hit->time > msecs) {
+			double ratio = (double) (hit->time - msecs) / hit_time_in;
+			oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius + ratio * hit_hint);
+		}
+	} else if (hit->state == OSHU_HIT_GOOD) {
+		SDL_SetRenderDrawColor(display->renderer, 64, 255, 64, 255);
+		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius / 3);
+	} else if (hit->state == OSHU_HIT_MISSED) {
+		SDL_SetRenderDrawColor(display->renderer, 255, 64, 64, 255);
+		int d = oshu_hit_radius / 3;
+		oshu_draw_line(display, hit->x - d, hit->y - d, hit->x + d, hit->y + d);
+		oshu_draw_line(display, hit->x + d, hit->y - d, hit->x - d, hit->y + d);
 	}
 }
 

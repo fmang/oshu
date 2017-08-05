@@ -53,6 +53,8 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
 			break;
 		if (hit->time < now - hit_clickable)
 			continue;
+		if (hit->state != OSHU_HIT_INITIAL)
+			continue;
 		int dx = x - hit->x;
 		int dy = y - hit->y;
 		int dist = sqrt(dx * dx + dy * dy);
@@ -71,11 +73,9 @@ static void hit(struct oshu_game *game)
 	struct oshu_hit *hit = find_hit(game, x, y);
 	if (hit) {
 		if (abs(hit->time - now) < hit_tolerance)
-			oshu_log_debug("hit!");
+			hit->state = OSHU_HIT_GOOD;
 		else
-			oshu_log_debug("miss");
-	} else {
-		oshu_log_debug("clicked on empty space");
+			hit->state = OSHU_HIT_MISSED;
 	}
 }
 

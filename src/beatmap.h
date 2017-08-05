@@ -70,6 +70,12 @@ enum oshu_hit_type {
 	OSHU_HIT_HOLD = 0b10000000, /**< Mania mode only. */
 };
 
+enum oshu_hit_state {
+	OSHU_HIT_INITIAL = 0,
+	OSHU_HIT_GOOD,
+	OSHU_HIT_MISSED,
+};
+
 /**
  * One hit object, and one link in the beatmap.
  *
@@ -84,6 +90,7 @@ struct oshu_hit {
 	int y; /**< 0-384 pixels, inclusive. */
 	int time; /**< Milliseconds. */
 	int type; /**< Combination of flags from \ref oshu_hit_type. */
+	enum oshu_hit_state state;
 	struct oshu_hit *next;
 };
 
