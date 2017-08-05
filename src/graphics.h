@@ -20,6 +20,11 @@
  */
 
 /**
+ * How big, in pixels, hit objects appear.
+ */
+extern const int oshu_hit_radius;
+
+/**
  * Store everything related to the current display.
  *
  * Holds the window, and all the textures and sprites required to show the
@@ -41,6 +46,10 @@ int oshu_display_init(struct oshu_display **display);
  */
 void oshu_display_destroy(struct oshu_display **display);
 
+/**
+ * Get the mouse position in game coordinates.
+ */
+void oshu_get_mouse(struct oshu_display *display, int *x, int *y);
 
 /**
  * \defgroup draw Draw
