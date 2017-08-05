@@ -1,14 +1,19 @@
+/**
+ * \file log.h
+ * \ingroup log
+ */
+
 #pragma once
 
 #include <SDL2/SDL.h>
 
-/** @defgroup log Log
+/** \defgroup log Log
  *
  * This module provides a set of macros to avoid mentionning the verbosely
  * named `SDL_LOG_CATEGORY_APPLICATION` parameter when using SDL's logging
  * facility.
  *
- * @{
+ * \{
  */
 
 /**
@@ -52,4 +57,4 @@
  */
 #define oshu_log_critical(...) SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, __VA_ARGS__)
 
-/** @} */
+/** \} */

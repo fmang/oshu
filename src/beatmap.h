@@ -1,6 +1,11 @@
+/**
+ * \file beatmap.h
+ * \ingroup beatmap
+ */
+
 #pragma once
 
-/** @defgroup beatmap Beatmap
+/** \defgroup beatmap Beatmap
  *
  * Check there for the format reference:
  * https://osu.ppy.sh/help/wiki/osu!_File_Formats
@@ -19,7 +24,7 @@
  * Because the format is so chaotic, the parser will happily ignore things it
  * doesn't understand, and generate a few warnings.
  *
- * @{
+ * \{
  */
 
 enum oshu_mode {
@@ -134,4 +139,4 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap);
  */
 void oshu_beatmap_free(struct oshu_beatmap **beatmap);
 
-/** @} */
+/** \} */

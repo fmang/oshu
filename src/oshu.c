@@ -1,3 +1,7 @@
+/**
+ * \file oshu.c
+ */
+
 #include "beatmap.h"
 #include "log.h"
 #include "audio.h"

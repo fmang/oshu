@@ -1,3 +1,8 @@
+/**
+ * \file graphics.h
+ * \ingroup graphics
+ */
+
 #pragma once
 
 #include <SDL2/SDL.h>
@@ -6,11 +11,11 @@
 #include "geometry.h"
 
 /**
- * @defgroup graphics Graphics
+ * \defgroup graphics Graphics
  *
  * Oshu's display-related routines and structure.
  *
- * @{
+ * \{
  */
 
 /**
@@ -37,7 +42,7 @@ void oshu_display_destroy(struct oshu_display **display);
 
 
 /**
- * @defgroup draw Draw
+ * \defgroup draw Draw
  *
  * Rendering functions, from the main \ref oshu_draw_beatmap to line drawing
  * helpers.
@@ -47,7 +52,7 @@ void oshu_display_destroy(struct oshu_display **display);
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
  *
- * @param msecs Current position in the playing song, in milliseconds.
+ * \param msecs Current position in the playing song, in milliseconds.
  */
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, int msecs);
 
@@ -81,6 +86,6 @@ void oshu_draw_circle(struct oshu_display *display, double x, double y, double r
  */
 void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2);
 
-/** @} */
+/** \} */
 
-/** @} */
+/** \} */

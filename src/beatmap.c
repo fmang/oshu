@@ -1,3 +1,8 @@
+/**
+ * \file beatmap.c
+ * \ingroup beatmap
+ */
+
 #include "beatmap.h"
 #include "log.h"
 

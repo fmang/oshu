@@ -1,9 +1,14 @@
+/**
+ * \file audio.h
+ * \ingroup audio
+ */
+
 #pragma once
 
 #include <libavformat/avformat.h>
 #include <SDL2/SDL.h>
 
-/** @defgroup audio Audio
+/** \defgroup audio Audio
  *
  * Oshu's audio module.
  *
@@ -74,7 +79,7 @@
  * Depending on how the SDL handles multiple devices, you may not be able to
  * open simultaneous streams.
  *
- * @{
+ * \{
  */
 
 /**
@@ -136,9 +141,9 @@ void oshu_audio_init();
  *
  * The stream can then be close with \ref oshu_audio_close.
  *
- * @param stream Will receive a newly allocated stream object.
+ * \param stream Will receive a newly allocated stream object.
  *
- * @return 0 on success. On error, -1 is returned and everything is free'd.
+ * \return 0 on success. On error, -1 is returned and everything is free'd.
  */
 int oshu_audio_open(const char *url, struct oshu_audio **stream);
 
@@ -166,7 +171,7 @@ void oshu_audio_play(struct oshu_audio *stream);
 void oshu_audio_close(struct oshu_audio **stream);
 
 /**
- * @defgroup sample Sample
+ * \defgroup sample Sample
  *
  * This sample module provides a means to load WAV files using SDL's WAV
  * loader.
@@ -178,7 +183,7 @@ void oshu_audio_close(struct oshu_audio **stream);
  * Use \ref oshu_audio_play_sample to start playing a sample on top of the
  * currently playing audio.
  *
- * @{
+ * \{
  */
 
 /**
@@ -202,8 +207,8 @@ struct oshu_sample {
  * On success, you must free the sample object with \ref oshu_sample_free. On
  * failure, the object is already free'd.
  *
- * @param sample Receive the sample object.
- * @return 0 on success, -1 on failure.
+ * \param sample Receive the sample object.
+ * \return 0 on success, -1 on failure.
  */
 int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sample **sample);
 
@@ -227,16 +232,16 @@ void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample);
 void oshu_sample_free(struct oshu_sample **sample);
 
 
-/** @}
+/** \}
  *
- * @defgroup sampleset Sample set
+ * \defgroup sampleset Sample set
  *
  * A sample set is a collection of all the samples needed to play a beatmap.
  *
  * It is stored as an array of pointers to sample, whose index is a combination
  * of flags from the structure below.
  *
- * @{
+ * \{
  */
 
 enum oshu_sampleset_index {
@@ -283,6 +288,6 @@ int oshu_sampleset_all(struct oshu_sample *set);
  */
 void oshu_sampleset_free(struct oshu_sample **set);
 
-/** @} */
+/** \} */
 
-/** @} */
+/** \} */

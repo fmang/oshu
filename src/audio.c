@@ -1,3 +1,8 @@
+/**
+ * \file audio.c
+ * \ingroup audio
+ */
+
 #include "audio.h"
 #include "log.h"
 
@@ -45,7 +50,7 @@ void oshu_audio_init()
 
 /**
  * Open the libavformat demuxer, and find the best audio stream.
- * @return 0 on success and an ffmpeg error code on failure.
+ * \return 0 on success and an ffmpeg error code on failure.
  */
 static int open_demuxer(const char *url, struct oshu_audio *stream)
 {
@@ -137,7 +142,7 @@ static void next_frame(struct oshu_audio *stream)
 
 /**
  * Initialize the libavcodec decoder.
- * @return an ffmpeg error code on failure, and 0 on success.
+ * \return an ffmpeg error code on failure, and 0 on success.
  */
 static int open_decoder(struct oshu_audio *stream)
 {
@@ -256,7 +261,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 
 /**
  * Initialize the SDL audio device.
- * @return 0 on success, -1 on error.
+ * \return 0 on success, -1 on error.
  */
 static int open_device(struct oshu_audio *stream)
 {

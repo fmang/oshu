@@ -1,3 +1,8 @@
+/**
+ * \file graphics.c
+ * \ingroup graphics
+ */
+
 #include "graphics.h"
 #include "log.h"
 
