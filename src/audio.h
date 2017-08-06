@@ -291,7 +291,7 @@ enum oshu_sampleset_index {
 	OSHU_SAMPLESET_SIZE = 64,
 };
 
-typedef oshu_sample *oshu_sampleset;
+typedef struct oshu_sample *oshu_sampleset;
 
 int oshu_sampleset_new(oshu_sampleset *set);
 
