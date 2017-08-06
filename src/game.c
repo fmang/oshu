@@ -129,14 +129,21 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
 			break;
-		if (event->key.keysym.sym == SDLK_w)
+		switch (event->key.keysym.sym) {
+		case SDLK_w:
+		case SDLK_x:
+		case SDLK_z:
 			hit(game);
-		else if (event->key.keysym.sym == SDLK_x)
 			hit(game);
-		else if (event->key.keysym.sym == SDLK_q)
+			break;
+		case SDLK_q:
 			game->stop = 1;
-		else if (event->key.keysym.sym == SDLK_ESCAPE)
+			break;
+		case SDLK_ESCAPE:
+		case SDLK_SPACE:
 			toggle_pause(game);
+			break;
+		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 		hit(game);
