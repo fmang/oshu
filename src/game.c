@@ -134,7 +134,6 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		case SDLK_x:
 		case SDLK_z:
 			hit(game);
-			hit(game);
 			break;
 		case SDLK_q:
 			game->stop = 1;
