@@ -22,3 +22,4 @@ Makefile.in
 /docs/oshu.1
 
 /src/oshu
+/oshu-*.tar.*

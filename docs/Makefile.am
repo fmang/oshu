@@ -4,3 +4,5 @@ apidoc: Doxyfile
 endif
 
 man_MANS = oshu.1
+
+EXTRA_DIST = index.md
