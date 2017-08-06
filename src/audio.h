@@ -88,8 +88,10 @@
  * demuxer and decoder to the audio device that will output the sound.
  *
  * This structure is mainly accessed through an audio thread, and should be
- * locked using SDL's `SDL_LockAudio` and `SDL_UnlockAudio` procedures in order
- * to be accessed peacefully.
+ * locked using SDL's `SDL_LockAudioDevice` and `SDL_UnlockAudioDevice`
+ * procedures in order to be accessed peacefully from another thread. You don't
+ * need to bother with locking when using the accessors defined in this module
+ * though. Only lock when accessing the multiplie fields directory.
  */
 struct oshu_audio {
 	AVFormatContext *demuxer;

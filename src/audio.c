@@ -319,9 +319,11 @@ void oshu_audio_pause(struct oshu_audio *stream)
 
 void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample)
 {
+	SDL_LockAudioDevice(stream->device_id);
 	stream->overlay = sample;
 	if (sample)
 		sample->cursor = 0;
+	SDL_UnlockAudioDevice(stream->device_id);
 }
 
 void oshu_audio_close(struct oshu_audio **stream)

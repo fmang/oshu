@@ -98,9 +98,7 @@ static void hit(struct oshu_game *game)
 	if (hit) {
 		if (abs(hit->time - now) < hit_tolerance) {
 			hit->state = OSHU_HIT_GOOD;
-			SDL_LockAudio();
 			oshu_sample_play(game->audio, game->hit_sound);
-			SDL_UnlockAudio();
 		} else {
 			hit->state = OSHU_HIT_MISSED;
 		}
@@ -109,7 +107,6 @@ static void hit(struct oshu_game *game)
 
 static void toggle_pause(struct oshu_game *game)
 {
-	SDL_LockAudio();
 	if (game->paused) {
 		oshu_audio_play(game->audio);
 		game->paused = 0;
@@ -117,7 +114,6 @@ static void toggle_pause(struct oshu_game *game)
 		oshu_audio_pause(game->audio);
 		game->paused = 1;
 	}
-	SDL_UnlockAudio();
 }
 
 /**
@@ -168,9 +164,7 @@ static void check_audio(struct oshu_game *game)
 				break;
 			} else if (hit->state == OSHU_HIT_INITIAL) {
 				hit->state = OSHU_HIT_GOOD;
-				SDL_LockAudio();
 				oshu_sample_play(game->audio, game->hit_sound);
-				SDL_UnlockAudio();
 			}
 		}
 	} else {
