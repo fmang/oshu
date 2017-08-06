@@ -13,6 +13,7 @@
 
 #include <getopt.h>
 #include <signal.h>
+#include <unistd.h>
 
 enum option_values {
 	OPT_AUTOPLAY = 0x10000,
@@ -114,7 +115,18 @@ int main(int argc, char **argv)
 		fputs(usage, stderr);
 		return 2;
 	}
+
 	char *beatmap_path = argv[optind];
+	char *slash = strrchr(beatmap_path, '/');
+	if (slash) {
+		*slash = '\0';
+		oshu_log_debug("changing the current directory to %s", beatmap_path);
+		if (chdir(beatmap_path) < 0) {
+			oshu_log_error("error while changing directory: %s", strerror(errno));
+			return 3;
+		}
+		beatmap_path = slash + 1;
+	}
 
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
