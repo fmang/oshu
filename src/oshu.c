@@ -11,7 +11,29 @@
 #include "game.h"
 #include "../config.h"
 
+#include <getopt.h>
 #include <signal.h>
+
+static struct option options[] = {
+	{"verbose", no_argument, 0, 'v'},
+	{"help", no_argument, 0, 'h'},
+	{0, 0, 0, 0},
+};
+
+static const char *flags = "vh";
+
+static const char *usage =
+	"Usage: oshu [-v] BEATMAP.osu\n"
+	"       oshu --help\n"
+;
+
+static const char *help =
+	"Options:\n"
+	"  -v, --verbose       Increase the verbosity.\n"
+	"  -h, --help          Show this help message.\n"
+	"\n"
+	"Check the man page oshu(1) for details.\n"
+;
 
 static struct oshu_game *current_game;
 
@@ -21,26 +43,13 @@ static void signal_handler(int signum)
 		current_game->stop = 1;
 }
 
-int main(int argc, char **argv)
+int run(const char *beatmap_path)
 {
-	if (argc != 2) {
-		puts("oshu! version " VERSION);
-		puts("Usage: oshu beatmap.osu");
-		return 5;
-	}
-
-	signal(SIGTERM, signal_handler);
-	signal(SIGINT, signal_handler);
-
 	int rc = 0;
-	char *beatmap_path = argv[1];
-
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0) {
 		oshu_log_error("SDL initialization error: %s", SDL_GetError());
-		return 1;
+		return -1;
 	}
 
 	oshu_audio_init();
@@ -59,5 +68,44 @@ done:
 	if (current_game)
 		oshu_game_destroy(&current_game);
 	SDL_Quit();
-	return (rc == 0) ? 0 : 1;
+	return rc;
+}
+
+int main(int argc, char **argv)
+{
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
+
+	for (;;) {
+		int c = getopt_long(argc, argv, flags, options, NULL);
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'v':
+			SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
+			break;
+		case 'h':
+			puts("oshu! version " VERSION);
+			puts(usage);
+			fputs(help, stdout);
+			return 0;
+		default:
+			fputs(usage, stderr);
+			return 2;
+		}
+	}
+
+	if (argc - optind != 1) {
+		fputs(usage, stderr);
+		return 2;
+	}
+	char *beatmap_path = argv[optind];
+
+	signal(SIGTERM, signal_handler);
+	signal(SIGINT, signal_handler);
+
+	if (run(beatmap_path) < 0)
+		return 1;
+
+	return 0;
 }
