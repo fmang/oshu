@@ -1,8 +1,52 @@
 .TH OSHU "1" "August 2017" "oshu! @VERSION@" "User Manual"
 
 .SH NAME
-oshu \- Lightweight clone of the osu! rhythm game
+oshu \- Lightweight port of the osu! rhythm game
 
 .SH SYNOPSIS
 .B oshu
 \fIBEATMAP\fR.osu
+
+.SH DESCRIPTION
+.PP
+Play a \fB.osu\fR beatmap file. Most linked files are automatically found from
+the data inside the beatmap file.
+.PP
+\fB.osz\fR files are not supported, but since they're just fancy ZIP files, you
+just have to unzip them into a sub-directory. Be careful though, it won't
+create the sub-directory by itself if you naively unzip it.
+.PP
+A \fIhit.wav\fR file is required in order to play the sound effect when
+clicking on a hit object. oshu! will first look into the current directory for
+a file named like that. If it cannot find it, it will look into the default
+data directory, configured at build time. That will be \fI@datadir@/hit.wav\fR
+for you.
+.TP
+\fB\-v, \-\-verbose\fR
+Increase the verbosity. This will print debugging messages, which may contain
+useful information for understanding errors when fixing issues.
+.TP
+\fB\-h, \-\-help\fR
+Show a brief help message.
+
+.SH CONTROLS
+.PP
+The game is controlled from the keyboard and mouse. The keys are based on
+osu!'s default settings.
+.TP
+\fBW, X, Z, mouse click\fR
+Hit an object.
+.TP
+\fBEscape, Space\fR
+Toggle pause.
+.TP
+\fBQ\fR
+Quit the game.
+
+.SH AUTHOR
+Written by Frédéric Mangano-Tarumi <fmang+oshu at mg0 fr>.
+
+.SH BUGS
+Report bugs at <https://github.com/fmang/oshu/issues>.
+.br
+Feel also free to join the official IRC channel, #oshu at chat.freenode.net.
