@@ -205,10 +205,12 @@ fail:
  */
 static void dump_stream_info(struct oshu_audio *audio)
 {
-	oshu_log_info("audio codec: %s", audio->codec->long_name);
-	oshu_log_info("sample rate: %d Hz", audio->decoder->sample_rate);
-	oshu_log_info("number of channels: %d", audio->decoder->channels);
-	oshu_log_info("format: %s", av_get_sample_fmt_name(audio->decoder->sample_fmt));
+	oshu_log_info("============ Audio information ============");
+	oshu_log_info("            Codec: %s.", audio->codec->long_name);
+	oshu_log_info("      Sample rate: %d Hz.", audio->decoder->sample_rate);
+	oshu_log_info(" Average bit rate: %d kbps.", audio->decoder->bit_rate / 1000);
+	oshu_log_info("    Sample format: %s.", av_get_sample_fmt_name(audio->decoder->sample_fmt));
+	oshu_log_info("         Duration: %d seconds.", (int) (audio->stream->duration * audio->time_base));
 }
 
 /**
