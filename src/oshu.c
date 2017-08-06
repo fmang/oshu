@@ -1,9 +1,15 @@
 /**
  * \file oshu.c
+ *
+ * \brief
+ * Main entry-point for the game.
+ *
+ * Interpret command-line arguments and spawn everything.
  */
 
 #include "log.h"
 #include "game.h"
+#include "../config.h"
 
 #include <signal.h>
 
@@ -18,6 +24,7 @@ static void signal_handler(int signum)
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
+		puts("oshu! version " VERSION);
 		puts("Usage: oshu beatmap.osu");
 		return 5;
 	}
