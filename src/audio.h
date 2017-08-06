@@ -3,7 +3,7 @@
  * \ingroup audio
  *
  * \brief
- * Definition of the audio module and its sub-modules.
+ * Definition of the audio module and its submodules.
  */
 
 #pragma once
