@@ -230,29 +230,33 @@ static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
 	AVFrame *frame = stream->frame;
 	int sample_size = av_get_bytes_per_sample(frame->format);
 	int planar = av_sample_fmt_is_planar(frame->format);
-	int left = len;
-	while (left > 0 && !stream->finished) {
-		while (left > 0 && stream->sample_index < frame->nb_samples) {
-			/* Copy 1 sample per iteration to each channel. */
-			if (planar) {
+	while (len > 0 && !stream->finished) {
+		if (stream->sample_index >= frame->nb_samples)
+			next_frame(stream);
+		if (planar) {
+			while (len > 0 && stream->sample_index < frame->nb_samples) {
+				/* Copy 1 sample per iteration. */
 				size_t offset = sample_size * stream->sample_index;
 				for (int ch = 0; ch < frame->channels; ch++) {
 					memcpy(buffer, frame->data[ch] + offset, sample_size);
 					buffer += sample_size;
 				}
-			} else {
-				size_t offset = sample_size * stream->sample_index * frame->channels;
-				memcpy(buffer, frame->data[0] + offset, sample_size * frame->channels);
-				buffer += sample_size * frame->channels;
+				len -= sample_size * frame->channels;
+				stream->sample_index++;
 			}
-			left -= sample_size * frame->channels;
-			stream->sample_index++;
+		} else {
+			size_t offset = sample_size * stream->sample_index * frame->channels;
+			size_t left = sample_size * frame->nb_samples * frame->channels - offset;
+			size_t block = (left < len) ? left : len;
+			assert (block % (sample_size * frame->channels) == 0);
+			memcpy(buffer, frame->data[0] + offset, block);
+			buffer += block;
+			len -= block;
+			stream->sample_index += block / (sample_size * frame->channels);
 		}
-		if (stream->sample_index >= frame->nb_samples)
-			next_frame(stream);
 	}
-	assert (left >= 0);
-	memset(buffer, left, stream->device_spec.silence);
+	assert (len >= 0);
+	memset(buffer, len, stream->device_spec.silence);
 }
 
 /**
