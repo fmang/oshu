@@ -68,26 +68,27 @@ void oshu_audio_init()
 static int next_page(struct oshu_audio *audio)
 {
 	int rc;
-	AVPacket packet;
 	for (;;) {
-		rc = av_read_frame(audio->demuxer, &packet);
+		rc = av_read_frame(audio->demuxer, &audio->packet);
 		if (rc == AVERROR_EOF) {
 			oshu_log_debug("reached the last page, flushing");
-			if ((rc = avcodec_send_packet(audio->decoder, NULL)) < 0)
-				goto fail;
-			return 0;
+			rc = avcodec_send_packet(audio->decoder, NULL);
+			break;
 		} else if (rc < 0) {
-			goto fail;
+			break;
 		}
-		if (packet.stream_index == audio->stream->index) {
-			if ((rc = avcodec_send_packet(audio->decoder, &packet)) < 0)
-				goto fail;
-			return 0;
+		if (audio->packet.stream_index == audio->stream->index) {
+			rc = avcodec_send_packet(audio->decoder, &audio->packet);
+			break;
 		}
+		av_packet_unref(&audio->packet);
 	}
-fail:
-	log_av_error(rc);
-	return -1;
+	av_packet_unref(&audio->packet);
+	if (rc < 0) {
+		log_av_error(rc);
+		return -1;
+	}
+	return 0;
 }
 
 /**
@@ -370,7 +371,7 @@ void oshu_audio_close(struct oshu_audio **audio)
 	if ((*audio)->frame)
 		av_frame_free(&(*audio)->frame);
 	if ((*audio)->decoder)
-		avcodec_close((*audio)->decoder);
+		avcodec_free_context(&(*audio)->decoder);
 	if ((*audio)->demuxer)
 		avformat_close_input(&(*audio)->demuxer);
 	free(*audio);

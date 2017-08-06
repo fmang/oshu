@@ -108,6 +108,7 @@ struct oshu_audio {
 	AVFormatContext *demuxer;
 	AVCodec *codec;
 	AVStream *stream;
+	AVPacket packet;
 	/**
 	 * The factor by which we must multiply ffmpeg timestamps to obtain
 	 * seconds. Because it won't change for a given stream, compute it
