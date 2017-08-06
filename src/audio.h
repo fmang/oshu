@@ -1,6 +1,9 @@
 /**
  * \file audio.h
  * \ingroup audio
+ *
+ * \brief
+ * Definition of the audio module and its sub-modules.
  */
 
 #pragma once
@@ -14,6 +17,9 @@
  * Open and decode any kind of audio file using ffmpeg. libavformat does the
  * demuxing, libavcodec decodes. Then feed the decoded samples to SDL's audio
  * device.
+ *
+ * Using this module, you should never need to call SDL's audio routines or
+ * ffmpeg's directly.
  *
  * Given this level of control, we aim to synchronize as well as we can to the
  * audio playback. This is a rhythm game after all. However, determining what
@@ -56,17 +62,17 @@
  * sent into SDL's audio samples buffer, which are relayed to the sound card.
  * The elapsed time between the frame decoding and its actual playback cannot
  * easily be determined, so we'll get a consistent lag, sadly. This consistent
- * lag can be rectified with a voluntary bias on the computed position.
- *
- * Playing a random file, I noticed the SDL callback for a buffer of 2048
- * samples is called about every 20 or 30 ms, which was mapped nicely to a
- * single frame.
+ * lag can be rectified with a voluntary bias on the computed position. Note
+ * however than the sound effects we'll trigger will suffer from that exact
+ * same bias.
  *
  * To use this module, first call \ref oshu_audio_init. Then open streams using
  * \ref oshu_audio_open, and play them using \ref oshu_audio_play. When you're
- * done, close your streams with \ref oshu_audio_close.
+ * done, close your streams with \ref oshu_audio_close. Also make sure you
+ * initialized SDL with the audio submodule.
  *
  * ```
+ * SDL_Init(SDL_AUDIO|...);
  * oshu_audio_init();
  * struct oshu_audio *stream;
  * oshu_audio_open("file.ogg", &stream);
@@ -78,47 +84,58 @@
  * Depending on how the SDL handles multiple devices, you may not be able to
  * open simultaneous streams.
  *
+ * This module was carefully built and should be relied upon. Its main
+ * limitations are that it cannot play sample formats not supported by SDL,
+ * like 64-bit integer samples that nobody use, and that it cannot play more
+ * than one sample on top of the main audio stream.
+ *
  * \{
  */
 
 /**
- * An audio stream.
- *
- * This includes everything related to the playback of an audio file, from the
- * demuxer and decoder to the audio device that will output the sound.
+ * An audio stream, from its demuxer and decoder to its output device.
  *
  * This structure is mainly accessed through an audio thread, and should be
  * locked using SDL's `SDL_LockAudioDevice` and `SDL_UnlockAudioDevice`
  * procedures in order to be accessed peacefully from another thread. You don't
  * need to bother with locking when using the accessors defined in this module
- * though. Only lock when accessing the multiplie fields directory.
+ * though. Only lock when accessing the multiplie fields directly.
+ *
+ * The only two fields you'll want to use outside of this module are \ref
+ * current_timestamp and \ref finished.
  */
 struct oshu_audio {
 	AVFormatContext *demuxer;
 	AVCodec *codec;
-	int stream_index;
+	AVStream *stream;
+	/**
+	 * The factor by which we must multiply ffmpeg timestamps to obtain
+	 * seconds. Because it won't change for a given stream, compute it
+	 * once and make it easily accessible.
+	 */
+	double time_base;
 	AVCodecContext *decoder;
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
-	AVFrame *frame;
-	/** The factor by which we must multiply ffmpeg timestamps to obtain
-	 *  seconds. Because it won't change for a given stream, compute it
-	 *  once and make it easily accessible.
+	/**
+	 * The last decoded frame. It is always valid unless the playback is
+	 * \ref finished, in which case its value is undefined.
 	 */
-	double time_base;
-	/** The current temporal position in the playing stream, expressed in
-	 *  floating seconds.
+	AVFrame *frame;
+	/**
+	 * The current temporal position in the playing stream, expressed in
+	 * floating seconds.
 	 *
-	 * Sometimes the best_effort_timestamp computed from a frame is
-	 *  erroneous. Rather than break everything, let's try to rely on the
-	 *  previous frame's timestamp, and therefore keep the timestamp in our
-	 *  structure, rather than using only ffmpeg's AVFrame.
+	 * Sometimes the best-effort timestamp computed from a frame is
+	 * erroneous. Rather than break everything, let's try to rely on the
+	 * previous frame's timestamp, and therefore keep the timestamp in our
+	 * structure, rather than using only ffmpeg's AVFrame.
 	 *
-	 *  In order to do that, the frame decoding routine will update the
-	 *  current_timestamp field whenever it reads a frame with a reasonable
-	 *  timestamp. It is field with the best_effort_timestamp, which means
-	 *  it must be multiplied by the time base in order to get a duration
-	 *  in seconds.
+	 * In order to do that, the frame decoding routine will update the \ref
+	 * current_timestamp field whenever it reads a frame with a reasonable
+	 * timestamp. It is computed from libavcodec's `best_effort_timestamp`,
+	 * which means it was be multiplied by the time base in order to get a
+	 * duration in seconds.
 	 */
 	double current_timestamp;
 	/** Current position in the decoded frame's buffer.
@@ -129,7 +146,7 @@ struct oshu_audio {
 	/** Sound sample to play on top of the audio stream.
 	 *
 	 *  Its memory space is not managed by this structure though, make sure
-	 *  you free it yourself. */
+	 *  you free it yourself using \ref oshu_sample_free. */
 	struct oshu_sample *overlay;
 };
 
@@ -141,13 +158,14 @@ struct oshu_audio {
 void oshu_audio_init();
 
 /**
- * Opens a file and initialize everything needed to play it.
+ * Open a file and initialize everything needed to play it.
  *
- * The stream can then be close with \ref oshu_audio_close.
+ * The stream can then be closed and freed with \ref oshu_audio_close.
  *
+ * \param url Path or URL to the audio file to play.
  * \param stream Will receive a newly allocated stream object.
  *
- * \return 0 on success. On error, -1 is returned and everything is free'd.
+ * \return 0 on success. On error, -1 is returned and everything is freed.
  */
 int oshu_audio_open(const char *url, struct oshu_audio **stream);
 
@@ -168,9 +186,12 @@ void oshu_audio_play(struct oshu_audio *stream);
 void oshu_audio_pause(struct oshu_audio *stream);
 
 /**
- * Close the audio stream and free everything associated to it.
+ * Close the audio stream and free everything associated to it, then set
+ * `*stream` to *NULL.
  *
- * Set `*stream` to *NULL*.
+ * If `*stream` is *NULL*, do nothing.
+ *
+ * You must not call this function with a null pointer though.
  */
 void oshu_audio_close(struct oshu_audio **stream);
 
