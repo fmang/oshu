@@ -1,6 +1,9 @@
 /**
  * \file audio.c
  * \ingroup audio
+ *
+ * \brief
+ * Implementation of the audio module and its submodules.
  */
 
 #include "audio.h"
@@ -230,6 +233,7 @@ static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
 	int left = len;
 	while (left > 0 && !stream->finished) {
 		while (left > 0 && stream->sample_index < frame->nb_samples) {
+			/* Copy 1 sample per iteration to each channel. */
 			if (planar) {
 				size_t offset = sample_size * stream->sample_index;
 				for (int ch = 0; ch < frame->channels; ch++) {
@@ -253,6 +257,12 @@ static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
 
 /**
  * Mix the already present data in the buffer with the sample.
+ *
+ * This should be called right after \ref fill_audio.
+ *
+ * Note that SDL's documentation recommends against calling
+ * `SDL_MixAudioFormat` more than once, because the clipping would deteriorate
+ * the overall sound quality.
  */
 static void mix_sample(Uint8 *buffer, int len, struct oshu_audio *stream, struct oshu_sample *sample)
 {
