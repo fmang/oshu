@@ -241,7 +241,7 @@ struct oshu_sample {
  * only.
  *
  * On success, you must free the sample object with #oshu_sample_free. On
- * failure, the object is already free'd.
+ * failure, the object is freed for you.
  *
  * \param path Path to the WAV file to load.
  * \param audio The stream on top of which the sample is meant to be played.
@@ -265,6 +265,9 @@ void oshu_sample_play(struct oshu_audio *audio, struct oshu_sample *sample);
 
 /**
  * Free the sample object along with its buffer data.
+ *
+ * Note that you should close the associated #oshu_audio object before freeing
+ * the samples it may use.
  *
  * Set `*sample` to *NULL.
  */
