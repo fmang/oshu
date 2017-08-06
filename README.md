@@ -24,9 +24,19 @@ Let's make a compatible lightweight version of the game!
 Install
 -------
 
+First of all, make sure you have the required dependencies. These things are so
+common that I may assure you they're in your distribution's official
+repositories.
+
+- SDL2,
+- ffmpeg or libav,
+- a C99 compiler,
+- pkg-config,
+- autoconf, automake (when building from the git repository).
+
 oshu! is a standard autoconf'd project, so install it the regular way with:
 
-	./autogen.sh
+	# ./autogen.sh if the configure file is missing.
 	./configure --prefix="$HOME/.local"
 	make && make install
 
