@@ -28,6 +28,9 @@ useful information for understanding errors when fixing issues.
 .TP
 \fB\-h, \-\-help\fR
 Show a brief help message.
+.TP
+\fB\-h, \-\-autoplay\fR
+Perform a perfect run on the beatmap without any user interaction.
 
 .SH CONTROLS
 .PP

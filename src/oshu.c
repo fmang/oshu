@@ -14,9 +14,16 @@
 #include <getopt.h>
 #include <signal.h>
 
+enum option_values {
+	OPT_AUTOPLAY = 0x10000,
+	OPT_HELP = 'h',
+	OPT_VERBOSE = 'v',
+};
+
 static struct option options[] = {
-	{"verbose", no_argument, 0, 'v'},
-	{"help", no_argument, 0, 'h'},
+	{"autoplay", no_argument, 0, OPT_AUTOPLAY},
+	{"help", no_argument, 0, OPT_HELP},
+	{"verbose", no_argument, 0, OPT_VERBOSE},
 	{0, 0, 0, 0},
 };
 
@@ -31,6 +38,7 @@ static const char *help =
 	"Options:\n"
 	"  -v, --verbose       Increase the verbosity.\n"
 	"  -h, --help          Show this help message.\n"
+	"  --autoplay          Perform a perfect run.\n"
 	"\n"
 	"Check the man page oshu(1) for details.\n"
 ;
@@ -43,7 +51,7 @@ static void signal_handler(int signum)
 		current_game->stop = 1;
 }
 
-int run(const char *beatmap_path)
+int run(const char *beatmap_path, int autoplay)
 {
 	int rc = 0;
 
@@ -58,6 +66,8 @@ int run(const char *beatmap_path)
 		oshu_log_error("game initialization failed");
 		goto done;
 	}
+
+	current_game->autoplay = autoplay;
 
 	if ((rc = oshu_game_run(current_game)) < 0) {
 		oshu_log_error("error while running the game, aborting");
@@ -76,19 +86,24 @@ int main(int argc, char **argv)
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
+	int autoplay = 0;
+
 	for (;;) {
 		int c = getopt_long(argc, argv, flags, options, NULL);
 		if (c == -1)
 			break;
 		switch (c) {
-		case 'v':
+		case OPT_VERBOSE:
 			SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 			break;
-		case 'h':
+		case OPT_HELP:
 			puts("oshu! version " VERSION);
 			puts(usage);
 			fputs(help, stdout);
 			return 0;
+		case OPT_AUTOPLAY:
+			autoplay = 1;
+			break;
 		default:
 			fputs(usage, stderr);
 			return 2;
@@ -104,7 +119,7 @@ int main(int argc, char **argv)
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
-	if (run(beatmap_path) < 0)
+	if (run(beatmap_path, autoplay) < 0)
 		return 1;
 
 	return 0;

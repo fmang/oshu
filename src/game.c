@@ -89,7 +89,7 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
  */
 static void hit(struct oshu_game *game)
 {
-	if (game->paused)
+	if (game->paused || game->autoplay)
 		return;
 	int x, y;
 	oshu_get_mouse(game->display, &x, &y);
@@ -162,11 +162,24 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 static void check_audio(struct oshu_game *game)
 {
 	int now = game->audio->current_timestamp * 1000;
-	for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
-		if (hit->time > now - hit_tolerance)
-			break;
-		if (hit->state == OSHU_HIT_INITIAL)
-			hit->state = OSHU_HIT_MISSED;
+	if (game->autoplay) {
+		for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
+			if (hit->time > now) {
+				break;
+			} else if (hit->state == OSHU_HIT_INITIAL) {
+				hit->state = OSHU_HIT_GOOD;
+				SDL_LockAudio();
+				oshu_sample_play(game->audio, game->hit_sound);
+				SDL_UnlockAudio();
+			}
+		}
+	} else {
+		for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
+			if (hit->time > now - hit_tolerance)
+				break;
+			if (hit->state == OSHU_HIT_INITIAL)
+				hit->state = OSHU_HIT_MISSED;
+		}
 	}
 	for (
 		struct oshu_hit **hit = &game->beatmap->hit_cursor;

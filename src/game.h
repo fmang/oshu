@@ -31,6 +31,9 @@ struct oshu_game {
 	struct oshu_display *display;
 	/** Will stop a the next iteration if this is true. */
 	int stop;
+	/** On autoplay mode, the user interactions are ignored and every
+	 *  object will be perfectly hit. */
+	int autoplay;
 	int paused;
 };
 
