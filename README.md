@@ -111,7 +111,9 @@ Because the project is really young, please join the #oshu IRC channel on
 contribute. Someone is probably already working on your idea, and most likely
 myself :)
 
-You may also open issues or contact me directly by mail.
+You may also open issues on [GitHub]() or contact me directly by mail.
+
+[GitHub]: https://github.com/fmang/oshu/
 
 
 Name
