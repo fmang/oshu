@@ -71,7 +71,7 @@
  * done, close your streams with #oshu_audio_close. Also make sure you
  * initialized SDL with the audio submodule.
  *
- * ```
+ * ```c
  * SDL_Init(SDL_AUDIO|...);
  * oshu_audio_init();
  * struct oshu_audio *audio;
@@ -208,6 +208,15 @@ void oshu_audio_close(struct oshu_audio **audio);
  *
  * Use #oshu_sample_play to start playing a sample on top of the currently
  * playing audio.
+ *
+ * ```c
+ * struct oshu_audio *audio; // defined somewhere else
+ * struct oshu_sample *sample;
+ * oshu_sample_load("hit.wav", audio, &sample);
+ * oshu_sample_play(audio, sample);
+ * things();
+ * oshu_sample_free(&sample);
+ * ```
  *
  * \{
  */
