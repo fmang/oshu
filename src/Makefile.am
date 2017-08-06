@@ -1,7 +1,7 @@
 bin_PROGRAMS = oshu
 
 oshu_SOURCES = \
-	oshu.c oshu.h \
+	oshu.c \
 	audio.c audio.h \
 	beatmap.c beatmap.h \
 	graphics.c graphics.h \
@@ -9,5 +9,5 @@ oshu_SOURCES = \
 	game.h game.c \
 	log.h
 
-oshu_CFLAGS = -DDATADIR='"$(datadir)"' $(SDL2_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LAVU_CFLAGS)
+oshu_CFLAGS = -DPKGDATADIR='"$(pkgdatadir)"' $(SDL2_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LAVU_CFLAGS)
 oshu_LDADD = -lm $(SDL2_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LAVU_LIBS)

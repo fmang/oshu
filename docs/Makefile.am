@@ -1,8 +1,6 @@
 if HAVE_DOXYGEN
-
-all-local: Doxyfile
+apidoc: Doxyfile
 	$(DOXYGEN) Doxyfile
-
 endif
 
 man_MANS = oshu.1
