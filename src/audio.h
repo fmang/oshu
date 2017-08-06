@@ -206,8 +206,8 @@ void oshu_audio_close(struct oshu_audio **audio);
  * and reactive, the samples are always stored in-memory. Do not confuse it
  * with a PCM sample.
  *
- * Use \ref oshu_audio_play_sample to start playing a sample on top of the
- * currently playing audio.
+ * Use \ref oshu_sample_play to start playing a sample on top of the currently
+ * playing audio.
  *
  * \{
  */
@@ -233,7 +233,10 @@ struct oshu_sample {
  * On success, you must free the sample object with \ref oshu_sample_free. On
  * failure, the object is already free'd.
  *
+ * \param path Path to the WAV file to load.
+ * \param audio The stream on top of which the sample is meant to be played.
  * \param sample Receive the sample object.
+ *
  * \return 0 on success, -1 on failure.
  */
 int oshu_sample_load(const char *path, struct oshu_audio *audio, struct oshu_sample **sample);

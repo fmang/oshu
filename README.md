@@ -116,12 +116,12 @@ files to play the drum, whistle and other kinds of sound effects.
 Contributing
 ------------
 
-Because the project is really young, please join the #oshu IRC channel on
+Because the project is really young, please join the \#oshu IRC channel on
 [chat.freenode.net](https://freenode.net/kb/answer/chat) if you'd like to
 contribute. Someone is probably already working on your idea, and most likely
 myself :)
 
-You may also open issues on [GitHub]() or contact me directly by mail.
+You may also open issues on [GitHub][] or contact me directly by mail.
 
 [GitHub]: https://github.com/fmang/oshu/
 

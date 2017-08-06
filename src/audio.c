@@ -129,7 +129,7 @@ finish:
 /**
  * Open the libavformat demuxer, and find the best audio stream.
  *
- * Fill \ref oshu_audio::demux, \ref oshu_audio::codec, \ref
+ * Fill \ref oshu_audio::demuxer, \ref oshu_audio::codec, \ref
  * oshu_audio::stream and \ref oshu_audio::time_base.
  *
  * \return 0 on success, -1 on error.

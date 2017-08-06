@@ -63,7 +63,7 @@ void oshu_get_mouse(struct oshu_display *display, int *x, int *y);
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
  *
- * \param msecs Current position in the playing song, in milliseconds.
+ * `msecs` is the current position in the playing song, in milliseconds.
  */
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, int msecs);
 
