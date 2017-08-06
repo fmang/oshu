@@ -87,6 +87,17 @@ Even after it's done, remains to see how audio can be mixed between different
 files to play the drum, whistle and other kinds of sound effects.
 
 
+Contributing
+------------
+
+Because the project is really young, please join the #oshu IRC channel on
+[chat.freenode.net](https://freenode.net/kb/answer/chat) if you'd like to
+contribute. Someone is probably already working on your idea, and most likely
+myself :)
+
+You may also open issues or contact me directly by mail.
+
+
 Name
 ----
 
