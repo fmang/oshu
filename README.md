@@ -21,6 +21,22 @@ mania and taiko mode could be played in a terminal!
 Let's make a compatible lightweight version of the game!
 
 
+Install
+-------
+
+oshu! is a standard autoconf'd project, so install it the regular way with:
+
+	./autogen.sh
+	./configure --prefix="$HOME/.local"
+	make && make install
+
+If you do use the `$HOME/.local` prefix, make sure you add `~/.local/bin` to
+your PATH, or invoke oshu! by specifying the full path like `~/.local/bin/oshu
+BEATMAP.osu`. Otherwise you may use the default `/usr/local`.
+
+If you're lucky, someone may have packaged it for your distribution.
+
+
 Goals
 -----
 
