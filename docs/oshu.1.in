@@ -1,0 +1,8 @@
+.TH OSHU "1" "August 2017" "oshu! @VERSION@" "User Manual"
+
+.SH NAME
+oshu \- Lightweight clone of the osu! rhythm game
+
+.SH SYNOPSIS
+.B oshu
+\fIBEATMAP\fR.osu

@@ -19,5 +19,6 @@ Makefile.in
 /docs/Doxyfile
 /docs/html
 /docs/latex
+/docs/oshu.1
 
 /src/oshu

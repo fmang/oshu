@@ -26,5 +26,6 @@ PKG_CHECK_MODULES([LAVU], [libavutil])
 
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([docs/Doxyfile])])
+AC_CONFIG_FILES([docs/oshu.1])
 
 AC_OUTPUT
