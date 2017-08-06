@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	char *beatmap_path = argv[1];
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0) {
 		oshu_log_error("SDL initialization error: %s", SDL_GetError());
