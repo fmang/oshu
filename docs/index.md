@@ -68,3 +68,15 @@ manipulate the beatmap state, then schedules the drawing of the window.
 The *main* module is the entry-point of oshu! and provides a command-line
 interface to briefly configure the game, and then yields control to the game
 module.
+
+
+Error handling
+--------------
+
+Unless mentioned otherwise, the oshu functions that may fail return an int
+which is either 0 on success, and a negative value on error. That negative
+value will be -1 most of the time.
+
+Error messages are logged with \ref oshu_log_error by the *callee*. This makes
+the code clearer for the caller, and besides, the callee has much more details
+about the error than the caller.
