@@ -268,6 +268,9 @@ void oshu_sample_free(struct oshu_sample **sample);
  * It is stored as an array of pointers to sample, whose index is a combination
  * of flags from the structure below.
  *
+ * This submodule is currently unimplemented. You must not call its functions
+ * or you'll get a link error.
+ *
  * \{
  */
 
@@ -288,7 +291,9 @@ enum oshu_sampleset_index {
 	OSHU_SAMPLESET_SIZE = 64,
 };
 
-int oshu_sampleset_new(struct oshu_sample **set);
+typedef oshu_sample *oshu_sampleset;
+
+int oshu_sampleset_new(oshu_sampleset *set);
 
 /**
  * Try to load a sample found on the filesystem, trying the directories in that
@@ -301,19 +306,19 @@ int oshu_sampleset_new(struct oshu_sample **set);
  * When a sample wasn't found, return 0 and leave the entry in the sample set
  * to *NULL*.
  */
-int oshu_sampleset_load(struct oshu_sample *set, int index);
+int oshu_sampleset_load(oshu_sampleset set, int index);
 
 /**
  * Call \ref oshu_sampleset_load for every possible sample.
  */
-int oshu_sampleset_all(struct oshu_sample *set);
+int oshu_sampleset_load_all(oshu_sampleset set);
 
 /**
  * Free the sample set and all the samples it contains.
  *
  * Set `*set` to *NULL*.
  */
-void oshu_sampleset_free(struct oshu_sample **set);
+void oshu_sampleset_free(oshu_sampleset *set);
 
 /** \} */
 
