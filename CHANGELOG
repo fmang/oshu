@@ -1,0 +1,14 @@
+Changelog
+=========
+
+Unreleased
+----------
+
+This is first working prototype of the project. Let's call it a
+proof-of-concept. It is basically playable even though it lacks major features
+like sliders and scoring.
+
+Here's what we got so far:
+
+- Extremely basic gameplay.
+- Pretty good compatibility of the official beatmaps.
