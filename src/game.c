@@ -2,7 +2,7 @@
  * \file game.c
  * \ingroup game
  *
- * \ref game module implementation.
+ * Game module implementation.
  */
 
 #include "log.h"

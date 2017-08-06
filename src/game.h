@@ -2,7 +2,7 @@
  * \file game.h
  * \ingroup game
  *
- * \ref game module definition.
+ * Define the game module.
  */
 
 #pragma once

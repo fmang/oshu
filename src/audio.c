@@ -60,7 +60,7 @@ void oshu_audio_init()
  *
  * When reaching EOF, feed the decoder a NULL packet to flush it.
  *
- * This function is meant to be called exclusively from \ref next_frame,
+ * This function is meant to be called exclusively from #next_frame,
  * because a single page may yield many codec frames.
  *
  * \return 0 on success, -1 on error.
@@ -91,12 +91,11 @@ fail:
 }
 
 /**
- * Decode a frame into the stream's \ref oshu_audio::frame.
+ * Decode a frame into the stream's #oshu_audio::frame.
  *
- * Request a new page with \ref next_page when the decoder needs more data.
+ * Request a new page with #next_page when the decoder needs more data.
  *
- * Update \ref oshu_audio::current_timestamp and reset \ref
- * oshu_audio::sample_index.
+ * Update #oshu_audio::current_timestamp and reset #oshu_audio::sample_index.
  *
  * Mark the stream as finished on EOF or on ERROR, meaning you must not call
  * this function anymore.
@@ -129,8 +128,8 @@ finish:
 /**
  * Open the libavformat demuxer, and find the best audio stream.
  *
- * Fill \ref oshu_audio::demuxer, \ref oshu_audio::codec, \ref
- * oshu_audio::stream and \ref oshu_audio::time_base.
+ * Fill #oshu_audio::demuxer, #oshu_audio::codec, #oshu_audio::stream and
+ * #oshu_audio::time_base.
  *
  * \return 0 on success, -1 on error.
  */
@@ -168,7 +167,7 @@ fail:
 /**
  * Open the libavcodec decoder.
  *
- * You must call this function after \ref open_demuxer.
+ * You must call this function after #open_demuxer.
  *
  * \return 0 on success, and a negative ffmpeg error code on failure.
  */
@@ -262,7 +261,7 @@ static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
 /**
  * Mix the already present data in the buffer with the sample.
  *
- * This should be called right after \ref fill_audio.
+ * This should be called right after #fill_audio.
  *
  * Note that SDL's documentation recommends against calling
  * `SDL_MixAudioFormat` more than once, because the clipping would deteriorate

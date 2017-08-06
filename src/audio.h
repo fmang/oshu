@@ -66,9 +66,9 @@
  * however than the sound effects we'll trigger will suffer from that exact
  * same bias.
  *
- * To use this module, first call \ref oshu_audio_init. Then open streams using
- * \ref oshu_audio_open, and play them using \ref oshu_audio_play. When you're
- * done, close your streams with \ref oshu_audio_close. Also make sure you
+ * To use this module, first call #oshu_audio_init. Then open streams using
+ * #oshu_audio_open, and play them using #oshu_audio_play. When you're
+ * done, close your streams with #oshu_audio_close. Also make sure you
  * initialized SDL with the audio submodule.
  *
  * ```
@@ -101,8 +101,8 @@
  * need to bother with locking when using the accessors defined in this module
  * though. Only lock when accessing the multiplie fields directly.
  *
- * The only two fields you'll want to use outside of this module are \ref
- * current_timestamp and \ref finished.
+ * The only two fields you'll want to use outside of this module are
+ * #current_timestamp and #finished.
  */
 struct oshu_audio {
 	AVFormatContext *demuxer;
@@ -119,7 +119,7 @@ struct oshu_audio {
 	SDL_AudioSpec device_spec;
 	/**
 	 * The last decoded frame. It is always valid unless the playback is
-	 * \ref finished, in which case its value is undefined.
+	 * #finished, in which case its value is undefined.
 	 */
 	AVFrame *frame;
 	/**
@@ -131,8 +131,8 @@ struct oshu_audio {
 	 * previous frame's timestamp, and therefore keep the timestamp in our
 	 * structure, rather than using only ffmpeg's AVFrame.
 	 *
-	 * In order to do that, the frame decoding routine will update the \ref
-	 * current_timestamp field whenever it reads a frame with a reasonable
+	 * In order to do that, the frame decoding routine will update the
+	 * #current_timestamp field whenever it reads a frame with a reasonable
 	 * timestamp. It is computed from libavcodec's `best_effort_timestamp`,
 	 * which means it was be multiplied by the time base in order to get a
 	 * duration in seconds.
@@ -146,7 +146,7 @@ struct oshu_audio {
 	/** Sound sample to play on top of the audio stream.
 	 *
 	 *  Its memory space is not managed by this structure though, make sure
-	 *  you free it yourself using \ref oshu_sample_free. */
+	 *  you free it yourself using #oshu_sample_free. */
 	struct oshu_sample *overlay;
 };
 
@@ -160,7 +160,7 @@ void oshu_audio_init();
 /**
  * Open a file and initialize everything needed to play it.
  *
- * The stream can then be closed and freed with \ref oshu_audio_close.
+ * The stream can then be closed and freed with #oshu_audio_close.
  *
  * \param url Path or URL to the audio file to play.
  * \param audio Will receive a newly allocated audio context.
@@ -180,7 +180,7 @@ void oshu_audio_play(struct oshu_audio *audio);
 /**
  * Pause the stream.
  *
- * Calling \ref oshu_audio_play will resume the audio playback where it was
+ * Calling #oshu_audio_play will resume the audio playback where it was
  * left playing.
  */
 void oshu_audio_pause(struct oshu_audio *audio);
@@ -206,7 +206,7 @@ void oshu_audio_close(struct oshu_audio **audio);
  * and reactive, the samples are always stored in-memory. Do not confuse it
  * with a PCM sample.
  *
- * Use \ref oshu_sample_play to start playing a sample on top of the currently
+ * Use #oshu_sample_play to start playing a sample on top of the currently
  * playing audio.
  *
  * \{
@@ -230,7 +230,7 @@ struct oshu_sample {
  * required. Note that this means the sample will be specific to that stream
  * only.
  *
- * On success, you must free the sample object with \ref oshu_sample_free. On
+ * On success, you must free the sample object with #oshu_sample_free. On
  * failure, the object is already free'd.
  *
  * \param path Path to the WAV file to load.
@@ -312,7 +312,7 @@ int oshu_sampleset_new(oshu_sampleset *set);
 int oshu_sampleset_load(oshu_sampleset set, int index);
 
 /**
- * Call \ref oshu_sampleset_load for every possible sample.
+ * Call #oshu_sampleset_load for every possible sample.
  */
 int oshu_sampleset_load_all(oshu_sampleset set);
 

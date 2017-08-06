@@ -23,7 +23,7 @@ static const char *osu_file_header = "osu file format v";
  * significantly, some being INI-like, and others being CSV-like.
  */
 enum beatmap_section {
-	BEATMAP_HEADER = 0, /**< Expect the \ref osu_file_header. */
+	BEATMAP_HEADER = 0, /**< Expect the #osu_file_header. */
 	BEATMAP_ROOT, /**< Between the header and the first section. We expect nothing. */
 	BEATMAP_GENERAL, /**< INI-like. */
 	BEATMAP_METADATA, /**< INI-like. */
@@ -64,7 +64,7 @@ static void trim(char **str)
  *
  * This function receives two pointers to uninitialized pointers, which this
  * function will make point to valid zero-terminated strings. Both the key and
- * the value are trimmed using \ref trim.
+ * the value are trimmed using #trim.
  *
  * If no colon deliminter was found, the whole line is saved into `*key` and
  * `*value` is set to *NULL*.
@@ -185,7 +185,7 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 }
 
 /**
- * Parse one hit using \ref parse_one_hit, and link it into the whole beatmap.
+ * Parse one hit using #parse_one_hit, and link it into the whole beatmap.
  *
  * Skip invalid hit objects.
  */
@@ -234,7 +234,7 @@ static int parse_line(char *line, struct parser_state *parser)
 
 /**
  * Create the parser state, then read the input file line-by-line, feeding it
- * to the parser automaton with \ref parse_line.
+ * to the parser automaton with #parse_line.
  */
 static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 {

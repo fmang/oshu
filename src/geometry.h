@@ -33,7 +33,7 @@ struct oshu_segment {
 	enum oshu_curve_type type;
 	/**
 	 * The length of a segment is defined relative to the total length of
-	 * the \ref oshu_path it is contained in.
+	 * the #oshu_path it is contained in.
 	 *
 	 * For example, a segment length of 10 inside a path of length 30 means
 	 * the segment account for 1/3 of the path.
@@ -47,7 +47,7 @@ struct oshu_segment {
 /**
  * Express the segment in [0, 1] floating t-coordinates.
  *
- * You should probably use \ref oshu_path_at.
+ * You should probably use #oshu_path_at.
  *
  * All the segments are merged together in that [0, 1] segment according to
  * their lengths.

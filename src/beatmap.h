@@ -58,8 +58,8 @@ struct oshu_timing_point {
  * Flags defining the type of a hit object.
  *
  * To check if it's a circle, you should use `type & OSHU_HIT_CIRCLE` rather
- * than check for equality, because it will often be combined with \ref
- * OSHU_HIT_NEW_COMBO.
+ * than check for equality, because it will often be combined with
+ * #OSHU_HIT_NEW_COMBO.
  */
 enum oshu_hit_type {
 	OSHU_HIT_CIRCLE = 0b1,
@@ -89,7 +89,7 @@ struct oshu_hit {
 	int x; /**< 0-512 pixels, inclusive. */
 	int y; /**< 0-384 pixels, inclusive. */
 	int time; /**< Milliseconds. */
-	int type; /**< Combination of flags from \ref oshu_hit_type. */
+	int type; /**< Combination of flags from #oshu_hit_type. */
 	enum oshu_hit_state state;
 	struct oshu_hit *next;
 };
@@ -104,7 +104,7 @@ struct oshu_hit {
  * an accurate abstract syntax tree of the original file.
  *
  * Most string values are dynamically allocated inside this structure. Make
- * sure you free it with \ref oshu_beatmap_free.
+ * sure you free it with #oshu_beatmap_free.
  */
 struct oshu_beatmap {
 	int version;
