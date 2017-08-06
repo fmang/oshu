@@ -65,22 +65,22 @@ void oshu_audio_init()
  *
  * \return 0 on success, -1 on error.
  */
-static int next_page(struct oshu_audio *stream)
+static int next_page(struct oshu_audio *audio)
 {
 	int rc;
 	AVPacket packet;
 	for (;;) {
-		rc = av_read_frame(stream->demuxer, &packet);
+		rc = av_read_frame(audio->demuxer, &packet);
 		if (rc == AVERROR_EOF) {
 			oshu_log_debug("reached the last page, flushing");
-			if ((rc = avcodec_send_packet(stream->decoder, NULL)) < 0)
+			if ((rc = avcodec_send_packet(audio->decoder, NULL)) < 0)
 				goto fail;
 			return 0;
 		} else if (rc < 0) {
 			goto fail;
 		}
-		if (packet.stream_index == stream->stream->index) {
-			if ((rc = avcodec_send_packet(stream->decoder, &packet)) < 0)
+		if (packet.stream_index == audio->stream->index) {
+			if ((rc = avcodec_send_packet(audio->decoder, &packet)) < 0)
 				goto fail;
 			return 0;
 		}
@@ -101,18 +101,18 @@ fail:
  * Mark the stream as finished on EOF or on ERROR, meaning you must not call
  * this function anymore.
  */
-static void next_frame(struct oshu_audio *stream)
+static void next_frame(struct oshu_audio *audio)
 {
 	for (;;) {
-		int rc = avcodec_receive_frame(stream->decoder, stream->frame);
+		int rc = avcodec_receive_frame(audio->decoder, audio->frame);
 		if (rc == 0) {
-			int64_t ts = stream->frame->best_effort_timestamp;
+			int64_t ts = audio->frame->best_effort_timestamp;
 			if (ts > 0)
-				stream->current_timestamp = stream->time_base * ts;
-			stream->sample_index = 0;
+				audio->current_timestamp = audio->time_base * ts;
+			audio->sample_index = 0;
 			return;
 		} else if (rc == AVERROR(EAGAIN)) {
-			if (next_page(stream) < 0)
+			if (next_page(audio) < 0)
 				goto finish;
 		} else if (rc == AVERROR_EOF) {
 			oshu_log_debug("reached the last frame");
@@ -123,7 +123,7 @@ static void next_frame(struct oshu_audio *stream)
 		}
 	}
 finish:
-	stream->finished = 1;
+	audio->finished = 1;
 }
 
 /**
@@ -134,31 +134,31 @@ finish:
  *
  * \return 0 on success, -1 on error.
  */
-static int open_demuxer(const char *url, struct oshu_audio *stream)
+static int open_demuxer(const char *url, struct oshu_audio *audio)
 {
-	int rc = avformat_open_input(&stream->demuxer, url, NULL, NULL);
+	int rc = avformat_open_input(&audio->demuxer, url, NULL, NULL);
 	if (rc < 0) {
 		oshu_log_error("failed opening the audio file");
 		goto fail;
 	}
-	rc = avformat_find_stream_info(stream->demuxer, NULL);
+	rc = avformat_find_stream_info(audio->demuxer, NULL);
 	if (rc < 0) {
 		oshu_log_error("error reading the stream headers");
 		goto fail;
 	}
 	rc = av_find_best_stream(
-		stream->demuxer,
+		audio->demuxer,
 		AVMEDIA_TYPE_AUDIO,
 		-1, -1,
-		&stream->codec,
+		&audio->codec,
 		0
 	);
-	if (rc < 0 || stream->codec == NULL) {
+	if (rc < 0 || audio->codec == NULL) {
 		oshu_log_error("error finding the best audio stream");
 		goto fail;
 	}
-	stream->stream = stream->demuxer->streams[rc];
-	stream->time_base = av_q2d(stream->stream->time_base);
+	audio->stream = audio->demuxer->streams[rc];
+	audio->time_base = av_q2d(audio->stream->time_base);
 	return 0;
 fail:
 	log_av_error(rc);
@@ -172,24 +172,24 @@ fail:
  *
  * \return 0 on success, and a negative ffmpeg error code on failure.
  */
-static int open_decoder(struct oshu_audio *stream)
+static int open_decoder(struct oshu_audio *audio)
 {
-	stream->decoder = avcodec_alloc_context3(stream->codec);
+	audio->decoder = avcodec_alloc_context3(audio->codec);
 	int rc = avcodec_parameters_to_context(
-		stream->decoder,
-		stream->stream->codecpar
+		audio->decoder,
+		audio->stream->codecpar
 	);
 	if (rc < 0) {
 		oshu_log_error("error copying the codec context");
 		goto fail;
 	}
-	rc = avcodec_open2(stream->decoder, stream->codec, NULL);
+	rc = avcodec_open2(audio->decoder, audio->codec, NULL);
 	if (rc < 0) {
 		oshu_log_error("error opening the codec");
 		goto fail;
 	}
-	stream->frame = av_frame_alloc();
-	if (stream->frame == NULL) {
+	audio->frame = av_frame_alloc();
+	if (audio->frame == NULL) {
 		oshu_log_error("could not allocate the codec frame");
 		goto fail;
 	}
@@ -203,12 +203,12 @@ fail:
  * Log some helpful information about the decoded audio stream.
  * Meant for debugging more than anything else.
  */
-static void dump_stream_info(struct oshu_audio *stream)
+static void dump_stream_info(struct oshu_audio *audio)
 {
-	oshu_log_info("audio codec: %s", stream->codec->long_name);
-	oshu_log_info("sample rate: %d Hz", stream->decoder->sample_rate);
-	oshu_log_info("number of channels: %d", stream->decoder->channels);
-	oshu_log_info("format: %s", av_get_sample_fmt_name(stream->decoder->sample_fmt));
+	oshu_log_info("audio codec: %s", audio->codec->long_name);
+	oshu_log_info("sample rate: %d Hz", audio->decoder->sample_rate);
+	oshu_log_info("number of channels: %d", audio->decoder->channels);
+	oshu_log_info("format: %s", av_get_sample_fmt_name(audio->decoder->sample_fmt));
 }
 
 /**
@@ -225,38 +225,38 @@ static void dump_stream_info(struct oshu_audio *stream)
  * because you never know what SDL might do with a left-over buffer. Most
  * likely, it would play the previous buffer over, and over again.
  */
-static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
+static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
 {
-	AVFrame *frame = stream->frame;
+	AVFrame *frame = audio->frame;
 	int sample_size = av_get_bytes_per_sample(frame->format);
 	int planar = av_sample_fmt_is_planar(frame->format);
-	while (len > 0 && !stream->finished) {
-		if (stream->sample_index >= frame->nb_samples)
-			next_frame(stream);
+	while (len > 0 && !audio->finished) {
+		if (audio->sample_index >= frame->nb_samples)
+			next_frame(audio);
 		if (planar) {
-			while (len > 0 && stream->sample_index < frame->nb_samples) {
+			while (len > 0 && audio->sample_index < frame->nb_samples) {
 				/* Copy 1 sample per iteration. */
-				size_t offset = sample_size * stream->sample_index;
+				size_t offset = sample_size * audio->sample_index;
 				for (int ch = 0; ch < frame->channels; ch++) {
 					memcpy(buffer, frame->data[ch] + offset, sample_size);
 					buffer += sample_size;
 				}
 				len -= sample_size * frame->channels;
-				stream->sample_index++;
+				audio->sample_index++;
 			}
 		} else {
-			size_t offset = sample_size * stream->sample_index * frame->channels;
+			size_t offset = sample_size * audio->sample_index * frame->channels;
 			size_t left = sample_size * frame->nb_samples * frame->channels - offset;
 			size_t block = (left < len) ? left : len;
 			assert (block % (sample_size * frame->channels) == 0);
 			memcpy(buffer, frame->data[0] + offset, block);
 			buffer += block;
 			len -= block;
-			stream->sample_index += block / (sample_size * frame->channels);
+			audio->sample_index += block / (sample_size * frame->channels);
 		}
 	}
 	assert (len >= 0);
-	memset(buffer, len, stream->device_spec.silence);
+	memset(buffer, len, audio->device_spec.silence);
 }
 
 /**
@@ -268,7 +268,7 @@ static void fill_audio(struct oshu_audio *stream, Uint8 *buffer, int len)
  * `SDL_MixAudioFormat` more than once, because the clipping would deteriorate
  * the overall sound quality.
  */
-static void mix_sample(Uint8 *buffer, int len, struct oshu_audio *stream, struct oshu_sample *sample)
+static void mix_sample(Uint8 *buffer, int len, struct oshu_audio *audio, struct oshu_sample *sample)
 {
 	while (len > 0) {
 		if (sample->cursor >= sample->length) {
@@ -282,7 +282,7 @@ static void mix_sample(Uint8 *buffer, int len, struct oshu_audio *stream, struct
 		SDL_MixAudioFormat(
 			buffer,
 			sample->buffer + sample->cursor,
-			stream->device_spec.format,
+			audio->device_spec.format,
 			block,
 			SDL_MIX_MAXVOLUME
 		);
@@ -297,94 +297,94 @@ static void mix_sample(Uint8 *buffer, int len, struct oshu_audio *stream, struct
  */
 static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
-	struct oshu_audio *stream;
-	stream = (struct oshu_audio*) userdata;
-	fill_audio(stream, buffer, len);
-	if (stream->overlay != NULL)
-		mix_sample(buffer, len, stream, stream->overlay);
+	struct oshu_audio *audio;
+	audio = (struct oshu_audio*) userdata;
+	fill_audio(audio, buffer, len);
+	if (audio->overlay != NULL)
+		mix_sample(buffer, len, audio, audio->overlay);
 }
 
 /**
  * Initialize the SDL audio device.
  * \return 0 on success, -1 on error.
  */
-static int open_device(struct oshu_audio *stream)
+static int open_device(struct oshu_audio *audio)
 {
 	SDL_AudioSpec want;
 	SDL_zero(want);
-	want.freq = stream->decoder->sample_rate;
-	SDL_AudioFormat fmt = format_map[stream->decoder->sample_fmt];
+	want.freq = audio->decoder->sample_rate;
+	SDL_AudioFormat fmt = format_map[audio->decoder->sample_fmt];
 	if (!fmt) {
 		oshu_log_error("unsupported sample format");
 		return -1;
 	}
 	want.format = fmt;
-	want.channels = stream->decoder->channels;
+	want.channels = audio->decoder->channels;
 	want.samples = sample_buffer_size;
 	want.callback = audio_callback;
-	want.userdata = (void*) stream;
-	stream->device_id = SDL_OpenAudioDevice(NULL, 0, &want, &stream->device_spec, 0);
-	if (stream->device_id == 0) {
+	want.userdata = (void*) audio;
+	audio->device_id = SDL_OpenAudioDevice(NULL, 0, &want, &audio->device_spec, 0);
+	if (audio->device_id == 0) {
 		oshu_log_error("failed to open the audio device: %s", SDL_GetError());
 		return -1;
 	}
 	return 0;
 }
 
-int oshu_audio_open(const char *url, struct oshu_audio **stream)
+int oshu_audio_open(const char *url, struct oshu_audio **audio)
 {
-	*stream = calloc(1, sizeof(**stream));
-	if (*stream == NULL) {
+	*audio = calloc(1, sizeof(**audio));
+	if (*audio == NULL) {
 		oshu_log_error("could not allocate the audio context");
 		return -1;
 	}
-	if (open_demuxer(url, *stream) < 0)
+	if (open_demuxer(url, *audio) < 0)
 		goto fail;
-	if (open_decoder(*stream) < 0)
+	if (open_decoder(*audio) < 0)
 		goto fail;
-	next_frame(*stream);
-	dump_stream_info(*stream);
-	if (open_device(*stream) < 0)
+	next_frame(*audio);
+	dump_stream_info(*audio);
+	if (open_device(*audio) < 0)
 		goto fail;
 	return 0;
 fail:
-	oshu_audio_close(stream);
+	oshu_audio_close(audio);
 	return -1;
 }
 
-void oshu_audio_play(struct oshu_audio *stream)
+void oshu_audio_play(struct oshu_audio *audio)
 {
-	SDL_PauseAudioDevice(stream->device_id, 0);
+	SDL_PauseAudioDevice(audio->device_id, 0);
 }
 
-void oshu_audio_pause(struct oshu_audio *stream)
+void oshu_audio_pause(struct oshu_audio *audio)
 {
-	SDL_PauseAudioDevice(stream->device_id, 1);
+	SDL_PauseAudioDevice(audio->device_id, 1);
 }
 
-void oshu_audio_close(struct oshu_audio **stream)
+void oshu_audio_close(struct oshu_audio **audio)
 {
-	if (*stream == NULL)
+	if (*audio == NULL)
 		return;
-	if ((*stream)->device_id)
-		SDL_CloseAudioDevice((*stream)->device_id);
-	if ((*stream)->frame)
-		av_frame_free(&(*stream)->frame);
-	if ((*stream)->decoder)
-		avcodec_close((*stream)->decoder);
-	if ((*stream)->demuxer)
-		avformat_close_input(&(*stream)->demuxer);
-	free(*stream);
-	*stream = NULL;
+	if ((*audio)->device_id)
+		SDL_CloseAudioDevice((*audio)->device_id);
+	if ((*audio)->frame)
+		av_frame_free(&(*audio)->frame);
+	if ((*audio)->decoder)
+		avcodec_close((*audio)->decoder);
+	if ((*audio)->demuxer)
+		avformat_close_input(&(*audio)->demuxer);
+	free(*audio);
+	*audio = NULL;
 }
 
-void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample)
+void oshu_sample_play(struct oshu_audio *audio, struct oshu_sample *sample)
 {
-	SDL_LockAudioDevice(stream->device_id);
-	stream->overlay = sample;
+	SDL_LockAudioDevice(audio->device_id);
+	audio->overlay = sample;
 	if (sample)
 		sample->cursor = 0;
-	SDL_UnlockAudioDevice(stream->device_id);
+	SDL_UnlockAudioDevice(audio->device_id);
 }
 
 /**
@@ -422,7 +422,7 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 	return 0;
 }
 
-int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sample **sample)
+int oshu_sample_load(const char *path, struct oshu_audio *audio, struct oshu_sample **sample)
 {
 	SDL_AudioSpec spec;
 	*sample = calloc(1, sizeof(**sample));
@@ -435,7 +435,7 @@ int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sa
 		oshu_log_error("SDL error when loading sample: %s", SDL_GetError());
 		goto fail;
 	}
-	if (convert_audio(&stream->device_spec, wav, *sample) < 0)
+	if (convert_audio(&audio->device_spec, wav, *sample) < 0)
 		goto fail;
 	return 0;
 fail:

@@ -74,11 +74,11 @@
  * ```
  * SDL_Init(SDL_AUDIO|...);
  * oshu_audio_init();
- * struct oshu_audio *stream;
- * oshu_audio_open("file.ogg", &stream);
- * oshu_audio_play(stream);
+ * struct oshu_audio *audio;
+ * oshu_audio_open("file.ogg", &audio);
+ * oshu_audio_play(audio);
  * do_things();
- * oshu_audio_close(stream);
+ * oshu_audio_close(audio);
  * ```
  *
  * Depending on how the SDL handles multiple devices, you may not be able to
@@ -163,11 +163,11 @@ void oshu_audio_init();
  * The stream can then be closed and freed with \ref oshu_audio_close.
  *
  * \param url Path or URL to the audio file to play.
- * \param stream Will receive a newly allocated stream object.
+ * \param audio Will receive a newly allocated audio context.
  *
  * \return 0 on success. On error, -1 is returned and everything is freed.
  */
-int oshu_audio_open(const char *url, struct oshu_audio **stream);
+int oshu_audio_open(const char *url, struct oshu_audio **audio);
 
 /**
  * Start playing!
@@ -175,7 +175,7 @@ int oshu_audio_open(const char *url, struct oshu_audio **stream);
  * The SDL plays audio in a separate thread, so you need not worry about
  * calling this function regularily or anything. Don't bother, it's magic!
  */
-void oshu_audio_play(struct oshu_audio *stream);
+void oshu_audio_play(struct oshu_audio *audio);
 
 /**
  * Pause the stream.
@@ -183,17 +183,17 @@ void oshu_audio_play(struct oshu_audio *stream);
  * Calling \ref oshu_audio_play will resume the audio playback where it was
  * left playing.
  */
-void oshu_audio_pause(struct oshu_audio *stream);
+void oshu_audio_pause(struct oshu_audio *audio);
 
 /**
  * Close the audio stream and free everything associated to it, then set
- * `*stream` to *NULL.
+ * `*audio` to *NULL.
  *
- * If `*stream` is *NULL*, do nothing.
+ * If `*audio` is *NULL*, do nothing.
  *
  * You must not call this function with a null pointer though.
  */
-void oshu_audio_close(struct oshu_audio **stream);
+void oshu_audio_close(struct oshu_audio **audio);
 
 /**
  * \defgroup sample Sample
@@ -236,7 +236,7 @@ struct oshu_sample {
  * \param sample Receive the sample object.
  * \return 0 on success, -1 on failure.
  */
-int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sample **sample);
+int oshu_sample_load(const char *path, struct oshu_audio *audio, struct oshu_sample **sample);
 
 /**
  * Play a sample on top of a stream.
@@ -248,7 +248,7 @@ int oshu_sample_load(const char *path, struct oshu_audio *stream, struct oshu_sa
  *
  * To stop playing any sample, call this function with `sample` as NULL.
  */
-void oshu_sample_play(struct oshu_audio *stream, struct oshu_sample *sample);
+void oshu_sample_play(struct oshu_audio *audio, struct oshu_sample *sample);
 
 /**
  * Free the sample object along with its buffer data.
