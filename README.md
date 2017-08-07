@@ -24,6 +24,10 @@ Let's make a compatible lightweight version of the game!
 Install
 -------
 
+**Note:** oshu! is still in an early stage of development. Don't expect it to
+be amazing. It doesn't even have a menu to select songs, you need to call it
+from the command line like `$ oshu my_beatmap.osu`.
+
 First of all, make sure you have the required dependencies. These things are so
 common that I may assure you they're in your distribution's official
 repositories.
