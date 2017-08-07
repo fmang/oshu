@@ -233,8 +233,6 @@ static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
 	int sample_size = av_get_bytes_per_sample(frame->format);
 	int planar = av_sample_fmt_is_planar(frame->format);
 	while (len > 0 && !audio->finished) {
-		if (audio->sample_index >= frame->nb_samples)
-			next_frame(audio);
 		if (planar) {
 			while (len > 0 && audio->sample_index < frame->nb_samples) {
 				/* Copy 1 sample per iteration. */
@@ -256,6 +254,8 @@ static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
 			len -= block;
 			audio->sample_index += block / (sample_size * frame->channels);
 		}
+		if (audio->sample_index >= frame->nb_samples)
+			next_frame(audio);
 	}
 	assert (len >= 0);
 	memset(buffer, len, audio->device_spec.silence);
