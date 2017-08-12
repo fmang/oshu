@@ -16,6 +16,76 @@
  * \brief
  * Manage a window and draw beatmaps.
  *
+ * ### Coordinate system
+ *
+ * The coordinate system the beatmaps use is not the same as the coordinate
+ * system of the SDL window. Let's take some time to define it.
+ *
+ * The original osu! screen is 640x480 pixels, while the playable game zone is
+ * 512x384. The game zone is centered in the window, leaving margin for the
+ * notes at each corner of the game zone.
+ *
+ * ```
+ * ┌───────────────────────────────────────────────────────────┐
+ * │ ↖                                          ↑              │
+ * │  (0,0) in window coordinates               | 48px         │
+ * │  or (-64, -48) in game coordinates         ↓              │
+ * │    ┌─────────────────────────────────────────────────┐    │
+ * │    │ ↖                                               │    │
+ * │    │  (0,0) in game coordinates                      │    │
+ * │    │                                                 │    │
+ * │    │                                                3│    │4
+ * │    │                                                8│    │8
+ * │    │                                                4│    │0
+ * │    │                                                p│    │p
+ * │    │                                                x│    │x
+ * │    │                                                 │    │
+ * │←——→│                                                 │←——→│
+ * │64px│                                                 │64px│
+ * │    │                      512px                      │    │
+ * │    └─────────────────────────────────────────────────┘    │
+ * │                                             ↑             │
+ * │                                             | 48px        │
+ * │                                             ↓             │
+ * └───────────────────────────────────────────────────────────┘
+ *                             640px
+ * ```
+ *
+ * When the window grows, this whole block is scaled, and not just the scale
+ * zone. The window will be zoomed to fit the available space, while preserving
+ * the aspect ratio and without cropping. This means that if the ratio of the
+ * user's window doesn't have the right ratio, black bars are added, like when
+ * playing cinemascope movies.
+ *
+ * This is what happens when the window is not wide enough:
+ *
+ * ```
+ * ┌───────────────────────────────────────────────────────┐
+ * │******    ↕ (window height - 480 × zoom) / 2     ******│
+ * ┌───────────────────────────────────────────────────────┐
+ * │                                                       │
+ * │                                                       │
+ * │↕ 480 × zoom                                           │
+ * │                                                       │
+ * │                     640 × zoom                        │
+ * └───────────────────────────────────────────────────────┘
+ * │******    ↕ (window height - 480 × zoom) / 2     ******│
+ * └───────────────────────────────────────────────────────┘
+ *                window width = 640 × zoom
+ * ```
+ *
+ * To convert a point from game coordinates to physical coordinates, you must,
+ * in that order:
+ *
+ * 1. Translate the point by (-64, -48) to obtain original window coordinates.
+ * 2. Multiply by the *zoom* factor for zoomed window coordinates.
+ * 3. Translate by (0, (window height - 480 × zoom) / 2) if the window is too
+ *    high, or by ((window width - 640 × zoom) / 2, 0) if the window is too
+*     wide.
+*
+*  Where *zoom* is *window width / 640* if *window width / window height < 640
+*  / 480*, or *window height / 480* otherwise.
+ *
  * \{
  */
 
