@@ -171,7 +171,58 @@ struct oshu_metadata {
 	int beatmap_set_id;
 };
 
+/**
+ * \brief Complete definition of the [Difficulty] section.
+ *
+ * A lot of its fields use an obscure unit. Because oshu! is still a prototype,
+ * we'll try to guess at first, then maybe compare later, or ask around.
+ */
 struct oshu_difficulty {
+	/**
+	 * Health point drain rate.
+	 *
+	 * This is how much a missed mark lowers your health bar until you
+	 * lose, especially in the standard osu! game mode.
+	 *
+	 * It's a float, but its unit is obscure.
+	 *
+	 * Defaults to 1, whatever that means.
+	 */
+	double hp_drain_rate;
+	/**
+	 * \brief Radius of the hit object's circles, in pixels.
+	 *
+	 * In the beatmap file, it's a float field `CircleSize` with a strange
+	 * unit. For now, let's assume it's the radius divided by 10. It's the
+	 * parser's job to convert it.
+	 *
+	 * Defaults to 32.
+	 */
+	double circle_radius;
+	/**
+	 * \brief Time tolerance to make a click good, in seconds.
+	 *
+	 * > OverallDifficulty (Float) specifies the amount of time allowed to click a hit object on time.
+	 *
+	 * In the beatmap file, it's an obscure float, so let's say an *overall
+	 * difficulty* of 5 is 0.1 seconds, and get proportional from here.
+	 *
+	 * Defaults to 0.1 seconds.
+	 */
+	double leniency;
+	/**
+	 * \brief Duration of the approach circle, in seconds.
+	 *
+	 * > ApproachRate (Float) specifies the amount of time taken for the
+	 * > approach circle and hit object to appear.
+	 *
+	 * Another obscure field. Let's say an approach rate of 5 maps to 1
+	 * second. So, this field will receive on fifth of the value in the
+	 * beatmap.
+	 *
+	 * Defaults to 1 second.
+	 */
+	double approach_rate;
 	/**
 	 * Makes the link between a slider's pixel length and the time.
 	 * 1 beat maps to 100 pixels multiplied by this factor.
@@ -183,8 +234,19 @@ struct oshu_difficulty {
 	 *
 	 * According to the official documentation, its default value
 	 * is 1.4.
+	 *
+	 * It should not be used outside of the beatmap module. The parser
+	 * should use this value to compute the length of the sliders when
+	 * creating them.
 	 */
-	float slider_multiplier;
+	double slider_multiplier;
+	/**
+	 * > SliderTickRate (Float) specifies how often slider ticks appear.
+	 * > Default value is 1.
+	 *
+	 * I guess its unit is *ticks per beat*.
+	 */
+	double slider_tick_rate;
 };
 
 struct oshu_event {
