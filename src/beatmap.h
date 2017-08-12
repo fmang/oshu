@@ -503,14 +503,25 @@ struct oshu_difficulty {
 	 */
 	double circle_radius;
 	/**
+	 * Number of stars of the song.
+	 */
+	double overall_difficulty;
+	/**
 	 * \brief Time tolerance to make a click good, in seconds.
 	 *
-	 * > OverallDifficulty (Float) specifies the amount of time allowed to click a hit object on time.
+	 * > OverallDifficulty (Float) specifies the amount of time allowed to
+	 * > click a hit object on time.
 	 *
-	 * In the beatmap file, it's an obscure float, so let's say an *overall
-	 * difficulty* of 5 is 0.1 seconds, and get proportional from here.
+	 * It's probably also the number of stars that appear.
+	 *
+	 * In the beatmap file, it's an obscure float. Let's try to apply some
+	 * inverse function, where an *overall difficulty* of 1 yields a
+	 * leniency of 0.3 seconds. 3 will be 0.1 seconds, 6 will be 0.05
+	 * seconds (getting hard).
 	 *
 	 * Defaults to 0.1 seconds.
+	 *
+	 * \sa overall_difficulty
 	 */
 	double leniency;
 	/**
