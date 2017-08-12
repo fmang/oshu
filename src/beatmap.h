@@ -101,7 +101,7 @@ struct oshu_hit {
 };
 
 /**
- * Complete definition of the [Metadata] section.
+ * \brief Complete definition of the [Metadata] section.
  *
  * Every character string inside this section is either NULL or a reference to
  * a dynamically allocated string.
@@ -113,7 +113,7 @@ struct oshu_hit {
  */
 struct oshu_metadata {
 	/**
-	 * ASCII representation of the title.
+	 * \brief ASCII representation of the title.
 	 *
 	 * This is what the user will usually see unless they can read
 	 * Japanese.
@@ -125,7 +125,7 @@ struct oshu_metadata {
 	 */
 	char *title_unicode;
 	/**
-	 * ASCII name of the artist of the song, not the beatmap.
+	 * \brief ASCII name of the artist of the song.
 	 */
 	char *artist;
 	/**
@@ -137,7 +137,7 @@ struct oshu_metadata {
 	 */
 	char *creator;
 	/**
-	 * Name of the beatmap's difficulty.
+	 * \brief Name of the beatmap's difficulty.
 	 *
 	 * It's often something like *Easy* or *Normal*, but is actually free
 	 * form and may contain fancier values like *Sunrise*, whatever that
@@ -145,8 +145,10 @@ struct oshu_metadata {
 	 */
 	char *version;
 	/**
-	 * Origin of the song. Might be the name of a series like *Touhou*
-	 * which has got an impressive amount of fan songs.
+	 * \briefOrigin of the song.
+	 *
+	 * Might be the name of a series like *Touhou* which has got an
+	 * impressive amount of fan songs.
 	 */
 	char *source;
 	/**
@@ -201,7 +203,7 @@ enum oshu_sampleset_category {
 };
 
 /**
- * One beatmap, from its metadata to hit objects.
+ * \brief One beatmap, from its metadata to hit objects.
  *
  * This structure is not limited to the raw parsed data, but also provides
  * space for the game state, like which objects was hit and when.
@@ -219,7 +221,8 @@ struct oshu_beatmap {
 	 */
 	int version;
 	/**
-	 * Name of the audio file relative to the beatmap's directory.
+	 * \brief Name of the audio file relative to the beatmap's directory.
+	 *
 	 * It should not contain any slash.
 	 *
 	 * Because of the structure of the INI file, it's not clear whether
@@ -238,7 +241,8 @@ struct oshu_beatmap {
 	 */
 	char *audio_filename;
 	/**
-	 * Length of the silence before the song starts playing, in seconds.
+	 * \brief Length of the silence before the song starts playing, in
+	 * seconds.
 	 *
 	 * Some beatmaps start with a hit object at the first note in the
 	 * song, which was rough in oshu! 1.0.0 since a tenth of second after
