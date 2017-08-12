@@ -182,6 +182,32 @@ static void check_audio(struct oshu_game *game)
 	);
 }
 
+/**
+ * Print the score if the song was finished, then exit.
+ */
+static void end(struct oshu_game *game)
+{
+	if (!game->audio->finished)
+		return;
+	int good = 0;
+	int missed = 0;
+	for (struct oshu_hit *hit = game->beatmap->hits; hit; hit = hit->next) {
+		if (hit->state == OSHU_HIT_MISSED)
+			missed++;
+		else if (hit->state == OSHU_HIT_GOOD)
+			good++;
+	}
+	printf(
+		"\n"
+		"*** Score ***\n"
+		"  Good: %d\n"
+		"  Miss: %d\n"
+		"\n",
+		good,
+		missed
+	);
+}
+
 int oshu_game_run(struct oshu_game *game)
 {
 	SDL_Event event;
@@ -194,6 +220,7 @@ int oshu_game_run(struct oshu_game *game)
 		oshu_draw_beatmap(game->display, game->beatmap, now);
 		SDL_Delay(20);
 	}
+	end(game);
 	return 0;
 }
 
