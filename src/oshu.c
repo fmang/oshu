@@ -116,7 +116,13 @@ int main(int argc, char **argv)
 		return 2;
 	}
 
-	char *beatmap_path = argv[optind];
+	char *beatmap_path = realpath(argv[optind], NULL);
+	if (beatmap_path == NULL) {
+		oshu_log_error("cannot locate %s", argv[optind]);
+		return 3;
+	}
+
+	char *beatmap_file = beatmap_path;
 	char *slash = strrchr(beatmap_path, '/');
 	if (slash) {
 		*slash = '\0';
@@ -125,14 +131,16 @@ int main(int argc, char **argv)
 			oshu_log_error("error while changing directory: %s", strerror(errno));
 			return 3;
 		}
-		beatmap_path = slash + 1;
+		beatmap_file = slash + 1;
 	}
 
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
-	if (run(beatmap_path, autoplay) < 0)
+	if (run(beatmap_file, autoplay) < 0)
 		return 1;
+
+	free(beatmap_path);
 
 	return 0;
 }
