@@ -154,9 +154,9 @@ static int parse_general(char *line, struct parser_state *parser)
 	if (!value)
 		return 0;
 	if (!strcmp(key, "AudioFilename")) {
-		parser->beatmap->general.audio_filename = strdup(value);
+		parser->beatmap->audio_filename = strdup(value);
 	} else if (!strcmp(key, "Mode")) {
-		parser->beatmap->general.mode = atoi(value);
+		parser->beatmap->mode = atoi(value);
 	}
 	return 0;
 }
@@ -180,7 +180,7 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 	*hit = calloc(1, sizeof(**hit));
 	(*hit)->x = atoi(x);
 	(*hit)->y = atoi(y);
-	(*hit)->time = atoi(time);
+	(*hit)->time = (double) atoi(time) / 1000;
 	(*hit)->type = atoi(type);
 }
 
@@ -261,7 +261,7 @@ static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 {
 	oshu_log_info("beatmap version: %d", beatmap->version);
-	oshu_log_info("audio filename: %s", beatmap->general.audio_filename);
+	oshu_log_info("audio filename: %s", beatmap->audio_filename);
 }
 
 /**
@@ -270,10 +270,10 @@ static void dump_beatmap_info(struct oshu_beatmap *beatmap)
  */
 static int validate(struct oshu_beatmap *beatmap)
 {
-	if (!beatmap->general.audio_filename) {
+	if (!beatmap->audio_filename) {
 		oshu_log_error("no audio file mentionned");
 		return -1;
-	} else if (strchr(beatmap->general.audio_filename, '/') != NULL) {
+	} else if (strchr(beatmap->audio_filename, '/') != NULL) {
 		oshu_log_error("slashes are forbidden in audio file names");
 		return -1;
 	}
@@ -317,7 +317,7 @@ void oshu_beatmap_free(struct oshu_beatmap **beatmap)
 			current = next;
 		}
 	}
-	free((*beatmap)->general.audio_filename);
+	free((*beatmap)->audio_filename);
 	free(*beatmap);
 	*beatmap = NULL;
 }

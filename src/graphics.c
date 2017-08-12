@@ -15,8 +15,7 @@ static const int game_height = 384;
 const int oshu_hit_radius = 24; /* px */
 static const int hit_hint = 64; /* px */
 
-static const int hit_time_in = 1000; /* ms */
-static const int hit_time_out = 0; /* ms */
+static const double hit_time_in = 1.; /* s */
 
 int create_window(struct oshu_display *display)
 {
@@ -115,7 +114,7 @@ void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2
 	SDL_RenderDrawLine(display->renderer, x1, y1, x2, y2);
 }
 
-void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, int msecs)
+void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, double now)
 {
 	if (hit->state == OSHU_HIT_INITIAL) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
@@ -123,8 +122,8 @@ void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, int msecs
 		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius - 2);
 		oshu_draw_line(display, hit->x - oshu_hit_radius, hit->y, hit->x + oshu_hit_radius, hit->y);
 		oshu_draw_line(display, hit->x, hit->y - oshu_hit_radius, hit->x, hit->y + oshu_hit_radius);
-		if (hit->time > msecs) {
-			double ratio = (double) (hit->time - msecs) / hit_time_in;
+		if (hit->time > now) {
+			double ratio = (double) (hit->time - now) / hit_time_in;
 			oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius + ratio * hit_hint);
 		}
 	} else if (hit->state == OSHU_HIT_GOOD) {
@@ -174,19 +173,19 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 	SDL_RenderDrawLines(display->renderer, right, resolution);
 }
 
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, int msecs)
+void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now)
 {
 	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
 	SDL_RenderClear(display->renderer);
 	struct oshu_hit *prev = NULL;
 	for (struct oshu_hit *hit = beatmap->hit_cursor; hit; hit = hit->next) {
-		if (hit->time > msecs + hit_time_in)
+		if (hit->time > now + hit_time_in)
 			break;
 		if (prev && !(hit->type & OSHU_HIT_NEW_COMBO)) {
 			SDL_SetRenderDrawColor(display->renderer, 128, 128, 128, 255);
 			oshu_draw_line(display, prev->x, prev->y, hit->x, hit->y);
 		}
-		oshu_draw_hit(display, hit, msecs);
+		oshu_draw_hit(display, hit, now);
 		prev = hit;
 	}
 	SDL_RenderPresent(display->renderer);

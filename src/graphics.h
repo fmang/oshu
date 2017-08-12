@@ -65,14 +65,14 @@ void oshu_get_mouse(struct oshu_display *display, int *x, int *y);
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
  *
- * `msecs` is the current position in the playing song, in milliseconds.
+ * `now` is the current position in the playing song, in seconds.
  */
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, int msecs);
+void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now);
 
 /**
  * Draw a hit object.
  */
-void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, int msecs);
+void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, double now);
 
 /**
  * Draw a 1-pixel aliased stroke following the path.

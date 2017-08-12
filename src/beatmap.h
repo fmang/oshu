@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "geometry.h"
+
 /** \defgroup beatmap Beatmap
  *
  * \brief

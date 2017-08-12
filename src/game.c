@@ -12,10 +12,10 @@
 
 /** How long before or after the hit time a click event is considered on the
  *  mark. */
-static int hit_tolerance = 100 ; /* ms */
+static double hit_tolerance = .1 ; /* seconds */
 
 /** How long before or after the hit time a hit object is clickable. */
-static int hit_clickable = 1000 ; /* ms */
+static double hit_clickable = 1. ; /* seconds */
 
 int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 {
@@ -25,12 +25,12 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		oshu_log_error("no beatmap, aborting");
 		goto fail;
 	}
-	if ((*game)->beatmap->general.mode != OSHU_MODE_OSU) {
+	if ((*game)->beatmap->mode != OSHU_MODE_OSU) {
 		oshu_log_error("unsupported game mode");
 		goto fail;
 	}
 
-	if (oshu_audio_open((*game)->beatmap->general.audio_filename, &(*game)->audio) < 0) {
+	if (oshu_audio_open((*game)->beatmap->audio_filename, &(*game)->audio) < 0) {
 		oshu_log_error("no audio, aborting");
 		goto fail;
 	}
@@ -65,7 +65,7 @@ fail:
  */
 static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
 {
-	int now = game->audio->current_timestamp * 1000;
+	double now = game->audio->current_timestamp;
 	for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
 		if (hit->time > now + hit_clickable)
 			break;
@@ -93,10 +93,10 @@ static void hit(struct oshu_game *game)
 		return;
 	int x, y;
 	oshu_get_mouse(game->display, &x, &y);
-	int now = game->audio->current_timestamp * 1000;
+	double now = game->audio->current_timestamp;
 	struct oshu_hit *hit = find_hit(game, x, y);
 	if (hit) {
-		if (abs(hit->time - now) < hit_tolerance) {
+		if (fabs(hit->time - now) < hit_tolerance) {
 			hit->state = OSHU_HIT_GOOD;
 			oshu_sample_play(game->audio, game->hit_sound);
 		} else {
@@ -157,7 +157,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
  */
 static void check_audio(struct oshu_game *game)
 {
-	int now = game->audio->current_timestamp * 1000;
+	double now = game->audio->current_timestamp;
 	if (game->autoplay) {
 		for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
 			if (hit->time > now) {
@@ -190,7 +190,7 @@ int oshu_game_run(struct oshu_game *game)
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
 		check_audio(game);
-		int now = game->audio->current_timestamp * 1000;
+		double now = game->audio->current_timestamp;
 		oshu_draw_beatmap(game->display, game->beatmap, now);
 		SDL_Delay(20);
 	}
