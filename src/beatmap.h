@@ -30,6 +30,12 @@
  * \{
  */
 
+/**
+ * The supported modes by the osu! beatmap file format.
+ *
+ * The value of the constants match the way they're written as integers in the
+ * beatmap.
+ */
 enum oshu_mode {
 	OSHU_MODE_OSU = 0,
 	OSHU_MODE_TAIKO = 1,
@@ -94,6 +100,40 @@ struct oshu_hit {
 	struct oshu_hit *next;
 };
 
+struct oshu_metadata {
+};
+
+struct oshu_difficulty {
+	/**
+	 * Makes the link between a slider's pixel length and the time.
+	 * 1 beat maps to 100 pixels multiplied by this factor.
+	 *
+	 * Therefore, the total duration in beats of a slider is
+	 * `pixel_length / (100 * slider_multiplier)`. Multiply this by
+	 * the milliseconds per beat of of the beatmap and you'll get
+	 * that duration is milliseconds.
+	 *
+	 * According to the official documentation, its default value
+	 * is 1.4.
+	 */
+	float slider_multiplier;
+};
+
+struct oshu_event {
+};
+
+struct oshu_timing_point {
+};
+
+struct oshu_color {
+};
+
+enum oshu_sampleset_category {
+	OSHU_SAMPLESET_NORMAL,
+	OSHU_SAMPLESET_SOFT,
+	OSHU_SAMPLESET_DRUM,
+};
+
 /**
  * One beatmap, from its metadata to hit objects.
  *
@@ -107,26 +147,101 @@ struct oshu_hit {
  * sure you free it with #oshu_beatmap_free.
  */
 struct oshu_beatmap {
+	/**
+	 * The version written in the header of every osu beatmap file.
+	 * Today it's something around 14.
+	 */
 	int version;
-	struct {
-		char *audio_filename;
-		enum oshu_mode mode;
-	} general;
-	struct {
-		/**
-		 * Makes the link between a slider's pixel length and the time.
-		 * 1 beat maps to 100 pixels multiplied by this factor.
-		 *
-		 * Therefore, the total duration in beats of a slider is
-		 * `pixel_length / (100 * slider_multiplier)`. Multiply this by
-		 * the milliseconds per beat of of the beatmap and you'll get
-		 * that duration is milliseconds.
-		 *
-		 * According to the official documentation, its default value
-		 * is 1.4.
-		 */
-		float slider_multiplier;
-	} difficulty;
+	/**
+	 * Name of the audio file relative to the beatmap's directory.
+	 * It should not contain any slash.
+	 *
+	 * Because of the structure of the INI file, it's not clear whether
+	 * spaces should be trimmed or not. Someone could make a file named `
+	 * .mp3` for all I know. Still, INI is unclear about it.
+	 *
+	 * One more thing, because such annoying beatmaps do exist: with
+	 * case-insensitive filesystems like NTFS, a mis-cased filename would
+	 * work on Windows and be considered a working beatmap even though on
+	 * ext4 it wouldn't work. The parser cannot detect that but some layer
+	 * between the beatmap loader and the audio loader should maybe take
+	 * that into account.
+	 *
+	 * It is obviously mandatory, and a file missing that field should
+	 * trigger a parsing error.
+	 */
+	char *audio_filename;
+	/**
+	 * Length of the silence before the song starts playing, in seconds.
+	 *
+	 * Some beatmaps start with a hit object at the first note in the
+	 * song, which was rough in oshu! 1.0.0 since a tenth of second after
+	 * the window appeared, you'd see a miss.
+	 *
+	 * In the beatmap file, it's an integral number of milliseconds. 0 is a
+	 * sane default.
+	 */
+	double audio_lead_in;
+	/**
+	 * When to start playing the song in the song selection menu, if there
+	 * were one. In seconds, even though it's an integral number of
+	 * milliseconds in the beatmap file. Defaults to 0.
+	 */
+	double preview_time;
+	/**
+	 * Specifies whether or not a countdown occurs before the first hit
+	 * object appears. Linked to #audio_lead_in. Defaults to 0.
+	 *
+	 * In both the beatmap file and in oshu!, 0 means false and 1 means
+	 * true.
+	 */
+	int countdown;
+	/**
+	 * Default sample set used in the beatmap. Should be written as
+	 * `Normal`, `Soft`, `Drum` in the beatmap.
+	 *
+	 * Note that timing points or specific hit objects may use their own
+	 * sampleset, so you must check the hit object first before resorting
+	 * to this variable.
+	 *
+	 * Let's default to #OSHU_SAMPLESET_SOFT.
+	 */
+	enum oshu_sampleset_category sampleset;
+	/**
+	 * From the official documentation:
+	 *
+	 * > StackLeniency (Float) is how often closely placed hit objects will
+	 * > be stacked together.
+	 *
+	 * Not sure what it means.
+	 */
+	double stack_leniency;
+	/**
+	 * The game mode. Today, only the standard osu! game is supported.
+	 *
+	 * It is written as a number between 0 and 3, and matches the values in
+	 * #oshu_mode.
+	 */
+	enum oshu_mode mode;
+	/**
+	 * Pseudo-boolean. Unused in oshu!.
+	 *
+	 * > LetterboxInBreaks (Boolean) specifies whether the letterbox
+	 * > appears during breaks.
+	 */
+	int letterbox_in_breaks;
+	/**
+	 * Pseudo-boolean. Unused in oshu!.
+	 *
+	 * > WidescreenStoryboard (Boolean) specifies whether or not the
+	 * > storyboard should be widescreen.
+	 */
+	int widescreen_storyboard;
+	struct oshu_metadata metadata;
+	struct oshu_difficulty difficulty;
+	struct oshu_event *events;
+	struct oshu_timing_point *timing_points;
+	struct oshu_color colors;
 	struct oshu_hit *hits;
 	struct oshu_hit *hit_cursor;
 };
