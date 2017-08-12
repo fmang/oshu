@@ -185,6 +185,24 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 }
 
 /**
+ * Compute #oshu_hit::combo and #oshu_hit::combo_seq of a single #oshu_hit.
+ */
+static void compute_hit_combo(struct oshu_hit *previous, struct oshu_hit *hit)
+{
+	if (previous == NULL) {
+		hit->combo = 0;
+		hit->combo_seq = 1;
+	} else if (hit->type & OSHU_HIT_NEW_COMBO) {
+		int skip_combo = (hit->type & OSHU_HIT_COMBO_MASK) >> OSHU_HIT_COMBO_OFFSET;
+		hit->combo = previous->combo + 1 + skip_combo;
+		hit->combo_seq = 1;
+	} else {
+		hit->combo = previous->combo;
+		hit->combo_seq = previous->combo_seq + 1;
+	}
+}
+
+/**
  * Parse one hit using #parse_one_hit, and link it into the whole beatmap.
  *
  * Skip invalid hit objects.
@@ -200,6 +218,7 @@ static int parse_hit_object(char *line, struct parser_state *parser)
 			assert(parser->beatmap->hit_cursor->time < hit->time);
 			parser->beatmap->hit_cursor->next = hit;
 		}
+		compute_hit_combo(parser->beatmap->hit_cursor, hit);
 		parser->beatmap->hit_cursor = hit;
 	}
 	return 0;
