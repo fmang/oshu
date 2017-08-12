@@ -370,15 +370,42 @@ struct oshu_beatmap {
 	 */
 	int widescreen_storyboard;
 	/**
-	 * All the metadata specified in the `[Metadata]` section of the
-	 * beatmap file.
+	 * \brief [Metadata] section.
 	 */
 	struct oshu_metadata metadata;
+	/**
+	 * \brief [Difficulty] section.
+	 */
 	struct oshu_difficulty difficulty;
+	/**
+	 * \brief [Event] section.
+	 */
 	struct oshu_event *events;
+	/**
+	 * \brief [TimingPoints] section.
+	 */
 	struct oshu_timing_point *timing_points;
-	struct oshu_color colors;
+	/**
+	 * \brief [Colours] section.
+	 */
+	struct oshu_color *colors;
+	/**
+	 * \brief [HitObjects] section.
+	 *
+	 * It's a linked list of hit objects, in chronological order.
+	 */
 	struct oshu_hit *hits;
+	/**
+	 * Pointer to the current hit, according to the context of the game.
+	 *
+	 * Typically, it would point to the first non-obsolete hit, where a hit
+	 * is said to be obsolete when it is nor displayable (not even its
+	 * fade-out shadow remains), nor clickable.
+	 *
+	 * Its goal is to improve the performance of the beatmap drawing
+	 * routine and the reactivity on user click, because the obsolete hits
+	 * are already skipped.
+	 */
 	struct oshu_hit *hit_cursor;
 };
 
