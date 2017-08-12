@@ -77,7 +77,7 @@
  * To convert a point from game coordinates to physical coordinates, you must,
  * in that order:
  *
- * 1. Translate the point by (-64, -48) to obtain original window coordinates.
+ * 1. Translate the point by (64, 48) to obtain original window coordinates.
  * 2. Multiply by the *zoom* factor for zoomed window coordinates.
  * 3. Translate by (0, (window height - 480 × zoom) / 2) if the window is too
  *    high, or by ((window width - 640 × zoom) / 2, 0) if the window is too
@@ -85,6 +85,13 @@
 *
 *  Where *zoom* is *window width / 640* if *window width / window height < 640
 *  / 480*, or *window height / 480* otherwise.
+*
+*  The reverse operation, from physical coordinates to game coordinates:
+*
+*  1. Translate by the negative horizontal margin or vertical margin in point 3
+*     above.
+*  2. Divide both coordinates by the *zoom* factor.
+ * 3. Translate the point by (-64, -48).
  *
  * \{
  */
@@ -103,6 +110,9 @@ extern const int oshu_hit_radius;
 struct oshu_display {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
+	double zoom;
+	int horizontal_margin;
+	int vertical_margin;
 };
 
 /**
@@ -115,6 +125,13 @@ int oshu_display_init(struct oshu_display **display);
  * Free the display structure and everything associated to it.
  */
 void oshu_display_destroy(struct oshu_display **display);
+
+/**
+ * Resize the game area to fit the new size of the window.
+ *
+ * Call this function when you receive a `SDL_WINDOWEVENT_SIZE_CHANGED`.
+ */
+void oshu_display_resize(struct oshu_display *display, int w, int h);
 
 /**
  * Get the mouse position in game coordinates.

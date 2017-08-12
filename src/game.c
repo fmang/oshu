@@ -143,6 +143,10 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_MOUSEBUTTONDOWN:
 		hit(game);
 		break;
+	case SDL_WINDOWEVENT:
+		if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+			oshu_display_resize(game->display, event->window.data1, event->window.data2);
+		break;
 	}
 }
 

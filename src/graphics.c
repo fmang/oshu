@@ -6,11 +6,8 @@
 #include "graphics.h"
 #include "log.h"
 
-static const int window_width = 640; /* px */
-static const int window_height = 480; /* px */
-
-static const int game_width = 512;
-static const int game_height = 384;
+static const int game_width = 640; /* px */
+static const int game_height = 480; /* px */
 
 const int oshu_hit_radius = 24; /* px */
 static const int hit_hint = 64; /* px */
@@ -22,8 +19,8 @@ int create_window(struct oshu_display *display)
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		window_width, window_height,
-		0
+		game_width, game_height,
+		SDL_WINDOW_RESIZABLE
 	);
 	if (display->window == NULL)
 		goto fail;
@@ -44,6 +41,7 @@ int load_textures(struct oshu_display *display)
 int oshu_display_init(struct oshu_display **display)
 {
 	*display = calloc(1, sizeof(**display));
+	(*display)->zoom = 1;
 	if (create_window(*display) < 0)
 		goto fail;
 	if (load_textures(*display) < 0)
@@ -64,10 +62,27 @@ void oshu_display_destroy(struct oshu_display **display)
 	*display = NULL;
 }
 
+void oshu_display_resize(struct oshu_display *display, int w, int h)
+{
+	double original_ratio = (double) game_width / game_height;
+	double actual_ratio = (double) w / h;
+	if (actual_ratio > original_ratio) {
+		/* the window is too wide */
+		display->zoom = (double) h / game_height;
+		display->horizontal_margin = (w - game_width * display->zoom) / 2;
+		display->vertical_margin = 0;
+	} else {
+		/* the window is too high */
+		display->zoom = (double) w / game_width;
+		display->horizontal_margin = 0;
+		display->vertical_margin = (h - game_height * display->zoom) / 2;
+	}
+}
+
 static void view_xy(struct oshu_display *display, int *x, int *y)
 {
-	*x += (window_width - game_width) / 2;
-	*y += (window_height - game_height) / 2;
+	*x = (64 + *x) * display->zoom + display->horizontal_margin;
+	*y = (48 + *y) * display->zoom + display->vertical_margin;
 }
 
 /**
@@ -78,19 +93,11 @@ static void view_point(struct oshu_display *display, SDL_Point *p)
 	view_xy(display, &p->x, &p->y);
 }
 
-/**
- * Translate a rectangle from game zone coordinates to window coordinates.
- */
-static void view_rect(struct oshu_display *display, SDL_Rect *r)
-{
-	view_xy(display, &r->x, &r->y);
-}
-
 void oshu_get_mouse(struct oshu_display *display, int *x, int *y)
 {
 	SDL_GetMouseState(x, y);
-	*x -= (window_width - game_width) / 2;
-	*y -= (window_height - game_height) / 2;
+	*x = (*x - display->horizontal_margin) / display->zoom - 64;
+	*y = (*y - display->vertical_margin) / display->zoom - 48;
 }
 
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)
