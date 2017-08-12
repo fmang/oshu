@@ -57,6 +57,17 @@ enum oshu_sample_type {
 };
 
 /**
+ * \brief An RGB color.
+ *
+ * Each field represents a component ranging from 0 to 255 (inclusive).
+ */
+struct oshu_color {
+	int red;
+	int green;
+	int blue;
+};
+
+/**
  * One timing point.
  *
  * This structure is a complete transcription of the timing point description
@@ -201,9 +212,25 @@ struct oshu_hit {
 	 */
 	enum oshu_hit_state state;
 	/**
-	 * Timing point in effect when the hit object should be clicked.
+	 * \brief Timing point in effect when the hit object should be clicked.
 	 */
 	struct oshu_timing_point *timing_point;
+	/**
+	 * \brief Combo identifier.
+	 *
+	 * Starts at 0 at the beginning of the beatmap, and increases at every
+	 * hit object with #OSHU_HIT_NEW_COMBO. Its value may increase by more
+	 * than 1 if the hit object specifies a non-zero combo skip.
+	 */
+	int combo;
+	/**
+	 * \brief Sequence number of the hit inside its combo.
+	 *
+	 * The first hit object will have the sequence number 1, the next one
+	 * 2, and so on until a hit object's type includes #OSHU_HIT_NEW_COMBO,
+	 * which resets the sequence number to 1.
+	 */
+	int combo_seq;
 	/**
 	 * Pointer to the next element of the linked list.
 	 *
@@ -257,7 +284,7 @@ struct oshu_metadata {
 	 */
 	char *version;
 	/**
-	 * \briefOrigin of the song.
+	 * \brief Origin of the song.
 	 *
 	 * Might be the name of a series like *Touhou* which has got an
 	 * impressive amount of fan songs.
@@ -359,9 +386,6 @@ struct oshu_difficulty {
 	 * I guess its unit is *ticks per beat*.
 	 */
 	double slider_tick_rate;
-};
-
-struct oshu_color {
 };
 
 /**
@@ -497,8 +521,18 @@ struct oshu_beatmap {
 	struct oshu_timing_point *timing_points;
 	/**
 	 * \brief [Colours] section.
+	 *
+	 * It's an array owned by the beatmap. Its size is stored in the
+	 * #colors_count field.
+	 *
+	 * These colors are used to display combos, so its index is going to be
+	 * a combo identifier modulo the size of this array.
 	 */
 	struct oshu_color *colors;
+	/**
+	 * Number of elements in the #colors array.
+	 */
+	int colors_count;
 	/**
 	 * \brief [HitObjects] section.
 	 *
