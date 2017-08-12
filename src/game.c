@@ -215,7 +215,8 @@ static void end(struct oshu_game *game)
 int oshu_game_run(struct oshu_game *game)
 {
 	SDL_Event event;
-	oshu_audio_play(game->audio);
+	if (!game->paused)
+		oshu_audio_play(game->audio);
 	while (!game->audio->finished && !game->stop) {
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);

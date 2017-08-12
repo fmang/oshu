@@ -18,12 +18,14 @@
 enum option_values {
 	OPT_AUTOPLAY = 0x10000,
 	OPT_HELP = 'h',
+	OPT_PAUSE = 0x10001,
 	OPT_VERBOSE = 'v',
 };
 
 static struct option options[] = {
 	{"autoplay", no_argument, 0, OPT_AUTOPLAY},
 	{"help", no_argument, 0, OPT_HELP},
+	{"pause", no_argument, 0, OPT_PAUSE},
 	{"verbose", no_argument, 0, OPT_VERBOSE},
 	{0, 0, 0, 0},
 };
@@ -40,6 +42,7 @@ static const char *help =
 	"  -v, --verbose       Increase the verbosity.\n"
 	"  -h, --help          Show this help message.\n"
 	"  --autoplay          Perform a perfect run.\n"
+	"  --pause             Start the game paused.\n"
 	"\n"
 	"Check the man page oshu(1) for details.\n"
 ;
@@ -52,7 +55,7 @@ static void signal_handler(int signum)
 		current_game->stop = 1;
 }
 
-int run(const char *beatmap_path, int autoplay)
+int run(const char *beatmap_path, int autoplay, int pause)
 {
 	int rc = 0;
 
@@ -69,6 +72,7 @@ int run(const char *beatmap_path, int autoplay)
 	}
 
 	current_game->autoplay = autoplay;
+	current_game->paused = pause;
 
 	if ((rc = oshu_game_run(current_game)) < 0) {
 		oshu_log_error("error while running the game, aborting");
@@ -88,6 +92,7 @@ int main(int argc, char **argv)
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
 	int autoplay = 0;
+	int pause = 0;
 
 	for (;;) {
 		int c = getopt_long(argc, argv, flags, options, NULL);
@@ -104,6 +109,9 @@ int main(int argc, char **argv)
 			return 0;
 		case OPT_AUTOPLAY:
 			autoplay = 1;
+			break;
+		case OPT_PAUSE:
+			pause = 1;
 			break;
 		default:
 			fputs(usage, stderr);
@@ -137,7 +145,7 @@ int main(int argc, char **argv)
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
-	if (run(beatmap_file, autoplay) < 0)
+	if (run(beatmap_file, autoplay, pause) < 0)
 		return 1;
 
 	free(beatmap_path);
