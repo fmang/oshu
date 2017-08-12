@@ -189,7 +189,8 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 	char *y = strsep(&line, ",");
 	char *time = strsep(&line, ",");
 	char *type = strsep(&line, ",");
-	if (!type) {
+	char *hit_sound = strsep(&line, ",");
+	if (!hit_sound) {
 		oshu_log_warn("invalid hit object");
 		*hit = NULL;
 		return;
@@ -199,6 +200,7 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 	(*hit)->y = atoi(y);
 	(*hit)->time = (double) atoi(time) / 1000;
 	(*hit)->type = atoi(type);
+	(*hit)->hit_sound = atoi(hit_sound);
 }
 
 /**
