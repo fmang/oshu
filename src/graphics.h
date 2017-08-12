@@ -57,6 +57,8 @@ void oshu_get_mouse(struct oshu_display *display, int *x, int *y);
  * \brief
  * Rendering functions, from the main beatmap drawing routine to line drawing
  * helpers.
+ *
+ * \{
  */
 
 /**
