@@ -43,17 +43,42 @@ enum oshu_mode {
 	OSHU_MODE_MANIA = 3,
 };
 
-enum oshu_sampleset_category {
-	OSHU_SAMPLESET_NORMAL,
-	OSHU_SAMPLESET_SOFT,
-	OSHU_SAMPLESET_DRUM,
+/**
+ * Families of sample sets.
+ *
+ * The constant values are taken from the documentation, and correspond to the
+ * value a hit object's addition may mention for its sample set.
+ */
+enum oshu_sampleset_family {
+	/**
+	 * The beatmap's hit objects often specifiy 0 as the sample set,
+	 * meaning we should use the inherited one.
+	 *
+	 * However, the parser should in these case replace 0 with the actual
+	 * value, so it should be used in an external module.
+	 */
+	OSHU_SAMPLESET_AUTO = 0,
+	OSHU_SAMPLESET_NORMAL = 1,
+	OSHU_SAMPLESET_SOFT = 2,
+	OSHU_SAMPLESET_DRUM = 3,
 };
 
-enum oshu_sample_type {
-	OSHU_SAMPLE_TYPE_NORMAL,
-	OSHU_SAMPLE_TYPE_WHISTLE,
-	OSHU_SAMPLE_TYPE_FISNISH,
-	OSHU_SAMPLE_TYPE_CLAP,
+/**
+ * Hit sounds to play on top of the normal hit sound.
+ *
+ * They can be OR'd, so you should store them in an *int*.
+ */
+enum oshu_hit_sound {
+	/**
+	 * The first bit is undocumented, let's assume it stands for normal.
+	 *
+	 * If it's unset, maybe we should play the normal sound? Needs more
+	 * research.
+	 */
+	OSHU_SAMPLE_TYPE_NORMAL = 1,
+	OSHU_SAMPLE_TYPE_WHISTLE = 2,
+	OSHU_SAMPLE_TYPE_FISNISH = 4,
+	OSHU_SAMPLE_TYPE_CLAP = 8,
 };
 
 /**
@@ -111,15 +136,17 @@ struct oshu_timing_point {
 	/**
 	 * Default sample type to use in that timing section.
 	 */
-	enum oshu_sample_type sample_type;
+	enum oshu_hit_sound sample_type;
 	/**
 	 * Default sample set to use in that timing section.
 	 */
-	enum oshu_sampleset_category sample_set;
+	enum oshu_sampleset_family sample_set;
 	/**
 	 * Volume of the samples, from 0 to 100%.
+	 *
+	 * It's an integer in the beatmap file.
 	 */
-	int volume;
+	double volume;
 	/**
 	 * Pseudo-boolean telling whether the timing point was inherited or
 	 * not. It's looks redundant with the negative #beat_duration.
@@ -178,6 +205,22 @@ enum oshu_hit_state {
  *
  * It is currently very limited, because it doesn't support sliders, or the
  * sample set.
+ *
+ * The structure for a hit circle is `x,y,time,type,hitSound,addition`.
+ *
+ * The structure for a slider is
+ * `x,y,time,type,hitSound,sliderType|curvePoints,repeat,pixelLength,edgeHitsounds,edgeAdditions,addition`.
+ *
+ * The structure for a spinner is `x,y,time,type,hitSound,endTime,addition`.
+ *
+ * The structure for a osu!mania hold note is
+ * `x,y,time,type,hitSound,endTime:addition`.
+ *
+ * For every type, the addition is structured like
+ * `sampleSet:additions:customIndex:sampleVolume:filename`.
+ * We'll ignore the filename for now, because it's pretty rare.
+ *
+ * For details, look at the corresponding field in this structure.
  */
 struct oshu_hit {
 	/**
@@ -198,13 +241,55 @@ struct oshu_hit {
 	 * In the beatmap, it's an integral number of milliseconds.
 	 */
 	double time;
-	 /**
-	  * Type of the hit object, like circle, slider, spinner, and a few
-	  * extra information.
-	  *
-	  * Combination of flags from #oshu_hit_type.
-	  */
+	/**
+	 * Type of the hit object, like circle, slider, spinner, and a few
+	 * extra information.
+	 *
+	 * Combination of flags from #oshu_hit_type.
+	 */
 	int type;
+	/**
+	 * Combination of flags from #oshu_hit_sound.
+	 *
+	 * Things to play on top of the normal sound.
+	 *
+	 * The sample set to use for these additions is defined by the
+	 * #additions field.
+	 */
+	int hit_sound;
+	/**
+	 * Sample set to use when playing the hit sound.
+	 *
+	 * It's often set to 0 in the beatmap files, but the parser should
+	 * replace that value by the sample set to use computed from the
+	 * context.
+	 *
+	 * \sa oshu_timing_point::sample_set
+	 */
+	enum oshu_sampleset_family sample_set;
+	/**
+	 * Sample set to use when playing #hit_sound over the normal hit sound,
+	 * and not the hit sound itself.
+	 *
+	 * It's similar to #sample_set.
+	 */
+	enum oshu_sampleset_family additions_set;
+	/**
+	 * For a given sampleset family, alternative sample may be used.
+	 *
+	 * The sample stored in `soft-hitnormal99.wav` may thus be accessed by
+	 * setting the sample index to 99.
+	 *
+	 * By default, it's 1, and means the sample `soft-hitnormal.wav` would
+	 * be used instead.
+	 */
+	int sample_index;
+	/**
+	 * Volume of the sample, from 0 to 100%.
+	 *
+	 * \sa #oshu_timing_point::volume
+	 */
+	double sample_volume;
 	/**
 	 * Dynamic state of the hit. Whether it was clicked or not.
 	 *
@@ -462,7 +547,7 @@ struct oshu_beatmap {
 	 *
 	 * Let's default to #OSHU_SAMPLESET_SOFT.
 	 */
-	enum oshu_sampleset_category sampleset;
+	enum oshu_sampleset_family sampleset;
 	/**
 	 * From the official documentation:
 	 *
