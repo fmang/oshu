@@ -25,8 +25,16 @@ struct oshu_point {
  */
 struct oshu_point oshu_normalize(struct oshu_point p);
 
+/**
+ * The curve types for a slider.
+ *
+ * Their value is the letter that appears in the beatmaps to identify the type.
+ */
 enum oshu_curve_type {
-	OSHU_CURVE_BEZIER,
+	OSHU_CURVE_LINEAR = 'L',
+	OSHU_CURVE_PERFECT = 'P',
+	OSHU_CURVE_BEZIER = 'B',
+	OSHU_CURVE_CATMULL = 'C',
 };
 
 struct oshu_segment {
@@ -39,8 +47,17 @@ struct oshu_segment {
 	 * the segment account for 1/3 of the path.
 	 */
 	double length;
-	/** How many control points the segment has. */
+	/**
+	 * How many control points the segment has.
+	 *
+	 * \sa points
+	 */
 	int size;
+	/**
+	 * The array of control points.
+	 *
+	 * \sa size
+	 */
 	struct oshu_point *points;
 };
 

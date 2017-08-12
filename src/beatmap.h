@@ -198,6 +198,72 @@ enum oshu_hit_state {
 };
 
 /**
+ * Parts of a #oshu_hit specific to slider objects.
+ */
+struct oshu_slider {
+	/**
+	 * Path the slider follows.
+	 */
+	struct oshu_path path;
+	/**
+	 * > repeat (Integer) is the number of times a player will go over the
+	 * > slider. A value of 1 will not repeat, 2 will repeat once, 3 twice,
+	 * > and so on.
+	 */
+	int repeat;
+	/**
+	 * Duration of the slider in seconds, one-way without repeat.
+	 *
+	 * The total duration of the slider is therefore #repeat multiplied by
+	 * #duration.
+	 *
+	 * It is computed from the pixel length in the beatmap file,
+	 * #oshu_difficulty::slider_multiplier, and
+	 * #oshu_timing_point::beat_duration.
+	 */
+	double duration;
+	/**
+	 * Sounds to play on top of the normal sound. One per slider cicle.
+	 *
+	 * It's an OR'd combination of #oshu_hit_sound.
+	 *
+	 * \sa edge_additions_set
+	 * \sa oshu_hit::hit_sound
+	 */
+	int edge_hit_sound[2];
+	/**
+	 * The sample set to use when playing the #edge_hit_sound.
+	 *
+	 * \sa oshu_hit::additions_set
+	 */
+	int edge_additions_set[2];
+};
+
+/**
+ * Parts of a #oshu_hit specific to spinner objects.
+ */
+struct oshu_spinner {
+	/**
+	 * Time in seconds when the spinner ends.
+	 *
+	 * Relative to the song's position, like #oshu_hit::time.
+	 */
+	double end_time;
+};
+
+/**
+ * Parts of a #oshu_hit specific to osu!mania hold note objects.
+ */
+struct oshu_hold_note {
+	/**
+	 * Time in seconds when the spinner ends.
+	 *
+	 * Relative to the song's position, like #oshu_hit::time.
+	 */
+	double end_time;
+};
+
+/**
  * One hit object, and one link in the beatmap.
  *
  * This structure actually defines a link in the linked list of all hit
@@ -210,11 +276,14 @@ enum oshu_hit_state {
  *
  * The structure for a slider is
  * `x,y,time,type,hitSound,sliderType|curvePoints,repeat,pixelLength,edgeHitsounds,edgeAdditions,addition`.
+ * See #oshu_slider.
  *
  * The structure for a spinner is `x,y,time,type,hitSound,endTime,addition`.
+ * See #oshu_spinner.
  *
  * The structure for a osu!mania hold note is
  * `x,y,time,type,hitSound,endTime:addition`.
+ * See #oshu_hold_note.
  *
  * For every type, the addition is structured like
  * `sampleSet:additions:customIndex:sampleVolume:filename`.
@@ -254,7 +323,7 @@ struct oshu_hit {
 	 * Things to play on top of the normal sound.
 	 *
 	 * The sample set to use for these additions is defined by the
-	 * #additions field.
+	 * #additions_set field.
 	 */
 	int hit_sound;
 	/**
@@ -290,6 +359,14 @@ struct oshu_hit {
 	 * \sa #oshu_timing_point::volume
 	 */
 	double sample_volume;
+	/**
+	 * Type-specific properties.
+	 */
+	union {
+		struct oshu_slider slider;
+		struct oshu_spinner spinner;
+		struct oshu_hold_note hold_note;
+	};
 	/**
 	 * Dynamic state of the hit. Whether it was clicked or not.
 	 *
