@@ -105,14 +105,19 @@ static void hit(struct oshu_game *game)
 	}
 }
 
+static void pause_game(struct oshu_game *game)
+{
+	oshu_audio_pause(game->audio);
+	game->paused = 1;
+}
+
 static void toggle_pause(struct oshu_game *game)
 {
 	if (game->paused) {
 		oshu_audio_play(game->audio);
 		game->paused = 0;
 	} else {
-		oshu_audio_pause(game->audio);
-		game->paused = 1;
+		pause_game(game);
 	}
 }
 
@@ -144,8 +149,19 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		hit(game);
 		break;
 	case SDL_WINDOWEVENT:
-		if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+		switch (event->window.event) {
+		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			oshu_display_resize(game->display, event->window.data1, event->window.data2);
+			break;
+		case SDL_WINDOWEVENT_HIDDEN:
+		case SDL_WINDOWEVENT_MINIMIZED:
+		case SDL_WINDOWEVENT_FOCUS_LOST:
+			pause_game(game);
+			break;
+		case SDL_WINDOWEVENT_CLOSE:
+			game->stop = 1;
+			break;
+		}
 		break;
 	}
 }
