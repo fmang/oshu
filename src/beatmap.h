@@ -100,7 +100,73 @@ struct oshu_hit {
 	struct oshu_hit *next;
 };
 
+/**
+ * Complete definition of the [Metadata] section.
+ *
+ * Every character string inside this section is either NULL or a reference to
+ * a dynamically allocated string.
+ *
+ * This structure should *own* the strings it references, so make sure you
+ * `strdup` your strings before filling it.
+ *
+ * All the strings are encoded in UTF-8.
+ */
 struct oshu_metadata {
+	/**
+	 * ASCII representation of the title.
+	 *
+	 * This is what the user will usually see unless they can read
+	 * Japanese.
+	 */
+	char *title;
+	/**
+	 * The true #title, with kanji and everything. It looks nicer but may
+	 * be unreadable to many.
+	 */
+	char *title_unicode;
+	/**
+	 * ASCII name of the artist of the song, not the beatmap.
+	 */
+	char *artist;
+	/**
+	 * The true #artist name.
+	 */
+	char *artist_unicode;
+	/**
+	 * Username of the creator of the beatmap, also known as the *mapper*.
+	 */
+	char *creator;
+	/**
+	 * Name of the beatmap's difficulty.
+	 *
+	 * It's often something like *Easy* or *Normal*, but is actually free
+	 * form and may contain fancier values like *Sunrise*, whatever that
+	 * means.
+	 */
+	char *version;
+	/**
+	 * Origin of the song. Might be the name of a series like *Touhou*
+	 * which has got an impressive amount of fan songs.
+	 */
+	char *source;
+	/**
+	 * Array of all the tags, for easy searching of beatmaps.
+	 *
+	 * In the beatmap file, tags are separated by spaces.
+	 *
+	 * May be *NULL*.
+	 */
+	char **tags;
+	/**
+	 * Beatmap ID of the beatmap, from osu!'s official beatmap repository.
+	 */
+	int beatmap_id;
+	/**
+	 * ID of the beatmap set. This is the prefix of the *.osz* files you
+	 * find on osu!'s website web when downloaded beatmaps or beatmap
+	 * packs.
+	 */
+	int beatmap_set_id;
 };
 
 struct oshu_difficulty {
@@ -237,6 +303,10 @@ struct oshu_beatmap {
 	 * > storyboard should be widescreen.
 	 */
 	int widescreen_storyboard;
+	/**
+	 * All the metadata specified in the `[Metadata]` section of the
+	 * beatmap file.
+	 */
 	struct oshu_metadata metadata;
 	struct oshu_difficulty difficulty;
 	struct oshu_event *events;
