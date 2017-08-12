@@ -37,6 +37,38 @@ enum oshu_curve_type {
 	OSHU_CURVE_CATMULL = 'C',
 };
 
+/**
+ * A segment is a piece of a regular curve, be that curve linear or Bézier.
+ *
+ * The linear segments are the simplest and only have 2 points.
+ *
+ * Perfect segments are bits of circle and have 3 points. The 3 non-aligned
+ * points define a circle in a unique way. The perfect segment is the part of
+ * that circle that starts with the first point, passes through the second
+ * point, and ends at the third point.
+ *
+ * Bézier segments have 2 to an arbitrary large number of control points. A
+ * 2-point Bézier segment is nothing but a linear segment. A 3-point Bézier
+ * segment is a quadratic curve, also called a parabola. Things get interesting
+ * with the 4-point cubic Bézier curve, which is the one you see in most
+ * painting tools.
+ *
+ * Here's a complex slider to illustrate:
+ * `166,250,154868,2,0,B|186:244|210:242|210:242|232:248|254:250|254:250|279:243|302:242,1,131.25,2|0,1:2|0:0,0:0:0:0:`.
+ *
+ * The `B|` part tells us it's a Bézier curve. You'll notice the point
+ * `254:250` appear twice, meaning it's a *red point* according to the osu!
+ * official doc. In better words, it's the end of one segment and the start of
+ * the next one.
+ *
+ * We can therefore split the slider above in the following segments:
+ *
+ * 1. 166:250 (at the very beginning of the line), 186:244, 210:242. That
+ *    makes a quadratic Bézier.
+ * 2. 210:242, 232:248, 254:250.
+ * 3. 254:250, 279:243, 302:242.
+ *
+ */
 struct oshu_segment {
 	enum oshu_curve_type type;
 	/**
