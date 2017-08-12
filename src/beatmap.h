@@ -190,6 +190,7 @@ enum oshu_hit_type {
 	OSHU_HIT_NEW_COMBO = 0b100,
 	OSHU_HIT_SPINNER = 0b1000,
 	OSHU_HIT_COMBO_MASK = 0b1110000, /**< How many combos to skip. */
+	OSHU_HIT_COMBO_OFFSET = 4, /**< How many bits to shift. */
 	OSHU_HIT_HOLD = 0b10000000, /**< Mania mode only. */
 };
 
