@@ -263,7 +263,7 @@ struct oshu_spinner {
  */
 struct oshu_hold_note {
 	/**
-	 * Time in seconds when the spinner ends.
+	 * Time in seconds when the hold note ends.
 	 *
 	 * Relative to the song's position, like #oshu_hit::time.
 	 */

@@ -179,6 +179,24 @@ static int parse_general(char *line, struct parser_state *parser)
 }
 
 /**
+ * Parse specific parts of a spinner
+ */
+static void parse_spinner(char *line, struct oshu_spinner *spinner)
+{
+	char *end_time = strsep(&line, ",");
+	spinner->end_time = (double) atoi(end_time) / 1000;
+}
+
+/**
+ * Parse specific parts of a hold note
+ */
+static void parse_hold_note(char *line, struct oshu_hold_note *hold_note)
+{
+	char *end_time = strsep(&line, ",");
+	hold_note->end_time = (double) atoi(end_time) / 1000;
+}
+
+/**
  * Allocate and parse one hit object.
  *
  * Only failure, `*hit` is set to *NULL*.
@@ -201,6 +219,10 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 	(*hit)->time = (double) atoi(time) / 1000;
 	(*hit)->type = atoi(type);
 	(*hit)->hit_sound = atoi(hit_sound);
+	if ((*hit)->type & OSHU_HIT_SPINNER)
+		parse_spinner(line, &(*hit)->spinner);
+	if ((*hit)->type & OSHU_HIT_HOLD)
+		parse_hold_note(line, &(*hit)->hold_note);
 }
 
 /**
