@@ -6,17 +6,19 @@
 #include "geometry.h"
 #include "log.h"
 
+#include <assert.h>
+
 /**
  * Pre-computed factorial values, for speed.
  * We're never going to see 8th-order Bezier curve, right?
  */
 static int fac[8] = {1, 1, 2, 6, 24, 120, 720, 5040};
 
-struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t)
+static struct oshu_point bezier_at(struct oshu_bezier *segment, double t)
 {
 	struct oshu_point p = {0, 0};
-	int n = segment->size - 1;
-	if (n >= 8) {
+	int n = segment->degree;
+	if (n >= sizeof(fac) / sizeof(*fac)) {
 		oshu_log_error("%dth-order curves are not supported", n);
 		return p;
 	}
@@ -24,10 +26,16 @@ struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t)
 	for (int i = 0; i <= n; i++) {
 		double bin = fac[n] / (fac[i] * fac[n - i]);
 		double factor = bin * pow(t, i) * pow(1 - t, n - i);
-		p.x += factor * segment->points[i].x;
-		p.y += factor * segment->points[i].y;
+		p.x += factor * segment->control_points[i].x;
+		p.y += factor * segment->control_points[i].y;
 	}
 	return p;
+}
+
+struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t)
+{
+	assert (segment->type == OSHU_CURVE_BEZIER);
+	return bezier_at(&segment->bezier, t);
 }
 
 struct oshu_point oshu_normalize(struct oshu_point p)
@@ -38,25 +46,32 @@ struct oshu_point oshu_normalize(struct oshu_point p)
 	return p;
 }
 
-struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t)
+static struct oshu_point bezier_derive(struct oshu_bezier *segment, double t)
 {
 	struct oshu_point p = {0, 0};
-	int n = segment->size - 1;
-	if (segment->size >= 8) {
+	int n = segment->degree;
+	if (n >= sizeof(fac) / sizeof(*fac)) {
+		/* Actually, we could tolerate that degree plus one.
+		 * Let's choose consistency with #bezier_at. */
 		oshu_log_error("%dth-order curves are not supported", n);
 		return p;
 	}
 	for (int i = 0; i <= n - 1; i++) {
 		double bin = fac[n - 1] / (fac[i] * fac[n - 1 - i]);
 		double factor = bin * pow(t, i) * pow(1 - t, n - 1 - i);
-		p.x += factor * (segment->points[i + 1].x - segment->points[i].x);
-		p.y += factor * (segment->points[i + 1].y - segment->points[i].y);
+		p.x += factor * (segment->control_points[i + 1].x - segment->control_points[i].x);
+		p.y += factor * (segment->control_points[i + 1].y - segment->control_points[i].y);
 	}
 	p.x *= n;
 	p.y *= n;
 	return p;
 }
 
+struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t)
+{
+	assert (segment->type == OSHU_CURVE_BEZIER);
+	return bezier_derive(&segment->bezier, t);
+}
 
 struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 {

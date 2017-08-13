@@ -38,20 +38,49 @@ enum oshu_curve_type {
 };
 
 /**
- * A segment is a piece of a regular curve, be that curve linear or Bézier.
+ * A simple line, with a start point and end point.
  *
- * The linear segments are the simplest and only have 2 points.
+ * Used by #OSHU_CURVE_LINEAR segments.
  *
- * Perfect segments are bits of circle and have 3 points. The 3 non-aligned
- * points define a circle in a unique way. The perfect segment is the part of
- * that circle that starts with the first point, passes through the second
- * point, and ends at the third point.
+ * It's formally the same as a degree 1 Bézier curve, but we'll keep that type
+ * to make experiments.
+ */
+struct oshu_line {
+	struct oshu_point start;
+	struct oshu_point end;
+};
+
+/**
+ * An arc, defined as a section of a circle.
  *
- * Bézier segments have 2 to an arbitrary large number of control points. A
- * 2-point Bézier segment is nothing but a linear segment. A 3-point Bézier
- * segment is a quadratic curve, also called a parabola. Things get interesting
- * with the 4-point cubic Bézier curve, which is the one you see in most
- * painting tools.
+ * Used by #OSHU_CURVE_PERFECT segments.
+ *
+ * In the beatmaps, these arc are called *perfect* and are defined with 3
+ * points. The first point beging the start of the arc, the second one (called
+ * the *grey* one in osu! terminology) is the point the arc must pass through,
+ * and the last one is the end of the curve. It's therefore a section of the
+ * circumscribed circle defined by the 3 points.
+ *
+ * Because it's hard to make computation with that kind of representation,
+ * we'll use an easier representation made of the center of the circle, its
+ * radius, and a pair of angles in radian where 0 is the the rightmost point,
+ * like we do in common trigonometry.
+ */
+struct oshu_arc {
+	struct oshu_point center;
+	double radius;
+	double start_angle;
+	double end_angle;
+};
+
+/**
+ * A Bézier curve is defined by its degree, and a number of control points
+ * equal to its degree plus one.
+ *
+ * Used by #OSHU_CURVE_BEZIER segments.
+ *
+ * For example, a degree 2 Bézier curve (called *quadratic*) has 3 control
+ * points.
  *
  * Here's a complex slider to illustrate:
  * `166,250,154868,2,0,B|186:244|210:242|210:242|232:248|254:250|254:250|279:243|302:242,1,131.25,2|0,1:2|0:0,0:0:0:0:`.
@@ -69,6 +98,43 @@ enum oshu_curve_type {
  * 3. 254:250, 279:243, 302:242.
  *
  */
+struct oshu_bezier {
+	/**
+	 * The degree of the Bézier curve, which is required to determine how
+	 * many points the #control_points array contains. The answer is
+	 * `degree + 1` control points.
+	 */
+	int degree;
+	/**
+	 * The array of control points, with a fixed size to simplify memory
+	 * management.
+	 *
+	 * Rather than hardcoding the 8 constant when creating the segment, you
+	 * should use `sizeof(control_points) / sizeof(*control_points)`.
+	 */
+	struct oshu_point control_points[8];
+};
+
+/**
+ * A segment is a piece of a regular curve, be that curve linear or Bézier.
+ *
+ * The linear segments (#OSHU_CURVE_LINEAR) are the simplest and only have 2
+ * points. See #oshu_line.
+ *
+ * Perfect segments (#OSHU_CURVE_PERFECT) are bits of circle and have 3 points.
+ * The 3 non-aligned points define a circle in a unique way. The perfect
+ * segment is the part of that circle that starts with the first point, passes
+ * through the second point, and ends at the third point. See #oshu_arc.
+ *
+ * Bézier segments (#OSHU_CURVE_BEZIER) have 2 to an arbitrary large number of
+ * control points. A 2-point Bézier segment is nothing but a linear segment. A
+ * 3-point Bézier segment is a quadratic curve, also called a parabola. Things
+ * get interesting with the 4-point cubic Bézier curve, which is the one you
+ * see in most painting tools. See #oshu_bezier.
+ *
+ * Catmull segments (#OSHU_CURVE_CATMULL) are officially deprecated, but we
+ * should support them someday in order to support old beatmaps.
+ */
 struct oshu_segment {
 	enum oshu_curve_type type;
 	/**
@@ -81,18 +147,11 @@ struct oshu_segment {
 	 * \sa oshu_path
 	 */
 	double length;
-	/**
-	 * How many control points the segment has.
-	 *
-	 * \sa points
-	 */
-	int size;
-	/**
-	 * The array of control points.
-	 *
-	 * \sa size
-	 */
-	struct oshu_point *points;
+	union {
+		struct oshu_line line;
+		struct oshu_arc arc;
+		struct oshu_bezier bezier;
+	};
 };
 
 /**
