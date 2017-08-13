@@ -77,6 +77,8 @@ struct oshu_segment {
 	 *
 	 * For example, a segment length of 10 inside a path of length 30 means
 	 * the segment account for 1/3 of the path.
+	 *
+	 * \sa oshu_path
 	 */
 	double length;
 	/**
@@ -109,10 +111,29 @@ struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t);
 struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t);
 
 /**
- * A path represents many segments joined together.
+ * A path represents many #oshu_segment joined together.
  *
  * To make a continous path, the end point of a segment should be the same as
  * the beginning point of the next one.
+ *
+ * The length of the segments are relative to each other, and the length of the
+ * path must be the sum of the lengths of all its segments. The lengths are
+ * essential to compute t-coordinates, so that t=1 is the end point, and t=0.5
+ * is the middle of the whole path.
+ *
+ * Let's illustrate a bit with paths made up of 2 segments. The number over
+ * each segment is the segment's length.
+ *
+ * ```
+ *      10        10
+ *  ├─────────┼─────────┤
+ * t=0       t=.5      t=1
+ *
+ *                300                 100
+ *  ├─────────────────────────────┼─────────┤
+ * t=0                          t=.75      t=1
+ * ```
+ *
  */
 struct oshu_path {
 	/**
