@@ -204,7 +204,7 @@ enum oshu_hit_state {
  * Parts of a #oshu_hit specific to slider objects.
  *
  * The most complex part of the slider is its path. The way it should be parsed
- * and represented is explained in #oshu_segment.
+ * and represented is explained in #oshu_path.
  */
 struct oshu_slider {
 	/**

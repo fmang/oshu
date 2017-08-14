@@ -26,21 +26,9 @@ struct oshu_point {
 struct oshu_point oshu_normalize(struct oshu_point p);
 
 /**
- * The curve types for a slider.
- *
- * Their value is the letter that appears in the beatmaps to identify the type.
- */
-enum oshu_curve_type {
-	OSHU_CURVE_LINEAR = 'L',
-	OSHU_CURVE_PERFECT = 'P',
-	OSHU_CURVE_BEZIER = 'B',
-	OSHU_CURVE_CATMULL = 'C',
-};
-
-/**
  * A simple line, with a start point and end point.
  *
- * Used by #OSHU_CURVE_LINEAR segments.
+ * Used by #OSHU_PATH_LINEAR segments.
  *
  * It's formally the same as a degree 1 Bézier curve, but we'll keep that type
  * to make experiments.
@@ -53,7 +41,7 @@ struct oshu_line {
 /**
  * An arc, defined as a section of a circle.
  *
- * Used by #OSHU_CURVE_PERFECT segments.
+ * Used by #OSHU_PATH_PERFECT segments.
  *
  * In the beatmaps, these arc are called *perfect* and are defined with 3
  * points. The first point beging the start of the arc, the second one (called
@@ -74,12 +62,14 @@ struct oshu_arc {
 };
 
 /**
- * A Bézier curve is defined by its degree, and a number of control points
+ * A Bézier path, made up of one or many Bézier segments.
+ *
+ * A Bézier segment is defined by its degree, and a number of control points
  * equal to its degree plus one.
  *
- * Used by #OSHU_CURVE_BEZIER segments.
+ * Used by #OSHU_PATH_BEZIER segments.
  *
- * For example, a degree 2 Bézier curve (called *quadratic*) has 3 control
+ * For example, a degree 2 Bézier segment (called *quadratic*) has 3 control
  * points.
  *
  * Here's a complex slider to illustrate:
@@ -97,111 +87,95 @@ struct oshu_arc {
  * 2. 210:242, 232:248, 254:250.
  * 3. 254:250, 279:243, 302:242.
  *
+ * The 3 segments joined together form a path.
+ *
+ * To make a continous path, the end point of a segment must be the same as
+ * the beginning point of the next one.
+ *
+ * A Bézier segment is usually represented in t-coordinates, with t ranging
+ * from 0 to 1. To represent a path in t-coordinates, we'll assume all the
+ * segments have roughly the same length, and map the k*th* segment in a
+ * n-segment path to the t-coordinates k/n to (k+1)/n where 0 ≤ k < n.
  */
 struct oshu_bezier {
 	/**
-	 * The degree of the Bézier curve, which is required to determine how
-	 * many points the #control_points array contains. The answer is
-	 * `degree + 1` control points.
+	 * How many segments the Bézier path contains.
 	 */
-	int degree;
+	int segment_count;
 	/**
-	 * The array of control points, with a fixed size to simplify memory
-	 * management.
+	 * \brief Starting position of each segment in control points array.
 	 *
-	 * Rather than hardcoding the 8 constant when creating the segment, you
-	 * should use `sizeof(control_points) / sizeof(*control_points)`.
+	 * More concretely, the n*th* segment of the path starts at
+	 * `control_points[indexes[n]]` and finishes at
+	 * `control_points[indexes[n+1] - 1]`, where `0 ≤ n < segment_count`.
+	 *
+	 * This implies the n*th* segment has `indexes[n+1] - indexes[n]`
+	 * points, and that its degree is `indexes[n+1] - indexes[n] - 1`.
+	 *
+	 * To reuse the example in #oshu_bezier, since all the segments are
+	 * quadratic, the indices are [0, 3, 6, 9].
+	 *
+	 * The size of the indices array must be `segment_count + 1`.
+	 *
+	 * \sa segment_count
+	 * \sa control_points
 	 */
-	struct oshu_point control_points[8];
+	int *indices;
+	/**
+	 * \brief The array of all control points, all segments combined.
+	 *
+	 * Each point belongs to exactly 1 segment, which means that for a
+	 * continous multi-segment paths, the same point will be repeated more
+	 * than once.
+	 *
+	 * The content of this array is precisely the control point list
+	 * written in the beatmap file, duplicated comprised. Don't forget to
+	 * add the very first point which is specified in the first two fields
+	 * and not the point list.
+	 *
+	 * To identify the segments these points belong to, you need to use the
+	 * #indices array.
+	 */
+	struct oshu_point *control_points;
 };
 
 /**
- * A segment is a piece of a regular curve, be that curve linear or Bézier.
+ * The curve types for a slider.
  *
- * The linear segments (#OSHU_CURVE_LINEAR) are the simplest and only have 2
+ * Their value is the letter that appears in the beatmaps to identify the type.
+ */
+enum oshu_path_type {
+	OSHU_PATH_LINEAR = 'L',
+	OSHU_PATH_PERFECT = 'P',
+	OSHU_PATH_BEZIER = 'B',
+	OSHU_PATH_CATMULL = 'C',
+};
+
+/**
+ * The linear paths (#OSHU_PATH_LINEAR) are the simplest and only have 2
  * points. See #oshu_line.
  *
- * Perfect segments (#OSHU_CURVE_PERFECT) are bits of circle and have 3 points.
- * The 3 non-aligned points define a circle in a unique way. The perfect
- * segment is the part of that circle that starts with the first point, passes
- * through the second point, and ends at the third point. See #oshu_arc.
+ * Perfect paths (#OSHU_PATH_PERFECT) are bits of circle and have 3 points.
+ * The 3 non-aligned points define a circle in a unique way. The perfect path
+ * is the part of that circle that starts with the first point, passes through
+ * the second point, and ends at the third point. See #oshu_arc.
  *
- * Bézier segments (#OSHU_CURVE_BEZIER) have 2 to an arbitrary large number of
- * control points. A 2-point Bézier segment is nothing but a linear segment. A
- * 3-point Bézier segment is a quadratic curve, also called a parabola. Things
- * get interesting with the 4-point cubic Bézier curve, which is the one you
- * see in most painting tools. See #oshu_bezier.
+ * Bézier paths (#OSHU_PATH_BEZIER) have 2 to an arbitrary large number of
+ * control points. A 2-point Bézier path is nothing but a linear path. A
+ * 3-point Bézier path is a quadratic curve, also called a parabola. Things get
+ * interesting with the 4-point cubic Bézier curve, which is the one you see in
+ * most painting tools. See #oshu_bezier.
  *
- * Catmull segments (#OSHU_CURVE_CATMULL) are officially deprecated, but we
- * should support them someday in order to support old beatmaps.
- */
-struct oshu_segment {
-	enum oshu_curve_type type;
-	/**
-	 * The length of a segment is defined relative to the total length of
-	 * the #oshu_path it is contained in.
-	 *
-	 * For example, a segment length of 10 inside a path of length 30 means
-	 * the segment account for 1/3 of the path.
-	 *
-	 * \sa oshu_path
-	 */
-	double length;
-	union {
-		struct oshu_line line;
-		struct oshu_arc arc;
-		struct oshu_bezier bezier;
-	};
-};
-
-/**
- * Express the segment in [0, 1] floating t-coordinates.
- *
- * You should probably use #oshu_path_at.
- *
- * All the segments are merged together in that [0, 1] segment according to
- * their lengths.
- */
-struct oshu_point oshu_segment_at(struct oshu_segment *segment, double t);
-
-/**
- * Return the derivative vector of the segment at point t in t-coordinates.
- */
-struct oshu_point oshu_segment_derive(struct oshu_segment *segment, double t);
-
-/**
- * A path represents many #oshu_segment joined together.
- *
- * To make a continous path, the end point of a segment should be the same as
- * the beginning point of the next one.
- *
- * The length of the segments are relative to each other, and the length of the
- * path must be the sum of the lengths of all its segments. The lengths are
- * essential to compute t-coordinates, so that t=1 is the end point, and t=0.5
- * is the middle of the whole path.
- *
- * Let's illustrate a bit with paths made up of 2 segments. The number over
- * each segment is the segment's length.
- *
- * ```
- *      10        10
- *  ├─────────┼─────────┤
- * t=0       t=.5      t=1
- *
- *                300                 100
- *  ├─────────────────────────────┼─────────┤
- * t=0                          t=.75      t=1
- * ```
- *
+ * Catmull paths (#OSHU_PATH_CATMULL) are officially deprecated, but we should
+ * support them someday in order to support old beatmaps.
  */
 struct oshu_path {
-	/**
-	 * Length of the segment, in an arbitrary unit.
-	 * The sum of the length of all its segment should be equal to this.
-	 */
-	double length;
-	int size; /**< How many segments. */
-	struct oshu_segment *segments;
+	enum oshu_path_type type;
+	union {
+		struct oshu_line line; /**< For #OSHU_PATH_LINEAR. */
+		struct oshu_arc arc; /**< For #OSHU_PATH_PERFECT. */
+		struct oshu_bezier bezier; /**< For #OSHU_PATH_BEZIER. */
+	};
 };
 
 /**
