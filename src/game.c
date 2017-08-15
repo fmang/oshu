@@ -10,13 +10,6 @@
 
 #include <unistd.h>
 
-/** How long before or after the hit time a click event is considered on the
- *  mark. */
-static double hit_tolerance = .1 ; /* seconds */
-
-/** How long before or after the hit time a hit object is clickable. */
-static double hit_clickable = 1. ; /* seconds */
-
 int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 {
 	*game = calloc(1, sizeof(**game));
@@ -67,16 +60,16 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
 {
 	double now = game->audio->current_timestamp;
 	for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
-		if (hit->time > now + hit_clickable)
+		if (hit->time > now + game->beatmap->difficulty.approach_rate)
 			break;
-		if (hit->time < now - hit_clickable)
+		if (hit->time < now - game->beatmap->difficulty.approach_rate)
 			continue;
 		if (hit->state != OSHU_HIT_INITIAL)
 			continue;
 		int dx = x - hit->x;
 		int dy = y - hit->y;
 		int dist = sqrt(dx * dx + dy * dy);
-		if (dist <= oshu_hit_radius)
+		if (dist <= game->beatmap->difficulty.circle_radius)
 			return hit;
 	}
 	return NULL;
@@ -96,7 +89,7 @@ static void hit(struct oshu_game *game)
 	double now = game->audio->current_timestamp;
 	struct oshu_hit *hit = find_hit(game, x, y);
 	if (hit) {
-		if (fabs(hit->time - now) < hit_tolerance) {
+		if (fabs(hit->time - now) < game->beatmap->difficulty.leniency) {
 			hit->state = OSHU_HIT_GOOD;
 			oshu_sample_play(game->audio, game->hit_sound);
 		} else {
@@ -189,7 +182,7 @@ static void check_audio(struct oshu_game *game)
 		}
 	} else {
 		for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
-			if (hit->time > now - hit_tolerance)
+			if (hit->time > now - game->beatmap->difficulty.leniency)
 				break;
 			if (hit->state == OSHU_HIT_INITIAL)
 				hit->state = OSHU_HIT_MISSED;
@@ -197,7 +190,7 @@ static void check_audio(struct oshu_game *game)
 	}
 	for (
 		struct oshu_hit **hit = &game->beatmap->hit_cursor;
-		*hit && (*hit)->time < now - hit_clickable;
+		*hit && (*hit)->time < now - game->beatmap->difficulty.approach_rate;
 		*hit = (*hit)->next
 	);
 }

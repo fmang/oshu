@@ -97,11 +97,6 @@
  */
 
 /**
- * How big, in pixels, hit objects appear.
- */
-extern const int oshu_hit_radius;
-
-/**
  * Store everything related to the current display.
  *
  * Holds the window, and all the textures and sprites required to show the
@@ -159,7 +154,7 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 /**
  * Draw a hit object.
  */
-void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, double now);
+void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
 
 /**
  * Draw a 1-pixel aliased stroke following the path.

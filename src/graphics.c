@@ -9,11 +9,6 @@
 static const int game_width = 640; /* px */
 static const int game_height = 480; /* px */
 
-const int oshu_hit_radius = 24; /* px */
-static const int hit_hint = 64; /* px */
-
-static const double hit_time_in = 1.; /* s */
-
 int create_window(struct oshu_display *display)
 {
 	display->window = SDL_CreateWindow(
@@ -121,24 +116,26 @@ void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2
 	SDL_RenderDrawLine(display->renderer, x1, y1, x2, y2);
 }
 
-void oshu_draw_hit(struct oshu_display *display, struct oshu_hit *hit, double now)
+void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
+	double radius = beatmap->difficulty.circle_radius;
 	if (hit->state == OSHU_HIT_INITIAL) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
-		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius);
-		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius - 2);
-		oshu_draw_line(display, hit->x - oshu_hit_radius, hit->y, hit->x + oshu_hit_radius, hit->y);
-		oshu_draw_line(display, hit->x, hit->y - oshu_hit_radius, hit->x, hit->y + oshu_hit_radius);
+		oshu_draw_circle(display, hit->x, hit->y, radius);
+		oshu_draw_circle(display, hit->x, hit->y, radius - 2);
+		oshu_draw_line(display, hit->x - radius, hit->y, hit->x + radius, hit->y);
+		oshu_draw_line(display, hit->x, hit->y - radius, hit->x, hit->y + radius);
 		if (hit->time > now) {
-			double ratio = (double) (hit->time - now) / hit_time_in;
-			oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius + ratio * hit_hint);
+			/* hint circle */
+			double ratio = (double) (hit->time - now) / beatmap->difficulty.approach_rate;
+			oshu_draw_circle(display, hit->x, hit->y, radius + ratio * (radius * 2));
 		}
 	} else if (hit->state == OSHU_HIT_GOOD) {
 		SDL_SetRenderDrawColor(display->renderer, 64, 255, 64, 255);
-		oshu_draw_circle(display, hit->x, hit->y, oshu_hit_radius / 3);
+		oshu_draw_circle(display, hit->x, hit->y, radius / 3);
 	} else if (hit->state == OSHU_HIT_MISSED) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 64, 64, 255);
-		int d = oshu_hit_radius / 3;
+		int d = radius / 3;
 		oshu_draw_line(display, hit->x - d, hit->y - d, hit->x + d, hit->y + d);
 		oshu_draw_line(display, hit->x + d, hit->y - d, hit->x - d, hit->y + d);
 	}
@@ -186,13 +183,13 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 	SDL_RenderClear(display->renderer);
 	struct oshu_hit *prev = NULL;
 	for (struct oshu_hit *hit = beatmap->hit_cursor; hit; hit = hit->next) {
-		if (hit->time > now + hit_time_in)
+		if (hit->time > now + beatmap->difficulty.approach_rate)
 			break;
 		if (prev && !(hit->type & OSHU_HIT_NEW_COMBO)) {
 			SDL_SetRenderDrawColor(display->renderer, 128, 128, 128, 255);
 			oshu_draw_line(display, prev->x, prev->y, hit->x, hit->y);
 		}
-		oshu_draw_hit(display, hit, now);
+		oshu_draw_hit(display, beatmap, hit, now);
 		prev = hit;
 	}
 	SDL_RenderPresent(display->renderer);
