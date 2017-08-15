@@ -146,7 +146,6 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			oshu_display_resize(game->display, event->window.data1, event->window.data2);
 			break;
-		case SDL_WINDOWEVENT_HIDDEN:
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 			pause_game(game);
