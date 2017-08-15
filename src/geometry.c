@@ -196,8 +196,8 @@ int arc_center(struct oshu_point a, struct oshu_point b, struct oshu_point c, st
 	if (abs(sum) < epsilon)
 		return -1;
 
-	*center.x = (s * a.x + t * b.x + u * c.x) / sum;
-	*center.y = (s * a.y + t * b.y + u * c.y) / sum;
+	center->x = (s * a.x + t * b.x + u * c.x) / sum;
+	center->y = (s * a.y + t * b.y + u * c.y) / sum;
 	return 0;
 }
 
