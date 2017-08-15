@@ -114,14 +114,57 @@ static struct oshu_point bezier_derive(struct oshu_bezier *path, double t)
 	return p;
 }
 
+/**
+ * Simple weighted average of the starting point and end point.
+ */
+static struct oshu_point line_at(struct oshu_line *line, double t)
+{
+	return (struct oshu_point) {
+		.x = (1 - t) * line->start.x + t * line->end.x,
+		.y = (1 - t) * line->start.y + t * line->end.y,
+	};
+}
+
+/**
+ * Derive the equation in #line_at to get the derivative.
+ */
+static struct oshu_point line_derive(struct oshu_line *line, double t)
+{
+	return (struct oshu_point) {
+		.x = - line->start.x + line->end.x,
+		.y = - line->start.y + line->end.y,
+	};
+}
+
 struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 {
-	assert (path->type == OSHU_PATH_BEZIER);
-	return bezier_at(&path->bezier, t);
+	switch (path->type) {
+	case OSHU_PATH_LINEAR:
+		return line_at(&path->line, t);
+	case OSHU_PATH_BEZIER:
+		return bezier_at(&path->bezier, t);
+	case OSHU_PATH_PERFECT:
+		assert (path->type != OSHU_PATH_PERFECT);
+	case OSHU_PATH_CATMULL:
+		assert (path->type != OSHU_PATH_CATMULL);
+	default:
+		assert (path->type != path->type);
+	}
+	return (struct oshu_point) {};
 }
 
 struct oshu_point oshu_path_derive(struct oshu_path *path, double t)
 {
-	assert (path->type == OSHU_PATH_BEZIER);
-	return bezier_derive(&path->bezier, t);
+	switch (path->type) {
+	case OSHU_PATH_LINEAR:
+		return line_derive(&path->line, t);
+	case OSHU_PATH_BEZIER:
+		return bezier_derive(&path->bezier, t);
+	case OSHU_PATH_PERFECT:
+		assert (path->type != OSHU_PATH_PERFECT);
+	case OSHU_PATH_CATMULL:
+		assert (path->type != OSHU_PATH_CATMULL);
+	default:
+		assert (path->type != path->type);
+	}
 }
