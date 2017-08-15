@@ -136,6 +136,28 @@ static struct oshu_point line_derive(struct oshu_line *line, double t)
 	};
 }
 
+static struct oshu_point arc_at(struct oshu_arc *arc, double t)
+{
+	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
+	return (struct oshu_point) {
+		.x = arc->center.x + arc->radius * cos(angle),
+		.y = arc->center.y + arc->radius * sin(angle),
+	};
+}
+
+/**
+ * Naive derivative of #arc_at.
+ */
+static struct oshu_point arc_derive(struct oshu_arc *arc, double t)
+{
+	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
+	double deriv_angle = - arc->start_angle + arc->end_angle;
+	return (struct oshu_point) {
+		.x = arc->radius * deriv_angle * (- sin(angle)),
+		.y = arc->radius * deriv_angle * cos(angle),
+	};
+}
+
 struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 {
 	switch (path->type) {
@@ -144,7 +166,7 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 	case OSHU_PATH_BEZIER:
 		return bezier_at(&path->bezier, t);
 	case OSHU_PATH_PERFECT:
-		assert (path->type != OSHU_PATH_PERFECT);
+		return arc_at(&path->arc, t);
 	case OSHU_PATH_CATMULL:
 		assert (path->type != OSHU_PATH_CATMULL);
 	default:
@@ -161,7 +183,7 @@ struct oshu_point oshu_path_derive(struct oshu_path *path, double t)
 	case OSHU_PATH_BEZIER:
 		return bezier_derive(&path->bezier, t);
 	case OSHU_PATH_PERFECT:
-		assert (path->type != OSHU_PATH_PERFECT);
+		return arc_derive(&path->arc, t);
 	case OSHU_PATH_CATMULL:
 		assert (path->type != OSHU_PATH_CATMULL);
 	default:
