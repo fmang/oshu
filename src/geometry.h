@@ -26,6 +26,23 @@ struct oshu_point {
 struct oshu_point oshu_normalize(struct oshu_point p);
 
 /**
+ * Compute the Euclidean distance between *p* and *q*.
+ *
+ * That's the usual sqrt(Δx² + Δy²) formula.
+ *
+ * \sa oshu_distance2
+ */
+double oshu_distance(struct oshu_point p, struct oshu_point q);
+
+/**
+ * Compute the squared Euclidean distance between *p* and *q*: Δx² + Δy².
+ *
+ * This function is faster and more accurate that #oshu_distance, when only the
+ * squared distances are needed.
+ */
+double oshu_distance2(struct oshu_point p, struct oshu_point q);
+
+/**
  * A simple line, with a start point and end point.
  *
  * Used by #OSHU_PATH_LINEAR segments.
@@ -53,6 +70,8 @@ struct oshu_line {
  * we'll use an easier representation made of the center of the circle, its
  * radius, and a pair of angles in radian where 0 is the the rightmost point,
  * like we do in common trigonometry.
+ *
+ * \sa oshu_build_arc
  */
 struct oshu_arc {
 	struct oshu_point center;
@@ -60,6 +79,29 @@ struct oshu_arc {
 	double start_angle;
 	double end_angle;
 };
+
+/**
+ * \brief Compute an arc of circle from 3 points.
+ *
+ * See #oshu_arc to see how arcs are defined in oshu!.
+ *
+ * In beatmaps, the arcs are defined in a hard to manipulate way, so this
+ * function in the #geometry module is meant to help the parser generate arcs.
+ *
+ * Sometimes, the 3 points won't define a valid circle, for example when two
+ * points are equal, or when the three points are aligned. In these case, one
+ * might want to fallback on a linear path of something, but that's out of the
+ * scope of this function.
+ *
+ * \param a First point of the arc.
+ * \param b Pass-through point of the arc.
+ * \param c Last point of the arc.
+ * \param arc Where to write the results. It doesn't have to be initialized,
+ *            only allocated. Its content is unspecified on failure.
+ *
+ * \return 0 on success, -1 if the arc computation failed.
+ */
+int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c, struct oshu_arc *arc);
 
 /**
  * A Bézier path, made up of one or many Bézier segments.

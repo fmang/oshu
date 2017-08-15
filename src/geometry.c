@@ -8,12 +8,30 @@
 
 #include <assert.h>
 
+/**
+ * When we get a value under this in our computation, we'll assume the value is
+ * almost 0 and possibly trigger an error, depending on the context.
+ */
+static double epsilon = 0.1;
+
 struct oshu_point oshu_normalize(struct oshu_point p)
 {
 	double norm = sqrt(p.x * p.x + p.y * p.y);
 	p.x /= norm;
 	p.y /= norm;
 	return p;
+}
+
+double oshu_distance2(struct oshu_point p, struct oshu_point q)
+{
+	double dx = p.x - q.x;
+	double dy = p.y - q.y;
+	return dx * dx + dy * dy;
+}
+
+double oshu_distance(struct oshu_point p, struct oshu_point q)
+{
+	return sqrt(oshu_distance2(p, q));
 }
 
 /**
@@ -156,6 +174,42 @@ static struct oshu_point arc_derive(struct oshu_arc *arc, double t)
 		.x = arc->radius * deriv_angle * (- sin(angle)),
 		.y = arc->radius * deriv_angle * cos(angle),
 	};
+}
+
+/**
+ * Compute the center of the circle defined by 3 points.
+ *
+ * This code is inspired by the official osu! client's source code.
+ */
+int arc_center(struct oshu_point a, struct oshu_point b, struct oshu_point c, struct oshu_point *center)
+{
+	double a2 = oshu_distance2(b, c);
+	double b2 = oshu_distance2(a, c);
+	double c2 = oshu_distance2(a, b);
+	if (a2 < epsilon || b2 < epsilon || c2 < epsilon)
+		return -1;
+
+	double s = a2 * (b2 + c2 - a2);
+	double t = b2 * (a2 + c2 - b2);
+	double u = c2 * (a2 + b2 - c2);
+	double sum = s + t + u;
+	if (abs(sum) < epsilon)
+		return -1;
+
+	*center.x = (s * a.x + t * b.x + u * c.x) / sum;
+	*center.y = (s * a.y + t * b.y + u * c.y) / sum;
+	return 0;
+}
+
+int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c, struct oshu_arc *arc)
+{
+	if (arc_center(a, b, c, &arc->center))
+		return -1;
+
+	arc->radius = oshu_distance(a, arc->center);
+	arc->start_angle = atan2(a.y - arc->center.y, a.x - arc->center.x);
+	arc->end_angle = atan2(c.y - arc->center.y, c.x - arc->center.x);
+	return 0;
 }
 
 struct oshu_point oshu_path_at(struct oshu_path *path, double t)
