@@ -92,10 +92,11 @@ struct oshu_arc {
  * To make a continous path, the end point of a segment must be the same as
  * the beginning point of the next one.
  *
- * A Bézier segment is usually represented in t-coordinates, with t ranging
- * from 0 to 1. To represent a path in t-coordinates, we'll assume all the
- * segments have roughly the same length, and map the k*th* segment in a
- * n-segment path to the t-coordinates k/n to (k+1)/n where 0 ≤ k < n.
+ * A Bézier segment is usually represented in *t*-coordinates, with *t* ranging
+ * from 0 to 1. To represent a path in *t*-coordinates, we'll assume all the
+ * segments have roughly the same length, and map the *k*th segment in a
+ * *n*-segment path to the *t*-coordinates *k/n* to *(k+1)/n* where
+ * *0 ≤ k < n*.
  */
 struct oshu_bezier {
 	/**
@@ -105,17 +106,17 @@ struct oshu_bezier {
 	/**
 	 * \brief Starting position of each segment in control points array.
 	 *
-	 * More concretely, the n*th* segment of the path starts at
+	 * More concretely, the *n*th segment of the path starts at
 	 * `control_points[indexes[n]]` and finishes at
-	 * `control_points[indexes[n+1] - 1]`, where `0 ≤ n < segment_count`.
+	 * `control_points[indexes[n+1] - 1]`, where *0 ≤ n < segment_count*.
 	 *
-	 * This implies the n*th* segment has `indexes[n+1] - indexes[n]`
+	 * This implies the *n*th segment has `indexes[n+1] - indexes[n]`
 	 * points, and that its degree is `indexes[n+1] - indexes[n] - 1`.
 	 *
 	 * To reuse the example in #oshu_bezier, since all the segments are
 	 * quadratic, the indices are [0, 3, 6, 9].
 	 *
-	 * The size of the indices array must be `segment_count + 1`.
+	 * The size of the indices array must be *segment_count + 1*.
 	 *
 	 * \sa segment_count
 	 * \sa control_points
