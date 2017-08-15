@@ -17,6 +17,23 @@
 static const char *osu_file_header = "osu file format v";
 
 /**
+ * Structure holding all the default values for a beatmap.
+ *
+ * This is especially handy for the difficulty section where many values are
+ * not 0 by default.
+ */
+static const struct oshu_beatmap default_beatmap = {
+	.difficulty = {
+		.hp_drain_rate = 1.,
+		.circle_radius = 32.,
+		.leniency = .1,
+		.approach_rate = 1.,
+		.slider_multiplier = 1.4,
+		.slider_tick_rate = 1.,
+	},
+};
+
+/**
  * Enumeration to keep track of the section we're currently in.
  *
  * This is especially important before the format inside each section changes
@@ -310,7 +327,8 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 		oshu_log_error("couldn't open the beatmap: %s", strerror(errno));
 		return -1;
 	}
-	*beatmap = calloc(1, sizeof(**beatmap));
+	*beatmap = malloc(sizeof(**beatmap));
+	memcpy(*beatmap, &default_beatmap, sizeof(**beatmap));
 	int rc = parse_file(input, *beatmap);
 	fclose(input);
 	if (rc < 0)
