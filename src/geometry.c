@@ -214,6 +214,9 @@ int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c
 
 struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 {
+	/* map t from ℝ to [0,1] */
+	t = abs(remainder(t, 2.));
+	assert (0 <= t && t <= 1);
 	switch (path->type) {
 	case OSHU_PATH_LINEAR:
 		return line_at(&path->line, t);
@@ -231,16 +234,31 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 
 struct oshu_point oshu_path_derive(struct oshu_path *path, double t)
 {
+	struct oshu_point d;
+	t = remainder(t, 2.);
+	int revert = t < 0;
+	t = abs(t);
+	assert (0 <= t && t <= 1);
+
 	switch (path->type) {
 	case OSHU_PATH_LINEAR:
-		return line_derive(&path->line, t);
+		d = line_derive(&path->line, t);
+		break;
 	case OSHU_PATH_BEZIER:
-		return bezier_derive(&path->bezier, t);
+		d = bezier_derive(&path->bezier, t);
+		break;
 	case OSHU_PATH_PERFECT:
-		return arc_derive(&path->arc, t);
+		d = arc_derive(&path->arc, t);
+		break;
 	case OSHU_PATH_CATMULL:
 		assert (path->type != OSHU_PATH_CATMULL);
 	default:
 		assert (path->type != path->type);
 	}
+
+	if (revert) {
+		d.x = - d.x;
+		d.y = - d.y;
+	}
+	return d;
 }

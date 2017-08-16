@@ -222,18 +222,50 @@ struct oshu_path {
 };
 
 /**
- * Express the path in [0, 1] floating t-coordinates.
+ * Express the path in floating t-coordinates.
  *
  * t=0 is the starting point, t=1 is the end point. Calling this function n
  * times with t=k/n will give an approximation of the curve.
  *
  * All the segments are merged together in that [0, 1] segment according to
  * their lengths.
+ *
+ * The coordinates are further generalized by supporting any floating number.
+ * Imagine a slider in your mind, one that repeats twice. You should see the
+ * ball going from the starting point to the ending point, then back to the
+ * starting back, and once again to the ending point. That behavior is modelled
+ * in t-coordinates by making the [1, 2] range map to a revered [1, 0] range,
+ * and then [2, 3] is the same as [0, 1].
+ *
+ * Thus, at(t=0) = at(t=2) = at(t=4), and at(t=1) = at(t=3) = at(t=5). In a
+ * more general way, at(t + 2k) = at(t), making at 2-periodic, and at(t) =
+ * at(-t), making it symetrical. These relations hold for any t in ℝ and k in
+ * ℤ.
+ *
+ *
+ * Let's graph it:
+ *
+ * ```
+ *  1    t=-1    t=1
+ *  |     /\      /\      /
+ *  |    /  \    /  \    /
+ *  |   /    \  /    \  /
+ *  |  /      \/      \/
+ *  0        t=0      t=2
+ * ```
+ *
+ * This behavior is obtained by taking the absolute value of the `remainder`,
+ * defined in the C standard library, by 2.
+ *
  */
 struct oshu_point oshu_path_at(struct oshu_path *path, double t);
 
 /**
  * Return the derivative vector of the path at point t in t-coordinates.
+ *
+ * t can be any point in ℝ, and will be mapped to [0, 1] according to the rules
+ * defined in #oshu_path_at. When t is on a decreasing slope, the derivative
+ * vector is reversed, as you'd expect if you like maths.
  */
 struct oshu_point oshu_path_derive(struct oshu_path *path, double t);
 
