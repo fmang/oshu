@@ -86,7 +86,7 @@ struct oshu_arc {
  * See #oshu_arc to see how arcs are defined in oshu!.
  *
  * In beatmaps, the arcs are defined in a hard to manipulate way, so this
- * function in the #geometry module is meant to help the parser generate arcs.
+ * function in the geometry module is meant to help the parser generate arcs.
  *
  * Sometimes, the 3 points won't define a valid circle, for example when two
  * points are equal, or when the three points are aligned. In these case, one
