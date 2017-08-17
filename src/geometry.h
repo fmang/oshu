@@ -246,12 +246,13 @@ struct oshu_path {
  * Let's graph it:
  *
  * ```
- *  1    t=-1    t=1
- *  |     /\      /\      /
- *  |    /  \    /  \    /
- *  |   /    \  /    \  /
- *  |  /      \/      \/
- *  0        t=0      t=2
+ * 1 ┼    .         .
+ *   │   ╱ ╲       ╱ ╲       ╱
+ *   │  ╱   ╲     ╱   ╲     ╱
+ *   │ ╱     ╲   ╱     ╲   ╱
+ *   │╱       ╲ ╱       ╲ ╱
+ *   └────┼────┼────┼────┼────> t
+ *  0     1    2    3    4
  * ```
  *
  * This behavior is obtained by taking the absolute value of the `remainder`,
