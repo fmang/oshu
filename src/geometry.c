@@ -215,8 +215,8 @@ int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c
 struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 {
 	/* map t from ℝ to [0,1] */
-	t = abs(remainder(t, 2.));
-	assert (0 <= t && t <= 1);
+	t = fabs(remainder(t, 2.));
+	assert (-epsilon <= t && t <= 1 + epsilon);
 	switch (path->type) {
 	case OSHU_PATH_LINEAR:
 		return line_at(&path->line, t);
@@ -237,8 +237,8 @@ struct oshu_point oshu_path_derive(struct oshu_path *path, double t)
 	struct oshu_point d;
 	t = remainder(t, 2.);
 	int revert = t < 0;
-	t = abs(t);
-	assert (0 <= t && t <= 1);
+	t = fabs(t);
+	assert (-epsilon <= t && t <= 1 + epsilon);
 
 	switch (path->type) {
 	case OSHU_PATH_LINEAR:

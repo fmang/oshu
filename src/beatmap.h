@@ -198,6 +198,7 @@ enum oshu_hit_state {
 	OSHU_HIT_INITIAL = 0,
 	OSHU_HIT_GOOD,
 	OSHU_HIT_MISSED,
+	OSHU_HIT_SLIDING,
 };
 
 /**
@@ -406,6 +407,14 @@ struct oshu_hit {
 	 */
 	struct oshu_hit *next;
 };
+
+/**
+ * Tell the time offset, in seconds, when the hit object ends.
+ *
+ * For a circle, that's the same as #oshu_hit::time, but for a slider, spinner
+ * or hold note, it's that offset plus the duration of the hit.
+ */
+double oshu_hit_end_time(struct oshu_hit *hit);
 
 /**
  * \brief Complete definition of the [Metadata] section.

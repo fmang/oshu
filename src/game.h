@@ -35,6 +35,8 @@ struct oshu_game {
 	 *  object will be perfectly hit. */
 	int autoplay;
 	int paused;
+	/** Hit object the user is holding, like a slider. */
+	struct oshu_hit *current_hit;
 };
 
 /**

@@ -358,3 +358,11 @@ void oshu_beatmap_free(struct oshu_beatmap **beatmap)
 	free(*beatmap);
 	*beatmap = NULL;
 }
+
+double oshu_hit_end_time(struct oshu_hit *hit)
+{
+	if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
+		return hit->time + hit->slider.duration * hit->slider.repeat;
+	else
+		return hit->time;
+}

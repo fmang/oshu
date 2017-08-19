@@ -119,7 +119,7 @@ void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2
 static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
 	double radius = beatmap->difficulty.circle_radius;
-	if (hit->state == OSHU_HIT_INITIAL) {
+	if (hit->state == OSHU_HIT_INITIAL || hit->state == OSHU_HIT_SLIDING) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 		oshu_draw_circle(display, hit->x, hit->y, radius);
 		oshu_draw_circle(display, hit->x, hit->y, radius - 2);
@@ -145,10 +145,17 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 {
 	double radius = beatmap->difficulty.circle_radius;
 	draw_hit_circle(display, beatmap, hit, now);
-	if (hit->state == OSHU_HIT_INITIAL) {
+	if (hit->state == OSHU_HIT_INITIAL || hit->state == OSHU_HIT_SLIDING) {
+		double t = (now - hit->time) / hit->slider.duration;
+		if (hit->state == OSHU_HIT_SLIDING) {
+			struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
+			oshu_draw_circle(display, ball.x, ball.y, radius / 2);
+		}
 		oshu_draw_thick_path(display, &hit->slider.path, 2 * radius);
 		struct oshu_point end = oshu_path_at(&hit->slider.path, 1);
-		oshu_draw_circle(display, end.x, end.y, radius);
+		int rounds_left = hit->slider.repeat - (t <= 0 ? 0 : (int) t);
+		for (int i = 1; i <= rounds_left; ++i)
+			oshu_draw_circle(display, end.x, end.y, radius * ((double) i / rounds_left));
 	}
 }
 

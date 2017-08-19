@@ -90,12 +90,38 @@ static void hit(struct oshu_game *game)
 	struct oshu_hit *hit = find_hit(game, x, y);
 	if (hit) {
 		if (fabs(hit->time - now) < game->beatmap->difficulty.leniency) {
-			hit->state = OSHU_HIT_GOOD;
+			if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type) {
+				hit->state = OSHU_HIT_SLIDING;
+				game->current_hit = hit;
+			} else {
+				hit->state = OSHU_HIT_GOOD;
+			}
 			oshu_sample_play(game->audio, game->hit_sound);
 		} else {
 			hit->state = OSHU_HIT_MISSED;
 		}
 	}
+}
+
+/**
+ * When the user is holding a slider or a hold note in mania mode, do
+ * something.
+ */
+static void release_hit(struct oshu_game *game)
+{
+	struct oshu_hit *hit = game->current_hit;
+	if (!hit)
+		return;
+	if (!(hit->type & OSHU_HIT_SLIDER))
+		return;
+	double now = game->audio->current_timestamp;
+	if (now < oshu_hit_end_time(hit) - game->beatmap->difficulty.leniency) {
+		hit->state = OSHU_HIT_MISSED;
+	} else {
+		hit->state = OSHU_HIT_GOOD;
+		oshu_sample_play(game->audio, game->hit_sound);
+	}
+	game->current_hit = NULL;
 }
 
 static void pause_game(struct oshu_game *game)
@@ -138,8 +164,20 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			break;
 		}
 		break;
+	case SDL_KEYUP:
+		switch (event->key.keysym.sym) {
+		case SDLK_w:
+		case SDLK_x:
+		case SDLK_z:
+			release_hit(game);
+			break;
+		}
+		break;
 	case SDL_MOUSEBUTTONDOWN:
 		hit(game);
+		break;
+	case SDL_MOUSEBUTTONUP:
+		release_hit(game);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
@@ -155,6 +193,37 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			break;
 		}
 		break;
+	}
+}
+
+/**
+ * Check the state of the current slider.
+ *
+ * Make it end if it's done.
+ */
+static void check_slider(struct oshu_game *game)
+{
+	struct oshu_hit *hit = game->current_hit;
+	if (!hit)
+		return;
+	if (!(hit->type & OSHU_HIT_SLIDER))
+		return;
+	double now = game->audio->current_timestamp;
+	if (now > oshu_hit_end_time(hit)) {
+		game->current_hit = NULL;
+		hit->state = OSHU_HIT_GOOD;
+		oshu_sample_play(game->audio, game->hit_sound);
+	}
+	double t = (now - hit->time) / hit->slider.duration;
+	struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
+	int x, y;
+	oshu_get_mouse(game->display, &x, &y);
+	int dx = x - ball.x;
+	int dy = y - ball.y;
+	int dist = sqrt(dx * dx + dy * dy);
+	if (dist > game->beatmap->difficulty.circle_radius * 1.5) {
+		game->current_hit = NULL;
+		hit->state = OSHU_HIT_MISSED;
 	}
 }
 
@@ -180,6 +249,7 @@ static void check_audio(struct oshu_game *game)
 			}
 		}
 	} else {
+		/* Mark dead notes as missed. */
 		for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
 			if (hit->time > now - game->beatmap->difficulty.leniency)
 				break;
@@ -189,7 +259,7 @@ static void check_audio(struct oshu_game *game)
 	}
 	for (
 		struct oshu_hit **hit = &game->beatmap->hit_cursor;
-		*hit && (*hit)->time < now - game->beatmap->difficulty.approach_rate;
+		*hit && oshu_hit_end_time(*hit) < now - game->beatmap->difficulty.approach_rate;
 		*hit = (*hit)->next
 	);
 }
@@ -228,6 +298,7 @@ int oshu_game_run(struct oshu_game *game)
 	while (!game->audio->finished && !game->stop) {
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
+		check_slider(game);
 		check_audio(game);
 		double now = game->audio->current_timestamp;
 		oshu_draw_beatmap(game->display, game->beatmap, now);
