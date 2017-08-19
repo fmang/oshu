@@ -116,7 +116,7 @@ void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2
 	SDL_RenderDrawLine(display->renderer, x1, y1, x2, y2);
 }
 
-void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
+static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
 	double radius = beatmap->difficulty.circle_radius;
 	if (hit->state == OSHU_HIT_INITIAL) {
@@ -139,6 +139,25 @@ void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, s
 		oshu_draw_line(display, hit->x - d, hit->y - d, hit->x + d, hit->y + d);
 		oshu_draw_line(display, hit->x + d, hit->y - d, hit->x - d, hit->y + d);
 	}
+}
+
+static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
+{
+	double radius = beatmap->difficulty.circle_radius;
+	draw_hit_circle(display, beatmap, hit, now);
+	if (hit->state == OSHU_HIT_INITIAL) {
+		oshu_draw_thick_path(display, &hit->slider.path, 2 * radius);
+		struct oshu_point end = oshu_path_at(&hit->slider.path, 1);
+		oshu_draw_circle(display, end.x, end.y, radius);
+	}
+}
+
+void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
+{
+	if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
+		draw_slider(display, beatmap, hit, now);
+	else
+		draw_hit_circle(display, beatmap, hit, now);
 }
 
 void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
