@@ -37,6 +37,8 @@ struct oshu_game {
 	int paused;
 	/** Hit object the user is holding, like a slider. */
 	struct oshu_hit *current_hit;
+	/** Song position at the previous game loop iteration. */
+	double previous_time;
 };
 
 /**
