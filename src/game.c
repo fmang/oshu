@@ -218,6 +218,8 @@ static void check_slider(struct oshu_game *game)
 	} else if ((int) t > (int) prev_t) {
 		oshu_sample_play(game->audio, game->hit_sound);
 	}
+	if (game->autoplay)
+		return;
 	struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
 	int x, y;
 	oshu_get_mouse(game->display, &x, &y);
@@ -247,7 +249,10 @@ static void check_audio(struct oshu_game *game)
 			if (hit->time > now) {
 				break;
 			} else if (hit->state == OSHU_HIT_INITIAL) {
-				hit->state = OSHU_HIT_GOOD;
+				if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
+					hit->state = OSHU_HIT_SLIDING;
+				else
+					hit->state = OSHU_HIT_GOOD;
 				oshu_sample_play(game->audio, game->hit_sound);
 			}
 		}
