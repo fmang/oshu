@@ -43,7 +43,12 @@ enum beatmap_section {
 	BEATMAP_HEADER = 0, /**< Expect the #osu_file_header. */
 	BEATMAP_ROOT, /**< Between the header and the first section. We expect nothing. */
 	BEATMAP_GENERAL, /**< INI-like. */
+	BEATMAP_EDITOR, /**< INI-like. */
 	BEATMAP_METADATA, /**< INI-like. */
+	BEATMAP_DIFFICULTY, /**< INI-like. */
+	BEATMAP_EVENTS, /**< CSV-like. */
+	BEATMAP_TIMING_POINTS, /**< CSV-like. */
+	BEATMAP_COLOURS, /**< INI-like. */
 	BEATMAP_HIT_OBJECTS, /**< CSV-like. */
 	BEATMAP_UNKNOWN,
 };
@@ -147,8 +152,18 @@ static int parse_section(char *line, struct parser_state *parser)
 	*end = '\0';
 	if (!strcmp(section, "General")) {
 		parser->section = BEATMAP_GENERAL;
+	} else if (!strcmp(section, "Editor")) {
+		parser->section = BEATMAP_EDITOR;
 	} else if (!strcmp(section, "Metadata")) {
 		parser->section = BEATMAP_METADATA;
+	} else if (!strcmp(section, "Difficulty")) {
+		parser->section = BEATMAP_DIFFICULTY;
+	} else if (!strcmp(section, "Events")) {
+		parser->section = BEATMAP_EVENTS;
+	} else if (!strcmp(section, "TimingPoints")) {
+		parser->section = BEATMAP_TIMING_POINTS;
+	} else if (!strcmp(section, "Colours")) {
+		parser->section = BEATMAP_COLOURS;
 	} else if (!strcmp(section, "HitObjects")) {
 		parser->section = BEATMAP_HIT_OBJECTS;
 	} else {
