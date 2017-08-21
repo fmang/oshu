@@ -67,6 +67,8 @@ struct parser_state {
 	struct oshu_beatmap *beatmap;
 	enum beatmap_section section;
 	struct oshu_hit *last_hit;
+	struct oshu_timing_point *last_timing_point;
+	struct oshu_timing_point *current_timing_point;
 };
 
 /**
@@ -194,6 +196,45 @@ static int parse_general(char *line, struct parser_state *parser)
 	return 0;
 }
 
+static int build_timing_point(char *line, struct parser_state *parser, struct oshu_timing_point **tp)
+{
+	char *offset = strsep(&line, ",");
+	char *beat_length = strsep(&line, ",");
+	assert (beat_length != NULL);
+	*tp = calloc(1, sizeof(**tp));
+	(*tp)->offset = atoi(offset);
+	double beat = atof(beat_length);
+	if (beat < 0) {
+		assert (parser->last_timing_point != NULL);
+		(*tp)->beat_duration = parser->last_timing_point->beat_duration;
+	} else {
+		(*tp)->beat_duration = beat / 1000.;
+	}
+	return 0;
+}
+
+/**
+ * Parse one timing point.
+ *
+ * Sample input:
+ * `129703,731.707317073171,4,2,1,50,1,0`
+ */
+static int parse_timing_point(char *line, struct parser_state *parser)
+{
+	struct oshu_timing_point *tp;
+	if (build_timing_point(line, parser, &tp) < 0)
+		return 0; /* ignore */
+	/* link it to the timing point list */
+	if (parser->last_timing_point != NULL) {
+		assert (parser->last_timing_point->offset <= tp->offset);
+		parser->last_timing_point->next = tp;
+	} else {
+		parser->beatmap->timing_points = tp;
+	}
+	parser->last_timing_point = tp;
+	return 0;
+}
+
 /**
  * Parse specific parts of a spinner.
  */
@@ -277,7 +318,7 @@ static int parse_hit_object(char *line, struct parser_state *parser)
 	if (!parser->beatmap->hits)
 		parser->beatmap->hits = hit;
 	if (parser->last_hit) {
-		assert(parser->last_hit->time < hit->time);
+		assert(parser->last_hit->time <= hit->time);
 		parser->last_hit->next = hit;
 	}
 	compute_hit_combo(parser->last_hit, hit);
@@ -306,6 +347,8 @@ static int parse_line(char *line, struct parser_state *parser)
 		rc = parse_section(line, parser);
 	} else if (parser->section == BEATMAP_GENERAL) {
 		rc = parse_general(line, parser);
+	} else if (parser->section == BEATMAP_TIMING_POINTS) {
+		rc = parse_timing_point(line, parser);
 	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
 		rc = parse_hit_object(line, parser);
 	}

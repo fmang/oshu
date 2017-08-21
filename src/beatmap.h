@@ -125,10 +125,10 @@ struct oshu_timing_point {
 	 *
 	 * In the beatmap file, it's a float of the milliseconds per beat.
 	 *
-	 * When negative, it probably means we should substract the absolute
-	 * value of the raw field to that of the previous non-negative timing
-	 * point. The parser's job should compute the actual value and store it
-	 * here in seconds.
+	 * When negative, it's a speed multiplier, in percents. This is not
+	 * supported, and irrelevant to the beat duration. The parser should
+	 * preserve the value of the previous timing point in that case, as far
+	 * as this field is concerned.
 	 */
 	double beat_duration;
 	/**
