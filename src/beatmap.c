@@ -195,7 +195,7 @@ static int parse_general(char *line, struct parser_state *parser)
 }
 
 /**
- * Parse specific parts of a spinner
+ * Parse specific parts of a spinner.
  */
 static void parse_spinner(char *line, struct oshu_spinner *spinner)
 {
@@ -204,7 +204,7 @@ static void parse_spinner(char *line, struct oshu_spinner *spinner)
 }
 
 /**
- * Parse specific parts of a hold note
+ * Parse specific parts of a hold note.
  */
 static void parse_hold_note(char *line, struct oshu_hold_note *hold_note)
 {
@@ -215,9 +215,13 @@ static void parse_hold_note(char *line, struct oshu_hold_note *hold_note)
 /**
  * Allocate and parse one hit object.
  *
- * Only failure, `*hit` is set to *NULL*.
+ * On failure, return -1, free any allocated memory, and leave `*hit`
+ * unspecified.
+ *
+ * Sample input:
+ * `288,256,8538,2,0,P|254:261|219:255,1,70,8|0,0:0|0:0,0:0:0:0:`
  */
-static void parse_one_hit(char *line, struct oshu_hit **hit)
+static int parse_one_hit(char *line, struct oshu_hit **hit)
 {
 	char *x = strsep(&line, ",");
 	char *y = strsep(&line, ",");
@@ -227,7 +231,7 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 	if (!hit_sound) {
 		oshu_log_warn("invalid hit object");
 		*hit = NULL;
-		return;
+		return -1;
 	}
 	*hit = calloc(1, sizeof(**hit));
 	(*hit)->x = atoi(x);
@@ -239,6 +243,7 @@ static void parse_one_hit(char *line, struct oshu_hit **hit)
 		parse_spinner(line, &(*hit)->spinner);
 	if ((*hit)->type & OSHU_HIT_HOLD)
 		parse_hold_note(line, &(*hit)->hold_note);
+	return 0;
 }
 
 /**
@@ -267,17 +272,16 @@ static void compute_hit_combo(struct oshu_hit *previous, struct oshu_hit *hit)
 static int parse_hit_object(char *line, struct parser_state *parser)
 {
 	struct oshu_hit *hit;
-	parse_one_hit(line, &hit);
-	if (hit) {
-		if (!parser->beatmap->hits)
-			parser->beatmap->hits = hit;
-		if (parser->last_hit) {
-			assert(parser->last_hit->time < hit->time);
-			parser->last_hit->next = hit;
-		}
-		compute_hit_combo(parser->last_hit, hit);
-		parser->last_hit = hit;
+	if (parse_one_hit(line, &hit) < 0)
+		return 0; /* ignore it */
+	if (!parser->beatmap->hits)
+		parser->beatmap->hits = hit;
+	if (parser->last_hit) {
+		assert(parser->last_hit->time < hit->time);
+		parser->last_hit->next = hit;
 	}
+	compute_hit_combo(parser->last_hit, hit);
+	parser->last_hit = hit;
 	return 0;
 }
 
