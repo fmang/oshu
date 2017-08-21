@@ -66,6 +66,7 @@ enum beatmap_section {
 struct parser_state {
 	struct oshu_beatmap *beatmap;
 	enum beatmap_section section;
+	struct oshu_hit *last_hit;
 };
 
 /**
@@ -270,12 +271,12 @@ static int parse_hit_object(char *line, struct parser_state *parser)
 	if (hit) {
 		if (!parser->beatmap->hits)
 			parser->beatmap->hits = hit;
-		if (parser->beatmap->hit_cursor) {
-			assert(parser->beatmap->hit_cursor->time < hit->time);
-			parser->beatmap->hit_cursor->next = hit;
+		if (parser->last_hit) {
+			assert(parser->last_hit->time < hit->time);
+			parser->last_hit->next = hit;
 		}
-		compute_hit_combo(parser->beatmap->hit_cursor, hit);
-		parser->beatmap->hit_cursor = hit;
+		compute_hit_combo(parser->last_hit, hit);
+		parser->last_hit = hit;
 	}
 	return 0;
 }
