@@ -236,6 +236,98 @@ static int parse_timing_point(char *line, struct parser_state *parser)
 }
 
 /**
+ * Parse a point.
+ *
+ * Sample input:
+ * `168:88`
+ */
+static void build_point(char *line, struct oshu_point *p)
+{
+	char *x = strsep(&line, ":");
+	char *y = line;
+	assert (y != NULL);
+	p->x = atoi(x);
+	p->y = atoi(y);
+}
+
+/**
+ * Build a linear path.
+ *
+ * Sample input:
+ * `168:88`
+ */
+static void build_linear_slider(char *line, struct oshu_hit *hit)
+{
+	struct oshu_path *path = &hit->slider.path;
+	path->type = OSHU_PATH_LINEAR;
+	path->line.start.x = hit->x;
+	path->line.start.y = hit->y;
+	build_point(line, &path->line.end);
+}
+
+/**
+ * Build a perfect arc.
+ *
+ * Sample input:
+ * `396:140|448:80'
+ */
+static void build_perfect_slider(char *line, struct oshu_hit *hit)
+{
+	hit->slider.path.type = OSHU_PATH_PERFECT;
+	char *pass = strsep(&line, "|");
+	char *end = line;
+	assert (end != NULL);
+
+	struct oshu_point a, b, c;
+	a.x = hit->x;
+	a.y = hit->y;
+	build_point(pass, &b);
+	build_point(end, &c);
+	oshu_build_arc(a, b, c, &hit->slider.path.arc);
+}
+
+/**
+ * Build a Bezier slider.
+ *
+ * Sample input:
+ * `460:188|408:240|408:240|416:280`
+ */
+static void build_bezier_slider(char *line, struct oshu_hit *hit)
+{
+}
+
+
+/**
+ * Parse the specific parts of a slider hit object.
+ *
+ * Sample input:
+ * - `P|396:140|448:80,1,140,0|8,1:0|0:0,0:0:0:0:`,
+ * - `L|168:88,1,70,8|0,0:0|0:0,0:0:0:0:`,
+ * - `B|460:188|408:240|408:240|416:280,1,140,4|2,1:2|0:3,0:0:0:0:`.
+ */
+static void build_slider(char *line, struct parser_state *parser, struct oshu_hit *hit)
+{
+	char *type = strsep(&line, "|");
+	char *path = strsep(&line, ",");
+	char *repeat = strsep(&line, ",");
+	char *length = strsep(&line, ",");
+	assert (length != NULL);
+	assert (strlen(type) == 1);
+	hit->slider.repeat = atoi(repeat);
+	assert (parser->current_timing_point != NULL);
+	assert (parser->beatmap->difficulty.slider_multiplier != 0);
+	hit->slider.duration = atof(length) / (100. * parser->beatmap->difficulty.slider_multiplier) * parser->current_timing_point->beat_duration;
+	if (*type == OSHU_PATH_LINEAR)
+		build_linear_slider(path, hit);
+	else if (*type == OSHU_PATH_PERFECT)
+		build_perfect_slider(path, hit);
+	else if (*type == OSHU_PATH_BEZIER)
+		build_bezier_slider(path, hit);
+	else
+		assert(*type != *type);
+}
+
+/**
  * Parse specific parts of a spinner.
  */
 static void parse_spinner(char *line, struct oshu_spinner *spinner)
@@ -254,6 +346,21 @@ static void parse_hold_note(char *line, struct oshu_hold_note *hold_note)
 }
 
 /**
+ * Set the parser's current timing point to the position in msecs specified in
+ * offset.
+ */
+static void seek_timing_point(int offset, struct parser_state *parser)
+{
+	struct oshu_timing_point **tp;
+	if (parser->current_timing_point == NULL)
+		parser->current_timing_point = parser->beatmap->timing_points;
+	for (tp = &parser->current_timing_point; *tp && (*tp)->next; *tp = (*tp)->next) {
+		if ((*tp)->next->offset > offset)
+			break;
+	}
+}
+
+/**
  * Allocate and parse one hit object.
  *
  * On failure, return -1, free any allocated memory, and leave `*hit`
@@ -262,7 +369,7 @@ static void parse_hold_note(char *line, struct oshu_hold_note *hold_note)
  * Sample input:
  * `288,256,8538,2,0,P|254:261|219:255,1,70,8|0,0:0|0:0,0:0:0:0:`
  */
-static int parse_one_hit(char *line, struct oshu_hit **hit)
+static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **hit)
 {
 	char *x = strsep(&line, ",");
 	char *y = strsep(&line, ",");
@@ -280,6 +387,9 @@ static int parse_one_hit(char *line, struct oshu_hit **hit)
 	(*hit)->time = (double) atoi(time) / 1000;
 	(*hit)->type = atoi(type);
 	(*hit)->hit_sound = atoi(hit_sound);
+	seek_timing_point(atoi(time), parser);
+	if ((*hit)->type & OSHU_HIT_SLIDER)
+		build_slider(line, parser, *hit);
 	if ((*hit)->type & OSHU_HIT_SPINNER)
 		parse_spinner(line, &(*hit)->spinner);
 	if ((*hit)->type & OSHU_HIT_HOLD)
@@ -306,14 +416,14 @@ static void compute_hit_combo(struct oshu_hit *previous, struct oshu_hit *hit)
 }
 
 /**
- * Parse one hit using #parse_one_hit, and link it into the whole beatmap.
+ * Parse one hit using #build_hit, and link it into the whole beatmap.
  *
  * Skip invalid hit objects.
  */
 static int parse_hit_object(char *line, struct parser_state *parser)
 {
 	struct oshu_hit *hit;
-	if (parse_one_hit(line, &hit) < 0)
+	if (build_hit(line, parser, &hit) < 0)
 		return 0; /* ignore it */
 	if (!parser->beatmap->hits)
 		parser->beatmap->hits = hit;
