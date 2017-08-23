@@ -209,6 +209,11 @@ int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c
 	arc->radius = oshu_distance(a, arc->center);
 	arc->start_angle = atan2(a.y - arc->center.y, a.x - arc->center.x);
 	arc->end_angle = atan2(c.y - arc->center.y, c.x - arc->center.x);
+	int cross = (c.x - a.x) * (b.y - a.y) - (b.x - a.x) * (c.y - a.y);
+	if (cross < 0 && arc->start_angle > arc->end_angle)
+		arc->end_angle += 2. * M_PI;
+	else if (cross > 0 && arc->start_angle < arc->end_angle)
+		arc->end_angle -= 2. * M_PI;
 	return 0;
 }
 

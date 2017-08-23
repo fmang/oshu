@@ -93,6 +93,20 @@ struct oshu_arc {
  * might want to fallback on a linear path of something, but that's out of the
  * scope of this function.
  *
+ * The first part in building the arc is finding the center. For the gory
+ * details, see the implementation. Next is computing the radius and the
+ * angles, but that's not even hard. Then, the last tricky point is finding on
+ * which side of the circle the pass-through point is. While 3 points define a
+ * circle, there are always two ways to go from any point A to any point B:
+ * going clockwise or counter-clockwise. To know which side to take, we compute
+ * the cross product of the vector AB and AC. Its sign tells whether B is on
+ * the left side of AC, or on the right side. If it's on the left side (resp.
+ * right side), that means the path goes clockwise (resp. counter-clockwise).
+ * Then, to respect that direction in t-coordinates, we must ensure that
+ * counter-clockwise (resp. clockwise) arcs have an end angle greater (resp.
+ * lesser) than the start angle. If that's not the case, we add or subtract +2π
+ * to one of the angles.
+ *
  * \param a First point of the arc.
  * \param b Pass-through point of the arc.
  * \param c Last point of the arc.
