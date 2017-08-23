@@ -249,10 +249,12 @@ static void check_audio(struct oshu_game *game)
 			if (hit->time > now) {
 				break;
 			} else if (hit->state == OSHU_HIT_INITIAL) {
-				if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
+				if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type) {
 					hit->state = OSHU_HIT_SLIDING;
-				else
+					game->current_hit = hit;
+				} else {
 					hit->state = OSHU_HIT_GOOD;
+				}
 				oshu_sample_play(game->audio, game->hit_sound);
 			}
 		}
