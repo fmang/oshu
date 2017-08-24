@@ -196,6 +196,22 @@ static int parse_general(char *line, struct parser_state *parser)
 	return 0;
 }
 
+/**
+ * Parse a key-value line in the `[Difficulty]` section.
+ */
+static int parse_difficulty(char *line, struct parser_state *parser)
+{
+	char *key, *value;
+	key_value(line, &key, &value);
+	if (!value)
+		return 0;
+	if (!strcmp(key, "SliderMultiplier")) {
+		parser->beatmap->difficulty.slider_multiplier = atof(value);
+	}
+	return 0;
+}
+
+
 static int build_timing_point(char *line, struct parser_state *parser, struct oshu_timing_point **tp)
 {
 	char *offset = strsep(&line, ",");
@@ -457,6 +473,8 @@ static int parse_line(char *line, struct parser_state *parser)
 		rc = parse_section(line, parser);
 	} else if (parser->section == BEATMAP_GENERAL) {
 		rc = parse_general(line, parser);
+	} else if (parser->section == BEATMAP_DIFFICULTY) {
+		rc = parse_difficulty(line, parser);
 	} else if (parser->section == BEATMAP_TIMING_POINTS) {
 		rc = parse_timing_point(line, parser);
 	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
@@ -495,6 +513,7 @@ static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 {
 	oshu_log_info("beatmap version: %d", beatmap->version);
 	oshu_log_info("audio filename: %s", beatmap->audio_filename);
+	oshu_log_debug("slider multiplier: %.1f", beatmap->difficulty.slider_multiplier);
 }
 
 /**
