@@ -215,7 +215,7 @@ static void check_slider(struct oshu_game *game)
 		game->current_hit = NULL;
 		hit->state = OSHU_HIT_GOOD;
 		oshu_sample_play(game->audio, game->hit_sound);
-	} else if ((int) t > (int) prev_t) {
+	} else if ((int) t > (int) prev_t && prev_t > 0) {
 		oshu_sample_play(game->audio, game->hit_sound);
 	}
 	if (game->autoplay)
