@@ -131,13 +131,15 @@ static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *b
 			oshu_draw_circle(display, hit->x, hit->y, radius + ratio * beatmap->difficulty.approach_size);
 		}
 	} else if (hit->state == OSHU_HIT_GOOD) {
+		struct oshu_point p = oshu_end_point(hit);
 		SDL_SetRenderDrawColor(display->renderer, 64, 255, 64, 255);
-		oshu_draw_circle(display, hit->x, hit->y, radius / 3);
+		oshu_draw_circle(display, p.x, p.y, radius / 3);
 	} else if (hit->state == OSHU_HIT_MISSED) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 64, 64, 255);
+		struct oshu_point p = oshu_end_point(hit);
 		int d = radius / 3;
-		oshu_draw_line(display, hit->x - d, hit->y - d, hit->x + d, hit->y + d);
-		oshu_draw_line(display, hit->x + d, hit->y - d, hit->x - d, hit->y + d);
+		oshu_draw_line(display, p.x - d, p.y - d, p.x + d, p.y + d);
+		oshu_draw_line(display, p.x + d, p.y - d, p.x - d, p.y + d);
 	}
 }
 
