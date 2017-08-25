@@ -109,6 +109,8 @@ static void hit(struct oshu_game *game)
  */
 static void release_hit(struct oshu_game *game)
 {
+	if (game->paused || game->autoplay)
+		return;
 	struct oshu_hit *hit = game->current_hit;
 	if (!hit)
 		return;
