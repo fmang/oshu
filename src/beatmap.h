@@ -586,6 +586,21 @@ struct oshu_difficulty {
 	 * I guess its unit is *ticks per beat*.
 	 */
 	double slider_tick_rate;
+	/**
+	 * How close the mouse should be to the sliding ball.
+	 *
+	 * When the player is holding a slider, they should follow the sliding
+	 * ball with their mouse. This variable specifies how far the mouse
+	 * cursor may be for its position to be considered valid.
+	 *
+	 * If the distance between the mouse and the ball gets greater than
+	 * this slider tolerance, the slider is marked as missed.
+	 *
+	 * The property isn't written in the beatmap file, but it's up to the
+	 * beatmap loader to fill it with a sane value relative to the circle
+	 * size and whatever other variable.
+	 */
+	double slider_tolerance;
 };
 
 /**

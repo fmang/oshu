@@ -226,7 +226,7 @@ static void check_slider(struct oshu_game *game)
 	int dx = x - ball.x;
 	int dy = y - ball.y;
 	int dist = sqrt(dx * dx + dy * dy);
-	if (dist > game->beatmap->difficulty.circle_radius * 1.5) {
+	if (dist > game->beatmap->difficulty.slider_tolerance) {
 		game->current_hit = NULL;
 		hit->state = OSHU_HIT_MISSED;
 	}

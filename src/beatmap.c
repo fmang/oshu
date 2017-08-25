@@ -31,6 +31,7 @@ static const struct oshu_beatmap default_beatmap = {
 		.approach_size = 96.,
 		.slider_multiplier = 1.4,
 		.slider_tick_rate = 1.,
+		.slider_tolerance = 64.
 	},
 };
 

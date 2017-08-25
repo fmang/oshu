@@ -147,13 +147,17 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 	draw_hit_circle(display, beatmap, hit, now);
 	if (hit->state == OSHU_HIT_INITIAL || hit->state == OSHU_HIT_SLIDING) {
 		double t = (now - hit->time) / hit->slider.duration;
+		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
+		oshu_draw_thick_path(display, &hit->slider.path, 2 * radius);
 		if (hit->state == OSHU_HIT_SLIDING) {
+			SDL_SetRenderDrawColor(display->renderer, 255, 255, 0, 255);
 			struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
 			oshu_draw_circle(display, ball.x, ball.y, radius / 2);
+			oshu_draw_circle(display, ball.x, ball.y, beatmap->difficulty.slider_tolerance);
 		}
-		oshu_draw_thick_path(display, &hit->slider.path, 2 * radius);
 		struct oshu_point end = oshu_path_at(&hit->slider.path, 1);
 		int rounds_left = hit->slider.repeat - (t <= 0 ? 0 : (int) t);
+		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 		for (int i = 1; i <= rounds_left; ++i)
 			oshu_draw_circle(display, end.x, end.y, radius * ((double) i / rounds_left));
 	}
