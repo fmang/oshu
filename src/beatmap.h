@@ -549,7 +549,19 @@ struct oshu_difficulty {
 	 *
 	 * Defaults to 1 second.
 	 */
-	double approach_rate;
+	double approach_time;
+	/**
+	 * Size of the approach circle, in pixels to add to the circle radius.
+	 *
+	 * The approach circle radius is thus *#circle_radius + r *
+	 * #approach_size* where r is a floating number starting at 1 and
+	 * decreasing to 0 when the hit object should be hit.
+	 *
+	 * The property isn't written in the beatmap file, but it's up to the
+	 * beatmap loader to fill it with a sane value relative to the circle
+	 * size and whatever other variable.
+	 */
+	double approach_size;
 	/**
 	 * Makes the link between a slider's pixel length and the time.
 	 * 1 beat maps to 100 pixels multiplied by this factor.

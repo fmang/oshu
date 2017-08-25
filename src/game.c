@@ -60,9 +60,9 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
 {
 	double now = game->audio->current_timestamp;
 	for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
-		if (hit->time > now + game->beatmap->difficulty.approach_rate)
+		if (hit->time > now + game->beatmap->difficulty.approach_time)
 			break;
-		if (hit->time < now - game->beatmap->difficulty.approach_rate)
+		if (hit->time < now - game->beatmap->difficulty.approach_time)
 			continue;
 		if (hit->state != OSHU_HIT_INITIAL)
 			continue;
@@ -269,7 +269,7 @@ static void check_audio(struct oshu_game *game)
 	}
 	for (
 		struct oshu_hit **hit = &game->beatmap->hit_cursor;
-		*hit && oshu_hit_end_time(*hit) < now - game->beatmap->difficulty.approach_rate;
+		*hit && oshu_hit_end_time(*hit) < now - game->beatmap->difficulty.approach_time;
 		*hit = (*hit)->next
 	);
 }
