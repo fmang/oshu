@@ -151,7 +151,7 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 		oshu_draw_thick_path(display, &hit->slider.path, 2 * radius);
 		if (hit->state == OSHU_HIT_SLIDING) {
 			SDL_SetRenderDrawColor(display->renderer, 255, 255, 0, 255);
-			struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
+			struct oshu_point ball = oshu_path_at(&hit->slider.path, t < 0 ? 0 : t);
 			oshu_draw_circle(display, ball.x, ball.y, radius / 2);
 			oshu_draw_circle(display, ball.x, ball.y, beatmap->difficulty.slider_tolerance);
 		}
@@ -217,7 +217,8 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 			break;
 		if (prev && !(hit->type & OSHU_HIT_NEW_COMBO)) {
 			SDL_SetRenderDrawColor(display->renderer, 128, 128, 128, 255);
-			oshu_draw_line(display, prev->x, prev->y, hit->x, hit->y);
+			struct oshu_point end = oshu_end_point(prev);
+			oshu_draw_line(display, end.x, end.y, hit->x, hit->y);
 		}
 		oshu_draw_hit(display, beatmap, hit, now);
 		prev = hit;

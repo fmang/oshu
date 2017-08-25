@@ -417,6 +417,15 @@ struct oshu_hit {
 double oshu_hit_end_time(struct oshu_hit *hit);
 
 /**
+ * Compute the last point of a hit object.
+ *
+ * For a circle, it's the same as the starting point, but for a slider it is
+ * the position at the end of the slide. If the slider repeats, it may be the
+ * same as the starting point though.
+ */
+struct oshu_point oshu_end_point(struct oshu_hit *hit);
+
+/**
  * \brief Complete definition of the [Metadata] section.
  *
  * Every character string inside this section is either NULL or a reference to
