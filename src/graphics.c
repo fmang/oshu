@@ -127,6 +127,7 @@ static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *b
 		oshu_draw_line(display, hit->x, hit->y - radius, hit->x, hit->y + radius);
 		if (hit->time > now) {
 			/* hint circle */
+			SDL_SetRenderDrawColor(display->renderer, 255, 128, 64, 255);
 			double ratio = (double) (hit->time - now) / beatmap->difficulty.approach_time;
 			oshu_draw_circle(display, hit->x, hit->y, radius + ratio * beatmap->difficulty.approach_size);
 		}
