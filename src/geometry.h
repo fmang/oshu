@@ -149,10 +149,9 @@ int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c
  * the beginning point of the next one.
  *
  * A Bézier segment is usually represented in *t*-coordinates, with *t* ranging
- * from 0 to 1. To represent a path in *t*-coordinates, we'll assume all the
- * segments have roughly the same length, and map the *k*th segment in a
- * *n*-segment path to the *t*-coordinates *k/n* to *(k+1)/n* where
- * *0 ≤ k < n*.
+ * from 0 to 1. To represent a path in *t*-coordinates, we'll map a portion of
+ * the 0-1 range proportional to the length of each segment. This is the
+ * purpose of the #oshu_bezier::lengths array.
  */
 struct oshu_bezier {
 	/**
