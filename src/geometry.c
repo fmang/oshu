@@ -93,6 +93,54 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct 
 }
 
 /**
+ * Map a t coordinate to a point in a Bézier segment.
+ */
+static struct oshu_point segment_at(int degree, struct oshu_point *control_points, double t)
+{
+	struct oshu_point p = {0, 0};
+	for (int i = 0; i <= degree; i++) {
+		double bin = fac[degree] / (fac[i] * fac[degree - i]);
+		double factor = bin * pow(t, i) * pow(1 - t, degree - i);
+		p.x += factor * control_points[i].x;
+		p.y += factor * control_points[i].y;
+	}
+	return p;
+}
+
+/**
+ * Compute a numerical approximation of the length of a Bézier segment.
+ *
+ * Split the Bézier into 16 points and sum the distance between each of those
+ * points. Return the result.
+ */
+static double segment_length(int degree, struct oshu_point *control_points)
+{
+	static int precision = 16;
+	double length = 0;
+	struct oshu_point prev = segment_at(degree, control_points, 0);
+	for (int i = 0; i < precision; i++) {
+		double t = (1. + (double) i) / precision;
+		struct oshu_point here = segment_at(degree, control_points, t);
+		length += oshu_distance(prev, here);
+	}
+	return length;
+}
+
+void oshu_normalize_bezier(struct oshu_bezier *bezier)
+{
+	double total_length = 0;
+	/* Compute the absolute lengths. */
+	for (int s = 0; s < bezier->segment_count; s++) {
+		int degree = bezier->indices[s+1] - bezier->indices[s] - 1;
+		bezier->lengths[s] = segment_length(degree, bezier->control_points + bezier->indices[s]);
+		total_length += bezier->lengths[s];
+	}
+	/* Normalize the lengths for their sum to be equal to 1. */
+	for (int s = 0; s < bezier->segment_count; s++)
+		bezier->lengths[s] /= total_length;
+}
+
+/**
  * Compute the position of a point expressed in *t*-coordinates.
  *
  * The coordinates are mapped with #bezier_map, and then we just apply the
@@ -100,18 +148,10 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct 
  */
 static struct oshu_point bezier_at(struct oshu_bezier *path, double t)
 {
-	struct oshu_point p = {0, 0};
-	int n; /* degree */
+	int degree;
 	struct oshu_point *points;
-	bezier_map(path, &t, &n, &points);
-
-	for (int i = 0; i <= n; i++) {
-		double bin = fac[n] / (fac[i] * fac[n - i]);
-		double factor = bin * pow(t, i) * pow(1 - t, n - i);
-		p.x += factor * points[i].x;
-		p.y += factor * points[i].y;
-	}
-	return p;
+	bezier_map(path, &t, &degree, &points);
+	return segment_at(degree, points, t);
 }
 
 static struct oshu_point bezier_derive(struct oshu_bezier *path, double t)

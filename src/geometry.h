@@ -194,7 +194,30 @@ struct oshu_bezier {
 	 * #indices array.
 	 */
 	struct oshu_point *control_points;
+	/**
+	 * An approximate relative length of all the segments.
+	 *
+	 * The length of the nth segment is `lengths[n]`, and the sum of all
+	 * the segments must sum up to 1.
+	 *
+	 * The size of this array must be at least #segment_count.
+	 *
+	 * Use #oshu_normalize_bezier to compute it.
+	 */
+	double *lengths;
 };
+
+/**
+ * Compute the relative lengths of all the segments in a Bézier path.
+ *
+ * Receives a Bézier path whose #oshu_bezier::segment_count,
+ * #oshu_bezier::indices and #oshu_bezier::control_points are filled, and use
+ * these data to compute the #oshu_bezier::lengths field.
+ *
+ * The #oshu_bezier::lengths field must be allocated before calling this
+ * function.
+ */
+void oshu_normalize_bezier(struct oshu_bezier *bezier);
 
 /**
  * The curve types for a slider.
