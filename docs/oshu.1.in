@@ -14,7 +14,8 @@ the data inside the beatmap file.
 .PP
 On startup, oshu moves to the real directory of the beatmap, where it expects
 to find the audio file. This lets you symlink your .osu files without bothering
-with the related audio and picture files.
+with the related audio and picture files. In more technical terms, symbolic
+terms are dereferenced.
 .PP
 \fB.osz\fR files are not supported, but since they're just fancy ZIP files, you
 just have to unzip them into a sub-directory. Be careful though, it won't

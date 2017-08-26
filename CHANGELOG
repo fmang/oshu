@@ -1,6 +1,22 @@
 Changelog
 =========
 
+1.1.0 - Unreleased
+------------------
+
+Full slider support!
+
+The game is now quite playable, and starts getting fun.
+
+Extra features:
+
+- Resizable window.
+- Slightly nicer graphics, even though it's still wireframe.
+- Dereference the symlinked beatmap files.
+- Automatic pause when the window focus is lost.
+- `--pause` option to start the game paused.
+- Print a crude score on the terminal output at the end of songs.
+
 1.0.0 - 2017-08-07
 ------------------
 

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([oshu], [1.0.0], [fmang+oshu@mg0.fr])
+AC_INIT([oshu], [1.1.0], [fmang+oshu@mg0.fr])
 AC_CONFIG_SRCDIR([src/oshu.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile docs/Makefile share/Makefile])
