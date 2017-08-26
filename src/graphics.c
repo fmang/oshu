@@ -97,7 +97,7 @@ void oshu_get_mouse(struct oshu_display *display, int *x, int *y)
 
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)
 {
-	static int resolution = 30;
+	int resolution = (int) radius;
 	SDL_Point points[resolution];
 	double step = 2 * M_PI / (resolution - 1);
 	for (int i = 0; i < resolution; i++) {
