@@ -86,7 +86,7 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct 
 		segment = path->segment_count - 1;
 
 	*degree = path->indices[segment+1] - path->indices[segment] - 1;
-	assert (*degree >= sizeof(fac) / sizeof(*fac));
+	assert (*degree < sizeof(fac) / sizeof(*fac));
 
 	*control_points = path->control_points + path->indices[segment];
 	*t = (*t * path->segment_count) - segment; /* rescale t */

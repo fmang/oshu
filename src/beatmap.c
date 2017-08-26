@@ -315,6 +315,35 @@ static void build_perfect_slider(char *line, struct oshu_hit *hit)
  */
 static void build_bezier_slider(char *line, struct oshu_hit *hit)
 {
+	int count = 2;
+	for (char *c = line; *c != '\0'; ++c) {
+		if (*c == '|')
+			count++;
+	}
+
+	hit->slider.path.type = OSHU_PATH_BEZIER;
+	struct oshu_bezier *bezier = &hit->slider.path.bezier;
+	bezier->control_points = calloc(count, sizeof(*bezier->control_points));
+	bezier->control_points[0].x = hit->x;
+	bezier->control_points[0].y = hit->y;
+
+	int index = 0;
+	bezier->indices = calloc(count, sizeof(*bezier->indices));
+	bezier->indices[index] = 0; /* useless but let's remind it */
+
+	struct oshu_point prev = bezier->control_points[0];
+	for (int i = 1; i < count; i++) {
+		struct oshu_point p;
+		char *frag = strsep(&line, "|");
+		build_point(frag, &p);
+		bezier->control_points[i] = p;
+		if (p.x == prev.x && p.y == prev.y) {
+			bezier->indices[++index] = i;
+		}
+		prev = p;
+	}
+	bezier->indices[++index] = count;
+	bezier->segment_count = index;
 }
 
 
