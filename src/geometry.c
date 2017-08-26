@@ -38,7 +38,7 @@ double oshu_distance(struct oshu_point p, struct oshu_point q)
  * Pre-computed factorial values, for speed.
  * We're never going to see 8th-order Bezier curve, right?
  */
-static int fac[8] = {1, 1, 2, 6, 24, 120, 720, 5040};
+static int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800};
 
 /**
  * \brief Map global *t*-coordinates to segment-wise *t*-coordinates.
