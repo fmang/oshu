@@ -125,10 +125,10 @@ struct oshu_timing_point {
 	 *
 	 * In the beatmap file, it's a float of the milliseconds per beat.
 	 *
-	 * When negative, it's a speed multiplier, in percents. This is not
-	 * supported, and irrelevant to the beat duration. The parser should
-	 * preserve the value of the previous timing point in that case, as far
-	 * as this field is concerned.
+	 * When negative, it's a speed multiplier, in percents. The beat
+	 * duration of the last non-negative timing point should be multiplied
+	 * by this ratio to get the new beat duration. It's crucial for
+	 * sliders.
 	 */
 	double beat_duration;
 	/**

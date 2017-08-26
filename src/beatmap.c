@@ -71,6 +71,8 @@ struct parser_state {
 	struct oshu_hit *last_hit;
 	struct oshu_timing_point *last_timing_point;
 	struct oshu_timing_point *current_timing_point;
+	/** This is the last non-inherited timing point. */
+	struct oshu_timing_point *timing_base;
 };
 
 /**
@@ -223,10 +225,11 @@ static int build_timing_point(char *line, struct parser_state *parser, struct os
 	(*tp)->offset = atoi(offset);
 	double beat = atof(beat_length);
 	if (beat < 0) {
-		assert (parser->last_timing_point != NULL);
-		(*tp)->beat_duration = parser->last_timing_point->beat_duration;
+		assert (parser->timing_base != NULL);
+		(*tp)->beat_duration = (-beat / 100.) * parser->timing_base->beat_duration;
 	} else {
 		(*tp)->beat_duration = beat / 1000.;
+		parser->timing_base = *tp;
 	}
 	return 0;
 }
