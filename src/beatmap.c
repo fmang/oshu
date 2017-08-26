@@ -431,6 +431,10 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 		*hit = NULL;
 		return -1;
 	}
+	if (atoi(type) & OSHU_HIT_SPINNER) {
+		oshu_log_debug("skipping spinner");
+		return -1;
+	}
 	*hit = calloc(1, sizeof(**hit));
 	(*hit)->x = atoi(x);
 	(*hit)->y = atoi(y);
