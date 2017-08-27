@@ -302,6 +302,23 @@ static void end(struct oshu_game *game)
 	);
 }
 
+/**
+ * Show the state of the game (paused/playing) and the current song position.
+ *
+ * Only do that for terminal outputs in order not to spam something if the
+ * output is redirected.
+ */
+static void dump_state(struct oshu_game *game, double now)
+{
+	if (!isatty(fileno(stdout)))
+		return;
+	int minutes = (int) now / 60.;
+	double seconds = now - (minutes * 60.);
+	const char *state = game->paused ? "Paused": "Playing";
+	printf("%s: %d:%06.3f\r", state, minutes, seconds);
+	fflush(stdout);
+}
+
 int oshu_game_run(struct oshu_game *game)
 {
 	SDL_Event event;
@@ -314,6 +331,7 @@ int oshu_game_run(struct oshu_game *game)
 		check_audio(game);
 		double now = game->audio->current_timestamp;
 		oshu_draw_beatmap(game->display, game->beatmap, now);
+		dump_state(game, now);
 		game->previous_time = now;
 		SDL_Delay(20);
 	}
