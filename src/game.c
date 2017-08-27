@@ -307,6 +307,10 @@ static void end(struct oshu_game *game)
  *
  * Only do that for terminal outputs in order not to spam something if the
  * output is redirected.
+ *
+ * The state length must not decrease over time, otherwise you end up with
+ * glitches. If you write `foo\rx`, you get `xoo`. This is the reason the
+ * Paused string literal has an extra space.
  */
 static void dump_state(struct oshu_game *game, double now)
 {
@@ -314,7 +318,7 @@ static void dump_state(struct oshu_game *game, double now)
 		return;
 	int minutes = (int) now / 60.;
 	double seconds = now - (minutes * 60.);
-	const char *state = game->paused ? "Paused": "Playing";
+	const char *state = game->paused ? " Paused" : "Playing";
 	printf("%s: %d:%06.3f\r", state, minutes, seconds);
 	fflush(stdout);
 }
