@@ -289,6 +289,9 @@ static void build_linear_slider(char *line, struct oshu_hit *hit)
 /**
  * Build a perfect arc.
  *
+ * If the points are aligned or something weird, transform it into a linear
+ * slider.
+ *
  * Sample input:
  * `396:140|448:80'
  */
@@ -304,7 +307,13 @@ static void build_perfect_slider(char *line, struct oshu_hit *hit)
 	a.y = hit->y;
 	build_point(pass, &b);
 	build_point(end, &c);
-	oshu_build_arc(a, b, c, &hit->slider.path.arc);
+
+	if (oshu_build_arc(a, b, c, &hit->slider.path.arc) < 0) {
+		/* tranform it into a linear path */
+		hit->slider.path.type = OSHU_PATH_LINEAR;
+		hit->slider.path.line.start = a;
+		hit->slider.path.line.end = c;
+	}
 }
 
 /**
