@@ -84,20 +84,20 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			toggle_pause(game);
 			break;
 		default:
-			if (game->mode->key_pressed)
+			if (!game->paused && game->mode->key_pressed)
 				game->mode->key_pressed(game, &event->key.keysym);
 		}
 		break;
 	case SDL_KEYUP:
-		if (game->mode->key_pressed)
+		if (!game->paused && game->mode->key_pressed)
 			game->mode->key_released(game, &event->key.keysym);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		if (game->mode->mouse_released)
+		if (!game->paused && game->mode->mouse_released)
 			game->mode->mouse_pressed(game, event->button.button);
 		break;
 	case SDL_MOUSEBUTTONUP:
-		if (game->mode->mouse_released)
+		if (!game->paused && game->mode->mouse_released)
 			game->mode->mouse_released(game, event->button.button);
 		break;
 	case SDL_WINDOWEVENT:
@@ -172,7 +172,7 @@ int oshu_game_run(struct oshu_game *game)
 	while (!game->audio->finished && !game->stop) {
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
-		if (game->mode->check)
+		if (!game->paused && game->mode->check)
 			game->mode->check(game);
 		double now = game->audio->current_timestamp;
 		if (game->mode->draw)
