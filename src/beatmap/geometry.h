@@ -15,7 +15,23 @@
  * \{
  */
 
+/**
+ * A point in a 2D space.
+ *
+ * The coordinate system is arbitrary.
+ */
 struct oshu_point {
+	double x;
+	double y;
+};
+
+/**
+ * A 2D vector.
+ *
+ * This is distinct from #oshu_point for readability, and to prevent some
+ * potential mistakes.
+ */
+struct oshu_vector {
 	double x;
 	double y;
 };
@@ -23,7 +39,7 @@ struct oshu_point {
 /**
  * Normalize a vector, making its norm equal to 1.
  */
-struct oshu_point oshu_normalize(struct oshu_point p);
+struct oshu_vector oshu_normalize(struct oshu_vector p);
 
 /**
  * Compute the Euclidean distance between *p* and *q*.
@@ -304,6 +320,6 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t);
  * defined in #oshu_path_at. When t is on a decreasing slope, the derivative
  * vector is reversed, as you'd expect if you like maths.
  */
-struct oshu_point oshu_path_derive(struct oshu_path *path, double t);
+struct oshu_vector oshu_path_derive(struct oshu_path *path, double t);
 
 /** \} */
