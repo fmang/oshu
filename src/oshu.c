@@ -8,7 +8,7 @@
  */
 
 #include "log.h"
-#include "game.h"
+#include "game/game.h"
 #include "../config.h"
 
 #include <getopt.h>

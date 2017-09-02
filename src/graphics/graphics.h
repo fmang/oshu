@@ -7,8 +7,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "beatmap.h"
-#include "geometry.h"
+#include "beatmap/beatmap.h"
 
 /**
  * \defgroup graphics Graphics

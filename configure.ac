@@ -6,7 +6,7 @@ AC_INIT([oshu], [1.1.0], [fmang+oshu@mg0.fr])
 AC_CONFIG_SRCDIR([src/oshu.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile docs/Makefile share/Makefile])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 # Checks for programs.
 AC_PROG_CC_C99

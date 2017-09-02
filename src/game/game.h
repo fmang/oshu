@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "audio.h"
-#include "beatmap.h"
-#include "graphics.h"
+#include "audio/audio.h"
+#include "beatmap/beatmap.h"
+#include "graphics/graphics.h"
 
 /**
  * \defgroup game Game
