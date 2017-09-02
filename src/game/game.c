@@ -84,20 +84,20 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			toggle_pause(game);
 			break;
 		default:
-			if (!game->paused && game->mode->key_pressed)
+			if (!game->paused && !game->autoplay && game->mode->key_pressed)
 				game->mode->key_pressed(game, &event->key.keysym);
 		}
 		break;
 	case SDL_KEYUP:
-		if (!game->paused && game->mode->key_pressed)
+		if (!game->paused && !game->autoplay && game->mode->key_pressed)
 			game->mode->key_released(game, &event->key.keysym);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		if (!game->paused && game->mode->mouse_released)
+		if (!game->paused && !game->autoplay && game->mode->mouse_released)
 			game->mode->mouse_pressed(game, event->button.button);
 		break;
 	case SDL_MOUSEBUTTONUP:
-		if (!game->paused && game->mode->mouse_released)
+		if (!game->paused && !game->autoplay && game->mode->mouse_released)
 			game->mode->mouse_released(game, event->button.button);
 		break;
 	case SDL_WINDOWEVENT:

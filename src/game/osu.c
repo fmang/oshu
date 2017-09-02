@@ -42,8 +42,6 @@ static struct oshu_hit* find_hit(struct oshu_game *game, int x, int y)
  */
 static void hit(struct oshu_game *game)
 {
-	if (game->paused || game->autoplay)
-		return;
 	int x, y;
 	oshu_get_mouse(game->display, &x, &y);
 	double now = game->audio->current_timestamp;
@@ -69,8 +67,6 @@ static void hit(struct oshu_game *game)
  */
 static void release_hit(struct oshu_game *game)
 {
-	if (game->paused || game->autoplay)
-		return;
 	struct oshu_hit *hit = game->osu.current_slider;
 	if (!hit)
 		return;
