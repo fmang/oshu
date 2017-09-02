@@ -80,3 +80,14 @@ value will be -1 most of the time.
 Error messages are logged with \ref oshu_log_error by the *callee*. This makes
 the code clearer for the caller, and besides, the callee has much more details
 about the error than the caller.
+
+
+Style convention
+----------------
+
+Linux kernel coding style full power.
+
+For function names, make them the most natural sounding you can. Use
+*oshu_create_thing* than *oshu_thing_create*. This is not how oshu started, so
+you'll see the old naming on older code, but as modules get refactored they'll
+adopt the new convention.
