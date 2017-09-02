@@ -9,9 +9,8 @@
 
 #include "audio/audio.h"
 #include "beatmap/beatmap.h"
-#include "graphics/graphics.h"
-
-#include "modes.h"
+#include "game/modes.h"
+#include "graphics/display.h"
 
 /**
  * \defgroup game Game

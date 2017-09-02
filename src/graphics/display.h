@@ -1,6 +1,6 @@
 /**
- * \file graphics.h
- * \ingroup graphics
+ * \file graphics/display.h
+ * \ingroup display
  */
 
 #pragma once
@@ -11,9 +11,14 @@
 
 /**
  * \defgroup graphics Graphics
+ */
+
+/**
+ * \defgroup display Display
+ * \ingroup graphics
  *
  * \brief
- * Manage a window and draw beatmaps.
+ * Manage a window and its projections.
  *
  * ### Coordinate system
  *
@@ -132,54 +137,5 @@ void oshu_display_resize(struct oshu_display *display, int w, int h);
  */
 void oshu_get_mouse(struct oshu_display *display, int *x, int *y);
 
-/**
- * \defgroup draw Draw
- *
- * \brief
- * Rendering functions, from the main beatmap drawing routine to line drawing
- * helpers.
- *
- * \{
- */
-
-/**
- * Draw all the visible nodes from the beatmap, according to the current
- * position in the song.
- *
- * `now` is the current position in the playing song, in seconds.
- */
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now);
-
-/**
- * Draw a hit object.
- */
-void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
-
-/**
- * Draw a 1-pixel aliased stroke following the path.
- */
-void oshu_draw_path(struct oshu_display *display, struct oshu_path *path);
-
-/**
- * Draw a thick stroke following the path.
- *
- * Actually draws two more-or-less parallel lines. Follow the curve nicely but
- * might make ugly loops when the path is too... loopy.
- */
-void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, double width);
-
-/**
- * Draw a regular polyline that should look like a circle.
- */
-void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius);
-
-/**
- * Draw one line, plain and simple.
- *
- * Perform coordinate translation, unlike its SDL counterpart.
- */
-void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2);
-
-/** \} */
 
 /** \} */

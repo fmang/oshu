@@ -3,7 +3,8 @@
  * \ingroup graphics
  */
 
-#include "graphics.h"
+#include "graphics/display.h"
+#include "graphics/draw.h"
 #include "log.h"
 
 static const int game_width = 640; /* px */

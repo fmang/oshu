@@ -13,8 +13,9 @@ oshu_SOURCES = \
 	game/game.h \
 	game/modes.h \
 	game/osu.c \
-	graphics/graphics.c \
-	graphics/graphics.h
+	graphics/display.h \
+	graphics/draw.h \
+	graphics/graphics.c
 
 oshu_CFLAGS = -iquote . -DPKGDATADIR='"$(pkgdatadir)"' $(SDL2_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LAVU_CFLAGS)
 oshu_LDADD = -lm $(SDL2_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LAVU_LIBS)

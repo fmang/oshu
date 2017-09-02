@@ -5,8 +5,9 @@
  * Implement the osu! standard mode.
  */
 
-#include "modes.h"
-#include "game.h"
+#include "game/game.h"
+#include "game/modes.h"
+#include "graphics/draw.h"
 
 /**
  * Find the first clickable hit object that contains the given x/y coordinates.
