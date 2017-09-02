@@ -7,8 +7,8 @@
 
 static void view_xy(struct oshu_display *display, int *x, int *y)
 {
-	*x = (64 + *x) * display->zoom + display->horizontal_margin;
-	*y = (48 + *y) * display->zoom + display->vertical_margin;
+	*x = (64 + *x) * display->viewport.zoom + display->viewport.left;
+	*y = (48 + *y) * display->viewport.zoom + display->viewport.top;
 }
 
 /**
@@ -24,8 +24,8 @@ struct oshu_point oshu_get_mouse(struct oshu_display *display)
 	struct oshu_point p;
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	p.x = (x - display->horizontal_margin) / display->zoom - 64.;
-	p.y = (y - display->vertical_margin) / display->zoom - 48.;
+	p.x = (x - display->viewport.left) / display->viewport.zoom - 64.;
+	p.y = (y - display->viewport.top) / display->viewport.zoom - 48.;
 	return p;
 }
 

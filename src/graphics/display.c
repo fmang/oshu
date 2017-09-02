@@ -33,21 +33,21 @@ int load_textures(struct oshu_display *display)
 	return 0;
 }
 
-int oshu_display_init(struct oshu_display **display)
+int oshu_open_display(struct oshu_display **display)
 {
 	*display = calloc(1, sizeof(**display));
-	(*display)->zoom = 1;
+	(*display)->viewport.zoom = 1.;
 	if (create_window(*display) < 0)
 		goto fail;
 	if (load_textures(*display) < 0)
 		goto fail;
 	return 0;
 fail:
-	oshu_display_destroy(display);
+	oshu_close_display(display);
 	return -1;
 }
 
-void oshu_display_destroy(struct oshu_display **display)
+void oshu_close_display(struct oshu_display **display)
 {
 	if ((*display)->renderer)
 		SDL_DestroyRenderer((*display)->renderer);
@@ -57,19 +57,21 @@ void oshu_display_destroy(struct oshu_display **display)
 	*display = NULL;
 }
 
-void oshu_display_resize(struct oshu_display *display, int w, int h)
+void oshu_resize_display(struct oshu_display *display)
 {
+	int w, h;
+	SDL_GetWindowSize(display->window, &w, &h);
 	double original_ratio = (double) game_width / game_height;
 	double actual_ratio = (double) w / h;
 	if (actual_ratio > original_ratio) {
 		/* the window is too wide */
-		display->zoom = (double) h / game_height;
-		display->horizontal_margin = (w - game_width * display->zoom) / 2;
-		display->vertical_margin = 0;
+		display->viewport.zoom = (double) h / game_height;
+		display->viewport.left = (w - game_width * display->viewport.zoom) / 2.;
+		display->viewport.top = 0.;
 	} else {
 		/* the window is too high */
-		display->zoom = (double) w / game_width;
-		display->horizontal_margin = 0;
-		display->vertical_margin = (h - game_height * display->zoom) / 2;
+		display->viewport.zoom = (double) w / game_width;
+		display->viewport.left = 0.;
+		display->viewport.top = (h - game_height * display->viewport.zoom) / 2.;
 	}
 }

@@ -118,6 +118,9 @@
  * \{
  */
 
+/**
+ * See the module's description to understand what these coordinates are.
+ */
 enum oshu_coordinate_system {
 	OSHU_PHYSICAL_COORDINATES,
 	OSHU_VIEWPORT_COORDINATES,
@@ -125,62 +128,81 @@ enum oshu_coordinate_system {
 };
 
 /**
+ * Position of the viewport in physical coordinates, and zoom factor to scale
+ * viewport coordinates.
+ */
+struct oshu_viewport {
+	double zoom;
+	double top;
+	double left;
+};
+
+/**
  * Store everything related to the current display.
  *
- * Holds the window, and all the textures and sprites required to show the
- * game.
+ * A display is an SDL window, a renderer, possibly some textures, and also a
+ * state for the drawing functions.
+ *
+ * \sa oshu_open_display
+ * \sa oshu_close_display
  */
 struct oshu_display {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-	double zoom;
-	double horizontal_margin;
-	double vertical_margin;
+	/**
+	 * Current coordinate system.
+	 */
+	enum oshu_coordinate_system system;
+	/**
+	 * Cached information for fast viewport-to-window projections.
+	 *
+	 * Update it with #oshu_resize_display.
+	 */
+	struct oshu_viewport viewport;
 };
 
 /**
- * Create a display structure and load everything required to start playing the
- * game.
+ * Create a display structure, open the SDL window and create the renderer.
+ *
+ * \sa oshu_close_display
  */
-int oshu_display_init(struct oshu_display **display);
+int oshu_open_display(struct oshu_display **display);
 
 /**
  * Free the display structure and everything associated to it.
  */
-void oshu_display_destroy(struct oshu_display **display);
+void oshu_close_display(struct oshu_display **display);
 
 /**
  * Resize the game area to fit the new size of the window.
  *
+ * The size of the window is automatically retrieved from the SDL window.
+ *
+ * So far, this is a fast operation, but in the future it might require pausing
+ * the game to regenerate textures.
+ *
  * Call this function when you receive a `SDL_WINDOWEVENT_SIZE_CHANGED`.
  */
-void oshu_display_resize(struct oshu_display *display, int w, int h);
-
-/**
- * Set the coordinate system that will be used by all the functions of this
- * module.
- */
-void oshu_set_coordinate_system(struct oshu_display *display, enum oshu_coordinate_system system);
+void oshu_resize_display(struct oshu_display *display);
 
 /**
  * Get the mouse position.
+ *
+ * \sa oshu_display::system
  */
 struct oshu_point oshu_get_mouse(struct oshu_display *display);
 
 /**
- * Return the size of drawing area, depending on the current coordinate system.
- *
- * It is perfectly okay to draw outside the bounds.
- */
-void oshu_bounds(struct oshu_display *display, double *w, double *h);
-
-/**
  * Project to physical coordinates.
+ *
+ * \sa oshu_display::system
  */
 struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
 
 /**
  * Unproject from physical coordinates.
+ *
+ * \sa oshu_display::system
  */
 struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p);
 

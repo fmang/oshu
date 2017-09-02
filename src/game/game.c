@@ -39,7 +39,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		goto fail;
 	}
 
-	if (oshu_display_init(&(*game)->display) < 0) {
+	if (oshu_open_display(&(*game)->display) < 0) {
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
@@ -103,7 +103,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			oshu_display_resize(game->display, event->window.data1, event->window.data2);
+			oshu_resize_display(game->display);
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
@@ -197,7 +197,7 @@ void oshu_game_destroy(struct oshu_game **game)
 	if ((*game)->hit_sound)
 		oshu_sample_free(&(*game)->hit_sound);
 	if ((*game)->display)
-		oshu_display_destroy(&(*game)->display);
+		oshu_close_display(&(*game)->display);
 	if ((*game)->beatmap)
 		oshu_beatmap_free(&(*game)->beatmap);
 	free(*game);
