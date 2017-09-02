@@ -1,5 +1,5 @@
 /**
- * \file game.c
+ * \file game/game.c
  * \ingroup game
  *
  * Game module implementation.

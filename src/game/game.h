@@ -1,5 +1,5 @@
 /**
- * \file game.h
+ * \file game/game.h
  * \ingroup game
  *
  * Define the game module.

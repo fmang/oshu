@@ -11,6 +11,8 @@ oshu_SOURCES = \
 	beatmap/geometry.h \
 	game/game.c \
 	game/game.h \
+	game/modes.h \
+	game/osu.c \
 	graphics/graphics.c \
 	graphics/graphics.h
 
