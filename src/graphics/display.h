@@ -134,8 +134,8 @@ struct oshu_display {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	double zoom;
-	int horizontal_margin;
-	int vertical_margin;
+	double horizontal_margin;
+	double vertical_margin;
 };
 
 /**
@@ -165,7 +165,7 @@ void oshu_set_coordinate_system(struct oshu_display *display, enum oshu_coordina
 /**
  * Get the mouse position.
  */
-void oshu_get_mouse(struct oshu_display *display, struct oshu_point *p);
+struct oshu_point oshu_get_mouse(struct oshu_display *display);
 
 /**
  * Return the size of drawing area, depending on the current coordinate system.
@@ -177,12 +177,12 @@ void oshu_bounds(struct oshu_display *display, double *w, double *h);
 /**
  * Project to physical coordinates.
  */
-void oshu_project(struct oshu_display *display, struct oshu_point *p);
+struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
 
 /**
  * Unproject from physical coordinates.
  */
-void oshu_unproject(struct oshu_display *display, struct oshu_point *p);
+struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p);
 
 
 /** \} */

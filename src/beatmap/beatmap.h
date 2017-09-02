@@ -300,17 +300,11 @@ struct oshu_hold_note {
  */
 struct oshu_hit {
 	/**
-	 * x-coordinate of the position of the hit object.
+	 * Coordinates of the hit object in game coordinates.
 	 *
-	 * It ranges from 0 (left) to 512 (right) pixels, inclusive.
+	 * From (0, 0) for top-left to (512, 384) for bottom-right.
 	 */
-	int x;
-	/**
-	 * y-coordinate of the position of the hit object.
-	 *
-	 * It ranges from 0 (top) to 384 (bottom) pixels, inclusive.
-	 */
-	int y;
+	struct oshu_point p;
 	/**
 	 * \brief When the hit object should be clicked, in seconds.
 	 *

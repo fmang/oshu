@@ -89,11 +89,14 @@ static void view_point(struct oshu_display *display, SDL_Point *p)
 	view_xy(display, &p->x, &p->y);
 }
 
-void oshu_get_mouse(struct oshu_display *display, int *x, int *y)
+struct oshu_point oshu_get_mouse(struct oshu_display *display)
 {
-	SDL_GetMouseState(x, y);
-	*x = (*x - display->horizontal_margin) / display->zoom - 64;
-	*y = (*y - display->vertical_margin) / display->zoom - 48;
+	struct oshu_point p;
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+	p.x = (x - display->horizontal_margin) / display->zoom - 64.;
+	p.y = (y - display->vertical_margin) / display->zoom - 48.;
+	return p;
 }
 
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)
@@ -122,15 +125,15 @@ static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *b
 	double radius = beatmap->difficulty.circle_radius;
 	if (hit->state == OSHU_HIT_INITIAL || hit->state == OSHU_HIT_SLIDING) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
-		oshu_draw_circle(display, hit->x, hit->y, radius);
-		oshu_draw_circle(display, hit->x, hit->y, radius - 2);
-		oshu_draw_line(display, hit->x - radius, hit->y, hit->x + radius, hit->y);
-		oshu_draw_line(display, hit->x, hit->y - radius, hit->x, hit->y + radius);
+		oshu_draw_circle(display, hit->p.x, hit->p.y, radius);
+		oshu_draw_circle(display, hit->p.x, hit->p.y, radius - 2);
+		oshu_draw_line(display, hit->p.x - radius, hit->p.y, hit->p.x + radius, hit->p.y);
+		oshu_draw_line(display, hit->p.x, hit->p.y - radius, hit->p.x, hit->p.y + radius);
 		if (hit->time > now) {
 			/* hint circle */
 			SDL_SetRenderDrawColor(display->renderer, 255, 128, 64, 255);
 			double ratio = (double) (hit->time - now) / beatmap->difficulty.approach_time;
-			oshu_draw_circle(display, hit->x, hit->y, radius + ratio * beatmap->difficulty.approach_size);
+			oshu_draw_circle(display, hit->p.x, hit->p.y, radius + ratio * beatmap->difficulty.approach_size);
 		}
 	} else if (hit->state == OSHU_HIT_GOOD) {
 		struct oshu_point p = oshu_end_point(hit);
@@ -198,7 +201,7 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 	double radius = width / 2.;
 	for (int i = 0; i < resolution; i++) {
 		struct oshu_point p = oshu_path_at(path, i * step);
-		struct oshu_point d = oshu_path_derive(path, i * step);
+		struct oshu_vector d = oshu_path_derive(path, i * step);
 		d = oshu_normalize(d);
 		left[i].x = p.x - radius* d.y;
 		left[i].y = p.y + radius* d.x;
@@ -219,11 +222,11 @@ static void connect_hits(struct oshu_display *display, struct oshu_beatmap *beat
 		return;
 	SDL_SetRenderDrawColor(display->renderer, 0, 128, 196, 255);
 	struct oshu_point end = oshu_end_point(prev);
-	struct oshu_point diff = { next->x - end.x, next->y - end.y };
-	struct oshu_point d = oshu_normalize(diff);
+	struct oshu_vector diff = { next->p.x - end.x, next->p.y - end.y };
+	struct oshu_vector d = oshu_normalize(diff);
 	d.x *= beatmap->difficulty.circle_radius;
 	d.y *= beatmap->difficulty.circle_radius;
-	oshu_draw_line(display, end.x + d.x, end.y + d.y, next->x - d.x, next->y - d.y);
+	oshu_draw_line(display, end.x + d.x, end.y + d.y, next->p.x - d.x, next->p.y - d.y);
 }
 
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now)

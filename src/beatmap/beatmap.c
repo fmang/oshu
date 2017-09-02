@@ -281,8 +281,7 @@ static void build_linear_slider(char *line, struct oshu_hit *hit)
 {
 	struct oshu_path *path = &hit->slider.path;
 	path->type = OSHU_PATH_LINEAR;
-	path->line.start.x = hit->x;
-	path->line.start.y = hit->y;
+	path->line.start = hit->p;
 	build_point(line, &path->line.end);
 }
 
@@ -303,8 +302,7 @@ static void build_perfect_slider(char *line, struct oshu_hit *hit)
 	assert (end != NULL);
 
 	struct oshu_point a, b, c;
-	a.x = hit->x;
-	a.y = hit->y;
+	a = hit->p;
 	build_point(pass, &b);
 	build_point(end, &c);
 
@@ -333,8 +331,7 @@ static void build_bezier_slider(char *line, struct oshu_hit *hit)
 	hit->slider.path.type = OSHU_PATH_BEZIER;
 	struct oshu_bezier *bezier = &hit->slider.path.bezier;
 	bezier->control_points = calloc(count, sizeof(*bezier->control_points));
-	bezier->control_points[0].x = hit->x;
-	bezier->control_points[0].y = hit->y;
+	bezier->control_points[0] = hit->p;
 
 	int index = 0;
 	bezier->indices = calloc(count, sizeof(*bezier->indices));
@@ -447,8 +444,8 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 		return -1;
 	}
 	*hit = calloc(1, sizeof(**hit));
-	(*hit)->x = atoi(x);
-	(*hit)->y = atoi(y);
+	(*hit)->p.x = atoi(x);
+	(*hit)->p.y = atoi(y);
 	(*hit)->time = (double) atoi(time) / 1000;
 	(*hit)->type = atoi(type);
 	(*hit)->hit_sound = atoi(hit_sound);
@@ -637,5 +634,5 @@ struct oshu_point oshu_end_point(struct oshu_hit *hit)
 	if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
 		return oshu_path_at(&hit->slider.path, hit->slider.repeat);
 	else
-		return (struct oshu_point) { hit->x, hit->y };
+		return hit->p;
 }
