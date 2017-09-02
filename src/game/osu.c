@@ -52,7 +52,7 @@ static void hit(struct oshu_game *game)
 		if (fabs(hit->time - now) < game->beatmap->difficulty.leniency) {
 			if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type) {
 				hit->state = OSHU_HIT_SLIDING;
-				game->current_hit = hit;
+				game->osu.current_slider = hit;
 			} else {
 				hit->state = OSHU_HIT_GOOD;
 			}
@@ -71,7 +71,7 @@ static void release_hit(struct oshu_game *game)
 {
 	if (game->paused || game->autoplay)
 		return;
-	struct oshu_hit *hit = game->current_hit;
+	struct oshu_hit *hit = game->osu.current_slider;
 	if (!hit)
 		return;
 	if (!(hit->type & OSHU_HIT_SLIDER))
@@ -83,7 +83,7 @@ static void release_hit(struct oshu_game *game)
 		hit->state = OSHU_HIT_GOOD;
 		oshu_sample_play(game->audio, game->hit_sound);
 	}
-	game->current_hit = NULL;
+	game->osu.current_slider = NULL;
 }
 
 /**
@@ -93,7 +93,7 @@ static void release_hit(struct oshu_game *game)
  */
 static void check_slider(struct oshu_game *game)
 {
-	struct oshu_hit *hit = game->current_hit;
+	struct oshu_hit *hit = game->osu.current_slider;
 	if (!hit)
 		return;
 	if (!(hit->type & OSHU_HIT_SLIDER))
@@ -102,7 +102,7 @@ static void check_slider(struct oshu_game *game)
 	double t = (now - hit->time) / hit->slider.duration;
 	double prev_t = (game->previous_time - hit->time) / hit->slider.duration;
 	if (now > oshu_hit_end_time(hit)) {
-		game->current_hit = NULL;
+		game->osu.current_slider = NULL;
 		hit->state = OSHU_HIT_GOOD;
 		oshu_sample_play(game->audio, game->hit_sound);
 	} else if ((int) t > (int) prev_t && prev_t > 0) {
@@ -117,7 +117,7 @@ static void check_slider(struct oshu_game *game)
 	int dy = y - ball.y;
 	int dist = sqrt(dx * dx + dy * dy);
 	if (dist > game->beatmap->difficulty.slider_tolerance) {
-		game->current_hit = NULL;
+		game->osu.current_slider = NULL;
 		hit->state = OSHU_HIT_MISSED;
 	}
 }
@@ -141,7 +141,7 @@ static void check_audio(struct oshu_game *game)
 			} else if (hit->state == OSHU_HIT_INITIAL) {
 				if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type) {
 					hit->state = OSHU_HIT_SLIDING;
-					game->current_hit = hit;
+					game->osu.current_slider = hit;
 				} else {
 					hit->state = OSHU_HIT_GOOD;
 				}
