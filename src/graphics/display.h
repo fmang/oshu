@@ -20,19 +20,37 @@
  * \brief
  * Manage a window and its projections.
  *
- * ### Coordinate system
+ * ### Anatomy of a window
+ *
+ * SDL provides us with a *physical* window, whose every pixel is mapped to a
+ * distinct pixel on the screen. Its size is arbitrary and the user may resize
+ * it at any time. The actual position and size of objects drawn directly on
+ * the window is predictable, but you have to take into account the window's
+ * size if you don't want to overflow.
+ *
+ * Inside the window, we have a logicial *viewport*, whose virtual size is
+ * always 640x480. When the window is bigger, the viewport is automatically
+ * scaled to be as large as possible in the window, without losing its aspect
+ * ratio. This is what you'd use to draw game components that should move and
+ * scale when the window is resized.
+ *
+ * The *game area* is a 512x384 rectangle centered inside the viewport. Since
+ * game coordinates are used throughout the beatmap, this will be your usual
+ * reference.
+ *
+ * ### Coordinate systems
  *
  * The coordinate system the beatmaps use is not the same as the coordinate
  * system of the SDL window. Let's take some time to define it.
  *
- * The original osu! screen is 640x480 pixels, while the playable game zone is
- * 512x384. The game zone is centered in the window, leaving margin for the
- * notes at each corner of the game zone.
+ * The original osu! viewport is 640x480 pixels, while the playable game zone
+ * is 512x384. The game zone is centered in the viewport, leaving margin for
+ * the notes at each corner of the game zone.
  *
  * ```
  * ┌───────────────────────────────────────────────────────────┐
  * │ ↖                                          ↑              │
- * │  (0,0) in window coordinates               | 48px         │
+ * │  (0,0) in viewport coordinates             | 48px         │
  * │  or (-64, -48) in game coordinates         ↓              │
  * │    ┌─────────────────────────────────────────────────┐    │
  * │    │ ↖                                               │    │
@@ -55,11 +73,11 @@
  *                             640px
  * ```
  *
- * When the window grows, this whole block is scaled, and not just the scale
- * zone. The window will be zoomed to fit the available space, while preserving
- * the aspect ratio and without cropping. This means that if the ratio of the
- * user's window doesn't have the right ratio, black bars are added, like when
- * playing cinemascope movies.
+ * When the window grows, this whole viewport is scaled, and not just the game
+ * area. The viewport will be zoomed to fit the available space, while
+ * preserving the aspect ratio and without cropping. This means that if the
+ * ratio of the user's window doesn't have the right ratio, black bars are
+ * added, like when playing cinemascope movies.
  *
  * This is what happens when the window is not wide enough:
  *
@@ -81,8 +99,8 @@
  * To convert a point from game coordinates to physical coordinates, you must,
  * in that order:
  *
- * 1. Translate the point by (64, 48) to obtain original window coordinates.
- * 2. Multiply by the *zoom* factor for zoomed window coordinates.
+ * 1. Translate the point by (64, 48) to obtain viewport coordinates.
+ * 2. Multiply by the *zoom* factor for relative physical coordinates.
  * 3. Translate by (0, (window height - 480 × zoom) / 2) if the window is too
  *    high, or by ((window width - 640 × zoom) / 2, 0) if the window is too
 *     wide.
@@ -99,6 +117,12 @@
  *
  * \{
  */
+
+enum oshu_coordinate_system {
+	OSHU_PHYSICAL_COORDINATES,
+	OSHU_VIEWPORT_COORDINATES,
+	OSHU_GAME_COORDINATES,
+};
 
 /**
  * Store everything related to the current display.
@@ -133,9 +157,32 @@ void oshu_display_destroy(struct oshu_display **display);
 void oshu_display_resize(struct oshu_display *display, int w, int h);
 
 /**
- * Get the mouse position in game coordinates.
+ * Set the coordinate system that will be used by all the functions of this
+ * module.
  */
-void oshu_get_mouse(struct oshu_display *display, int *x, int *y);
+void oshu_set_coordinate_system(struct oshu_display *display, enum oshu_coordinate_system system);
+
+/**
+ * Get the mouse position.
+ */
+void oshu_get_mouse(struct oshu_display *display, struct oshu_point *p);
+
+/**
+ * Return the size of drawing area, depending on the current coordinate system.
+ *
+ * It is perfectly okay to draw outside the bounds.
+ */
+void oshu_bounds(struct oshu_display *display, double *w, double *h);
+
+/**
+ * Project to physical coordinates.
+ */
+void oshu_project(struct oshu_display *display, struct oshu_point *p);
+
+/**
+ * Unproject from physical coordinates.
+ */
+void oshu_unproject(struct oshu_display *display, struct oshu_point *p);
 
 
 /** \} */
