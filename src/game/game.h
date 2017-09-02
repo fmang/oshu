@@ -11,6 +11,8 @@
 #include "beatmap/beatmap.h"
 #include "graphics/graphics.h"
 
+#include "modes.h"
+
 /**
  * \defgroup game Game
  *
@@ -29,6 +31,7 @@ struct oshu_game {
 	struct oshu_audio *audio;
 	struct oshu_sample *hit_sound;
 	struct oshu_display *display;
+	struct oshu_game_mode *mode;
 	/** Will stop a the next iteration if this is true. */
 	int stop;
 	/** On autoplay mode, the user interactions are ignored and every
