@@ -14,7 +14,7 @@
  */
 static double epsilon = 0.1;
 
-struct oshu_point oshu_normalize(struct oshu_point p)
+struct oshu_vector oshu_normalize(struct oshu_vector p)
 {
 	double norm = sqrt(p.x * p.x + p.y * p.y);
 	p.x /= norm;
@@ -166,9 +166,9 @@ static struct oshu_point bezier_at(struct oshu_bezier *path, double t)
 	return segment_at(degree, points, t);
 }
 
-static struct oshu_point bezier_derive(struct oshu_bezier *path, double t)
+static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
 {
-	struct oshu_point p = {0, 0};
+	struct oshu_vector d = {0, 0};
 	int degree;
 	struct oshu_point *points;
 	bezier_map(path, &t, &degree, &points);
@@ -177,12 +177,12 @@ static struct oshu_point bezier_derive(struct oshu_bezier *path, double t)
 	for (int i = 0; i <= degree - 1; i++) {
 		double bin = fac[degree - 1] / (fac[i] * fac[degree - 1 - i]);
 		double factor = bin * pow(t, i) * pow(1 - t, degree - 1 - i);
-		p.x += factor * (points[i + 1].x - points[i].x);
-		p.y += factor * (points[i + 1].y - points[i].y);
+		d.x += factor * (points[i + 1].x - points[i].x);
+		d.y += factor * (points[i + 1].y - points[i].y);
 	}
-	p.x *= degree;
-	p.y *= degree;
-	return p;
+	d.x *= degree;
+	d.y *= degree;
+	return d;
 }
 
 /**
@@ -199,9 +199,9 @@ static struct oshu_point line_at(struct oshu_line *line, double t)
 /**
  * Derive the equation in #line_at to get the derivative.
  */
-static struct oshu_point line_derive(struct oshu_line *line, double t)
+static struct oshu_vector line_derive(struct oshu_line *line, double t)
 {
-	return (struct oshu_point) {
+	return (struct oshu_vector) {
 		.x = - line->start.x + line->end.x,
 		.y = - line->start.y + line->end.y,
 	};
@@ -219,11 +219,11 @@ static struct oshu_point arc_at(struct oshu_arc *arc, double t)
 /**
  * Naive derivative of #arc_at.
  */
-static struct oshu_point arc_derive(struct oshu_arc *arc, double t)
+static struct oshu_vector arc_derive(struct oshu_arc *arc, double t)
 {
 	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
 	double deriv_angle = - arc->start_angle + arc->end_angle;
-	return (struct oshu_point) {
+	return (struct oshu_vector) {
 		.x = arc->radius * deriv_angle * (- sin(angle)),
 		.y = arc->radius * deriv_angle * cos(angle),
 	};
@@ -290,9 +290,9 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 	return (struct oshu_point) {};
 }
 
-struct oshu_point oshu_path_derive(struct oshu_path *path, double t)
+struct oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 {
-	struct oshu_point d;
+	struct oshu_vector d;
 	t = remainder(t, 2.);
 	int revert = t < 0;
 	t = fabs(t);
