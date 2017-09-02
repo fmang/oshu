@@ -40,7 +40,7 @@ struct oshu_game {
 	int paused;
 	/** Song position at the previous game loop iteration. */
 	double previous_time;
-	/** Mode-specific data, defined in the #game-modes module. */
+	/** Mode-specific data, defined in the \ref game-modes module. */
 	union {
 		struct oshu_osu_state osu;
 	};
