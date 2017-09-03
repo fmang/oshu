@@ -22,7 +22,7 @@
  *
  * ### Anatomy of a window
  *
- * SDL provides us with a *physical* window, whose every pixel is mapped to a
+ * SDL provides us with a physical window, whose every pixel is mapped to a
  * distinct pixel on the screen. Its size is arbitrary and the user may resize
  * it at any time. The actual position and size of objects drawn directly on
  * the window is predictable, but you have to take into account the window's
@@ -96,11 +96,11 @@
  *                window width = 640 × zoom
  * ```
  *
- * To convert a point from game coordinates to physical coordinates, you must,
+ * To convert a point from game coordinates to window coordinates, you must,
  * in that order:
  *
  * 1. Translate the point by (64, 48) to obtain viewport coordinates.
- * 2. Multiply by the *zoom* factor for relative physical coordinates.
+ * 2. Multiply by the *zoom* factor for relative window coordinates.
  * 3. Translate by (0, (window height - 480 × zoom) / 2) if the window is too
  *    high, or by ((window width - 640 × zoom) / 2, 0) if the window is too
 *     wide.
@@ -108,7 +108,7 @@
 *  Where *zoom* is *window width / 640* if *window width / window height < 640
 *  / 480*, or *window height / 480* otherwise.
 *
-*  The reverse operation, from physical coordinates to game coordinates:
+*  The reverse operation, from window coordinates to game coordinates:
 *
 *  1. Translate by the negative horizontal margin or vertical margin in point 3
 *     above.
@@ -122,13 +122,13 @@
  * See the module's description to understand what these coordinates are.
  */
 enum oshu_coordinate_system {
-	OSHU_PHYSICAL_COORDINATES,
+	OSHU_WINDOW_COORDINATES,
 	OSHU_VIEWPORT_COORDINATES,
 	OSHU_GAME_COORDINATES,
 };
 
 /**
- * Position of the viewport in physical coordinates, and zoom factor to scale
+ * Position of the viewport in window coordinates, and zoom factor to scale
  * viewport coordinates.
  */
 struct oshu_viewport {
@@ -151,6 +151,13 @@ struct oshu_display {
 	SDL_Renderer *renderer;
 	/**
 	 * Current coordinate system.
+	 *
+	 * Its initial value after #oshu_open_display is unspecified, so you
+	 * should set it before drawing anything.
+	 *
+	 * No function in the #graphics module is going to change it for you,
+	 * so you need not check its value between every call to drawing
+	 * functions.
 	 */
 	enum oshu_coordinate_system system;
 	/**
@@ -193,14 +200,14 @@ void oshu_resize_display(struct oshu_display *display);
 struct oshu_point oshu_get_mouse(struct oshu_display *display);
 
 /**
- * Project to physical coordinates.
+ * Project to SDL window coordinates.
  *
  * \sa oshu_display::system
  */
 struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
 
 /**
- * Unproject from physical coordinates.
+ * Unproject from SDL window coordinates.
  *
  * \sa oshu_display::system
  */
