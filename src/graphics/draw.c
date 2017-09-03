@@ -15,7 +15,7 @@ typedef struct oshu_point P;
 
 void oshu_draw_circle(struct oshu_display *display, struct oshu_point center, double radius)
 {
-	int resolution = (int) radius;
+	int resolution = 32;
 	SDL_Point points[resolution];
 	double step = 2 * M_PI / (resolution - 1);
 	for (int i = 0; i < resolution; i++) {
@@ -41,10 +41,11 @@ static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *b
 	double radius = beatmap->difficulty.circle_radius;
 	if (hit->state == OSHU_HIT_INITIAL || hit->state == OSHU_HIT_SLIDING) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
+		double xradius = radius * .9;
 		oshu_draw_circle(display, hit->p, radius);
-		oshu_draw_circle(display, hit->p, radius - 2);
-		oshu_draw_line(display, (P) {hit->p.x - radius, hit->p.y}, (P) {hit->p.x + radius, hit->p.y});
-		oshu_draw_line(display, (P) {hit->p.x, hit->p.y - radius}, (P) {hit->p.x, hit->p.y + radius});
+		oshu_draw_circle(display, hit->p, xradius);
+		oshu_draw_line(display, (P) {hit->p.x - xradius, hit->p.y}, (P) {hit->p.x + xradius, hit->p.y});
+		oshu_draw_line(display, (P) {hit->p.x, hit->p.y - xradius}, (P) {hit->p.x, hit->p.y + xradius});
 		if (hit->time > now) {
 			/* hint circle */
 			SDL_SetRenderDrawColor(display->renderer, 255, 128, 64, 255);
