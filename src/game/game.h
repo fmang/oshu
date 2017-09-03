@@ -39,6 +39,8 @@ struct oshu_game {
 	int paused;
 	/** Song position at the previous game loop iteration. */
 	double previous_time;
+	/** Background picture. */
+	SDL_Texture *background;
 	/** Mode-specific data, defined in the \ref game-modes module. */
 	union {
 		struct oshu_osu_state osu;

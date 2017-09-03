@@ -5,10 +5,13 @@
  * Game module implementation.
  */
 
+#include "game/game.h"
+#include "graphics/draw.h"
 #include "log.h"
-#include "game.h"
 
 #include <unistd.h>
+
+#include <SDL2/SDL_image.h>
 
 int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 {
@@ -44,6 +47,8 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		goto fail;
 	}
 	(*game)->display->system = OSHU_GAME_COORDINATES;
+
+	(*game)->background = IMG_LoadTexture((*game)->display->renderer, "background.jpg");
 
 	return 0;
 fail:
@@ -166,6 +171,16 @@ static void dump_state(struct oshu_game *game, double now)
 	fflush(stdout);
 }
 
+static void draw(struct oshu_game *game)
+{
+	SDL_SetRenderDrawColor(game->display->renderer, 0, 0, 0, 255);
+	SDL_RenderClear(game->display->renderer);
+	if (game->background)
+		oshu_draw_background(game->display, game->background);
+	if (game->mode->draw)
+		game->mode->draw(game);
+}
+
 int oshu_game_run(struct oshu_game *game)
 {
 	SDL_Event event;
@@ -177,8 +192,7 @@ int oshu_game_run(struct oshu_game *game)
 		if (!game->paused && game->mode->check)
 			game->mode->check(game);
 		double now = game->audio->current_timestamp;
-		if (game->mode->draw)
-			game->mode->draw(game);
+		draw(game);
 		dump_state(game, now);
 		game->previous_time = now;
 		SDL_Delay(20);
@@ -197,6 +211,8 @@ void oshu_game_destroy(struct oshu_game **game)
 		oshu_audio_close(&(*game)->audio);
 	if ((*game)->hit_sound)
 		oshu_sample_free(&(*game)->hit_sound);
+	if ((*game)->background)
+		SDL_DestroyTexture((*game)->background);
 	if ((*game)->display)
 		oshu_close_display(&(*game)->display);
 	if ((*game)->beatmap)

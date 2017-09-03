@@ -149,8 +149,6 @@ static void connect_hits(struct oshu_display *display, struct oshu_beatmap *beat
 
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now)
 {
-	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
-	SDL_RenderClear(display->renderer);
 	struct oshu_hit *prev = NULL;
 	for (struct oshu_hit *hit = beatmap->hit_cursor; hit; hit = hit->next) {
 		if (hit->time > now + beatmap->difficulty.approach_time)
@@ -161,4 +159,30 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 		prev = hit;
 	}
 	SDL_RenderPresent(display->renderer);
+}
+
+void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic)
+{
+	SDL_Rect dest;
+	int ww, wh;
+	int tw, th;
+	SDL_GetWindowSize(display->window, &ww, &wh);
+	SDL_QueryTexture(pic, NULL, NULL, &tw, &th);
+	double window_ratio = (double) ww / wh;
+	double pic_ratio = (double) tw / th;
+
+	if (window_ratio > pic_ratio) {
+		/* the window is too wide */
+		dest.h = wh;
+		dest.w = dest.h * pic_ratio;
+		dest.y = 0;
+		dest.x = (ww - dest.w) / 2;
+	} else {
+		/* the window is too high */
+		dest.w = ww;
+		dest.h = dest.w / pic_ratio;
+		dest.x = 0;
+		dest.y = (wh - dest.h) / 2;
+	}
+	SDL_RenderCopy(display->renderer, pic, NULL, &dest);
 }
