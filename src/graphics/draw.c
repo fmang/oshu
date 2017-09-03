@@ -173,16 +173,16 @@ void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic)
 
 	if (window_ratio > pic_ratio) {
 		/* the window is too wide */
-		dest.h = wh;
-		dest.w = dest.h * pic_ratio;
-		dest.y = 0;
-		dest.x = (ww - dest.w) / 2;
-	} else {
-		/* the window is too high */
 		dest.w = ww;
 		dest.h = dest.w / pic_ratio;
 		dest.x = 0;
 		dest.y = (wh - dest.h) / 2;
+	} else {
+		/* the window is too high */
+		dest.h = wh;
+		dest.w = dest.h * pic_ratio;
+		dest.y = 0;
+		dest.x = (ww - dest.w) / 2;
 	}
 	SDL_RenderCopy(display->renderer, pic, NULL, &dest);
 }

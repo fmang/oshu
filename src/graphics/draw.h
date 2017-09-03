@@ -72,8 +72,9 @@ void oshu_draw_line(struct oshu_display *display, struct oshu_point p1, struct o
 /**
  * Draw a background image.
  *
- * Scale the texture to the window's size, while preserving the aspect ratio,
- * and center it.
+ * Scale the texture to the window's size, while preserving the aspect ratio.
+ * When the aspects don't match, crop the picture to ensure the window is
+ * filled.
  */
 void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic);
 
