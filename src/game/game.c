@@ -48,8 +48,11 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 	}
 	(*game)->display->system = OSHU_GAME_COORDINATES;
 
-	if ((*game)->beatmap->background_file)
+	if ((*game)->beatmap->background_file) {
 		(*game)->background = IMG_LoadTexture((*game)->display->renderer, (*game)->beatmap->background_file);
+		if ((*game)->background)
+			SDL_SetTextureColorMod((*game)->background, 64, 64, 64);
+	}
 
 	return 0;
 fail:
