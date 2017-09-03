@@ -7,8 +7,8 @@
 
 static void view_xy(struct oshu_display *display, int *x, int *y)
 {
-	*x = (64 + *x) * display->viewport.zoom + display->viewport.left;
-	*y = (48 + *y) * display->viewport.zoom + display->viewport.top;
+	*x = (64 + *x) * display->viewport.zoom + display->viewport.x;
+	*y = (48 + *y) * display->viewport.zoom + display->viewport.y;
 }
 
 /**
@@ -17,16 +17,6 @@ static void view_xy(struct oshu_display *display, int *x, int *y)
 static void view_point(struct oshu_display *display, SDL_Point *p)
 {
 	view_xy(display, &p->x, &p->y);
-}
-
-struct oshu_point oshu_get_mouse(struct oshu_display *display)
-{
-	struct oshu_point p;
-	int x, y;
-	SDL_GetMouseState(&x, &y);
-	p.x = (x - display->viewport.left) / display->viewport.zoom - 64.;
-	p.y = (y - display->viewport.top) / display->viewport.zoom - 48.;
-	return p;
 }
 
 void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius)

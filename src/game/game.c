@@ -43,6 +43,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
+	(*game)->display->system = OSHU_GAME_COORDINATES;
 
 	return 0;
 fail:

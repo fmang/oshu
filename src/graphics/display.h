@@ -133,8 +133,8 @@ enum oshu_coordinate_system {
  */
 struct oshu_viewport {
 	double zoom;
-	double top;
-	double left;
+	double x;
+	double y;
 };
 
 /**
@@ -195,19 +195,23 @@ void oshu_resize_display(struct oshu_display *display);
 /**
  * Get the mouse position.
  *
+ * SDL provides it in window coordinates, which are unprojected into the
+ * current coordinate system for the display.
+ *
+ * \sa oshu_unproject
  * \sa oshu_display::system
  */
 struct oshu_point oshu_get_mouse(struct oshu_display *display);
 
 /**
- * Project to SDL window coordinates.
+ * Project a point on the current coordinate system to SDL window coordinates.
  *
  * \sa oshu_display::system
  */
 struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
 
 /**
- * Unproject from SDL window coordinates.
+ * Unproject from SDL window coordinates to the current coordinate system.
  *
  * \sa oshu_display::system
  */

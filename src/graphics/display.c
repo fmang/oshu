@@ -6,6 +6,8 @@
 #include "graphics/display.h"
 #include "log.h"
 
+#include <assert.h>
+
 static const int game_width = 640; /* px */
 static const int game_height = 480; /* px */
 
@@ -66,12 +68,56 @@ void oshu_resize_display(struct oshu_display *display)
 	if (actual_ratio > original_ratio) {
 		/* the window is too wide */
 		display->viewport.zoom = (double) h / game_height;
-		display->viewport.left = (w - game_width * display->viewport.zoom) / 2.;
-		display->viewport.top = 0.;
+		display->viewport.x = (w - game_width * display->viewport.zoom) / 2.;
+		display->viewport.y = 0.;
 	} else {
 		/* the window is too high */
 		display->viewport.zoom = (double) w / game_width;
-		display->viewport.left = 0.;
-		display->viewport.top = (h - game_height * display->viewport.zoom) / 2.;
+		display->viewport.x = 0.;
+		display->viewport.y = (h - game_height * display->viewport.zoom) / 2.;
 	}
+}
+
+struct oshu_point oshu_get_mouse(struct oshu_display *display)
+{
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+	return oshu_unproject(display, (struct oshu_point) {x, y});
+}
+
+struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p)
+{
+	switch (display->system) {
+	case OSHU_GAME_COORDINATES:
+		p.x += 64.;
+		p.y += 48.;
+	case OSHU_VIEWPORT_COORDINATES:
+		p.x = (p.x * display->viewport.zoom) + display->viewport.x;
+		p.y = (p.y * display->viewport.zoom) + display->viewport.y;
+	case OSHU_WINDOW_COORDINATES:
+		break;
+	default:
+		assert (display->system != display->system);
+	}
+	return p;
+}
+
+struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p)
+{
+	switch (display->system) {
+	case OSHU_WINDOW_COORDINATES:
+		break;
+	case OSHU_VIEWPORT_COORDINATES:
+	case OSHU_GAME_COORDINATES:
+		p.x = (p.x - display->viewport.x) / display->viewport.zoom;
+		p.y = (p.y - display->viewport.y) / display->viewport.zoom;
+		if (display->system == OSHU_GAME_COORDINATES) {
+			p.x -= 64.;
+			p.y -= 48.;
+		}
+		break;
+	default:
+		assert (display->system != display->system);
+	}
+	return p;
 }
