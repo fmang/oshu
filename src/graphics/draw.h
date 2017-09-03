@@ -31,12 +31,18 @@
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
  *
+ * \todo
+ * Since it's too specific to the Osu! mode, it should be moved in the future.
+ *
  * `now` is the current position in the playing song, in seconds.
  */
 void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now);
 
 /**
  * Draw a hit object.
+ *
+ * \todo
+ * Since it's too specific to the Osu! mode, it should be moved in the future.
  */
 void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
 
@@ -56,13 +62,11 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 /**
  * Draw a regular polyline that should look like a circle.
  */
-void oshu_draw_circle(struct oshu_display *display, double x, double y, double radius);
+void oshu_draw_circle(struct oshu_display *display, struct oshu_point center, double radius);
 
 /**
  * Draw one line, plain and simple.
- *
- * Perform coordinate translation, unlike its SDL counterpart.
  */
-void oshu_draw_line(struct oshu_display *display, int x1, int y1, int x2, int y2);
+void oshu_draw_line(struct oshu_display *display, struct oshu_point p1, struct oshu_point p2);
 
 /** \} */
