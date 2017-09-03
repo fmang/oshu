@@ -215,6 +215,23 @@ static int parse_difficulty(char *line, struct parser_state *parser)
 	return 0;
 }
 
+static int parse_event(char *line, struct parser_state *parser)
+{
+	char *f1 = strsep(&line, ",");
+	char *f2 = strsep(&line, ",");
+	char *file = strsep(&line, ",");
+	if (!file)
+		return 0;
+	if (!strcmp(f1, "0") && !strcmp(f2, "0")) {
+		int len = strlen(file);
+		if (file[len-1] == '"')
+			file[len-1] = '\0';
+		if (file[0] == '"')
+			file++;
+		parser->beatmap->background_file = strdup(file);
+	}
+	return 0;
+}
 
 static int build_timing_point(char *line, struct parser_state *parser, struct oshu_timing_point **tp)
 {
@@ -521,6 +538,8 @@ static int parse_line(char *line, struct parser_state *parser)
 		rc = parse_general(line, parser);
 	} else if (parser->section == BEATMAP_DIFFICULTY) {
 		rc = parse_difficulty(line, parser);
+	} else if (parser->section == BEATMAP_EVENTS) {
+		rc = parse_event(line, parser);
 	} else if (parser->section == BEATMAP_TIMING_POINTS) {
 		rc = parse_timing_point(line, parser);
 	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
