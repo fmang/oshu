@@ -32,7 +32,7 @@ First of all, make sure you have the required dependencies. These things are so
 common that I may assure you they're in your distribution's official
 repositories.
 
-- SDL2,
+- SDL2 and SDL2_image,
 - ffmpeg or libav,
 - a C99 compiler,
 - pkg-config,
