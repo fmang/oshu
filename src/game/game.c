@@ -13,6 +13,17 @@
 
 #include <SDL2/SDL_image.h>
 
+static void set_window_title(struct oshu_game **game)
+{
+	const char * title = "Oshu! ♫ \"%s\" by %s";
+
+	asprintf(&(*game)->display->window_title, title,
+		(*game)->beatmap->metadata.title,
+		(*game)->beatmap->metadata.artist);
+	SDL_SetWindowTitle((*game)->display->window,
+		(*game)->display->window_title);
+}
+
 int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 {
 	*game = calloc(1, sizeof(**game));
@@ -46,6 +57,8 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
+
+	set_window_title(game);
 	(*game)->display->system = OSHU_GAME_COORDINATES;
 
 	if ((*game)->beatmap->background_file) {

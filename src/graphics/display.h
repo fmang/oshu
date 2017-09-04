@@ -147,6 +147,7 @@ struct oshu_viewport {
  * \sa oshu_close_display
  */
 struct oshu_display {
+	char *window_title;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	/**
