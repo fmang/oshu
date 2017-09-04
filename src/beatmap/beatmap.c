@@ -201,6 +201,58 @@ static int parse_general(char *line, struct parser_state *parser)
 }
 
 /**
+ * Parse a key-value line in the `[Metadata]` section.
+ */
+static int parse_metadata(char *line, struct parser_state *parser)
+{
+	char *key, *value;
+	key_value(line, &key, &value);
+	if (!value)
+		return 0;
+	if (!strcmp(key, "Title"))
+		parser->beatmap->metadata.title = strdup(value);
+	else if (!strcmp(key, "TitleUnicode"))
+		parser->beatmap->metadata.title_unicode = strdup(value);
+	else if (!strcmp(key, "Artist"))
+		parser->beatmap->metadata.artist = strdup(value);
+	else if (!strcmp(key, "ArtistUnicode"))
+		parser->beatmap->metadata.artist_unicode = strdup(value);
+	else if (!strcmp(key, "Creator"))
+		parser->beatmap->metadata.creator = strdup(value);
+	else if (!strcmp(key, "Version"))
+		parser->beatmap->metadata.version = strdup(value);
+	else if (!strcmp(key, "Source"))
+		parser->beatmap->metadata.source = strdup(value);
+	else if (!strcmp(key, "Tags")){
+		parser->beatmap->metadata._tags = strdup(value);
+		int tags_nbr = 2;
+		int len = -1;
+		while (parser->beatmap->metadata._tags[++len]){
+			if (parser->beatmap->metadata._tags[len] == ' '){
+				parser->beatmap->metadata._tags[len] = '\0';
+				tags_nbr++;
+			}
+		}
+		parser->beatmap->metadata.tags = malloc(sizeof(char *) * tags_nbr);
+		if (!parser->beatmap->metadata.tags)
+			return 0;
+		parser->beatmap->metadata.tags[--tags_nbr] = NULL;
+		while (len-- >= 0){
+			if (!parser->beatmap->metadata._tags[len]){
+				tags_nbr--;
+				parser->beatmap->metadata.tags[tags_nbr] =\
+				 &parser->beatmap->metadata._tags[len + 1];
+			}
+		}
+	}
+	else if (!strcmp(key, "BeatmapID"))
+		parser->beatmap->metadata.beatmap_id = atoi(value);
+	else if (!strcmp(key, "BeatmapSetID"))
+		parser->beatmap->metadata.beatmap_set_id = atoi(value);
+	return 0;
+}
+
+/**
  * Parse a key-value line in the `[Difficulty]` section.
  */
 static int parse_difficulty(char *line, struct parser_state *parser)
@@ -536,6 +588,8 @@ static int parse_line(char *line, struct parser_state *parser)
 		rc = parse_section(line, parser);
 	} else if (parser->section == BEATMAP_GENERAL) {
 		rc = parse_general(line, parser);
+	} else if (parser->section == BEATMAP_METADATA) {
+		rc = parse_metadata(line, parser);
 	} else if (parser->section == BEATMAP_DIFFICULTY) {
 		rc = parse_difficulty(line, parser);
 	} else if (parser->section == BEATMAP_EVENTS) {
