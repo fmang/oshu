@@ -478,6 +478,7 @@ struct oshu_metadata {
 	 * May be *NULL*.
 	 */
 	char **tags;
+	char *_tags;
 	/**
 	 * Beatmap ID of the beatmap, from osu!'s official beatmap repository.
 	 */
