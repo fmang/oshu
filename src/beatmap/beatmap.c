@@ -213,6 +213,10 @@ static int parse_difficulty(char *line, struct parser_state *parser)
 		return 0;
 	if (!strcmp(key, "SliderMultiplier")) {
 		parser->beatmap->difficulty.slider_multiplier = atof(value);
+	} else if (!strcmp(key, "CircleSize")) {
+		double r = (atof(value) - 5.) / 5.;
+		parser->beatmap->difficulty.circle_radius = 32. * (1. - .7 * r);
+		assert (parser->beatmap->difficulty.circle_radius > 0.);
 	}
 	return 0;
 }

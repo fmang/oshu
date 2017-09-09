@@ -512,8 +512,13 @@ struct oshu_difficulty {
 	 * \brief Radius of the hit object's circles, in pixels.
 	 *
 	 * In the beatmap file, it's a float field `CircleSize` with a strange
-	 * unit. For now, let's assume it's the radius divided by 10. It's the
-	 * parser's job to convert it.
+	 * unit. Looks like the bigger it is, the smaller the circles.
+	 *
+	 * According to `osu.Game.Rulesets.Osu/Objects/OsuHitObject.cs`, we have:
+	 *
+	 * - OBJECT_RADIUS = 64 (actually, it's the diameter, whatever)
+	 * - Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2
+	 * - Radius = OBJECT_RADIUS * Scale
 	 *
 	 * Defaults to 32.
 	 */
