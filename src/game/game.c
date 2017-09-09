@@ -219,7 +219,9 @@ static void update_clock(struct oshu_game *game)
 	clock->audio = game->audio->current_timestamp;
 	clock->before = clock->now;
 	clock->ticks = ticks;
-	if (clock->before < 0) /* leading in */
+	if (game->paused)
+		; /* don't update the clock */
+	else if (clock->before < 0) /* leading in */
 		clock->now = clock->before + diff;
 	else if (clock->audio == prev_audio) /* audio clock stuck */
 		clock->now = clock->before + diff;
