@@ -14,7 +14,7 @@
  * Collection of drawing primitives.
  *
  * This module provides an interface to SDL's drawing routine, and any module
- * external to the #graphics module should rely on these primitives rather than
+ * external to the graphics module should rely on these primitives rather than
  * call SDL directly.
  *
  * Unlike SDL's routine, this module takes into account the logical coordinate

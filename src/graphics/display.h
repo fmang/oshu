@@ -155,7 +155,7 @@ struct oshu_display {
 	 * Its initial value after #oshu_open_display is unspecified, so you
 	 * should set it before drawing anything.
 	 *
-	 * No function in the #graphics module is going to change it for you,
+	 * No function in the graphics module is going to change it for you,
 	 * so you need not check its value between every call to drawing
 	 * functions.
 	 */
