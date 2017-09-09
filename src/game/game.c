@@ -164,12 +164,12 @@ static void end(struct oshu_game *game)
  * glitches. If you write `foo\rx`, you get `xoo`. This is the reason the
  * Paused string literal has an extra space.
  */
-static void dump_state(struct oshu_game *game, double now)
+static void dump_state(struct oshu_game *game)
 {
 	if (!isatty(fileno(stdout)))
 		return;
-	int minutes = (int) now / 60.;
-	double seconds = now - (minutes * 60.);
+	int minutes = (int) game->clock.now / 60.;
+	double seconds = game->clock.now - (minutes * 60.);
 	const char *state = game->paused ? " Paused" : "Playing";
 	printf("%s: %d:%06.3f\r", state, minutes, seconds);
 	fflush(stdout);
@@ -185,20 +185,28 @@ static void draw(struct oshu_game *game)
 		game->mode->draw(game);
 }
 
+static void update_clock(struct oshu_game *game)
+{
+	struct oshu_clock *clock = &game->clock;
+	clock->before = clock->now;
+	clock->audio = game->audio->current_timestamp;
+	clock->now = clock->audio;
+	clock->ticks = SDL_GetTicks();
+}
+
 int oshu_game_run(struct oshu_game *game)
 {
 	SDL_Event event;
 	if (!game->paused)
 		oshu_audio_play(game->audio);
 	while (!game->audio->finished && !game->stop) {
+		update_clock(game);
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
 		if (!game->paused && game->mode->check)
 			game->mode->check(game);
-		double now = game->audio->current_timestamp;
 		draw(game);
-		dump_state(game, now);
-		game->previous_time = now;
+		dump_state(game);
 		SDL_Delay(20);
 	}
 	end(game);
