@@ -38,7 +38,7 @@
  * in the parser state.
  *
  * All these functions return 0 on success, and -1 on failure. The callee
- * should print an message using #parser_error or #parser_warning on failure.
+ * should print an message using #parser_error or #parser_warn on failure.
  */
 
 #include "beatmap/beatmap.h"
@@ -130,6 +130,20 @@ struct parser_state {
 	/** This is the last non-inherited timing point. */
 	struct oshu_timing_point *timing_base;
 };
+
+/**
+ * Log an error with contextual information from the parser state.
+ *
+ * \sa oshu_log_error
+ */
+static void parser_error(struct parser_state *parser, const char *fmt, ...);
+
+/**
+ * Log a warning with contextual information from the parser state.
+ *
+ * \sa oshu_log_warn
+ */
+static void parser_warn(struct parser_state *parser, const char *fmt, ...);
 
 /**
  * Convient typedef to help define the prototypes. Don't use it in the
