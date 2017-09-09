@@ -194,6 +194,8 @@ static int parse_general(char *line, struct parser_state *parser)
 		return 0;
 	if (!strcmp(key, "AudioFilename")) {
 		parser->beatmap->audio_filename = strdup(value);
+	} else if (!strcmp(key, "AudioLeadIn")) {
+		parser->beatmap->audio_lead_in = atof(value) / 1000.;
 	} else if (!strcmp(key, "Mode")) {
 		parser->beatmap->mode = atoi(value);
 	}

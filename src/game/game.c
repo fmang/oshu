@@ -54,6 +54,9 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 			SDL_SetTextureColorMod((*game)->background, 64, 64, 64);
 	}
 
+	(*game)->clock.now = - (*game)->beatmap->audio_lead_in;
+	(*game)->clock.ticks = SDL_GetTicks();
+
 	return 0;
 fail:
 	oshu_game_destroy(game);
@@ -185,22 +188,52 @@ static void draw(struct oshu_game *game)
 		game->mode->draw(game);
 }
 
+/**
+ * Update the game clock.
+ *
+ * It as roughly 2 modes:
+ *
+ * 1. When the audio has a lead-in time, rely on SDL's ticks to increase the
+ *    clock.
+ * 2. When the lead-in phase is over, use the audio clock. However, if we
+ *    detect it hasn't change, probably because the codec frame is too big, then
+ *    we make it progress with the SDL clock anyway.
+ *
+ * In both cases, we wanna ensure the *now* clock is always monotonous. If we
+ * detect the new time is before the previous time, then we stop the time until
+ * now catches up with before. That case does happen at least right after the
+ * lead-in phase, because the audio starts when the *now* clock becomes
+ * positive, while the audio clock will be null at that moment.
+ */
 static void update_clock(struct oshu_game *game)
 {
 	struct oshu_clock *clock = &game->clock;
-	clock->before = clock->now;
+	long int ticks = SDL_GetTicks();
+	double diff = (double) (ticks - clock->ticks) / 1000.;
+	double prev_audio = clock->audio;
 	clock->audio = game->audio->current_timestamp;
-	clock->now = clock->audio;
-	clock->ticks = SDL_GetTicks();
+	clock->before = clock->now;
+	clock->ticks = ticks;
+	if (clock->before < 0) /* leading in */
+		clock->now = clock->before + diff;
+	else if (clock->audio == prev_audio) /* audio clock stuck */
+		clock->now = clock->before + diff;
+	else
+		clock->now = clock->audio;
+	/* force monoticity */
+	if (clock->now < clock->before)
+		clock->now = clock->before;
 }
 
 int oshu_game_run(struct oshu_game *game)
 {
 	SDL_Event event;
-	if (!game->paused)
+	if (!game->paused && game->clock.now >= 0)
 		oshu_audio_play(game->audio);
 	while (!game->audio->finished && !game->stop) {
 		update_clock(game);
+		if (game->clock.before < 0 && game->clock.now >= 0)
+			oshu_audio_play(game->audio);
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
 		if (!game->paused && game->mode->check)
