@@ -1,6 +1,9 @@
 /**
- * \file beatmap.c
+ * \file beatmap/parser.c
  * \ingroup beatmap
+ *
+ * \brief
+ * Beatmap loader.
  */
 
 #include "beatmap/beatmap.h"
@@ -605,20 +608,4 @@ void oshu_beatmap_free(struct oshu_beatmap **beatmap)
 	free((*beatmap)->audio_filename);
 	free(*beatmap);
 	*beatmap = NULL;
-}
-
-double oshu_hit_end_time(struct oshu_hit *hit)
-{
-	if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
-		return hit->time + hit->slider.duration * hit->slider.repeat;
-	else
-		return hit->time;
-}
-
-struct oshu_point oshu_end_point(struct oshu_hit *hit)
-{
-	if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
-		return oshu_path_at(&hit->slider.path, hit->slider.repeat);
-	else
-		return hit->p;
 }
