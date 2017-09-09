@@ -3,7 +3,8 @@
  * \ingroup beatmap
  */
 
-#include "beatmap.h"
+#include "beatmap/beatmap.h"
+#include "beatmap/parser.h"
 #include "log.h"
 
 #include <assert.h>
@@ -33,46 +34,6 @@ static const struct oshu_beatmap default_beatmap = {
 		.slider_tick_rate = 1.,
 		.slider_tolerance = 64.
 	},
-};
-
-/**
- * Enumeration to keep track of the section we're currently in.
- *
- * This is especially important before the format inside each section changes
- * significantly, some being INI-like, and others being CSV-like.
- */
-enum beatmap_section {
-	BEATMAP_HEADER = 0, /**< Expect the #osu_file_header. */
-	BEATMAP_ROOT, /**< Between the header and the first section. We expect nothing. */
-	BEATMAP_GENERAL, /**< INI-like. */
-	BEATMAP_EDITOR, /**< INI-like. */
-	BEATMAP_METADATA, /**< INI-like. */
-	BEATMAP_DIFFICULTY, /**< INI-like. */
-	BEATMAP_EVENTS, /**< CSV-like. */
-	BEATMAP_TIMING_POINTS, /**< CSV-like. */
-	BEATMAP_COLOURS, /**< INI-like. */
-	BEATMAP_HIT_OBJECTS, /**< CSV-like. */
-	BEATMAP_UNKNOWN,
-};
-
-/**
- * The parsing process is split into many functions, each minding its own
- * business.
- *
- * To make the prototypes of these functions easy, all they pass in the line to
- * parse and that parser state structure.
- *
- * You'll note the parsing is based on an automaton model, with a transition
- * function receiving one line at a time, and updating the parser state.
- */
-struct parser_state {
-	struct oshu_beatmap *beatmap;
-	enum beatmap_section section;
-	struct oshu_hit *last_hit;
-	struct oshu_timing_point *last_timing_point;
-	struct oshu_timing_point *current_timing_point;
-	/** This is the last non-inherited timing point. */
-	struct oshu_timing_point *timing_base;
 };
 
 /**

@@ -7,6 +7,7 @@ oshu_SOURCES = \
 	audio/audio.h \
 	beatmap/beatmap.c \
 	beatmap/beatmap.h \
+	beatmap/parser.h \
 	beatmap/geometry.c \
 	beatmap/geometry.h \
 	game/game.c \
