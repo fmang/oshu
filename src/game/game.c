@@ -13,6 +13,11 @@
 
 #include <SDL2/SDL_image.h>
 
+/**
+ * How long a frame should last in milleseconds. 17 is about 60 FPS.
+ */
+static const double frame_duration = 17;
+
 int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 {
 	*game = calloc(1, sizeof(**game));
@@ -240,7 +245,9 @@ int oshu_game_run(struct oshu_game *game)
 			game->mode->check(game);
 		draw(game);
 		dump_state(game);
-		SDL_Delay(20);
+		long int advance = frame_duration - (SDL_GetTicks() - game->clock.ticks);
+		if (advance > 0)
+			SDL_Delay(advance);
 	}
 	end(game);
 	return 0;
