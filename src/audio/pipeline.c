@@ -1,9 +1,9 @@
 /**
- * \file audio.c
+ * \file audio/pipeline.c
  * \ingroup audio
  *
  * \brief
- * Implementation of the audio module and its submodules.
+ * Manage the audio pipeline, from ffmpeg input to SDL output.
  */
 
 #include "audio/audio.h"

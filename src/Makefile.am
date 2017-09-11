@@ -3,8 +3,8 @@ bin_PROGRAMS = oshu
 oshu_SOURCES = \
 	oshu.c \
 	log.h \
-	audio/audio.c \
 	audio/audio.h \
+	audio/pipeline.c \
 	audio/sample.c \
 	audio/stream.c \
 	beatmap/beatmap.h \
