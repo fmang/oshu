@@ -6,7 +6,7 @@
  * Implementation of the audio module and its submodules.
  */
 
-#include "audio.h"
+#include "audio/audio.h"
 #include "log.h"
 
 #include <assert.h>
@@ -39,164 +39,9 @@ static SDL_AudioFormat format_map[AV_SAMPLE_FMT_NB] = {
 	[AV_SAMPLE_FMT_FLTP] = AUDIO_F32,
 };
 
-/**
- * Spew an error message according to the return value of a call to one of
- * ffmpeg's functions.
- */
-static void log_av_error(int rc)
-{
-	char errbuf[256];
-	av_strerror(rc, errbuf, sizeof(errbuf));
-	oshu_log_error("ffmpeg error: %s", errbuf);
-}
-
 void oshu_audio_init()
 {
 	av_register_all();
-}
-
-/**
- * Read a page for the demuxer and feed it to the decoder.
- *
- * When reaching EOF, feed the decoder a NULL packet to flush it.
- *
- * This function is meant to be called exclusively from #next_frame,
- * because a single page may yield many codec frames.
- *
- * \return 0 on success, -1 on error.
- */
-static int next_page(struct oshu_audio *audio)
-{
-	int rc;
-	for (;;) {
-		rc = av_read_frame(audio->demuxer, &audio->packet);
-		if (rc == AVERROR_EOF) {
-			oshu_log_debug("reached the last page, flushing");
-			rc = avcodec_send_packet(audio->decoder, NULL);
-			break;
-		} else if (rc < 0) {
-			break;
-		}
-		if (audio->packet.stream_index == audio->stream->index) {
-			rc = avcodec_send_packet(audio->decoder, &audio->packet);
-			break;
-		}
-		av_packet_unref(&audio->packet);
-	}
-	av_packet_unref(&audio->packet);
-	if (rc < 0) {
-		log_av_error(rc);
-		return -1;
-	}
-	return 0;
-}
-
-/**
- * Decode a frame into the stream's #oshu_audio::frame.
- *
- * Request a new page with #next_page when the decoder needs more data.
- *
- * Update #oshu_audio::current_timestamp and reset #oshu_audio::sample_index.
- *
- * Mark the stream as finished on EOF or on ERROR, meaning you must not call
- * this function anymore.
- */
-static void next_frame(struct oshu_audio *audio)
-{
-	for (;;) {
-		int rc = avcodec_receive_frame(audio->decoder, audio->frame);
-		if (rc == 0) {
-			int64_t ts = audio->frame->best_effort_timestamp;
-			if (ts > 0)
-				audio->current_timestamp = audio->time_base * ts;
-			audio->sample_index = 0;
-			return;
-		} else if (rc == AVERROR(EAGAIN)) {
-			if (next_page(audio) < 0)
-				goto finish;
-		} else if (rc == AVERROR_EOF) {
-			oshu_log_debug("reached the last frame");
-			goto finish;
-		} else {
-			log_av_error(rc);
-			goto finish;
-		}
-	}
-finish:
-	audio->finished = 1;
-}
-
-/**
- * Open the libavformat demuxer, and find the best audio stream.
- *
- * Fill #oshu_audio::demuxer, #oshu_audio::codec, #oshu_audio::stream and
- * #oshu_audio::time_base.
- *
- * \return 0 on success, -1 on error.
- */
-static int open_demuxer(const char *url, struct oshu_audio *audio)
-{
-	int rc = avformat_open_input(&audio->demuxer, url, NULL, NULL);
-	if (rc < 0) {
-		oshu_log_error("failed opening the audio file");
-		goto fail;
-	}
-	rc = avformat_find_stream_info(audio->demuxer, NULL);
-	if (rc < 0) {
-		oshu_log_error("error reading the stream headers");
-		goto fail;
-	}
-	rc = av_find_best_stream(
-		audio->demuxer,
-		AVMEDIA_TYPE_AUDIO,
-		-1, -1,
-		&audio->codec,
-		0
-	);
-	if (rc < 0 || audio->codec == NULL) {
-		oshu_log_error("error finding the best audio stream");
-		goto fail;
-	}
-	audio->stream = audio->demuxer->streams[rc];
-	audio->time_base = av_q2d(audio->stream->time_base);
-	return 0;
-fail:
-	log_av_error(rc);
-	return -1;
-}
-
-/**
- * Open the libavcodec decoder.
- *
- * You must call this function after #open_demuxer.
- *
- * \return 0 on success, and a negative ffmpeg error code on failure.
- */
-static int open_decoder(struct oshu_audio *audio)
-{
-	audio->decoder = avcodec_alloc_context3(audio->codec);
-	int rc = avcodec_parameters_to_context(
-		audio->decoder,
-		audio->stream->codecpar
-	);
-	if (rc < 0) {
-		oshu_log_error("error copying the codec context");
-		goto fail;
-	}
-	rc = avcodec_open2(audio->decoder, audio->codec, NULL);
-	if (rc < 0) {
-		oshu_log_error("error opening the codec");
-		goto fail;
-	}
-	audio->frame = av_frame_alloc();
-	if (audio->frame == NULL) {
-		oshu_log_error("could not allocate the codec frame");
-		goto fail;
-	}
-	return 0;
-fail:
-	log_av_error(rc);
-	return -1;
 }
 
 /**
@@ -205,12 +50,35 @@ fail:
  */
 static void dump_stream_info(struct oshu_audio *audio)
 {
+	struct oshu_stream *stream = &audio->source;
 	oshu_log_info("============ Audio information ============");
-	oshu_log_info("            Codec: %s.", audio->codec->long_name);
-	oshu_log_info("      Sample rate: %d Hz.", audio->decoder->sample_rate);
-	oshu_log_info(" Average bit rate: %ld kbps.", audio->decoder->bit_rate / 1000);
-	oshu_log_info("    Sample format: %s.", av_get_sample_fmt_name(audio->decoder->sample_fmt));
-	oshu_log_info("         Duration: %d seconds.", (int) (audio->stream->duration * audio->time_base));
+	oshu_log_info("            Codec: %s.", stream->codec->long_name);
+	oshu_log_info("      Sample rate: %d Hz.", stream->decoder->sample_rate);
+	oshu_log_info(" Average bit rate: %ld kbps.", stream->decoder->bit_rate / 1000);
+	oshu_log_info("    Sample format: %s.", av_get_sample_fmt_name(stream->decoder->sample_fmt));
+	oshu_log_info("         Duration: %d seconds.", (int) (stream->stream->duration * stream->time_base));
+}
+
+/**
+ * Decode a frame.
+ *
+ * Update #oshu_audio::current_timestamp and reset #oshu_audio::sample_index.
+ *
+ * Mark the stream as finished on EOF or on ERROR, meaning you must not call
+ * this function anymore.
+ */
+int next_frame(struct oshu_audio *audio)
+{
+	int rc = oshu_next_frame(&audio->source);
+	if (rc < 0) {
+		audio->finished = 1;
+	} else {
+		int64_t ts = audio->source.frame->best_effort_timestamp;
+		if (ts > 0)
+			audio->current_timestamp = audio->source.time_base * ts;
+		audio->sample_index = 0;
+	}
+	return 0;
 }
 
 /**
@@ -229,7 +97,7 @@ static void dump_stream_info(struct oshu_audio *audio)
  */
 static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
 {
-	AVFrame *frame = audio->frame;
+	AVFrame *frame = audio->source.frame;
 	int sample_size = av_get_bytes_per_sample(frame->format);
 	int planar = av_sample_fmt_is_planar(frame->format);
 	while (len > 0 && !audio->finished) {
@@ -314,14 +182,14 @@ static int open_device(struct oshu_audio *audio)
 {
 	SDL_AudioSpec want;
 	SDL_zero(want);
-	want.freq = audio->decoder->sample_rate;
-	SDL_AudioFormat fmt = format_map[audio->decoder->sample_fmt];
+	want.freq = audio->source.decoder->sample_rate;
+	SDL_AudioFormat fmt = format_map[audio->source.decoder->sample_fmt];
 	if (!fmt) {
 		oshu_log_error("unsupported sample format");
 		return -1;
 	}
 	want.format = fmt;
-	want.channels = audio->decoder->channels;
+	want.channels = audio->source.decoder->channels;
 	want.samples = sample_buffer_size;
 	want.callback = audio_callback;
 	want.userdata = (void*) audio;
@@ -340,11 +208,8 @@ int oshu_audio_open(const char *url, struct oshu_audio **audio)
 		oshu_log_error("could not allocate the audio context");
 		return -1;
 	}
-	if (open_demuxer(url, *audio) < 0)
-		goto fail;
-	if (open_decoder(*audio) < 0)
-		goto fail;
-	next_frame(*audio);
+	if (oshu_open_stream(url, &(*audio)->source) < 0)
+		return -1;
 	dump_stream_info(*audio);
 	if (open_device(*audio) < 0)
 		goto fail;
@@ -370,12 +235,7 @@ void oshu_audio_close(struct oshu_audio **audio)
 		return;
 	if ((*audio)->device_id)
 		SDL_CloseAudioDevice((*audio)->device_id);
-	if ((*audio)->frame)
-		av_frame_free(&(*audio)->frame);
-	if ((*audio)->decoder)
-		avcodec_free_context(&(*audio)->decoder);
-	if ((*audio)->demuxer)
-		avformat_close_input(&(*audio)->demuxer);
+	oshu_close_stream(&(*audio)->source);
 	free(*audio);
 	*audio = NULL;
 }

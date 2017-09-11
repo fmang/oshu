@@ -94,6 +94,44 @@
 
 /**
  * An audio stream, from its demuxer and decoder to its output device.
+ */
+struct oshu_stream {
+	AVFormatContext *demuxer;
+	AVCodec *codec;
+	AVStream *stream;
+	AVCodecContext *decoder;
+	AVPacket packet;
+	AVFrame *frame;
+	/**
+	 * The factor by which we must multiply ffmpeg timestamps to obtain
+	 * seconds. Because it won't change for a given stream, compute it
+	 * once and make it easily accessible.
+	 */
+	double time_base;
+};
+
+/**
+ * Open an audio stream.
+ *
+ * \param stream A null-initialized stream object.
+ */
+int oshu_open_stream(const char *url, struct oshu_stream *stream);
+
+
+/**
+ * Read the next frame from a stream into #oshu_stream::frame.
+ *
+ * \return `AVERROR_EOF` on end of file, 0 on success, -1 on failure.
+ */
+int oshu_next_frame(struct oshu_stream *steam);
+
+/**
+ * Close an audio stream.
+ */
+void oshu_close_stream(struct oshu_stream *stream);
+
+/**
+ * The full audio pipeline.
  *
  * This structure is mainly accessed through an audio thread, and should be
  * locked using SDL's `SDL_LockAudioDevice` and `SDL_UnlockAudioDevice`
@@ -105,24 +143,9 @@
  * #current_timestamp and #finished.
  */
 struct oshu_audio {
-	AVFormatContext *demuxer;
-	AVCodec *codec;
-	AVStream *stream;
-	AVPacket packet;
-	/**
-	 * The factor by which we must multiply ffmpeg timestamps to obtain
-	 * seconds. Because it won't change for a given stream, compute it
-	 * once and make it easily accessible.
-	 */
-	double time_base;
-	AVCodecContext *decoder;
+	struct oshu_stream source;
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
-	/**
-	 * The last decoded frame. It is always valid unless the playback is
-	 * #finished, in which case its value is undefined.
-	 */
-	AVFrame *frame;
 	/**
 	 * The current temporal position in the playing stream, expressed in
 	 * floating seconds.
