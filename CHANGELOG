@@ -1,6 +1,18 @@
 Changelog
 =========
 
+1.2.0 - ETA 2017-09-16
+----------------------
+
+Background pictures!
+
+The overall graphics engine now uses more precise positions, yielding smoother
+curves, and also uses a finer game clock, while ensuring a constant frame rate.
+
+It's mostly a technical release though, with a more generic game module
+refactored to support more game modes in the future. More refactoring to come
+in the next release.
+
 1.1.0 - 2017-09-02
 ------------------
 
