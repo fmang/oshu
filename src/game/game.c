@@ -59,7 +59,13 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 			SDL_SetTextureColorMod((*game)->background, 64, 64, 64);
 	}
 
-	(*game)->clock.now = - (*game)->beatmap->audio_lead_in;
+	if ((*game)->beatmap->audio_lead_in > 0) {
+		(*game)->clock.now = - (*game)->beatmap->audio_lead_in;
+	} else {
+		double first_hit = (*game)->beatmap->hits->time;
+		if (first_hit < 1.)
+			(*game)->clock.now = first_hit - 1.;
+	}
 	(*game)->clock.ticks = SDL_GetTicks();
 
 	return 0;
