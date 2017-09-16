@@ -1,6 +1,6 @@
 /**
- * \file stream/stream.c
- * \ingroup audio
+ * \file audio/stream.c
+ * \ingroup audio_stream
  *
  * \brief
  * Open and decode an stream file.

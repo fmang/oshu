@@ -6,6 +6,7 @@ oshu_SOURCES = \
 	audio/audio.h \
 	audio/pipeline.c \
 	audio/sample.c \
+	audio/stream.h \
 	audio/stream.c \
 	beatmap/beatmap.h \
 	beatmap/helpers.c \
