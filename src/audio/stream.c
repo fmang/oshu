@@ -90,18 +90,26 @@ static int next_frame(struct oshu_stream *stream)
 int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
 {
 	int produced = 0;
-	while (nb_samples > 0 && !stream->finished) {
+	int wanted = nb_samples;
+	while (wanted > 0 && !stream->finished) {
 		int left = stream->frame->nb_samples - stream->sample_index;
 		if (left == 0) {
 			if (next_frame(stream) < 0)
 				return -1;
 			continue;
 		}
-		int consume = left < nb_samples ? left : nb_samples;
+		const uint8_t *data[stream->frame->channels];
+		if (av_sample_fmt_is_planar(stream->frame->format)) {
+			for (int c = 0; c < stream->frame->channels; ++c)
+				data[c] = stream->frame->data[c] + stream->sample_index * av_get_bytes_per_sample(stream->frame->format);
+		} else {
+			data[0] = stream->frame->data[0] + stream->sample_index * av_get_bytes_per_sample(stream->frame->format) * stream->frame->channels;
+		}
+		int consume = left < wanted ? left : wanted;
 		int rc = swr_convert(
 			stream->converter,
 			(uint8_t**) &samples, consume,
-			(const uint8_t**) stream->frame->data, consume
+			data, consume
 		);
 		if (rc < 0) {
 			oshu_log_error("audio sample conversion error");
@@ -109,7 +117,9 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
 		}
 		assert (rc == consume);
 		produced += consume;
-		nb_samples -= consume;
+		wanted -= consume;
+		stream->sample_index += consume;
+		samples += consume * 2;
 	}
 	return produced;
 }
