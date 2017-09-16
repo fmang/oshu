@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 
-void oshu_play_channel(struct oshu_channel *channel, struct oshu_sample *sample, float volume)
+void oshu_start_channel(struct oshu_channel *channel, struct oshu_sample *sample, float volume)
 {
 	channel->sample = sample;
 	channel->cursor = 0;
@@ -16,7 +16,7 @@ void oshu_play_channel(struct oshu_channel *channel, struct oshu_sample *sample,
 	channel->loop = 0;
 }
 
-void oshu_reset_channel(struct oshu_channel *channel)
+void oshu_stop_channel(struct oshu_channel *channel)
 {
 	channel->sample = NULL;
 }

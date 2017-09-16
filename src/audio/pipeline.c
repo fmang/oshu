@@ -111,6 +111,6 @@ void oshu_audio_close(struct oshu_audio **audio)
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample)
 {
 	SDL_LockAudioDevice(audio->device_id);
-	oshu_play_channel(&audio->overlay, sample, 1.);
+	oshu_start_channel(&audio->overlay, sample, 1.);
 	SDL_UnlockAudioDevice(audio->device_id);
 }

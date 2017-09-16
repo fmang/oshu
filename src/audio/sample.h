@@ -25,6 +25,8 @@ struct SDL_AudioSpec;
  * always WAV anyway, let's start with a naive implementation using SDL's
  * procedures.
  *
+ * To play samples, you must use channels. See #audio_channel.
+ *
  * \{
  */
 
