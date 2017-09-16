@@ -6,9 +6,10 @@
  * Open and decode an stream file.
  */
 
-#include "audio/audio.h"
+#include "audio/stream.h"
 #include "log.h"
 
+#include <libavformat/avformat.h>
 #include <libavutil/opt.h>
 #include <libswresample/swresample.h>
 
@@ -38,8 +39,9 @@ static void log_av_error(int rc)
 static int next_page(struct oshu_stream *stream)
 {
 	int rc;
+	AVPacket packet;
 	for (;;) {
-		rc = av_read_frame(stream->demuxer, &stream->packet);
+		rc = av_read_frame(stream->demuxer, &packet);
 		if (rc == AVERROR_EOF) {
 			oshu_log_debug("reached the last page, flushing");
 			rc = avcodec_send_packet(stream->decoder, NULL);
@@ -47,13 +49,12 @@ static int next_page(struct oshu_stream *stream)
 		} else if (rc < 0) {
 			break;
 		}
-		if (stream->packet.stream_index == stream->stream->index) {
-			rc = avcodec_send_packet(stream->decoder, &stream->packet);
+		if (packet.stream_index == stream->stream->index) {
+			rc = avcodec_send_packet(stream->decoder, &packet);
 			break;
 		}
-		av_packet_unref(&stream->packet);
 	}
-	av_packet_unref(&stream->packet);
+	av_packet_unref(&packet);
 	if (rc < 0) {
 		log_av_error(rc);
 		return -1;
@@ -122,6 +123,20 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
 		samples += consume * 2;
 	}
 	return produced;
+}
+
+/**
+ * Log some helpful information about the decoded audio stream.
+ * Meant for debugging more than anything else.
+ */
+static void dump_stream_info(struct oshu_stream *stream)
+{
+	oshu_log_info("============ Audio information ============");
+	oshu_log_info("            Codec: %s.", stream->codec->long_name);
+	oshu_log_info("      Sample rate: %d Hz.", stream->decoder->sample_rate);
+	oshu_log_info(" Average bit rate: %ld kbps.", stream->decoder->bit_rate / 1000);
+	oshu_log_info("    Sample format: %s.", av_get_sample_fmt_name(stream->decoder->sample_fmt));
+	oshu_log_info("         Duration: %d seconds.", (int) (stream->stream->duration * stream->time_base));
 }
 
 /**
@@ -225,10 +240,12 @@ static int open_converter(struct oshu_stream *stream)
 
 int oshu_open_stream(const char *url, struct oshu_stream *stream)
 {
+	av_register_all();
 	if (open_demuxer(url, stream) < 0)
 		goto fail;
 	if (open_decoder(stream) < 0)
 		goto fail;
+	dump_stream_info(stream);
 	stream->sample_rate = stream->decoder->sample_rate;
 	if (open_converter(stream) < 0)
 		goto fail;

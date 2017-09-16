@@ -10,33 +10,12 @@
 #include "log.h"
 
 #include <assert.h>
-#include <libavutil/time.h>
 
 /**
  * Size of the SDL audio buffer, in samples.
  * The smaller it is, the less lag.
  */
 static const int sample_buffer_size = 1024;
-
-void oshu_audio_init()
-{
-	av_register_all();
-}
-
-/**
- * Log some helpful information about the decoded audio stream.
- * Meant for debugging more than anything else.
- */
-static void dump_stream_info(struct oshu_audio *audio)
-{
-	struct oshu_stream *stream = &audio->music;
-	oshu_log_info("============ Audio information ============");
-	oshu_log_info("            Codec: %s.", stream->codec->long_name);
-	oshu_log_info("      Sample rate: %d Hz.", stream->decoder->sample_rate);
-	oshu_log_info(" Average bit rate: %ld kbps.", stream->decoder->bit_rate / 1000);
-	oshu_log_info("    Sample format: %s.", av_get_sample_fmt_name(stream->decoder->sample_fmt));
-	oshu_log_info("         Duration: %d seconds.", (int) (stream->stream->duration * stream->time_base));
-}
 
 /**
  * Fill SDL's audio buffer, while requesting more frames as needed.
@@ -142,7 +121,6 @@ int oshu_audio_open(const char *url, struct oshu_audio **audio)
 	}
 	if (oshu_open_stream(url, &(*audio)->music) < 0)
 		return -1;
-	dump_stream_info(*audio);
 	if (open_device(*audio) < 0)
 		goto fail;
 	return 0;

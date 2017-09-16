@@ -10,7 +10,6 @@
 
 #include "audio/stream.h"
 
-#include <libavformat/avformat.h>
 #include <SDL2/SDL.h>
 
 /** \defgroup audio Audio
@@ -118,13 +117,6 @@ struct oshu_audio {
 	 *  you free it yourself using #oshu_sample_free. */
 	struct oshu_sample *overlay;
 };
-
-/**
- * Initialize ffmpeg.
- *
- * Make sure you call it once at the beginning of the program.
- */
-void oshu_audio_init();
 
 /**
  * Open a file and initialize everything needed to play it.

@@ -11,6 +11,7 @@
 #include "game/game.h"
 #include "../config.h"
 
+#include <errno.h>
 #include <getopt.h>
 #include <signal.h>
 #include <unistd.h>
@@ -63,8 +64,6 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		oshu_log_error("SDL initialization error: %s", SDL_GetError());
 		return -1;
 	}
-
-	oshu_audio_init();
 
 	if ((rc = oshu_game_create(beatmap_path, &current_game)) < 0) {
 		oshu_log_error("game initialization failed");

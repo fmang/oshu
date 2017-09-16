@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <libavformat/avformat.h>
-
 /**
  * \defgroup audio_stream
  * \ingroup audio
@@ -17,16 +15,21 @@
  * \{
  */
 
+struct AVFormatContext;
+struct AVCodec;
+struct AVStream;
+struct AVCodecContext;
+struct AVFrame;
+
 /**
  * An audio stream, from its demuxer and decoder to its output device.
  */
 struct oshu_stream {
-	AVFormatContext *demuxer;
-	AVCodec *codec;
-	AVStream *stream;
-	AVCodecContext *decoder;
-	AVPacket packet;
-	AVFrame *frame;
+	struct AVFormatContext *demuxer;
+	struct AVCodec *codec;
+	struct AVStream *stream;
+	struct AVCodecContext *decoder;
+	struct AVFrame *frame;
 	struct SwrContext *converter;
 	int sample_rate;
 	/**
