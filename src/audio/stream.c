@@ -221,29 +221,36 @@ fail:
 	return -1;
 }
 
+/**
+ * Initialize the libswresample converter to resample data from
+ * #oshu_stream::decoder into a definied output format.
+ *
+ * The output sample rate must be defined in #oshu_stream::sample_rate.
+ */
 static int open_converter(struct oshu_stream *stream)
 {
-	stream->converter = swr_alloc();
+	stream->converter = swr_alloc_set_opts(
+		stream->converter,
+		/* output */
+		AV_CH_LAYOUT_STEREO,
+		AV_SAMPLE_FMT_FLT,
+		stream->sample_rate,
+		/* input */
+		stream->decoder->channel_layout,
+		stream->decoder->sample_fmt,
+		stream->decoder->sample_rate,
+		0, NULL
+	);
 	if (!stream->converter) {
 		oshu_log_error("error allocating the audio resampler");
 		return -1;
 	}
-
-	av_opt_set_int(stream->converter, "in_channel_layout", stream->decoder->channel_layout, 0);
-	av_opt_set_int(stream->converter, "in_sample_rate", stream->decoder->sample_rate, 0);
-	av_opt_set_sample_fmt(stream->converter, "in_sample_fmt", stream->decoder->sample_fmt, 0);
-
-	av_opt_set_int(stream->converter, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
-	av_opt_set_int(stream->converter, "out_sample_rate", stream->sample_rate, 0);
-	av_opt_set_sample_fmt(stream->converter, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
-
 	int rc = swr_init(stream->converter);
 	if (rc < 0) {
 		oshu_log_error("error initializing the audio resampler");
 		log_av_error(rc);
 		return -1;
 	}
-
 	return 0;
 }
 
