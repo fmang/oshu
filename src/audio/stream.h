@@ -1,20 +1,49 @@
 /**
  * \file audio/stream.h
  * \ingroup audio_stream
- *
- * \brief
- * Read an audio file progressively.
  */
 
 #pragma once
 
 /**
- * \defgroup audio_stream
+ * \defgroup audio_stream Stream
  * \ingroup audio
+ *
+ * \brief
+ * Read an audio file progressively.
+ *
+ * This module provides a high-level interface for reading an audio stream
+ * using ffmpeg.
+ *
+ * Any file supported by ffmpeg will be read, but to make things simpler, the
+ * audio is systematically transcoded to a uniform output format:
+ *
+ * - Stereo output: 2 channels.
+ * - The sample rate is the same as the input stream. Usually 44.1 KHz or 48 KHz.
+ * - The sample format is 32-bit float, also named FLT or F32 for SDL.
+ * - The samples are packed, meaning they're interlaced like LRLRLR, as opposed to planar LLLRRR.
+ *
+ * The decoding process is a combination of demuxing using libavformat, then
+ * decoding using libavcodec, and finally converting the samples using
+ * libswresample. The pipeline is illustrated below.
+ *
+ * \dot
+ * digraph {
+ * 	rankdir=LR
+ * 	node [shape=rect]
+ * 	AVFormatContext -> AVCodecContext [label=AVPacket]
+ * 	AVCodecContext -> SwrContext [label=AVFrame]
+ * 	SwrContext -> "float*"
+ * 	"float*" [shape=none]
+ * }
+ * \enddot
  *
  * \{
  */
 
+/*
+ * Forward declaration of the ffmpeg structures to avoid including big headers.
+ */
 struct AVFormatContext;
 struct AVCodec;
 struct AVStream;
@@ -23,14 +52,53 @@ struct AVFrame;
 
 /**
  * An audio stream, from its demuxer and decoder to its output device.
+ *
+ * The only properties you'd want to use outside this sub-modules are
+ * #sample_rate when setting up the audio output device, and the
+ * #current_timestamp to know the current stream position.
  */
 struct oshu_stream {
+	/**
+	 * The libavformat demuxer, handling the I/O aspects.
+	 */
 	struct AVFormatContext *demuxer;
-	struct AVCodec *codec;
+	/**
+	 * Pointer to the best audio stream we've found in the media file.
+	 *
+	 * Its memory is managed by the #demuxer context.
+	 */
 	struct AVStream *stream;
+	/**
+	 * The codec for the #stream.
+	 *
+	 * Its memory is managed globally by libavcodec. It must not be freed.
+	 */
+	struct AVCodec *codec;
+	/**
+	 * The #decoder context, initialized from the #codec with the
+	 * parameters defined in the #stream.
+	 */
 	struct AVCodecContext *decoder;
+	/**
+	 * A frame, containing a dozen milliseconds worth of audio data.
+	 *
+	 * It's allocated and freed by us once, and re-used every time a new
+	 * frame is read.
+	 */
 	struct AVFrame *frame;
+	/**
+	 * The audio resampler that converts whatever audio data format #frame
+	 * contains into the packed stereo 32-bit float samples we use for our
+	 * output.
+	 */
 	struct SwrContext *converter;
+	/**
+	 * The sample rate of the output stream when read with
+	 * #oshu_read_stream.
+	 *
+	 * It is set by the #converter, and in practice will always be the same
+	 * as the sample rate of the #decoder.
+	 */
 	int sample_rate;
 	/**
 	 * The factor by which we must multiply ffmpeg timestamps to obtain
@@ -54,36 +122,52 @@ struct oshu_stream {
 	 * duration in seconds.
 	 */
 	double current_timestamp;
+	/**
+	 * How many samples per channel of the current #frame we've read using
+	 * #oshu_read_stream. When this number is bigger than the number of
+	 * samples per channel in the frame, we must request a new frame.
+	 */
 	int sample_index;
+	/**
+	 * True when the end of the stream is reached.
+	 *
+	 * Set to 1 by #oshu_read_stream when we receive an AVERROR_EOF code
+	 * while trying to read a frame.
+	 */
 	int finished;
 };
 
 /**
  * Open an audio stream.
  *
+ * \param url Path or URL to the media you want to play.
  * \param stream A null-initialized stream object.
+ *
+ * \sa oshu_close_stream
  */
 int oshu_open_stream(const char *url, struct oshu_stream *stream);
 
 /**
- * Read *nb_samples* from an audio stream.
+ * Read *nb_samples* float samples from an audio stream.
  *
  * Samples are always float, because float samples are practical for mixing.
  *
  * The *nb_samples* parameter specifies how many samples per channel to read.
  *
  * The *samples* output buffer size must be at least `nb_samples * 2 *
- * sizeof(float)` bytes, because right now we're forcing stereo.
+ * sizeof(float)` bytes, because we're forcing stereo.
  *
  * \return
  * The number of samples read per channel. If it is less than *nb_samples*, it
  * means the end of the stream was reached, and further calls to this function
  * will return 0. On error, return -1.
+ *
+ * \sa oshu_stream::finished
  */
 int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples);
 
 /**
- * Close an audio stream.
+ * Close an audio stream, and free everything we can.
  */
 void oshu_close_stream(struct oshu_stream *stream);
 

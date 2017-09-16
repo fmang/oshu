@@ -1,9 +1,6 @@
 /**
  * \file audio/stream.c
  * \ingroup audio_stream
- *
- * \brief
- * Open and decode an stream file.
  */
 
 #include "audio/stream.h"
