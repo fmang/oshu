@@ -11,21 +11,21 @@ struct SDL_AudioSpec;
 
 /**
  * \defgroup audio_sample Sample
+ * \ingroup audio
  *
  * \brief
- * Load WAV files using SDL's WAV loader in order to play them over an audio
- * stream as sound effects.
+ * Load WAV files in order to play them as sound effects.
  *
  * A sample is a short sound played when the user hits something. To be fast
  * and reactive, the samples are always stored in-memory. Do not confuse it
  * with a PCM sample.
  *
- * If need be, samples could be loaded using the #audio_stream module and
+ * If need be, samples could be loaded using the audio stream module and
  * slurped into memory through #oshu_read_stream. However, since samples are
  * always WAV anyway, let's start with a naive implementation using SDL's
  * procedures.
  *
- * To play samples, you must use channels. See #audio_channel.
+ * To play samples, you must use channels. See #oshu_channel.
  *
  * \{
  */
@@ -49,7 +49,7 @@ struct oshu_sample {
 	/**
 	 * The size of the #samples buffer.
 	 *
-	 * It must be at least 2 × #length × sizeof(float).
+	 * It must be at least 2 × #nb_samples × sizeof(float).
 	 */
 	uint32_t size;
 	/**

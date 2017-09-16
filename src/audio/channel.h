@@ -11,6 +11,9 @@ struct oshu_sample;
  * \defgroup audio_channel Channel
  * \ingroup audio
  *
+ * \brief
+ * Mix samples on top of an audio stream.
+ *
  * A channel lets you play a sample on top of another stream. While samples are
  * dumb data buffers, a channel remembers its position, its volume, and is able
  * to loop the sample.
@@ -50,7 +53,7 @@ struct oshu_channel {
 	float volume;
 	/**
 	 * If true, the sample is looped over and over until
-	 * #oshu_reset_channel is called.
+	 * #oshu_stop_channel is called.
 	 */
 	int loop;
 };

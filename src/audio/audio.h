@@ -17,9 +17,7 @@
 /** \defgroup audio Audio
  *
  * \brief
- * Open and decode any kind of audio file using ffmpeg. libavformat does the
- * demuxing, libavcodec decodes. Then feed the decoded samples to SDL's audio
- * device.
+ * Play music and sound effects.
  *
  * Using this module, you should never need to call SDL's audio routines or
  * ffmpeg's directly.
@@ -108,10 +106,6 @@ struct oshu_audio {
 	struct oshu_stream music;
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
-	/** Sound sample to play on top of the audio stream.
-	 *
-	 *  Its memory space is not managed by this structure though, make sure
-	 *  you free it yourself using #oshu_sample_free. */
 	struct oshu_channel overlay;
 };
 
