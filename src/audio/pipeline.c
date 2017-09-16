@@ -45,7 +45,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	} else if (rc < nb_samples) {
 		memset(buffer + rc * unit, 0, len - rc * unit);
 	}
-	oshu_mix_channel(audio->overlay, (float*) buffer, nb_samples);
+	oshu_mix_channel(&audio->overlay, (float*) buffer, nb_samples);
 }
 
 /**
@@ -110,5 +110,7 @@ void oshu_audio_close(struct oshu_audio **audio)
 
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample)
 {
-	oshu_play_channel(audio->overlay, sample, 1.);
+	SDL_LockAudioDevice(audio->device_id);
+	oshu_play_channel(&audio->overlay, sample, 1.);
+	SDL_UnlockAudioDevice(audio->device_id);
 }

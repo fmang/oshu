@@ -37,7 +37,9 @@ int oshu_mix_channel(struct oshu_channel *channel, float *samples, int nb_sample
 		float *input = channel->sample->samples + channel->cursor * 2;
 		for (int i = 0; i < consume * 2; i++)
 			samples[i] += input[i] * channel->volume;
+		channel->cursor += consume;
 		samples += consume * 2;
+		wanted -= consume;
 	}
 	return nb_samples - wanted;
 }

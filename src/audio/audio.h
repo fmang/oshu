@@ -112,7 +112,7 @@ struct oshu_audio {
 	 *
 	 *  Its memory space is not managed by this structure though, make sure
 	 *  you free it yourself using #oshu_sample_free. */
-	struct oshu_channel *overlay;
+	struct oshu_channel overlay;
 };
 
 /**
