@@ -38,9 +38,9 @@ static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
 	int nb_samples = len / unit;
 	int rc = oshu_read_stream(&audio->music, (float*) buffer, nb_samples);
 	if (rc < 0) {
+		oshu_log_debug("failed reading samples from the audio stream");
 		return;
 	} else if (rc < nb_samples) {
-		audio->finished = 1;
 		memset(buffer + rc * unit, 0, len - rc * unit);
 	}
 }

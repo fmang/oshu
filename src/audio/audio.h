@@ -109,8 +109,6 @@ struct oshu_audio {
 	struct oshu_stream music;
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
-	/** When true, stop decoding the stream and output silence. */
-	int finished;
 	/** Sound sample to play on top of the audio stream.
 	 *
 	 *  Its memory space is not managed by this structure though, make sure

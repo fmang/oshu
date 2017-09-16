@@ -147,7 +147,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
  */
 static void end(struct oshu_game *game)
 {
-	if (!game->audio->finished)
+	if (!game->audio->music.finished)
 		return;
 	int good = 0;
 	int missed = 0;
@@ -243,7 +243,7 @@ int oshu_game_run(struct oshu_game *game)
 	SDL_Event event;
 	if (!game->paused && game->clock.now >= 0)
 		oshu_audio_play(game->audio);
-	while (!game->audio->finished && !game->stop) {
+	while (!game->audio->music.finished && !game->stop) {
 		update_clock(game);
 		if (game->clock.before < 0 && game->clock.now >= 0)
 			oshu_audio_play(game->audio);
