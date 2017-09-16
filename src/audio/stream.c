@@ -97,41 +97,55 @@ static int next_frame(struct oshu_stream *stream)
 	}
 }
 
+/**
+ * Convert a frame, starting from the sample at position *index*.
+ *
+ * Fill at most *wanted* samples per channel, and return the number of sample
+ * per channel written into the *samples* output buffer.
+ *
+ * The first half of this function translates the planes in the frame's *data*
+ * array, according to index. The second half passes the translated planes into
+ * the resampler, which will write the converted samples into the output.
+ */
+static int convert_frame(struct SwrContext *converter, AVFrame *frame, int index, float *samples, int wanted)
+{
+	const uint8_t *data[frame->channels];
+	int sample_size = av_get_bytes_per_sample(frame->format);
+	if (av_sample_fmt_is_planar(frame->format)) {
+		for (int c = 0; c < frame->channels; ++c)
+			data[c] = frame->data[c] + index * sample_size;
+	} else {
+		data[0] = frame->data[0] + index * sample_size * frame->channels;
+	}
+
+	int left = frame->nb_samples - index;
+	int consume = left < wanted ? left : wanted;
+	int rc = swr_convert(converter, (uint8_t**) &samples, consume, data, consume);
+	if (rc < 0) {
+		oshu_log_error("audio sample conversion error");
+		log_av_error(rc);
+		return -1;
+	}
+	return rc;
+}
+
 int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
 {
-	int produced = 0;
-	int wanted = nb_samples;
-	while (wanted > 0 && !stream->finished) {
-		int left = stream->frame->nb_samples - stream->sample_index;
-		if (left == 0) {
+	int left = nb_samples;
+	while (left > 0 && !stream->finished) {
+		if (stream->sample_index >= stream->frame->nb_samples) {
 			if (next_frame(stream) < 0)
 				return -1;
 			continue;
 		}
-		const uint8_t *data[stream->frame->channels];
-		if (av_sample_fmt_is_planar(stream->frame->format)) {
-			for (int c = 0; c < stream->frame->channels; ++c)
-				data[c] = stream->frame->data[c] + stream->sample_index * av_get_bytes_per_sample(stream->frame->format);
-		} else {
-			data[0] = stream->frame->data[0] + stream->sample_index * av_get_bytes_per_sample(stream->frame->format) * stream->frame->channels;
-		}
-		int consume = left < wanted ? left : wanted;
-		int rc = swr_convert(
-			stream->converter,
-			(uint8_t**) &samples, consume,
-			data, consume
-		);
-		if (rc < 0) {
-			oshu_log_error("audio sample conversion error");
+		int rc = convert_frame(stream->converter, stream->frame, stream->sample_index, samples, left);
+		if (rc < 0)
 			return -1;
-		}
-		assert (rc == consume);
-		produced += consume;
-		wanted -= consume;
-		stream->sample_index += consume;
-		samples += consume * 2;
+		left -= rc;
+		stream->sample_index += rc;
+		samples += rc * 2; /* because stereo */
 	}
-	return produced;
+	return nb_samples - left;
 }
 
 /**
