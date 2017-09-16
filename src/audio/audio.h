@@ -107,28 +107,9 @@
  * #current_timestamp and #finished.
  */
 struct oshu_audio {
-	struct oshu_stream source;
+	struct oshu_stream music;
 	SDL_AudioDeviceID device_id;
 	SDL_AudioSpec device_spec;
-	/**
-	 * The current temporal position in the playing stream, expressed in
-	 * floating seconds.
-	 *
-	 * Sometimes the best-effort timestamp computed from a frame is
-	 * erroneous. Rather than break everything, let's try to rely on the
-	 * previous frame's timestamp, and therefore keep the timestamp in our
-	 * structure, rather than using only ffmpeg's AVFrame.
-	 *
-	 * In order to do that, the frame decoding routine will update the
-	 * #current_timestamp field whenever it reads a frame with a reasonable
-	 * timestamp. It is computed from libavcodec's `best_effort_timestamp`,
-	 * which means it was be multiplied by the time base in order to get a
-	 * duration in seconds.
-	 */
-	double current_timestamp;
-	/** Current position in the decoded frame's buffer.
-	 *  Multiply it by the sample size to get the position in bytes. */
-	int sample_index;
 	/** When true, stop decoding the stream and output silence. */
 	int finished;
 	/** Sound sample to play on top of the audio stream.

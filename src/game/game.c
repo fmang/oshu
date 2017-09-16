@@ -222,7 +222,7 @@ static void update_clock(struct oshu_game *game)
 	long int ticks = SDL_GetTicks();
 	double diff = (double) (ticks - clock->ticks) / 1000.;
 	double prev_audio = clock->audio;
-	clock->audio = game->audio->current_timestamp;
+	clock->audio = game->audio->music.current_timestamp;
 	clock->before = clock->now;
 	clock->ticks = ticks;
 	if (game->paused)

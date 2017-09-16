@@ -9,6 +9,11 @@
 #include "audio/audio.h"
 #include "log.h"
 
+#include <libavutil/opt.h>
+#include <libswresample/swresample.h>
+
+#include <assert.h>
+
 /**
  * Spew an error message according to the return value of a call to one of
  * ffmpeg's functions.
@@ -56,11 +61,15 @@ static int next_page(struct oshu_stream *stream)
 	return 0;
 }
 
-int oshu_next_frame(struct oshu_stream *stream)
+static int next_frame(struct oshu_stream *stream)
 {
 	for (;;) {
 		int rc = avcodec_receive_frame(stream->decoder, stream->frame);
 		if (rc == 0) {
+			int64_t ts = stream->frame->best_effort_timestamp;
+			if (ts > 0)
+				stream->current_timestamp = stream->time_base * ts;
+			stream->sample_index = 0;
 			return 0;
 		} else if (rc == AVERROR(EAGAIN)) {
 			if (next_page(stream) < 0) {
@@ -69,12 +78,40 @@ int oshu_next_frame(struct oshu_stream *stream)
 			}
 		} else if (rc == AVERROR_EOF) {
 			oshu_log_debug("reached the last frame");
-			return AVERROR_EOF;
+			stream->finished = 1;
+			return 0;
 		} else {
 			log_av_error(rc);
 			return -1;
 		}
 	}
+}
+
+int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
+{
+	int produced = 0;
+	while (nb_samples > 0 && !stream->finished) {
+		int left = stream->frame->nb_samples - stream->sample_index;
+		if (left == 0) {
+			if (next_frame(stream) < 0)
+				return -1;
+			continue;
+		}
+		int consume = left < nb_samples ? left : nb_samples;
+		int rc = swr_convert(
+			stream->converter,
+			(uint8_t**) &samples, consume,
+			(const uint8_t**) stream->frame->data, consume
+		);
+		if (rc < 0) {
+			oshu_log_error("audio sample conversion error");
+			return -1;
+		}
+		assert (rc == consume);
+		produced += consume;
+		nb_samples -= consume;
+	}
+	return produced;
 }
 
 /**
@@ -150,13 +187,42 @@ fail:
 	return -1;
 }
 
+static int open_converter(struct oshu_stream *stream)
+{
+	stream->converter = swr_alloc();
+	if (!stream->converter) {
+		oshu_log_error("error allocating the audio resampler");
+		return -1;
+	}
+
+	av_opt_set_int(stream->converter, "in_channel_layout", stream->decoder->channel_layout, 0);
+	av_opt_set_int(stream->converter, "in_sample_rate", stream->decoder->sample_rate, 0);
+	av_opt_set_sample_fmt(stream->converter, "in_sample_fmt", stream->decoder->sample_fmt, 0);
+
+	av_opt_set_int(stream->converter, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
+	av_opt_set_int(stream->converter, "out_sample_rate", stream->sample_rate, 0);
+	av_opt_set_sample_fmt(stream->converter, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
+
+	int rc = swr_init(stream->converter);
+	if (rc < 0) {
+		oshu_log_error("error initializing the audio resampler");
+		log_av_error(rc);
+		return -1;
+	}
+
+	return 0;
+}
+
 int oshu_open_stream(const char *url, struct oshu_stream *stream)
 {
 	if (open_demuxer(url, stream) < 0)
 		goto fail;
 	if (open_decoder(stream) < 0)
 		goto fail;
-	if (oshu_next_frame(stream) < 0)
+	stream->sample_rate = stream->decoder->sample_rate;
+	if (open_converter(stream) < 0)
+		goto fail;
+	if (next_frame(stream) < 0)
 		goto fail;
 	return 0;
 fail:
@@ -172,4 +238,6 @@ void oshu_close_stream(struct oshu_stream *stream)
 		avcodec_free_context(&stream->decoder);
 	if (stream->demuxer)
 		avformat_close_input(&stream->demuxer);
+	if (stream->converter)
+		swr_free(&stream->converter);
 }
