@@ -1,21 +1,12 @@
 /**
  * \file audio/sample.c
- * \ingroup audio
+ * \ingroup audio_sample
  */
 
-#include "audio/audio.h"
+#include "audio/sample.h"
 #include "log.h"
 
 #include <assert.h>
-
-void oshu_sample_play(struct oshu_audio *audio, struct oshu_sample *sample)
-{
-	SDL_LockAudioDevice(audio->device_id);
-	audio->overlay = sample;
-	if (sample)
-		sample->cursor = 0;
-	SDL_UnlockAudioDevice(audio->device_id);
-}
 
 /**
  * Convert a sample loaded from a WAV file in order to play it on the currently
@@ -37,48 +28,42 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 		oshu_log_error("SDL audio conversion error: %s", SDL_GetError());
 		return -1;
 	}
-	sample->buffer = realloc(sample->buffer, sample->length * converter.len_mult);
-	if (sample->buffer == NULL) {
-		oshu_log_error("could not resize the sample buffer");
+	sample->samples = realloc(sample->samples, sample->size * converter.len_mult);
+	if (sample->samples == NULL) {
+		oshu_log_error("could not resize the samples buffer");
 		return -1;
 	}
-	converter.buf = sample->buffer;
-	converter.len = sample->length;
+	converter.buf = (Uint8*) sample->samples;
+	converter.len = sample->size;
 	SDL_ConvertAudio(&converter);
-	sample->length = converter.len_cvt;
+	sample->size = converter.len_cvt;
 	/* reclaim the unrequired memory */
-	sample->buffer = realloc(sample->buffer, sample->length);
-	assert (sample->buffer != NULL);
+	sample->samples = realloc(sample->samples, sample->size);
+	assert (sample->samples != NULL);
 	return 0;
 }
 
-int oshu_sample_load(const char *path, struct oshu_audio *audio, struct oshu_sample **sample)
+int oshu_sample_load(const char *path, SDL_AudioSpec *spec, struct oshu_sample *sample)
 {
-	SDL_AudioSpec spec;
-	*sample = calloc(1, sizeof(**sample));
-	if (*sample == NULL) {
-		oshu_log_error("could not allocate the memory for the sample object");
-		return -1;
-	}
-	SDL_AudioSpec *wav = SDL_LoadWAV(path, &spec, &(*sample)->buffer, &(*sample)->length);
+	assert (spec->format == AUDIO_F32);
+	assert (spec->channels == 2);
+	SDL_AudioSpec wav_spec;
+	SDL_AudioSpec *wav = SDL_LoadWAV(path, &wav_spec, (Uint8**) &sample->samples, &sample->size);
 	if (wav == NULL) {
-		oshu_log_error("SDL error when loading sample: %s", SDL_GetError());
+		oshu_log_error("SDL error when loading the sample: %s", SDL_GetError());
 		goto fail;
 	}
-	if (convert_audio(&audio->device_spec, wav, *sample) < 0)
+	if (convert_audio(spec, wav, sample) < 0)
 		goto fail;
+	sample->length = sample->size / (2 * sizeof(*sample->samples));
 	return 0;
 fail:
-	oshu_sample_free(sample);
+	oshu_destroy_sample(sample);
 	return -1;
 }
 
-void oshu_sample_free(struct oshu_sample **sample)
+void oshu_destroy_sample(struct oshu_sample *sample)
 {
-	if (*sample == NULL)
-		return;
-	if ((*sample)->buffer)
-		SDL_FreeWAV((*sample)->buffer);
-	free(*sample);
-	*sample = NULL;
+	if (sample->samples)
+		SDL_FreeWAV((Uint8*) sample->samples);
 }
