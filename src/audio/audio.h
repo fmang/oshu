@@ -67,10 +67,10 @@
  * however than the sound effects we'll trigger will suffer from that exact
  * same bias.
  *
- * To use this module, first call #oshu_audio_init. Then open streams using
- * #oshu_audio_open, and play them using #oshu_audio_play. When you're
- * done, close your streams with #oshu_audio_close. Also make sure you
- * initialized SDL with the audio submodule.
+ * To use this module, open streams using #oshu_audio_open, and play them using
+ * #oshu_audio_play. When you're done, close your streams with
+ * #oshu_audio_close. Also make sure you initialized SDL with the audio
+ * submodule.
  *
  * ```c
  * SDL_Init(SDL_AUDIO|...);
@@ -101,9 +101,6 @@
  * procedures in order to be accessed peacefully from another thread. You don't
  * need to bother with locking when using the accessors defined in this module
  * though. Only lock when accessing the multiplie fields directly.
- *
- * The only two fields you'll want to use outside of this module are
- * #current_timestamp and #finished.
  */
 struct oshu_audio {
 	struct oshu_stream music;

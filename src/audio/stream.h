@@ -63,7 +63,11 @@ struct oshu_stream {
 	 */
 	struct AVFormatContext *demuxer;
 	/**
-	 * Pointer to the best audio stream we've found in the media file.
+	 * Pointer to the best audio stream we've found in the media file, from
+	 * the demuxer's point of view.
+	 *
+	 * It most notably contains temporal information, like the time base
+	 * and the duration of the stream.
 	 *
 	 * Its memory is managed by the #demuxer context.
 	 */
@@ -71,12 +75,17 @@ struct oshu_stream {
 	/**
 	 * The codec for the #stream.
 	 *
-	 * Its memory is managed globally by libavcodec. It must not be freed.
+	 * It's a generic object managed by libavcodec, and will therefore only
+	 * tell us the name of the codec, along with other metadata. It is
+	 * stored here for convenience when opening the stream. Do not free it.
 	 */
 	struct AVCodec *codec;
 	/**
 	 * The #decoder context, initialized from the #codec with the
 	 * parameters defined in the #stream.
+	 *
+	 * It is the most useful source of information concerning the sample
+	 * format. It defines the sample rate, type, the channel layout.
 	 */
 	struct AVCodecContext *decoder;
 	/**
@@ -90,6 +99,9 @@ struct oshu_stream {
 	 * The audio resampler that converts whatever audio data format #frame
 	 * contains into the packed stereo 32-bit float samples we use for our
 	 * output.
+	 *
+	 * Its input format is based on the #decoder, which must match the
+	 * format of every decoded #frame.
 	 */
 	struct SwrContext *converter;
 	/**
@@ -104,6 +116,9 @@ struct oshu_stream {
 	 * The factor by which we must multiply ffmpeg timestamps to obtain
 	 * seconds. Because it won't change for a given stream, compute it
 	 * once and make it easily accessible.
+	 *
+	 * Its correct value is the one taken from the demuxer's #stream
+	 * object, and not the codec's.
 	 */
 	double time_base;
 	/**

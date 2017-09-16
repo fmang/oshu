@@ -28,8 +28,11 @@ static void log_av_error(int rc)
  *
  * When reaching EOF, feed the decoder a NULL packet to flush it.
  *
- * This function is meant to be called exclusively from #next_frame,
- * because a single page may yield many codec frames.
+ * Beware: a single page may yield many codec frames. Only call this function
+ * when the decoder returns EAGAIN.
+ *
+ * The management of the AVPacket object comes from the filtering_audio.c
+ * example file from ffmpeg's documentation.
  *
  * \return 0 on success, -1 on error.
  */
@@ -48,17 +51,24 @@ static int next_page(struct oshu_stream *stream)
 		}
 		if (packet.stream_index == stream->stream->index) {
 			rc = avcodec_send_packet(stream->decoder, &packet);
+			av_packet_unref(&packet);
 			break;
 		}
 	}
-	av_packet_unref(&packet);
 	if (rc < 0) {
+		oshu_log_error("failed reading a page from the audio stream");
 		log_av_error(rc);
 		return -1;
 	}
 	return 0;
 }
 
+/**
+ * Read the next frame from the stream into #oshu_stream::frame.
+ *
+ * When the end of file is reached, or when an error occurs, set
+ * #oshu_stream::finished to true.
+ */
 static int next_frame(struct oshu_stream *stream)
 {
 	for (;;) {
@@ -79,7 +89,9 @@ static int next_frame(struct oshu_stream *stream)
 			stream->finished = 1;
 			return 0;
 		} else {
+			oshu_log_error("frame decoding failed");
 			log_av_error(rc);
+			stream->finished = 1;
 			return -1;
 		}
 	}
