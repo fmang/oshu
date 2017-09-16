@@ -71,7 +71,7 @@ struct oshu_clock {
 struct oshu_game {
 	struct oshu_beatmap *beatmap;
 	struct oshu_audio *audio;
-	struct oshu_sample *hit_sound;
+	struct oshu_sample hit_sound;
 	struct oshu_display *display;
 	struct oshu_game_mode *mode;
 	struct oshu_clock clock;

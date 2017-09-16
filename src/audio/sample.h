@@ -53,7 +53,7 @@ struct oshu_sample {
 	/**
 	 * The length of the sample, in samples per channel.
 	 */
-	uint32_t length;
+	int nb_samples;
 };
 
 /**

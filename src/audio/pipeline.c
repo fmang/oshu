@@ -31,8 +31,10 @@ static const int sample_buffer_size = 1024;
  * because you never know what SDL might do with a left-over buffer. Most
  * likely, it would play the previous buffer over, and over again.
  */
-static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
+static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
+	struct oshu_audio *audio;
+	audio = (struct oshu_audio*) userdata;
 	int unit = 2 * sizeof(float);
 	assert (len % unit == 0);
 	int nb_samples = len / unit;
@@ -43,51 +45,7 @@ static void fill_audio(struct oshu_audio *audio, Uint8 *buffer, int len)
 	} else if (rc < nb_samples) {
 		memset(buffer + rc * unit, 0, len - rc * unit);
 	}
-}
-
-/**
- * Mix the already present data in the buffer with the sample.
- *
- * This should be called right after #fill_audio.
- *
- * Note that SDL's documentation recommends against calling
- * `SDL_MixAudioFormat` more than once, because the clipping would deteriorate
- * the overall sound quality.
- */
-static void mix_sample(Uint8 *buffer, int len, struct oshu_audio *audio, struct oshu_sample *sample)
-{
-	while (len > 0) {
-		if (sample->cursor >= sample->length) {
-			if (sample->loop)
-				sample->cursor = 0;
-			else
-				break;
-		}
-		size_t left = sample->length - sample->cursor;
-		size_t block = (left < len) ? left : len;
-		SDL_MixAudioFormat(
-			buffer,
-			sample->buffer + sample->cursor,
-			audio->device_spec.format,
-			block,
-			SDL_MIX_MAXVOLUME
-		);
-		sample->cursor += block;
-		buffer += block;
-		len -= block;
-	}
-}
-
-/**
- * Fill the audio buffer with the song data, then optionally add a sample.
- */
-static void audio_callback(void *userdata, Uint8 *buffer, int len)
-{
-	struct oshu_audio *audio;
-	audio = (struct oshu_audio*) userdata;
-	fill_audio(audio, buffer, len);
-	if (audio->overlay != NULL)
-		mix_sample(buffer, len, audio, audio->overlay);
+	oshu_mix_channel(audio->overlay, (float*) buffer, nb_samples);
 }
 
 /**
@@ -148,4 +106,9 @@ void oshu_audio_close(struct oshu_audio **audio)
 	oshu_close_stream(&(*audio)->music);
 	free(*audio);
 	*audio = NULL;
+}
+
+void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample)
+{
+	oshu_play_channel(audio->overlay, sample, 1.);
 }

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "audio/channel.h"
+#include "audio/sample.h"
 #include "audio/stream.h"
 
 #include <SDL2/SDL.h>
@@ -110,7 +112,7 @@ struct oshu_audio {
 	 *
 	 *  Its memory space is not managed by this structure though, make sure
 	 *  you free it yourself using #oshu_sample_free. */
-	struct oshu_sample *overlay;
+	struct oshu_channel *overlay;
 };
 
 /**
@@ -140,6 +142,8 @@ void oshu_audio_play(struct oshu_audio *audio);
  * left playing.
  */
 void oshu_audio_pause(struct oshu_audio *audio);
+
+void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample);
 
 /**
  * Close the audio stream and free everything associated to it, then set

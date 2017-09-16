@@ -42,7 +42,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 	if (access(hit_path, F_OK) != 0)
 		hit_path = PKGDATADIR "/hit.wav";
 	oshu_log_debug("loading %s", hit_path);
-	if (oshu_sample_load(hit_path, (*game)->audio, &(*game)->hit_sound) < 0) {
+	if (oshu_load_sample(hit_path, &(*game)->audio->device_spec, &(*game)->hit_sound) < 0) {
 		oshu_log_error("could not load hit.wav, aborting");
 		goto fail;
 	}
@@ -269,8 +269,6 @@ void oshu_game_destroy(struct oshu_game **game)
 		return;
 	if ((*game)->audio)
 		oshu_audio_close(&(*game)->audio);
-	if ((*game)->hit_sound)
-		oshu_sample_free(&(*game)->hit_sound);
 	if ((*game)->background)
 		SDL_DestroyTexture((*game)->background);
 	if ((*game)->display)

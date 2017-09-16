@@ -43,7 +43,7 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 	return 0;
 }
 
-int oshu_sample_load(const char *path, SDL_AudioSpec *spec, struct oshu_sample *sample)
+int oshu_load_sample(const char *path, SDL_AudioSpec *spec, struct oshu_sample *sample)
 {
 	assert (spec->format == AUDIO_F32);
 	assert (spec->channels == 2);
@@ -55,7 +55,7 @@ int oshu_sample_load(const char *path, SDL_AudioSpec *spec, struct oshu_sample *
 	}
 	if (convert_audio(spec, wav, sample) < 0)
 		goto fail;
-	sample->length = sample->size / (2 * sizeof(*sample->samples));
+	sample->nb_samples = sample->size / (2 * sizeof(*sample->samples));
 	return 0;
 fail:
 	oshu_destroy_sample(sample);

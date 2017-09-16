@@ -50,7 +50,7 @@ static void hit(struct oshu_game *game)
 			} else {
 				hit->state = OSHU_HIT_GOOD;
 			}
-			oshu_sample_play(game->audio, game->hit_sound);
+			oshu_play_sample(game->audio, &game->hit_sound);
 		} else {
 			hit->state = OSHU_HIT_MISSED;
 		}
@@ -72,7 +72,7 @@ static void release_hit(struct oshu_game *game)
 		hit->state = OSHU_HIT_MISSED;
 	} else {
 		hit->state = OSHU_HIT_GOOD;
-		oshu_sample_play(game->audio, game->hit_sound);
+		oshu_play_sample(game->audio, &game->hit_sound);
 	}
 	game->osu.current_slider = NULL;
 }
@@ -94,9 +94,9 @@ static void check_slider(struct oshu_game *game)
 	if (game->clock.now > oshu_hit_end_time(hit)) {
 		game->osu.current_slider = NULL;
 		hit->state = OSHU_HIT_GOOD;
-		oshu_sample_play(game->audio, game->hit_sound);
+		oshu_play_sample(game->audio, &game->hit_sound);
 	} else if ((int) t > (int) prev_t && prev_t > 0) {
-		oshu_sample_play(game->audio, game->hit_sound);
+		oshu_play_sample(game->audio, &game->hit_sound);
 	}
 	if (game->autoplay)
 		return;
@@ -131,7 +131,7 @@ static void check_audio(struct oshu_game *game)
 				} else {
 					hit->state = OSHU_HIT_GOOD;
 				}
-				oshu_sample_play(game->audio, game->hit_sound);
+				oshu_play_sample(game->audio, &game->hit_sound);
 			}
 		}
 	} else {
