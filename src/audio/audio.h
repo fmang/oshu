@@ -151,10 +151,31 @@
  * though. Only lock when accessing multiple fields directly.
  */
 struct oshu_audio {
+	/**
+	 * The background music.
+	 */
 	struct oshu_stream music;
+	/**
+	 * Channels for playing sound effects on top of the music.
+	 *
+	 * Up to 8 samples may be played at a time.
+	 *
+	 * When the need for looping samples arise, it would be smart to
+	 * dedicate a channel for them.
+	 */
+	struct oshu_channel effects[8];
+	/**
+	 * A device ID returned by SDL, and required by most SDL audio
+	 * functions.
+	 */
 	SDL_AudioDeviceID device_id;
+	/**
+	 * Contains the sample rate, format, and channel of the audio output
+	 * device.
+	 *
+	 * This is useful for loading samples with #oshu_load_sample.
+	 */
 	SDL_AudioSpec device_spec;
-	struct oshu_channel overlay;
 };
 
 /**

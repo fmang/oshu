@@ -13,9 +13,12 @@
 
 /**
  * Size of the SDL audio buffer, in samples.
+ *
  * The smaller it is, the less lag.
+ *
+ * It should be a power of 2 according to SDL's doc.
  */
-static const int sample_buffer_size = 1024;
+static const int sample_buffer_size = 2048;
 
 /**
  * Fill SDL's audio buffer, while requesting more frames as needed.
@@ -38,14 +41,19 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	int unit = audio->device_spec.channels * sizeof(float);
 	assert (len % unit == 0);
 	int nb_samples = len / unit;
+
 	int rc = oshu_read_stream(&audio->music, (float*) buffer, nb_samples);
 	if (rc < 0) {
 		oshu_log_debug("failed reading samples from the audio stream");
 		return;
 	} else if (rc < nb_samples) {
+		/* fill what remains with silence */
 		memset(buffer + rc * unit, 0, len - rc * unit);
 	}
-	oshu_mix_channel(&audio->overlay, (float*) buffer, nb_samples);
+
+	int channels = sizeof(audio->effects) / sizeof(*audio->effects);
+	for (int i = 0; i < channels; i++)
+		oshu_mix_channel(&audio->effects[i], (float*) buffer, nb_samples);
 }
 
 /**
@@ -77,7 +85,7 @@ int oshu_open_audio(const char *url, struct oshu_audio *audio)
 {
 	assert (sizeof(float) == 4);
 	if (oshu_open_stream(url, &audio->music) < 0)
-		return -1;
+		goto fail;
 	if (open_device(audio) < 0)
 		goto fail;
 	return 0;
@@ -103,9 +111,39 @@ void oshu_close_audio(struct oshu_audio *audio)
 	oshu_close_stream(&audio->music);
 }
 
+/**
+ * Pick a channel for playing sound effects.
+ *
+ * If one channel is inactive, pick it without hesitation. If all the channels
+ * are active, pick the one with the biggest cursor, because there's a good
+ * chance it's about to end.
+ *
+ * Make sure you lock the audio device when calling this function, in order to
+ * ensure predictable results.
+ */
+static struct oshu_channel *select_channel(struct oshu_audio *audio)
+{
+	int max_cursor = 0;
+	struct oshu_channel *best_channel = &audio->effects[0];
+	int channels = sizeof(audio->effects) / sizeof(*audio->effects);
+	for (int i = 0; i < channels; ++i) {
+		struct oshu_channel *c = &audio->effects[i];
+		if (c->sample == NULL) {
+			return c;
+		} else if (c->cursor > max_cursor) {
+			max_cursor = c->cursor;
+			best_channel = c;
+		}
+	}
+	return best_channel;
+}
+
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample)
 {
 	SDL_LockAudioDevice(audio->device_id);
-	oshu_start_channel(&audio->overlay, sample, 1.);
+	struct oshu_channel *channel = select_channel(audio);
+	if (channel->sample != NULL)
+		oshu_log_debug("all the effect channels are taken, stealing one");
+	oshu_start_channel(channel, sample, 1.);
 	SDL_UnlockAudioDevice(audio->device_id);
 }
