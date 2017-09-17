@@ -33,7 +33,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		goto fail;
 	}
 
-	if (oshu_audio_open((*game)->beatmap->audio_filename, &(*game)->audio) < 0) {
+	if (oshu_open_audio((*game)->beatmap->audio_filename, &(*game)->audio) < 0) {
 		oshu_log_error("no audio, aborting");
 		goto fail;
 	}
@@ -42,7 +42,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 	if (access(hit_path, F_OK) != 0)
 		hit_path = PKGDATADIR "/hit.wav";
 	oshu_log_debug("loading %s", hit_path);
-	if (oshu_load_sample(hit_path, &(*game)->audio->device_spec, &(*game)->hit_sound) < 0) {
+	if (oshu_load_sample(hit_path, &(*game)->audio.device_spec, &(*game)->hit_sound) < 0) {
 		oshu_log_error("could not load hit.wav, aborting");
 		goto fail;
 	}
@@ -76,14 +76,14 @@ fail:
 
 static void pause_game(struct oshu_game *game)
 {
-	oshu_audio_pause(game->audio);
+	oshu_pause_audio(&game->audio);
 	game->paused = 1;
 }
 
 static void toggle_pause(struct oshu_game *game)
 {
 	if (game->paused) {
-		oshu_audio_play(game->audio);
+		oshu_play_audio(&game->audio);
 		game->paused = 0;
 	} else {
 		pause_game(game);
@@ -147,7 +147,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
  */
 static void end(struct oshu_game *game)
 {
-	if (!game->audio->music.finished)
+	if (!game->audio.music.finished)
 		return;
 	int good = 0;
 	int missed = 0;
@@ -222,7 +222,7 @@ static void update_clock(struct oshu_game *game)
 	long int ticks = SDL_GetTicks();
 	double diff = (double) (ticks - clock->ticks) / 1000.;
 	double prev_audio = clock->audio;
-	clock->audio = game->audio->music.current_timestamp;
+	clock->audio = game->audio.music.current_timestamp;
 	clock->before = clock->now;
 	clock->ticks = ticks;
 	if (game->paused)
@@ -242,11 +242,11 @@ int oshu_game_run(struct oshu_game *game)
 {
 	SDL_Event event;
 	if (!game->paused && game->clock.now >= 0)
-		oshu_audio_play(game->audio);
-	while (!game->audio->music.finished && !game->stop) {
+		oshu_play_audio(&game->audio);
+	while (!game->audio.music.finished && !game->stop) {
 		update_clock(game);
 		if (game->clock.before < 0 && game->clock.now >= 0)
-			oshu_audio_play(game->audio);
+			oshu_play_audio(&game->audio);
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
 		if (!game->paused && game->mode->check)
@@ -267,8 +267,7 @@ void oshu_game_destroy(struct oshu_game **game)
 		return;
 	if (!*game)
 		return;
-	if ((*game)->audio)
-		oshu_audio_close(&(*game)->audio);
+	oshu_close_audio(&(*game)->audio);
 	if ((*game)->background)
 		SDL_DestroyTexture((*game)->background);
 	if ((*game)->display)

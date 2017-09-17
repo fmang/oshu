@@ -73,43 +73,34 @@ static int open_device(struct oshu_audio *audio)
 	return 0;
 }
 
-int oshu_audio_open(const char *url, struct oshu_audio **audio)
+int oshu_open_audio(const char *url, struct oshu_audio *audio)
 {
 	assert (sizeof(float) == 4);
-	*audio = calloc(1, sizeof(**audio));
-	if (*audio == NULL) {
-		oshu_log_error("could not allocate the audio context");
+	if (oshu_open_stream(url, &audio->music) < 0)
 		return -1;
-	}
-	if (oshu_open_stream(url, &(*audio)->music) < 0)
-		return -1;
-	if (open_device(*audio) < 0)
+	if (open_device(audio) < 0)
 		goto fail;
 	return 0;
 fail:
-	oshu_audio_close(audio);
+	oshu_close_audio(audio);
 	return -1;
 }
 
-void oshu_audio_play(struct oshu_audio *audio)
+void oshu_play_audio(struct oshu_audio *audio)
 {
 	SDL_PauseAudioDevice(audio->device_id, 0);
 }
 
-void oshu_audio_pause(struct oshu_audio *audio)
+void oshu_pause_audio(struct oshu_audio *audio)
 {
 	SDL_PauseAudioDevice(audio->device_id, 1);
 }
 
-void oshu_audio_close(struct oshu_audio **audio)
+void oshu_close_audio(struct oshu_audio *audio)
 {
-	if (*audio == NULL)
-		return;
-	if ((*audio)->device_id)
-		SDL_CloseAudioDevice((*audio)->device_id);
-	oshu_close_stream(&(*audio)->music);
-	free(*audio);
-	*audio = NULL;
+	if (audio->device_id)
+		SDL_CloseAudioDevice(audio->device_id);
+	oshu_close_stream(&audio->music);
 }
 
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample)

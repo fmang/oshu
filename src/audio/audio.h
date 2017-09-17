@@ -107,19 +107,19 @@
  *
  * ## Use
  *
- * To use this module, open streams using #oshu_audio_open, and play them using
- * #oshu_audio_play. When you're done, close your streams with
- * #oshu_audio_close. Also make sure you initialized SDL with the audio
- * submodule.
+ * To use this module, open streams using #oshu_open_audio, and play them using
+ * #oshu_play_audio. When you're done, close your streams with
+ * #oshu_pause_audio. Also make sure you initialized SDL with the audio
+ * sub-module.
  *
  * ```c
  * SDL_Init(SDL_AUDIO|...);
- * oshu_audio_init();
- * struct oshu_audio *audio;
- * oshu_audio_open("file.ogg", &audio);
- * oshu_audio_play(audio);
+ * struct oshu_audio audio;
+ * memset(&audio, 0, sizeof(audio));
+ * oshu_open_audio("file.ogg", &audio);
+ * oshu_play_audio(&audio);
  * do_things();
- * oshu_audio_close(audio);
+ * oshu_close_audio(&audio);
  * ```
  *
  * ## Limitations
@@ -160,22 +160,24 @@ struct oshu_audio {
 /**
  * Open a file and initialize everything needed to play it.
  *
- * The stream can then be closed and freed with #oshu_audio_close.
- *
  * \param url Path or URL to the audio file to play.
- * \param audio Will receive a newly allocated audio context.
+ * \param audio Null-initialized #oshu_audio object.
  *
  * \return 0 on success. On error, -1 is returned and everything is freed.
+ *
+ * \sa oshu_audio_close
  */
-int oshu_audio_open(const char *url, struct oshu_audio **audio);
+int oshu_open_audio(const char *url, struct oshu_audio *audio);
 
 /**
  * Start playing!
  *
  * The SDL plays audio in a separate thread, so you need not worry about
  * calling this function regularily or anything. Don't bother, it's magic!
+ *
+ * \sa oshu_pause_audio
  */
-void oshu_audio_play(struct oshu_audio *audio);
+void oshu_play_audio(struct oshu_audio *audio);
 
 /**
  * Pause the stream.
@@ -183,18 +185,21 @@ void oshu_audio_play(struct oshu_audio *audio);
  * Calling #oshu_audio_play will resume the audio playback where it was
  * left playing.
  */
-void oshu_audio_pause(struct oshu_audio *audio);
+void oshu_pause_audio(struct oshu_audio *audio);
 
+/**
+ * Play a sample on top of the background music.
+ *
+ * Multiple samples may be played at once, but there's still a limit to the
+ * number of samples that can be played simultaneously. When that number is
+ * reached because all the effects channels are used, the playback of one of
+ * the samples is stopped to play the new sample.
+ */
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample);
 
 /**
- * Close the audio stream and free everything associated to it, then set
- * `*audio` to *NULL.
- *
- * If `*audio` is *NULL*, do nothing.
- *
- * You must not call this function with a null pointer though.
+ * Close the audio stream and free everything associated to it.
  */
-void oshu_audio_close(struct oshu_audio **audio);
+void oshu_close_audio(struct oshu_audio *audio);
 
 /** \} */
