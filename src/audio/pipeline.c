@@ -35,7 +35,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
 	struct oshu_audio *audio;
 	audio = (struct oshu_audio*) userdata;
-	int unit = 2 * sizeof(float);
+	int unit = audio->device_spec.channels * sizeof(float);
 	assert (len % unit == 0);
 	int nb_samples = len / unit;
 	int rc = oshu_read_stream(&audio->music, (float*) buffer, nb_samples);
@@ -67,6 +67,9 @@ static int open_device(struct oshu_audio *audio)
 		oshu_log_error("failed to open the audio device: %s", SDL_GetError());
 		return -1;
 	}
+	assert (audio->device_spec.freq == audio->music.sample_rate);
+	assert (audio->device_spec.format == AUDIO_F32);
+	assert (audio->device_spec.channels == 2);
 	return 0;
 }
 

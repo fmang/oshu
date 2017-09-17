@@ -8,6 +8,9 @@
 
 #include <assert.h>
 
+/** Work in stereo. */
+static const int channels = 2;
+
 /**
  * Convert a sample loaded from a WAV file in order to play it on the currently
  * opened device.
@@ -46,7 +49,7 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 int oshu_load_sample(const char *path, SDL_AudioSpec *spec, struct oshu_sample *sample)
 {
 	assert (spec->format == AUDIO_F32);
-	assert (spec->channels == 2);
+	assert (spec->channels == channels);
 	SDL_AudioSpec wav_spec;
 	SDL_AudioSpec *wav = SDL_LoadWAV(path, &wav_spec, (Uint8**) &sample->samples, &sample->size);
 	if (wav == NULL) {
@@ -55,7 +58,7 @@ int oshu_load_sample(const char *path, SDL_AudioSpec *spec, struct oshu_sample *
 	}
 	if (convert_audio(spec, wav, sample) < 0)
 		goto fail;
-	sample->nb_samples = sample->size / (2 * sizeof(*sample->samples));
+	sample->nb_samples = sample->size / (channels * sizeof(*sample->samples));
 	return 0;
 fail:
 	oshu_destroy_sample(sample);

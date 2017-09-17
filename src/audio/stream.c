@@ -12,6 +12,9 @@
 
 #include <assert.h>
 
+/** Work in stereo. */
+static const int channels = 2;
+
 /**
  * Spew an error message according to the return value of a call to one of
  * ffmpeg's functions.
@@ -143,7 +146,7 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
 			return -1;
 		left -= rc;
 		stream->sample_index += rc;
-		samples += rc * 2; /* because stereo */
+		samples += rc * channels;
 	}
 	return nb_samples - left;
 }
@@ -243,6 +246,7 @@ fail:
  */
 static int open_converter(struct oshu_stream *stream)
 {
+	assert (channels == 2);
 	stream->converter = swr_alloc_set_opts(
 		stream->converter,
 		/* output */

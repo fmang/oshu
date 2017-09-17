@@ -26,6 +26,8 @@ struct oshu_sample;
 /**
  * A channel object for playing one sample.
  *
+ * Channels may only play packed stereo float samples.
+ *
  * \sa oshu_start_channel
  * \sa oshu_stop_channel
  */

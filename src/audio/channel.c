@@ -9,6 +9,9 @@
 #include <math.h>
 #include <stdlib.h>
 
+/** Work in stereo. */
+static const int channels = 2;
+
 void oshu_start_channel(struct oshu_channel *channel, struct oshu_sample *sample, float volume)
 {
 	channel->sample = sample;
@@ -35,11 +38,11 @@ int oshu_mix_channel(struct oshu_channel *channel, float *samples, int nb_sample
 			continue;
 		}
 		int consume = left < wanted ? left : wanted;
-		float *input = channel->sample->samples + channel->cursor * 2;
-		for (int i = 0; i < consume * 2; i++)
+		float *input = channel->sample->samples + channel->cursor * channels;
+		for (int i = 0; i < consume * channels; i++)
 			samples[i] = fmaf(input[i], channel->volume, samples[i]);
 		channel->cursor += consume;
-		samples += consume * 2;
+		samples += consume * channels;
 		wanted -= consume;
 	}
 	return nb_samples - wanted;
