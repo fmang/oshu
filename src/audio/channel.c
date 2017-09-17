@@ -6,6 +6,7 @@
 #include "audio/channel.h"
 #include "audio/sample.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 void oshu_start_channel(struct oshu_channel *channel, struct oshu_sample *sample, float volume)
@@ -36,7 +37,7 @@ int oshu_mix_channel(struct oshu_channel *channel, float *samples, int nb_sample
 		int consume = left < wanted ? left : wanted;
 		float *input = channel->sample->samples + channel->cursor * 2;
 		for (int i = 0; i < consume * 2; i++)
-			samples[i] += input[i] * channel->volume;
+			samples[i] = fmaf(input[i], channel->volume, samples[i]);
 		channel->cursor += consume;
 		samples += consume * 2;
 		wanted -= consume;

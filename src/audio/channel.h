@@ -85,6 +85,11 @@ void oshu_stop_channel(struct oshu_channel *channel);
  * The *samples* buffer must contain at least 2 × *nb_samples* floats, already
  * filled with audio data. The samples of the channel are added on top of it.
  *
+ * The operation performed for mixing the samples is called multiply-accumulate
+ * (MAC) and when dealing with audio, there are specialized hardware units to
+ * handle it. The *fmaf* function in math.h should be able to perform the
+ * operation in a single step, with less rounding error.
+ *
  * \return
  * The number of samples per channel that were added to the buffer. It may be 0
  * when the stream is inactive, or less than *nb_samples* when the sample has
