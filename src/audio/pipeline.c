@@ -75,6 +75,7 @@ static int open_device(struct oshu_audio *audio)
 
 int oshu_audio_open(const char *url, struct oshu_audio **audio)
 {
+	assert (sizeof(float) == 4);
 	*audio = calloc(1, sizeof(**audio));
 	if (*audio == NULL) {
 		oshu_log_error("could not allocate the audio context");

@@ -3,7 +3,7 @@
  * \ingroup audio
  *
  * \brief
- * Definition of the audio module and its submodules.
+ * Definition of the highest-level audio module.
  */
 
 #pragma once
@@ -30,6 +30,8 @@
  * milliseconds, which is already about 1 image frame in 60 FPS! However, we
  * should at least guarantee the game won't drift away from the audio playback,
  * even if for some reason the audio thread fails to decode a frame on time.
+ *
+ * ## The audio pipeline
  *
  * The playback is handled as follows:
  *
@@ -67,6 +69,44 @@
  * however than the sound effects we'll trigger will suffer from that exact
  * same bias.
  *
+ * ## Mixing
+ *
+ * To play samples on top of the background music, the work is split between
+ * the various audio sub-modules.
+ *
+ * Their relations are shown below.
+ *
+ * \dot
+ * digraph {
+ * 	rankdir=LR
+ * 	node [shape=rect]
+ *
+ * 	channel1 [label="oshu_channel"]
+ * 	channel2 [label="oshu_channel"]
+ * 	channel3 [label="oshu_channel"]
+ * 	sample1 [label="oshu_sample"]
+ * 	sample2 [label="oshu_sample"]
+ * 	"float*" [shape=none]
+ * 	"music.mp3" [shape=none]
+ * 	"hit.wav" [shape=none]
+ * 	"clap.wav" [shape=none]
+ *
+ * 	"music.mp3" -> "oshu_stream" [label="oshu_open_stream"]
+ * 	"oshu_stream" -> "float*" [label="oshu_read_stream"]
+ * 	"hit.wav" -> sample1 [label="oshu_load_sample"]
+ * 	"clap.wav" -> sample2 [label="oshu_load_sample"]
+ * 	sample1 -> channel1 [label="oshu_start_channel"]
+ * 	sample1 -> channel2 [label="oshu_start_channel"]
+ * 	sample2 -> channel3 [label="oshu_start_channel"]
+ * 	channel1 -> "float*" [label="oshu_mix_channel"]
+ * 	channel2 -> "float*" [label="oshu_mix_channel"]
+ * 	channel3 -> "float*" [label="oshu_mix_channel"]
+ * 	"float*" -> "SDL"
+ * }
+ * \enddot
+ *
+ * ## Use
+ *
  * To use this module, open streams using #oshu_audio_open, and play them using
  * #oshu_audio_play. When you're done, close your streams with
  * #oshu_audio_close. Also make sure you initialized SDL with the audio
@@ -82,13 +122,21 @@
  * oshu_audio_close(audio);
  * ```
  *
- * Depending on how the SDL handles multiple devices, you may not be able to
- * open simultaneous streams.
+ * ## Limitations
  *
- * This module was carefully built and should be relied upon. Its main
- * limitations are that it cannot play sample formats not supported by SDL,
- * like 64-bit integer samples that nobody use, and that it cannot play more
- * than one sample on top of the main audio stream.
+ * To make the implementation simpler, samples are always converted to packed
+ * stetero 32-bit floats. See \ref audio_stream. The float part is not a
+ * limitation in itself because it's one of the most accurate format commonly
+ * available. The packed part is no different from planar in terms of
+ * information since it's just about ordering.
+ *
+ * The main limitation is the stereo mode, and fortunately, it's probably also
+ * the easiest one to lift. However, I cannot see any use case, since players
+ * have stereo headphones, and most songs are in stereo in the first place.
+ * The number of channels is not enough to properly define a channel layout
+ * though, because there are several ways to arrange them. It doesn't look like
+ * SDL2 has been thinking it out through tough, so let's wait until someone
+ * comes up with a concrete case, and test a few things when that time comes.
  *
  * \{
  */
@@ -100,7 +148,7 @@
  * locked using SDL's `SDL_LockAudioDevice` and `SDL_UnlockAudioDevice`
  * procedures in order to be accessed peacefully from another thread. You don't
  * need to bother with locking when using the accessors defined in this module
- * though. Only lock when accessing the multiplie fields directly.
+ * though. Only lock when accessing multiple fields directly.
  */
 struct oshu_audio {
 	struct oshu_stream music;
