@@ -170,8 +170,7 @@ void oshu_normalize_bezier(struct oshu_bezier *bezier)
 	for (int i = 0; i < num_anchors; i++) {
 		double t = (double) i / num_anchors;
 		struct oshu_point current = bezier_at(bezier, t);
-		double step = oshu_distance(prev, current);
-		length += step;
+		length += oshu_distance(prev, current);
 		bezier->anchors[i] = length;
 	}
 	assert (length > 0);
@@ -204,8 +203,15 @@ void oshu_normalize_bezier(struct oshu_bezier *bezier)
 static double normalize_t(struct oshu_bezier *bezier, double t)
 {
 	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
-	int piece = focus(&t, num_anchors - 1);
-	return (1. - t) * bezier->anchors[piece] + t * bezier->anchors[piece + 1];
+	for (int i = 1; i < num_anchors; ++i) {
+		if (t <= bezier->anchors[i]) {
+			assert (t >= bezier->anchors[i - 1]);
+			double piece_length = bezier->anchors[i] - bezier->anchors[i - 1];
+			assert (piece_length > 0);
+			return (i  + (t - bezier->anchors[i - 1]) / piece_length) / num_anchors;
+		}
+	}
+	return 1.;
 }
 
 /**

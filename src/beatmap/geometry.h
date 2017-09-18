@@ -216,9 +216,13 @@ struct oshu_bezier {
 	 * For each of these points, write in this array the coordinates it
 	 * should have had in normalized t-coordinates.
 	 *
+	 * The first anchor is always 0, the last anchor is always 1. The
+	 * relative length of the i'th piece, from i/16 to (i+1)/16, is
+	 * `anchors[i+1] - anchors[i]`.
+	 *
 	 * \sa oshu_normalize_bezier
 	 */
-	double anchors[17];
+	double anchors[32];
 };
 
 /**
