@@ -35,6 +35,36 @@ double oshu_distance(struct oshu_point p, struct oshu_point q)
 }
 
 /**
+ * Split the [0, 1] range into n equal sub-ranges.
+ *
+ * For example, splitting [0, 1] in 2 will make [0, 1/2] and [1/2, 1].
+ * In that case, if t=1/4, then it belongs to the first segment, and is at 1/2
+ * in that segment's sub-range. So t becomes 1/2, and 0 is returned.
+ *
+ * Expects:
+ * - 0 ≤ t ≤ 1
+ * - n > 0
+ *
+ * Guarantees:
+ * - 0 ≤ t ≤ 1
+ * - 0 ≤ return value < n
+ *
+ * \sa bezier_map
+ */
+static int focus(double *t, int n)
+{
+	assert (n > 0);
+	int segment = (int) (*t * n);
+	assert (segment >= 0);
+	assert (segment <= n);
+	/* When t=1, we'd get segment = n */
+	if (segment >= n)
+		segment = n - 1;
+	*t = (*t * n) - segment; /* rescale t */
+	return segment;
+}
+
+/**
  * Pre-computed factorial values, for speed.
  * We're never going to see 8th-order Bezier curve, right?
  */
@@ -75,21 +105,15 @@ static int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 3991
  *
  * From the illustration, we see that 0.625 maps to the middle of the third
  * segment, which is what we expect.
+ *
+ * \sa focus
  */
 static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct oshu_point **control_points)
 {
-	int segment = (int) (*t * path->segment_count);
-	assert (segment >= 0);
-	assert (segment <= path->segment_count);
-	/* When t=1, we'd get segment = segment_count */
-	if (segment >= path->segment_count)
-		segment = path->segment_count - 1;
-
+	int segment = focus(t, path->segment_count);
 	*degree = path->indices[segment+1] - path->indices[segment] - 1;
 	assert (*degree < sizeof(fac) / sizeof(*fac));
-
 	*control_points = path->control_points + path->indices[segment];
-	*t = (*t * path->segment_count) - segment; /* rescale t */
 }
 
 /**
@@ -105,39 +129,6 @@ static struct oshu_point segment_at(int degree, struct oshu_point *control_point
 		p.y += factor * control_points[i].y;
 	}
 	return p;
-}
-
-/**
- * Compute a numerical approximation of the length of a Bézier segment.
- *
- * Split the Bézier into 16 points and sum the distance between each of those
- * points. Return the result.
- */
-static double segment_length(int degree, struct oshu_point *control_points)
-{
-	static int precision = 16;
-	double length = 0;
-	struct oshu_point prev = segment_at(degree, control_points, 0);
-	for (int i = 0; i < precision; i++) {
-		double t = (1. + (double) i) / precision;
-		struct oshu_point here = segment_at(degree, control_points, t);
-		length += oshu_distance(prev, here);
-	}
-	return length;
-}
-
-void oshu_normalize_bezier(struct oshu_bezier *bezier)
-{
-	double total_length = 0;
-	/* Compute the absolute lengths. */
-	for (int s = 0; s < bezier->segment_count; s++) {
-		int degree = bezier->indices[s+1] - bezier->indices[s] - 1;
-		bezier->lengths[s] = segment_length(degree, bezier->control_points + bezier->indices[s]);
-		total_length += bezier->lengths[s];
-	}
-	/* Normalize the lengths for their sum to be equal to 1. */
-	for (int s = 0; s < bezier->segment_count; s++)
-		bezier->lengths[s] /= total_length;
 }
 
 /**
@@ -169,6 +160,52 @@ static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
 	d.x *= degree;
 	d.y *= degree;
 	return d;
+}
+
+void oshu_normalize_bezier(struct oshu_bezier *bezier)
+{
+	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
+	double length = 0;
+	struct oshu_point prev = bezier->control_points[0];
+	for (int i = 0; i < num_anchors; i++) {
+		double t = (double) i / num_anchors;
+		struct oshu_point current = bezier_at(bezier, t);
+		double step = oshu_distance(prev, current);
+		length += step;
+		bezier->anchors[i] = length;
+	}
+	assert (length > 0);
+	for (int i = 0; i < num_anchors; i++)
+		bezier->anchors[i] /= length;
+}
+
+/**
+ * Translate t coordinates with respect to the length of the various pieces of
+ * the path.
+ *
+ * First, we have the naive global coordinates, where, if there are two
+ * segments, the first one will receive [0, 1/2] and the second one [1/2, 1].
+ *
+ * Now, assume the first segment is twice as big as the second one, we'd like
+ * to have a [0, 2/3] and [2/3, 1] share instead. This kind of problem arises
+ * even inside a single segment, where the curve moves much faster on some
+ * parts.
+ *
+ * Let's call the fair coordinates *normalized t-coordinates*.
+ *
+ * To handle this uniformly, #oshu_bezier::anchors contains all the length
+ * information we'll need, disregarding segments. The whole path is split into
+ * N pieces ranging from i/(N+1) to (i+1)/(N+1). These two ends are called
+ * *anchors*, and the normalized t-coordinates of the anchors of the i'th piece
+ * are available as `anchors[i]` to `anchors[i+1]`.
+ *
+ * \sa oshu_normalize_bezier
+ */
+static double normalize_t(struct oshu_bezier *bezier, double t)
+{
+	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
+	int piece = focus(&t, num_anchors - 1);
+	return (1. - t) * bezier->anchors[piece] + t * bezier->anchors[piece + 1];
 }
 
 /**
@@ -265,6 +302,7 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 	case OSHU_PATH_LINEAR:
 		return line_at(&path->line, t);
 	case OSHU_PATH_BEZIER:
+		t = normalize_t(&path->bezier, t);
 		return bezier_at(&path->bezier, t);
 	case OSHU_PATH_PERFECT:
 		return arc_at(&path->arc, t);
@@ -289,6 +327,7 @@ struct oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 		d = line_derive(&path->line, t);
 		break;
 	case OSHU_PATH_BEZIER:
+		t = normalize_t(&path->bezier, t);
 		d = bezier_derive(&path->bezier, t);
 		break;
 	case OSHU_PATH_PERFECT:

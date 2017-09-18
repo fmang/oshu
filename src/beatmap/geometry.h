@@ -211,16 +211,14 @@ struct oshu_bezier {
 	 */
 	struct oshu_point *control_points;
 	/**
-	 * An approximate relative length of all the segments.
+	 * Pick 17 points in naive: t=0/16, t=1/16, t=2/16, to t=16/16.
 	 *
-	 * The length of the nth segment is `lengths[n]`, and the sum of all
-	 * the segments must sum up to 1.
+	 * For each of these points, write in this array the coordinates it
+	 * should have had in normalized t-coordinates.
 	 *
-	 * The size of this array must be at least #segment_count.
-	 *
-	 * Use #oshu_normalize_bezier to compute it.
+	 * \sa oshu_normalize_bezier
 	 */
-	double *lengths;
+	double anchors[17];
 };
 
 /**
@@ -228,10 +226,7 @@ struct oshu_bezier {
  *
  * Receives a Bézier path whose #oshu_bezier::segment_count,
  * #oshu_bezier::indices and #oshu_bezier::control_points are filled, and use
- * these data to compute the #oshu_bezier::lengths field.
- *
- * The #oshu_bezier::lengths field must be allocated before calling this
- * function.
+ * these data to compute the #oshu_bezier::anchors field.
  */
 void oshu_normalize_bezier(struct oshu_bezier *bezier);
 

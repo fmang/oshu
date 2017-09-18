@@ -337,7 +337,6 @@ static void build_bezier_slider(char *line, struct oshu_hit *hit)
 	}
 	bezier->indices[++index] = count;
 	bezier->segment_count = index;
-	bezier->lengths = calloc(bezier->segment_count, sizeof(*bezier->lengths));
 	oshu_normalize_bezier(bezier);
 }
 
