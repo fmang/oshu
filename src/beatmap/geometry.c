@@ -208,7 +208,7 @@ static double normalize_t(struct oshu_bezier *bezier, double t)
 			assert (t >= bezier->anchors[i - 1]);
 			double piece_length = bezier->anchors[i] - bezier->anchors[i - 1];
 			assert (piece_length > 0);
-			return (i  + (t - bezier->anchors[i - 1]) / piece_length) / num_anchors;
+			return (i - 1 + (t - bezier->anchors[i - 1]) / piece_length) / num_anchors;
 		}
 	}
 	return 1.;
