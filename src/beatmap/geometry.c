@@ -48,59 +48,48 @@ static int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 3991
  * \param degree Write the selected segment's degree.
  * \param control_points Write the address of the first point of the segment.
  *
- * Let's illustrate with 3 segments, showing the *t*-coordinates for the path:
+ * Let's explain a bit how *t* is mapped. First of all, we assume each segment
+ * has the same length, and have the same portion of the [0, 1] range for *t*.
+ *
+ * Let's illustrate with 4 segments, using the *t*-coordinates for the path:
  *
  * ```
  *                        t=0.625
  *                           ↓
- *  ├─────────┼─────────┼───────────────────┤
- * t=0      t=1/4     t=1/2                t=1
+ *  ├─────────┼─────────┼─────────┼─────────┤
+ * t=0      t=1/4     t=1/2     t=3/4      t=1
  * ```
  *
- * The first first two segments are of relative length 1/4 each, and the third
- * one represents the remaining 1/2.
- *
- * The *t*-point represented belongs to the third segment, so we'll remove the
- * start of the third segment from *t*, getting 0.625 - 1/2 = 0.125.
- *
+ * When we multiply it by 4, we get the followed scaled *t*-coordinates:
  *
  * ```
- *    t=0.125
- *       ↓
- *  ├───────────────────┤
- * t=0                t=1/2
+ *                         t=2.5
+ *                           ↓
+ *  ├─────────┼─────────┼─────────┼─────────┤
+ * t=0       t=1       t=2       t=3       t=4
  * ```
  *
- * The next step consists in scaling the *t* coordinate after the shift. All we
- * have to do is divide it by the relative length of the segment. Here, it's
- * 1/2, so we get this:
+ * With these scaled coordinates, we just take the integral part (or floor) and
+ * get the segment's index. The floating part will range from 0 to 1 which is
+ * just what we need.
  *
- * ```
- *         t=0.250
- *            ↓
- *  ├───────────────────────────────────────┤
- * t=0                                     t=1
- * ```
- *
- * Now we have standard *t*-coordinates for a Bézier segment, and just have to
- * apply the explicit definition of the Bézier curves.
- *
+ * From the illustration, we see that 0.625 maps to the middle of the third
+ * segment, which is what we expect.
  */
 static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct oshu_point **control_points)
 {
-	int segment = 0;
-	double segment_start = 0.;
-	for (; segment < path->segment_count - 1; ++segment) {
-		double length = path->lengths[segment];
-		if (segment_start + length > *t)
-			break;
-		segment_start += length;
-	}
+	int segment = (int) (*t * path->segment_count);
+	assert (segment >= 0);
+	assert (segment <= path->segment_count);
+	/* When t=1, we'd get segment = segment_count */
+	if (segment >= path->segment_count)
+		segment = path->segment_count - 1;
 
-	assert (path->lengths[segment] != 0);
-	*t = (*t - segment_start) / path->lengths[segment];
 	*degree = path->indices[segment+1] - path->indices[segment] - 1;
+	assert (*degree < sizeof(fac) / sizeof(*fac));
+
 	*control_points = path->control_points + path->indices[segment];
+	*t = (*t * path->segment_count) - segment; /* rescale t */
 }
 
 /**
@@ -109,7 +98,6 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct 
 static struct oshu_point segment_at(int degree, struct oshu_point *control_points, double t)
 {
 	struct oshu_point p = {0, 0};
-	assert (degree < sizeof(fac) / sizeof(*fac));
 	for (int i = 0; i <= degree; i++) {
 		double bin = fac[degree] / (fac[i] * fac[degree - i]);
 		double factor = bin * pow(t, i) * pow(1 - t, degree - i);
@@ -172,8 +160,6 @@ static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
 	int degree;
 	struct oshu_point *points;
 	bezier_map(path, &t, &degree, &points);
-
-	assert (degree < sizeof(fac) / sizeof(*fac));
 	for (int i = 0; i <= degree - 1; i++) {
 		double bin = fac[degree - 1] / (fac[i] * fac[degree - 1 - i]);
 		double factor = bin * pow(t, i) * pow(1 - t, degree - 1 - i);
