@@ -164,11 +164,14 @@ int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c
  * To make a continous path, the end point of a segment must be the same as
  * the beginning point of the next one.
  *
- * A Bézier segment is usually represented in *t*-coordinates, with *t* ranging
- * from 0 to 1. To represent a path in *t*-coordinates, we'll assume all the
- * segments have roughly the same length, and map the *k*th segment in a
- * *n*-segment path to the *t*-coordinates *k/n* to *(k+1)/n* where
- * *0 ≤ k < n*.
+ * Bézier segments in oshu implement two coordinates systems. The first one is
+ * the t-coordinate system, which is the one you see in the explicit definition
+ * of the Bézier curves everywhere. The second one is more specific and meant
+ * for oshu. Let's call it the l-coordinate system, where l ranges between 0
+ * and 1, and represents how far the point is from the start. For example,
+ * l=1/2 means that the point is at the middle of the curve, as opposed to
+ * t=1/2 which means, for quadratic curves, that the point is closest to the
+ * middle control point. See #oshu_normalize.
  */
 struct oshu_bezier {
 	/**
@@ -211,14 +214,13 @@ struct oshu_bezier {
 	 */
 	struct oshu_point *control_points;
 	/**
-	 * Pick 17 points in naive: t=0/16, t=1/16, t=2/16, to t=16/16.
+	 * Translation map from l-coordinates to t-coordinates.
 	 *
-	 * For each of these points, write in this array the coordinates it
-	 * should have had in normalized t-coordinates.
+	 * Let's say we have n pieces, and n+1 anchors. Then for every 0 ≤ i ≤
+	 * n, `anchors[i]` holds the t-coordinate for the point at l = i / n.
 	 *
-	 * The first anchor is always 0, the last anchor is always 1. The
-	 * relative length of the i'th piece, from i/16 to (i+1)/16, is
-	 * `anchors[i+1] - anchors[i]`.
+	 * For any point such that i / n ≤ l ≤ (i + 1) / n, compute a weighted
+	 * average between anchors[i] and anchors[i+1].
 	 *
 	 * \sa oshu_normalize_bezier
 	 */
