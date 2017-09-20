@@ -35,7 +35,10 @@ double oshu_distance(struct oshu_point p, struct oshu_point q)
 }
 
 /**
- * Split the [0, 1] range into n equal sub-ranges.
+ * Split the [0, 1] range into n equal sub-segments.
+ *
+ * More concretely, compute and `*t * n`, write its fractional part in `*t`,
+ * and return the integral part, while guaranteeing it doesn't exceed n - 1.
  *
  * For example, splitting [0, 1] in 2 will make [0, 1/2] and [1/2, 1].
  * In that case, if t=1/4, then it belongs to the first segment, and is at 1/2
@@ -53,13 +56,12 @@ double oshu_distance(struct oshu_point p, struct oshu_point q)
  */
 static int focus(double *t, int n)
 {
+	assert (*t >= 0);
 	assert (n > 0);
 	int segment = (int) (*t * n);
-	assert (segment >= 0);
-	assert (segment <= n);
 	/* When t=1, we'd get segment = n */
-	if (segment >= n)
-		segment = n - 1;
+	assert (segment <= n);
+	segment = segment < n ? segment : n - 1;
 	*t = (*t * n) - segment; /* rescale t */
 	return segment;
 }
@@ -99,7 +101,7 @@ static int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 3991
  * t=0       t=1       t=2       t=3       t=4
  * ```
  *
- * With these scaled coordinates, we just take the integral part (or floor) and
+ * With these scaled coordinates, we just take the integral part (or floor) to
  * get the segment's index. The floating part will range from 0 to 1 which is
  * just what we need.
  *
