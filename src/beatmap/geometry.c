@@ -69,6 +69,13 @@ static int focus(double *t, int n)
 /**
  * Pre-computed factorial values, for speed.
  * We're never going to see 8th-order Bezier curve, right?
+ *
+ * Don't add any more value here, it's going to cause numerical instabilities
+ * because of overflows and float approximations.
+ *
+ * Use de Casteljau's algorithm is this is limiting.
+ *
+ * \sa bezier_at
  */
 static int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800};
 
@@ -120,6 +127,8 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct 
 
 /**
  * Map a t coordinate to a point in a Bézier segment.
+ *
+ * \sa bezier_at
  */
 static struct oshu_point segment_at(int degree, struct oshu_point *control_points, double t)
 {
@@ -138,6 +147,10 @@ static struct oshu_point segment_at(int degree, struct oshu_point *control_point
  *
  * The coordinates are mapped with #bezier_map, and then we just apply the
  * standard explicit definition of Bézier curves.
+ *
+ * If the factorial gets too big and annoying, we'll switch to de Casteljau's
+ * algorithm. However, since I'm not sure it would let us derive, maybe that's
+ * gonna wait until we switch to a new Bézier drawing engine.
  */
 static struct oshu_point bezier_at(struct oshu_bezier *path, double t)
 {
