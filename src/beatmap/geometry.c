@@ -160,6 +160,14 @@ static struct oshu_point bezier_at(struct oshu_bezier *path, double t)
 	return segment_at(degree, points, t);
 }
 
+/**
+ * Compute the derivative of a Bézier curve in t-coordinates.
+ *
+ * In practice, it's going to be called with l-coordinates, so the result is
+ * formally wrong. However, because both derivative vectors are collinear, and
+ * because the resulting vector is normalized at the end anyway, it doesn't
+ * matter.
+ */
 static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
 {
 	struct oshu_vector d = {0, 0};
