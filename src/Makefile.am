@@ -5,12 +5,12 @@ oshu_SOURCES = \
 	log.h \
 	audio/audio.c \
 	audio/audio.h \
-	audio/channel.c \
-	audio/channel.h \
 	audio/sample.c \
 	audio/sample.h \
 	audio/stream.c \
 	audio/stream.h \
+	audio/track.c \
+	audio/track.h \
 	beatmap/beatmap.h \
 	beatmap/helpers.c \
 	beatmap/parser.c \

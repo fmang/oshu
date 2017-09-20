@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "audio/channel.h"
 #include "audio/sample.h"
 #include "audio/stream.h"
+#include "audio/track.h"
 
 #include <SDL2/SDL.h>
 
@@ -81,9 +81,9 @@
  * 	rankdir=LR
  * 	node [shape=rect]
  *
- * 	channel1 [label="oshu_channel"]
- * 	channel2 [label="oshu_channel"]
- * 	channel3 [label="oshu_channel"]
+ * 	track1 [label="oshu_track"]
+ * 	track2 [label="oshu_track"]
+ * 	track3 [label="oshu_track"]
  * 	sample1 [label="oshu_sample"]
  * 	sample2 [label="oshu_sample"]
  * 	"float*" [shape=none]
@@ -95,12 +95,12 @@
  * 	"oshu_stream" -> "float*" [label="oshu_read_stream"]
  * 	"hit.wav" -> sample1 [label="oshu_load_sample"]
  * 	"clap.wav" -> sample2 [label="oshu_load_sample"]
- * 	sample1 -> channel1 [label="oshu_start_channel"]
- * 	sample1 -> channel2 [label="oshu_start_channel"]
- * 	sample2 -> channel3 [label="oshu_start_channel"]
- * 	channel1 -> "float*" [label="oshu_mix_channel"]
- * 	channel2 -> "float*" [label="oshu_mix_channel"]
- * 	channel3 -> "float*" [label="oshu_mix_channel"]
+ * 	sample1 -> track1 [label="oshu_start_track"]
+ * 	sample1 -> track2 [label="oshu_start_track"]
+ * 	sample2 -> track3 [label="oshu_start_track"]
+ * 	track1 -> "float*" [label="oshu_mix_track"]
+ * 	track2 -> "float*" [label="oshu_mix_track"]
+ * 	track3 -> "float*" [label="oshu_mix_track"]
  * 	"float*" -> "SDL"
  * }
  * \enddot
@@ -156,22 +156,22 @@ struct oshu_audio {
 	 */
 	struct oshu_stream music;
 	/**
-	 * Channels for playing sound effects on top of the music.
+	 * Tracks for playing sound effects on top of the music.
 	 *
 	 * Up to 8 samples may be played at a time.
 	 *
 	 * When the need for looping samples arise, it would be smart to
-	 * dedicate a channel for them.
+	 * dedicate a track for them.
 	 */
-	struct oshu_channel effects[8];
+	struct oshu_track effects[8];
 	/**
 	 * A device ID returned by SDL, and required by most SDL audio
 	 * functions.
 	 */
 	SDL_AudioDeviceID device_id;
 	/**
-	 * Contains the sample rate, format, and channel of the audio output
-	 * device.
+	 * Contains the sample rate, format, and channel layout of the audio
+	 * output device.
 	 *
 	 * This is useful for loading samples with #oshu_load_sample.
 	 */
@@ -213,7 +213,7 @@ void oshu_pause_audio(struct oshu_audio *audio);
  *
  * Multiple samples may be played at once, but there's still a limit to the
  * number of samples that can be played simultaneously. When that number is
- * reached because all the effects channels are used, the playback of one of
+ * reached because all the effects tracks are used, the playback of one of
  * the samples is stopped to play the new sample.
  */
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample);

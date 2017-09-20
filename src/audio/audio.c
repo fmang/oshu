@@ -53,7 +53,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 
 	int channels = sizeof(audio->effects) / sizeof(*audio->effects);
 	for (int i = 0; i < channels; i++)
-		oshu_mix_channel(&audio->effects[i], (float*) buffer, nb_samples);
+		oshu_mix_track(&audio->effects[i], (float*) buffer, nb_samples);
 }
 
 /**
@@ -112,38 +112,38 @@ void oshu_close_audio(struct oshu_audio *audio)
 }
 
 /**
- * Pick a channel for playing sound effects.
+ * Pick a track for playing sound effects.
  *
- * If one channel is inactive, pick it without hesitation. If all the channels
+ * If one track is inactive, pick it without hesitation. If all the tracks
  * are active, pick the one with the biggest cursor, because there's a good
  * chance it's about to end.
  *
  * Make sure you lock the audio device when calling this function, in order to
  * ensure predictable results.
  */
-static struct oshu_channel *select_channel(struct oshu_audio *audio)
+static struct oshu_track *select_track(struct oshu_audio *audio)
 {
 	int max_cursor = 0;
-	struct oshu_channel *best_channel = &audio->effects[0];
-	int channels = sizeof(audio->effects) / sizeof(*audio->effects);
-	for (int i = 0; i < channels; ++i) {
-		struct oshu_channel *c = &audio->effects[i];
+	struct oshu_track *best_track = &audio->effects[0];
+	int tracks = sizeof(audio->effects) / sizeof(*audio->effects);
+	for (int i = 0; i < tracks; ++i) {
+		struct oshu_track *c = &audio->effects[i];
 		if (c->sample == NULL) {
 			return c;
 		} else if (c->cursor > max_cursor) {
 			max_cursor = c->cursor;
-			best_channel = c;
+			best_track = c;
 		}
 	}
-	return best_channel;
+	return best_track;
 }
 
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample)
 {
 	SDL_LockAudioDevice(audio->device_id);
-	struct oshu_channel *channel = select_channel(audio);
-	if (channel->sample != NULL)
-		oshu_log_debug("all the effect channels are taken, stealing one");
-	oshu_start_channel(channel, sample, 1.);
+	struct oshu_track *track = select_track(audio);
+	if (track->sample != NULL)
+		oshu_log_debug("all the effect tracks are taken, stealing one");
+	oshu_start_track(track, sample, 1.);
 	SDL_UnlockAudioDevice(audio->device_id);
 }
