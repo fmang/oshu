@@ -21,6 +21,22 @@
 static const int sample_buffer_size = 2048;
 
 /**
+ * Clip a buffer of float audio samples to ensure every sample's value is
+ * normalized between -1 and 1.
+ *
+ * Without this, some audio cards emit an awful noise.
+ */
+static void clip(float *samples, int nb_samples)
+{
+	for (int i = 0; i < nb_samples; i++) {
+		if (samples[i] > 1.)
+			samples[i] = 1.;
+		else if (samples[i] < -1.)
+			samples[i] = -1;
+	}
+}
+
+/**
  * Fill SDL's audio buffer, while requesting more frames as needed.
  *
  * libavcodec organize frames by channel in planar mode (LLLLRRRR), while we'd
@@ -41,8 +57,9 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	int unit = audio->device_spec.channels * sizeof(float);
 	assert (len % unit == 0);
 	int nb_samples = len / unit;
+	float *samples = (float*) buffer;
 
-	int rc = oshu_read_stream(&audio->music, (float*) buffer, nb_samples);
+	int rc = oshu_read_stream(&audio->music, samples, nb_samples);
 	if (rc < 0) {
 		oshu_log_debug("failed reading samples from the audio stream");
 		return;
@@ -53,7 +70,9 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 
 	int channels = sizeof(audio->effects) / sizeof(*audio->effects);
 	for (int i = 0; i < channels; i++)
-		oshu_mix_track(&audio->effects[i], (float*) buffer, nb_samples);
+		oshu_mix_track(&audio->effects[i], samples, nb_samples);
+
+	clip(samples, nb_samples);
 }
 
 /**
