@@ -26,13 +26,13 @@ static const int sample_buffer_size = 2048;
  *
  * Without this, some audio cards emit an awful noise.
  */
-static void clip(float *samples, int nb_samples)
+static void clip(float *samples, int nb_samples, int channels)
 {
-	for (int i = 0; i < nb_samples; i++) {
+	for (int i = 0; i < nb_samples * channels; ++i) {
 		if (samples[i] > 1.)
 			samples[i] = 1.;
 		else if (samples[i] < -1.)
-			samples[i] = -1;
+			samples[i] = -1.;
 	}
 }
 
@@ -68,11 +68,11 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 		memset(buffer + rc * unit, 0, len - rc * unit);
 	}
 
-	int channels = sizeof(audio->effects) / sizeof(*audio->effects);
-	for (int i = 0; i < channels; i++)
+	int tracks = sizeof(audio->effects) / sizeof(*audio->effects);
+	for (int i = 0; i < tracks; i++)
 		oshu_mix_track(&audio->effects[i], samples, nb_samples);
 
-	clip(samples, nb_samples);
+	clip(samples, nb_samples, audio->device_spec.channels);
 }
 
 /**
