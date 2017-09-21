@@ -175,57 +175,58 @@ static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
 	return d;
 }
 
+/* Implement the algorithm described in geometry.h */
 void oshu_normalize_bezier(struct oshu_bezier *bezier)
 {
-	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
+	/* 1. Prepare the field. */
+	int n = 32;  /* arbitrary */
+	double l[n + 1];
+
+	/* 2. Compute the length of the path. */
 	double length = 0;
 	struct oshu_point prev = bezier->control_points[0];
-	for (int i = 0; i < num_anchors; i++) {
-		double t = (double) i / (num_anchors - 1);
+	for (int i = 0; i <= n; i++) {
+		double t = (double) i / n;
 		struct oshu_point current = bezier_at(bezier, t);
 		length += oshu_distance(prev, current);
-		bezier->anchors[i] = length;
+		l[i] = length;
 		prev = current;
 	}
+
+	/* 3. Deduce the l-coordinates. */
 	assert (length > 0);
-	for (int i = 0; i < num_anchors; i++)
-		bezier->anchors[i] /= length;
+	for (int i = 0; i <= n; i++)
+		l[i] /= length;
+
+	/* 4. Set up the anchors. */
+	int i = 0;
+	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
+	for (int j = 0; j < num_anchors; j++) {
+		double my_l = (double) j / (num_anchors - 1);
+		while (!(my_l <= l[i + 1]) && i < n)
+			i++;
+		assert (l[i] <= my_l);
+		double k = (my_l - l[i]) / (l[i+1] - l[i]);
+		bezier->anchors[j] = (1. - k) * i / n + k * (i + 1.) / n;
+	}
 }
 
 /**
- * Translate t coordinates with respect to the length of the various pieces of
- * the path.
+ * Translate l-coordinates to t-coordinates.
  *
- * First, we have the naive global coordinates, where, if there are two
- * segments, the first one will receive [0, 1/2] and the second one [1/2, 1].
+ * First, the #focus converts our l such that we have
+ * `l = (1 - k) * i / n + k * (i + 1) / n`.
  *
- * Now, assume the first segment is twice as big as the second one, we'd like
- * to have a [0, 2/3] and [2/3, 1] share instead. This kind of problem arises
- * even inside a single segment, where the curve moves much faster on some
- * parts.
- *
- * Let's call the fair coordinates *normalized t-coordinates*.
- *
- * To handle this uniformly, #oshu_bezier::anchors contains all the length
- * information we'll need, disregarding segments. The whole path is split into
- * N pieces ranging from i/(N+1) to (i+1)/(N+1). These two ends are called
- * *anchors*, and the normalized t-coordinates of the anchors of the i'th piece
- * are available as `anchors[i]` to `anchors[i+1]`.
+ * Then, we get the approximate t by applying a similar relation:
+ * `t = (1 - k) * anchors[i] + k * anchors[i + 1]`.
  *
  * \sa oshu_normalize_bezier
  */
-static double normalize_t(struct oshu_bezier *bezier, double t)
+static double l_to_t(struct oshu_bezier *bezier, double l)
 {
-	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
-	for (int i = 1; i < num_anchors; ++i) {
-		if (t <= bezier->anchors[i]) {
-			assert (t >= bezier->anchors[i - 1]);
-			double piece_length = bezier->anchors[i] - bezier->anchors[i - 1];
-			assert (piece_length > 0);
-			return (i - 1 + (t - bezier->anchors[i - 1]) / piece_length) / (num_anchors - 1);
-		}
-	}
-	return 1.;
+	int n = sizeof(bezier->anchors) / sizeof(*bezier->anchors) - 1;
+	int i = focus(&l, n);
+	return (1. - l) * bezier->anchors[i] + l * bezier->anchors[i + 1];
 }
 
 /**
@@ -322,7 +323,7 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 	case OSHU_PATH_LINEAR:
 		return line_at(&path->line, t);
 	case OSHU_PATH_BEZIER:
-		t = normalize_t(&path->bezier, t);
+		t = l_to_t(&path->bezier, t);
 		return bezier_at(&path->bezier, t);
 	case OSHU_PATH_PERFECT:
 		return arc_at(&path->arc, t);
@@ -347,7 +348,7 @@ struct oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 		d = line_derive(&path->line, t);
 		break;
 	case OSHU_PATH_BEZIER:
-		t = normalize_t(&path->bezier, t);
+		t = l_to_t(&path->bezier, t);
 		d = bezier_derive(&path->bezier, t);
 		break;
 	case OSHU_PATH_PERFECT:

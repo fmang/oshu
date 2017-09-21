@@ -216,8 +216,8 @@ struct oshu_bezier {
 	/**
 	 * Translation map from l-coordinates to t-coordinates.
 	 *
-	 * Let's say we have n pieces, and n+1 anchors. Then for every 0 ≤ i ≤
-	 * n, `anchors[i]` holds the t-coordinate for the point at l = i / n.
+	 * Let's say we have n pieces, and n+1 anchors. Then for every 0 ≤ i ≤ n,
+	 * `anchors[i]` holds the t-coordinate for the point at l = i / n.
 	 *
 	 * For any point such that i / n ≤ l ≤ (i + 1) / n, compute a weighted
 	 * average between anchors[i] and anchors[i+1].
