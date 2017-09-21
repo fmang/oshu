@@ -8,15 +8,25 @@
 
 #include <assert.h>
 
+/*
+ * These two constants are crucial for correctly defining the viewport.
+ * They're not arbitrary and required by osu's beatmap format.
+ */
 static const int game_width = 640; /* px */
 static const int game_height = 480; /* px */
 
+/**
+ * Open the window and create the rendered.
+ *
+ * The default window size, 960x720 is arbitrary but proportional the the game
+ * area. It's just a saner default for most screens.
+ */
 int create_window(struct oshu_display *display)
 {
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		game_width, game_height,
+		960, 720,
 		SDL_WINDOW_RESIZABLE
 	);
 	if (display->window == NULL)
