@@ -126,23 +126,6 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct 
 }
 
 /**
- * Map a t coordinate to a point in a Bézier segment.
- *
- * \sa bezier_at
- */
-static struct oshu_point segment_at(int degree, struct oshu_point *control_points, double t)
-{
-	struct oshu_point p = {0, 0};
-	for (int i = 0; i <= degree; i++) {
-		double bin = fac[degree] / (fac[i] * fac[degree - i]);
-		double factor = bin * pow(t, i) * pow(1 - t, degree - i);
-		p.x += factor * control_points[i].x;
-		p.y += factor * control_points[i].y;
-	}
-	return p;
-}
-
-/**
  * Compute the position of a point expressed in *t*-coordinates.
  *
  * The coordinates are mapped with #bezier_map, and then we just apply the
@@ -157,7 +140,14 @@ static struct oshu_point bezier_at(struct oshu_bezier *path, double t)
 	int degree;
 	struct oshu_point *points;
 	bezier_map(path, &t, &degree, &points);
-	return segment_at(degree, points, t);
+	struct oshu_point p = {0, 0};
+	for (int i = 0; i <= degree; i++) {
+		double bin = fac[degree] / (fac[i] * fac[degree - i]);
+		double factor = bin * pow(t, i) * pow(1 - t, degree - i);
+		p.x += factor * points[i].x;
+		p.y += factor * points[i].y;
+	}
+	return p;
 }
 
 /**
