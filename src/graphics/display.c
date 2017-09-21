@@ -48,11 +48,11 @@ int load_textures(struct oshu_display *display)
 int oshu_open_display(struct oshu_display **display)
 {
 	*display = calloc(1, sizeof(**display));
-	(*display)->viewport.zoom = 1.;
 	if (create_window(*display) < 0)
 		goto fail;
 	if (load_textures(*display) < 0)
 		goto fail;
+	oshu_resize_display(*display);
 	return 0;
 fail:
 	oshu_close_display(display);
