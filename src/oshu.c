@@ -7,13 +7,17 @@
  * Interpret command-line arguments and spawn everything.
  */
 
+#include "../config.h"
+
 #include "log.h"
 #include "game/game.h"
-#include "../config.h"
+
+#include <SDL2/SDL.h>
 
 #include <errno.h>
 #include <getopt.h>
 #include <signal.h>
+#include <stdio.h>
 #include <unistd.h>
 
 enum option_values {
@@ -72,6 +76,11 @@ int run(const char *beatmap_path, int autoplay, int pause)
 
 	current_game->autoplay = autoplay;
 	current_game->paused = pause;
+
+	char *title;
+	asprintf(&title, "%s - oshu!", beatmap_path);
+	SDL_SetWindowTitle(current_game->display->window, title);
+	free(title);
 
 	if ((rc = oshu_game_run(current_game)) < 0) {
 		oshu_log_error("error while running the game, aborting");

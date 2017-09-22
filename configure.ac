@@ -7,6 +7,7 @@ AC_CONFIG_SRCDIR([src/oshu.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile docs/Makefile share/Makefile])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+AC_USE_SYSTEM_EXTENSIONS
 
 # Checks for programs.
 AC_PROG_CC_C99
