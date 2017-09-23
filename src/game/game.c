@@ -26,7 +26,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		oshu_log_error("no beatmap, aborting");
 		goto fail;
 	}
-	if ((*game)->beatmap->mode == OSHU_MODE_OSU) {
+	if ((*game)->beatmap->mode == OSHU_OSU_MODE) {
 		(*game)->mode = &oshu_osu_mode;
 	} else {
 		oshu_log_error("unsupported game mode");

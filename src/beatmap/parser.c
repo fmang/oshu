@@ -27,7 +27,7 @@ static const char *osu_file_header = "osu file format v";
  * not 0 by default.
  */
 static const struct oshu_beatmap default_beatmap = {
-	.sample_set = OSHU_SAMPLE_SET_SOFT,
+	.sample_set = OSHU_SOFT_SAMPLE_SET,
 	.difficulty = {
 		.hp_drain_rate = 1.,
 		.circle_radius = 32.,
@@ -735,13 +735,13 @@ static int parse_sample_set(struct parser_state *parser, enum oshu_sample_set_fa
 		return -1;
 	switch (token) {
 	case Drum:
-		*set = OSHU_SAMPLE_SET_DRUM;
+		*set = OSHU_DRUM_SAMPLE_SET;
 		break;
 	case Normal:
-		*set = OSHU_SAMPLE_SET_NORMAL;
+		*set = OSHU_NORMAL_SAMPLE_SET;
 		break;
 	case Soft:
-		*set = OSHU_SAMPLE_SET_SOFT;
+		*set = OSHU_SOFT_SAMPLE_SET;
 		break;
 	default:
 		parser_error(parser, "invalid sample set");

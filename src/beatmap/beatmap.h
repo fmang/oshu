@@ -39,10 +39,10 @@
  * beatmap.
  */
 enum oshu_mode {
-	OSHU_MODE_OSU = 0,
-	OSHU_MODE_TAIKO = 1,
-	OSHU_MODE_CATCH_THE_BEAT = 2,
-	OSHU_MODE_MANIA = 3,
+	OSHU_OSU_MODE = 0,
+	OSHU_TAIKO_MODE = 1,
+	OSHU_CATCH_THE_BEAT_MODE = 2,
+	OSHU_MANIA_MODE = 3,
 };
 
 /**
@@ -59,10 +59,10 @@ enum oshu_sample_set_family {
 	 * However, the parser should in these case replace 0 with the actual
 	 * value, so it should be used in an external module.
 	 */
-	OSHU_SAMPLE_SET_AUTO = 0,
-	OSHU_SAMPLE_SET_NORMAL = 1,
-	OSHU_SAMPLE_SET_SOFT = 2,
-	OSHU_SAMPLE_SET_DRUM = 3,
+	OSHU_AUTO_SAMPLE_SET = 0,
+	OSHU_NORMAL_SAMPLE_SET = 1,
+	OSHU_SOFT_SAMPLE_SET = 2,
+	OSHU_DRUM_SAMPLE_SET = 3,
 };
 
 /**
@@ -77,10 +77,10 @@ enum oshu_hit_sound {
 	 * If it's unset, maybe we should play the normal sound? Needs more
 	 * research.
 	 */
-	OSHU_SAMPLE_TYPE_NORMAL = 1,
-	OSHU_SAMPLE_TYPE_WHISTLE = 2,
-	OSHU_SAMPLE_TYPE_FISNISH = 4,
-	OSHU_SAMPLE_TYPE_CLAP = 8,
+	OSHU_NORMAL_SAMPLE = 1,
+	OSHU_WHISTLE_SAMPLE = 2,
+	OSHU_FISNISH_SAMPLE = 4,
+	OSHU_CLAP_SAMPLE = 8,
 };
 
 /**
