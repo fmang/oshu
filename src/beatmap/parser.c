@@ -423,7 +423,7 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 	char *type = strsep(&line, ",");
 	char *hit_sound = strsep(&line, ",");
 	if (!hit_sound) {
-		oshu_log_warn("invalid hit object");
+		oshu_log_warning("invalid hit object");
 		*hit = NULL;
 		return -1;
 	}
@@ -538,7 +538,7 @@ static void parser_error(struct parser_state *parser, const char *message)
 	parser_log(SDL_LOG_PRIORITY_ERROR, parser, message);
 }
 
-static void parser_warn(struct parser_state *parser, const char *message)
+static void parser_warning(struct parser_state *parser, const char *message)
 {
 	parser_log(SDL_LOG_PRIORITY_WARN, parser, message);
 }

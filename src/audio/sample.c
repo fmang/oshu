@@ -6,6 +6,8 @@
 #include "audio/sample.h"
 #include "log.h"
 
+#include <SDL2/SDL.h>
+
 #include <assert.h>
 
 /** Work in stereo. */

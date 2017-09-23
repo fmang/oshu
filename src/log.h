@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_log.h>
 
 /** \defgroup log Log
  *
@@ -45,7 +45,7 @@
  * Warning messages are for non-fatal errors. They'll be the primary indicator
  * of unimplemented non-essential features.
  */
-#define oshu_log_warn(...)     SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, __VA_ARGS__)
+#define oshu_log_warning(...)     SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, __VA_ARGS__)
 
 /**
  * Error messages explain errors fatal to the task we were doing. These won't

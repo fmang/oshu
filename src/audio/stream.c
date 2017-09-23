@@ -84,7 +84,7 @@ static int next_frame(struct oshu_stream *stream)
 			return 0;
 		} else if (rc == AVERROR(EAGAIN)) {
 			if (next_page(stream) < 0) {
-				oshu_log_warn("abrupt end of stream");
+				oshu_log_warning("abrupt end of stream");
 				return -1;
 			}
 		} else if (rc == AVERROR_EOF) {

@@ -38,7 +38,7 @@
  * in the parser state.
  *
  * All these functions return 0 on success, and -1 on failure. The callee
- * should print an message using #parser_error or #parser_warn on failure.
+ * should print an message using #parser_error or #parser_warning on failure.
  */
 
 #include "beatmap/beatmap.h"
@@ -147,7 +147,7 @@ struct parser_state {
  * Log a message with contextual information from the parser state.
  *
  * \sa parser_error
- * \sa parser_warn
+ * \sa parser_warning
  */
 static void parser_log(int priority, struct parser_state *parser, const char *message);
 
@@ -163,9 +163,9 @@ static void parser_error(struct parser_state *parser, const char *message);
  * Log a warning with contextual information from the parser state.
  *
  * \sa parser_log
- * \sa oshu_log_warn
+ * \sa oshu_log_warning
  */
-static void parser_warn(struct parser_state *parser, const char *message);
+static void parser_warning(struct parser_state *parser, const char *message);
 
 /**
  * Convient typedef to help define the prototypes. Don't use it in the
