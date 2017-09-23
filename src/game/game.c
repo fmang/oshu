@@ -22,18 +22,18 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 {
 	*game = calloc(1, sizeof(**game));
 
-	if (oshu_beatmap_load(beatmap_path, &(*game)->beatmap) < 0) {
+	if (oshu_load_beatmap(beatmap_path, &(*game)->beatmap) < 0) {
 		oshu_log_error("no beatmap, aborting");
 		goto fail;
 	}
-	if ((*game)->beatmap->mode == OSHU_OSU_MODE) {
+	if ((*game)->beatmap.mode == OSHU_OSU_MODE) {
 		(*game)->mode = &oshu_osu_mode;
 	} else {
 		oshu_log_error("unsupported game mode");
 		goto fail;
 	}
 
-	if (oshu_open_audio((*game)->beatmap->audio_filename, &(*game)->audio) < 0) {
+	if (oshu_open_audio((*game)->beatmap.audio_filename, &(*game)->audio) < 0) {
 		oshu_log_error("no audio, aborting");
 		goto fail;
 	}
@@ -53,16 +53,16 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 	}
 	(*game)->display->system = OSHU_GAME_COORDINATES;
 
-	if ((*game)->beatmap->background_file) {
-		(*game)->background = IMG_LoadTexture((*game)->display->renderer, (*game)->beatmap->background_file);
+	if ((*game)->beatmap.background_file) {
+		(*game)->background = IMG_LoadTexture((*game)->display->renderer, (*game)->beatmap.background_file);
 		if ((*game)->background)
 			SDL_SetTextureColorMod((*game)->background, 64, 64, 64);
 	}
 
-	if ((*game)->beatmap->audio_lead_in > 0) {
-		(*game)->clock.now = - (*game)->beatmap->audio_lead_in;
+	if ((*game)->beatmap.audio_lead_in > 0) {
+		(*game)->clock.now = - (*game)->beatmap.audio_lead_in;
 	} else {
-		double first_hit = (*game)->beatmap->hits->time;
+		double first_hit = (*game)->beatmap.hits->time;
 		if (first_hit < 1.)
 			(*game)->clock.now = first_hit - 1.;
 	}
@@ -151,7 +151,7 @@ static void end(struct oshu_game *game)
 		return;
 	int good = 0;
 	int missed = 0;
-	for (struct oshu_hit *hit = game->beatmap->hits; hit; hit = hit->next) {
+	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->state == OSHU_HIT_MISSED)
 			missed++;
 		else if (hit->state == OSHU_HIT_GOOD)
@@ -272,8 +272,7 @@ void oshu_game_destroy(struct oshu_game **game)
 		SDL_DestroyTexture((*game)->background);
 	if ((*game)->display)
 		oshu_close_display(&(*game)->display);
-	if ((*game)->beatmap)
-		oshu_beatmap_free(&(*game)->beatmap);
+	oshu_destroy_beatmap(&(*game)->beatmap);
 	free(*game);
 	*game = NULL;
 }

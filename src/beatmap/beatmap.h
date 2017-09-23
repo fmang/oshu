@@ -754,21 +754,16 @@ struct oshu_beatmap {
 };
 
 /**
- * Take a path to a \e .osu file, open it and parse it.
+ * Take a path to a `.osu` file, open it and parse it.
  *
- * The parsed beatmap is returned by setting `*beatmap` to point to a newly
- * allocated beatmap object.
- *
- * On failure, the beatmap is automatically free'd.
+ * On failure, the content of *beatmap* is undefined, but any dynamically
+ * allocated internal memory is freed.
  */
-int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap);
+int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap);
 
 /**
- * Free the beatmap object and every other dynamically allocated object it
- * refers to.
- *
- * Sets `*beatmap` to *NULL.
+ * Free any object dynamically allocated inside the beatmap.
  */
-void oshu_beatmap_free(struct oshu_beatmap **beatmap);
+void oshu_destroy_beatmap(struct oshu_beatmap *beatmap);
 
 /** \} */

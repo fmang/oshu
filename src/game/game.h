@@ -69,7 +69,7 @@ struct oshu_clock {
  * context.
  */
 struct oshu_game {
-	struct oshu_beatmap *beatmap;
+	struct oshu_beatmap beatmap;
 	struct oshu_audio audio;
 	struct oshu_sample hit_sound;
 	struct oshu_display *display;

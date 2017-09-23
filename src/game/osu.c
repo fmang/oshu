@@ -19,15 +19,15 @@
  */
 static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
 {
-	for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
-		if (hit->time > game->clock.now + game->beatmap->difficulty.approach_time)
+	for (struct oshu_hit *hit = game->beatmap.hit_cursor; hit; hit = hit->next) {
+		if (hit->time > game->clock.now + game->beatmap.difficulty.approach_time)
 			break;
-		if (hit->time < game->clock.now - game->beatmap->difficulty.approach_time)
+		if (hit->time < game->clock.now - game->beatmap.difficulty.approach_time)
 			continue;
 		if (hit->state != OSHU_HIT_INITIAL)
 			continue;
 		double dist = oshu_distance(p, hit->p);
-		if (dist <= game->beatmap->difficulty.circle_radius)
+		if (dist <= game->beatmap.difficulty.circle_radius)
 			return hit;
 	}
 	return NULL;
@@ -43,7 +43,7 @@ static void hit(struct oshu_game *game)
 	struct oshu_point mouse = oshu_get_mouse(game->display);
 	struct oshu_hit *hit = find_hit(game, mouse);
 	if (hit) {
-		if (fabs(hit->time - game->clock.now) < game->beatmap->difficulty.leniency) {
+		if (fabs(hit->time - game->clock.now) < game->beatmap.difficulty.leniency) {
 			if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type) {
 				hit->state = OSHU_HIT_SLIDING;
 				game->osu.current_slider = hit;
@@ -68,7 +68,7 @@ static void release_hit(struct oshu_game *game)
 		return;
 	if (!(hit->type & OSHU_HIT_SLIDER))
 		return;
-	if (game->clock.now < oshu_hit_end_time(hit) - game->beatmap->difficulty.leniency) {
+	if (game->clock.now < oshu_hit_end_time(hit) - game->beatmap.difficulty.leniency) {
 		hit->state = OSHU_HIT_MISSED;
 	} else {
 		hit->state = OSHU_HIT_GOOD;
@@ -103,7 +103,7 @@ static void check_slider(struct oshu_game *game)
 	struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
 	struct oshu_point mouse = oshu_get_mouse(game->display);
 	double dist = oshu_distance(ball, mouse);
-	if (dist > game->beatmap->difficulty.slider_tolerance) {
+	if (dist > game->beatmap.difficulty.slider_tolerance) {
 		game->osu.current_slider = NULL;
 		hit->state = OSHU_HIT_MISSED;
 	}
@@ -121,7 +121,7 @@ static void check_slider(struct oshu_game *game)
 static void check_audio(struct oshu_game *game)
 {
 	if (game->autoplay) {
-		for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
+		for (struct oshu_hit *hit = game->beatmap.hit_cursor; hit; hit = hit->next) {
 			if (hit->time > game->clock.now) {
 				break;
 			} else if (hit->state == OSHU_HIT_INITIAL) {
@@ -136,16 +136,16 @@ static void check_audio(struct oshu_game *game)
 		}
 	} else {
 		/* Mark dead notes as missed. */
-		for (struct oshu_hit *hit = game->beatmap->hit_cursor; hit; hit = hit->next) {
-			if (hit->time > game->clock.now - game->beatmap->difficulty.leniency)
+		for (struct oshu_hit *hit = game->beatmap.hit_cursor; hit; hit = hit->next) {
+			if (hit->time > game->clock.now - game->beatmap.difficulty.leniency)
 				break;
 			if (hit->state == OSHU_HIT_INITIAL)
 				hit->state = OSHU_HIT_MISSED;
 		}
 	}
 	for (
-		struct oshu_hit **hit = &game->beatmap->hit_cursor;
-		*hit && oshu_hit_end_time(*hit) < game->clock.now - game->beatmap->difficulty.approach_time;
+		struct oshu_hit **hit = &game->beatmap.hit_cursor;
+		*hit && oshu_hit_end_time(*hit) < game->clock.now - game->beatmap.difficulty.approach_time;
 		*hit = (*hit)->next
 	);
 }
@@ -159,7 +159,7 @@ static int check(struct oshu_game *game)
 
 static int draw(struct oshu_game *game)
 {
-	oshu_draw_beatmap(game->display, game->beatmap, game->clock.now);
+	oshu_draw_beatmap(game->display, &game->beatmap, game->clock.now);
 	return 0;
 }
 

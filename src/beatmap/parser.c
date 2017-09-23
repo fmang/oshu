@@ -843,31 +843,30 @@ static int validate(struct oshu_beatmap *beatmap)
 	return 0;
 }
 
-int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
+int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap)
 {
 	FILE *input = fopen(path, "r");
 	if (input == NULL) {
 		oshu_log_error("couldn't open the beatmap: %s", strerror(errno));
 		return -1;
 	}
-	*beatmap = malloc(sizeof(**beatmap));
-	memcpy(*beatmap, &default_beatmap, sizeof(**beatmap));
-	int rc = parse_file(input, path, *beatmap);
+	memcpy(beatmap, &default_beatmap, sizeof(*beatmap));
+	int rc = parse_file(input, path, beatmap);
 	fclose(input);
 	if (rc < 0)
 		goto fail;
-	(*beatmap)->hit_cursor = (*beatmap)->hits;
-	dump_beatmap_info(*beatmap);
-	if (validate(*beatmap) < 0)
+	beatmap->hit_cursor = beatmap->hits;
+	dump_beatmap_info(beatmap);
+	if (validate(beatmap) < 0)
 		goto fail;
 	return 0;
 fail:
 	oshu_log_error("error loading the beatmap file");
-	oshu_beatmap_free(beatmap);
+	oshu_destroy_beatmap(beatmap);
 	return -1;
 }
 
-void free_metadata(struct oshu_metadata *meta)
+static void free_metadata(struct oshu_metadata *meta)
 {
 	free(meta->title);
 	free(meta->title_unicode);
@@ -878,18 +877,32 @@ void free_metadata(struct oshu_metadata *meta)
 	free(meta->source);
 }
 
-void oshu_beatmap_free(struct oshu_beatmap **beatmap)
+static void free_hits(struct oshu_hit *hits)
 {
-	if ((*beatmap)->hits) {
-		struct oshu_hit *current = (*beatmap)->hits;
-		while (current != NULL) {
-			struct oshu_hit *next = current->next;
-			free(current);
-			current = next;
-		}
+	struct oshu_hit *current = hits;
+	while (current != NULL) {
+		struct oshu_hit *next = current->next;
+		free(current);
+		current = next;
 	}
-	free((*beatmap)->audio_filename);
-	free_metadata(&(*beatmap)->metadata);
-	free(*beatmap);
-	*beatmap = NULL;
+}
+
+static void free_timing_points(struct oshu_timing_point *t)
+{
+	struct oshu_timing_point *current = t;
+	while (current != NULL) {
+		struct oshu_timing_point *next = current->next;
+		free(current);
+		current = next;
+	}
+}
+
+void oshu_destroy_beatmap(struct oshu_beatmap *beatmap)
+{
+	free(beatmap->audio_filename);
+	free_metadata(&beatmap->metadata);
+	if (beatmap->hits)
+		free_hits(beatmap->hits);
+	if (beatmap->timing_points)
+		free_timing_points(beatmap->timing_points);
 }
