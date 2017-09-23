@@ -619,6 +619,8 @@ static int process_input(struct parser_state *parser)
 		return -1;
 	} else if (parser->section == BEATMAP_GENERAL) {
 		rc = process_general(parser);
+	} else if (parser->section == BEATMAP_METADATA) {
+		rc = process_metadata(parser);
 	} else {
 		return parse_line(parser->input, parser);
 	}
@@ -750,6 +752,35 @@ static int parse_sample_set(struct parser_state *parser, enum oshu_sample_set_fa
 	return 0;
 }
 
+static int process_metadata(struct parser_state *parser)
+{
+	struct oshu_metadata *meta = &parser->beatmap->metadata;
+	enum token key;
+	char *value;
+	if (parse_key(parser, &key) < 0)
+		return -1;
+	if (key == BeatmapID)
+		return parse_int(parser, &meta->beatmap_id);
+	else if (key == BeatmapSetID)
+		return parse_int(parser, &meta->beatmap_set_id);
+	if (parse_string(parser, &value) < 0)
+		return -1;
+	switch (key) {
+	case Title:         meta->title = strdup(value); break;
+	case TitleUnicode:  meta->title_unicode = strdup(value); break;
+	case Artist:        meta->artist = strdup(value); break;
+	case ArtistUnicode: meta->artist_unicode = strdup(value); break;
+	case Creator:       meta->creator = strdup(value); break;
+	case Version:       meta->version = strdup(value); break;
+	case Source:        meta->source = strdup(value); break;
+	case Tags:          /* TODO */ break;
+	default:
+		parser_error(parser, "unrecognized metadata");
+		return -1;
+	}
+	return 0;
+}
+
 /* Global interface **********************************************************/
 
 /**
@@ -787,6 +818,9 @@ static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 {
 	oshu_log_info("audio filename: %s", beatmap->audio_filename);
 	oshu_log_debug("slider multiplier: %.1f", beatmap->difficulty.slider_multiplier);
+	oshu_log_info("title: %s", beatmap->metadata.title);
+	oshu_log_info("artist: %s", beatmap->metadata.artist);
+	oshu_log_info("version: %s", beatmap->metadata.version);
 }
 
 /**
@@ -833,6 +867,17 @@ fail:
 	return -1;
 }
 
+void free_metadata(struct oshu_metadata *meta)
+{
+	free(meta->title);
+	free(meta->title_unicode);
+	free(meta->artist);
+	free(meta->artist_unicode);
+	free(meta->creator);
+	free(meta->version);
+	free(meta->source);
+}
+
 void oshu_beatmap_free(struct oshu_beatmap **beatmap)
 {
 	if ((*beatmap)->hits) {
@@ -844,6 +889,7 @@ void oshu_beatmap_free(struct oshu_beatmap **beatmap)
 		}
 	}
 	free((*beatmap)->audio_filename);
+	free_metadata(&(*beatmap)->metadata);
 	free(*beatmap);
 	*beatmap = NULL;
 }

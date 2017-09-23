@@ -208,8 +208,8 @@ static int process_input(P*);
 	static int process_section(P*);
 	static int process_general(P*);
 		static int parse_sample_set(P*, enum oshu_sample_set_family*);
-/*
 	static int process_metadata(P*);
+/*
 	static int process_event(P*);
 	static int process_timing_point(P*);
 		static int parse_timing_point(P*, struct oshu_timing_point*);
