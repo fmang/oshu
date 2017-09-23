@@ -13,7 +13,6 @@
  * orders of magnitude faster.
  */
 
-
 TOKEN(ApproachRate)
 TOKEN(Artist)
 TOKEN(ArtistUnicode)
@@ -41,6 +40,7 @@ TOKEN(HitObjects)
 TOKEN(LetterboxInBreaks)
 TOKEN(Metadata)
 TOKEN(Mode)
+TOKEN(None)
 TOKEN(Normal)
 TOKEN(OverallDifficulty)
 TOKEN(PreviewTime)

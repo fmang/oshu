@@ -59,6 +59,7 @@ enum oshu_sample_set_family {
 	 * However, the parser should in these case replace 0 with the actual
 	 * value, so it should be used in an external module.
 	 */
+	OSHU_NO_SAMPLE_SET = -1,
 	OSHU_AUTO_SAMPLE_SET = 0,
 	OSHU_NORMAL_SAMPLE_SET = 1,
 	OSHU_SOFT_SAMPLE_SET = 2,

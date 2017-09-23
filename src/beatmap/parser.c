@@ -729,6 +729,9 @@ static int parse_sample_set(struct parser_state *parser, enum oshu_sample_set_fa
 	case Soft:
 		*set = OSHU_SOFT_SAMPLE_SET;
 		break;
+	case None:
+		*set = OSHU_NO_SAMPLE_SET;
+		break;
 	default:
 		parser_error(parser, "invalid sample set");
 		return -1;
