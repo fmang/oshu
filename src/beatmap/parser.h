@@ -197,8 +197,10 @@ static int parse_key(P*, enum token*);
  * processors.
  */
 
-/*
 static int process_input(P*);
+	static int process_header(P*);
+	static int process_section(P*);
+/*
 	static int process_category(P*);
 	static int process_general(P*);
 	static int process_metadata(P*);

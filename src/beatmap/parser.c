@@ -81,75 +81,6 @@ static void key_value(char *line, char **key, char **value)
 }
 
 /**
- * Parse the first line of the beatmap file and extract the version number.
- *
- * Fails if it not a valid header, or if it couldn't parse the version.
- */
-static int parse_header(char *line, struct parser_state *parser)
-{
-	/* skip some binary noise: */
-	for (; *line && *line != 'o'; line++);
-	if (strncmp(line, osu_file_header, strlen(osu_file_header)) == 0) {
-		line += strlen(osu_file_header);
-		int version = atoi(line);
-		if (version) {
-			parser->beatmap->version = version;
-			parser->section = BEATMAP_ROOT;
-			return 0;
-		} else {
-			oshu_log_error("invalid osu version");
-		}
-	} else {
-		oshu_log_error("invalid or missing osu file header");
-	}
-	return -1;
-}
-
-/**
- * Parse a section like `[General]`.
- *
- * If the line passed as argument is not a section definition line, or doesn't
- * end with a closing square bracket, fail.
- *
- * Unknown sections are okay.
- */
-static int parse_section(char *line, struct parser_state *parser)
-{
-	char *section, *end;
-	if (*line != '[')
-		goto fail;
-	section = line + 1;
-	for (end = section; *end && *end != ']'; end++);
-	if (*end != ']')
-		goto fail;
-	*end = '\0';
-	if (!strcmp(section, "General")) {
-		parser->section = BEATMAP_GENERAL;
-	} else if (!strcmp(section, "Editor")) {
-		parser->section = BEATMAP_EDITOR;
-	} else if (!strcmp(section, "Metadata")) {
-		parser->section = BEATMAP_METADATA;
-	} else if (!strcmp(section, "Difficulty")) {
-		parser->section = BEATMAP_DIFFICULTY;
-	} else if (!strcmp(section, "Events")) {
-		parser->section = BEATMAP_EVENTS;
-	} else if (!strcmp(section, "TimingPoints")) {
-		parser->section = BEATMAP_TIMING_POINTS;
-	} else if (!strcmp(section, "Colours")) {
-		parser->section = BEATMAP_COLOURS;
-	} else if (!strcmp(section, "HitObjects")) {
-		parser->section = BEATMAP_HIT_OBJECTS;
-	} else {
-		oshu_log_debug("unknown section %s", section);
-		parser->section = BEATMAP_UNKNOWN;
-	}
-	return 0;
-fail:
-	oshu_log_error("misformed section: %s", line);
-	return -1;
-}
-
-/**
  * Parse a key-value line in the `[General]` section.
  */
 static int parse_general(char *line, struct parser_state *parser)
@@ -497,15 +428,7 @@ static int parse_line(char *line, struct parser_state *parser)
 {
 	int rc = 0;
 	trim(&line);
-	if (*line == '\0') {
-		/* skip empty lines */
-	} else if (line[0] == '/' && line[1] == '/') {
-		/* skip comments */
-	} else if (parser->section == BEATMAP_HEADER) {
-		rc = parse_header(line, parser);
-	} else if (*line == '[') {
-		rc = parse_section(line, parser);
-	} else if (parser->section == BEATMAP_GENERAL) {
+	if (parser->section == BEATMAP_GENERAL) {
 		rc = parse_general(line, parser);
 	} else if (parser->section == BEATMAP_DIFFICULTY) {
 		rc = parse_difficulty(line, parser);
@@ -519,13 +442,13 @@ static int parse_line(char *line, struct parser_state *parser)
 	return rc;
 }
 
-/* New parser ****************************************************************/
+/* Primitives ****************************************************************/
 
 static void parser_error(struct parser_state *parser, const char *message)
 {
 	int column = 0;
 	if (parser->buffer && parser->input)
-		column = parser->input - parser->buffer;
+		column = parser->input - parser->buffer + 1;
 	oshu_log_error(
 		"%s:%d:%d: %s",
 		parser->source, parser->line_number, column, message
@@ -552,7 +475,7 @@ static int consume_spaces(struct parser_state *parser)
 static int consume_string(struct parser_state *parser, const char *str)
 {
 	size_t len = strlen(str);
-	if (parser->input && strncmp(parser->input, str, len)) {
+	if (parser->input && strncmp(parser->input, str, len) == 0) {
 		parser->input += len;
 		return 0;
 	} else {
@@ -661,7 +584,6 @@ static int parse_token(struct parser_state *parser, enum token *token)
 
 static int parse_key(struct parser_state *parser, enum token *key)
 {
-	consume_spaces(parser);
 	if (parse_token(parser, key) < 0)
 		return -1;
 	consume_spaces(parser);
@@ -669,6 +591,83 @@ static int parse_key(struct parser_state *parser, enum token *key)
 		return -1;
 	consume_spaces(parser);
 	return 0;
+}
+
+/* New parser ****************************************************************/
+
+static int process_input(struct parser_state *parser)
+{
+	int rc;
+	consume_spaces(parser);
+	if (*parser->input == '\0') {
+		/* skip empty lines */
+		return 0;
+	} else if (parser->input[0] == '/' && parser->input[1] == '/') {
+		/* skip comments */
+		return 0;
+	} else if (parser->section == BEATMAP_HEADER) {
+		rc = process_header(parser);
+	} else if (parser->input[0] == '[') {
+		rc = process_section(parser);
+	} else if (parser->section == BEATMAP_ROOT) {
+		parser_error(parser, "unexpected content outside sections");
+		return -1;
+	} else {
+		return parse_line(parser->input, parser);
+	}
+	if (rc < 0)
+		return -1;
+	consume_spaces(parser);
+	return consume_end(parser);
+}
+
+static int process_header(struct parser_state *parser)
+{
+	assert (parser->input);
+	/* skip some binary noise: */
+	while (*parser->input && *parser->input != 'o')
+		++parser->input;
+	if (consume_string(parser, osu_file_header) < 0)
+		return -1;
+	if (parse_int(parser, &parser->beatmap->version) < 0)
+		return -1;
+	if (parser->beatmap->version < 0) {
+		parser_error(parser, "invalid osu beatmap version");
+		return -1;
+	}
+	parser->section = BEATMAP_ROOT;
+	oshu_log_debug("beatmap version: %d", parser->beatmap->version);
+	return 0;
+}
+
+static int process_section(struct parser_state *parser)
+{
+	enum token token;
+	if (consume_string(parser, "[") < 0)
+		return -1;
+	consume_spaces(parser);
+	if (parse_token(parser, &token) < 0)
+		return -1;
+	consume_spaces(parser);
+	if (consume_string(parser, "]") < 0)
+		return -1;
+
+	switch (token) {
+	case General:
+	case Editor:
+	case Metadata:
+	case Difficulty:
+	case Events:
+	case TimingPoints:
+	case Colours:
+	case HitObjects:
+		parser->section = token;
+		return 0;
+	default:
+		parser_error(parser, "unknown section");
+		parser->section = BEATMAP_UNKNOWN;
+		return -1;
+	}
 }
 
 /* Global interface **********************************************************/
@@ -695,7 +694,7 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 		parser.buffer = line;
 		parser.input = line;
 		parser.line_number++;
-		if (parse_line(line, &parser) < 0) {
+		if (process_input(&parser) < 0) {
 			free(line);
 			return -1;
 		}
@@ -706,7 +705,6 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 
 static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 {
-	oshu_log_info("beatmap version: %d", beatmap->version);
 	oshu_log_info("audio filename: %s", beatmap->audio_filename);
 	oshu_log_debug("slider multiplier: %.1f", beatmap->difficulty.slider_multiplier);
 }
