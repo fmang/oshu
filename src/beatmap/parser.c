@@ -521,6 +521,12 @@ static int parse_line(char *line, struct parser_state *parser)
 
 /* New parser ****************************************************************/
 
+/**
+ * Log a message with contextual information from the parser state.
+ *
+ * \sa parser_error
+ * \sa parser_warning
+ */
 static void parser_log(int priority, struct parser_state *parser, const char *message)
 {
 	int column = 0;
@@ -543,16 +549,47 @@ static void parser_warning(struct parser_state *parser, const char *message)
 	parser_log(SDL_LOG_PRIORITY_WARN, parser, message);
 }
 
+static int consume_end(struct parser_state *parser)
+{
+	if (!parser->input || *parser->input == '\0') {
+		return 0;
+	} else {
+		parser_error(parser, "unexpected end of line");
+		return -1;
+	}
+}
+
+static int consume_spaces(struct parser_state *parser)
+{
+	while (parser->input && isspace(*parser->input))
+		parser->input++;
+	return 0;
+}
+
+static int consume_string(struct parser_state *parser, const char *str)
+{
+	size_t len = strlen(str);
+	if (parser->input && strncmp(parser->input, str, len)) {
+		parser->input += len;
+		return 0;
+	} else {
+		parser_error(parser, "unexpected input");
+		oshu_log_error("expected \"%s\"", str);
+		return -1;
+	}
+}
+
 /* Global interface **********************************************************/
 
 /**
  * Create the parser state, then read the input file line-by-line, feeding it
  * to the parser automaton with #parse_line.
  */
-static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
+static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatmap)
 {
 	struct parser_state parser;
 	memset(&parser, 0, sizeof(parser));
+	parser.source = name;
 	parser.beatmap = beatmap;
 	char *line = NULL;
 	size_t len = 0;
@@ -562,6 +599,9 @@ static int parse_file(FILE *input, struct oshu_beatmap *beatmap)
 			line[nread - 1] = '\0';
 		if (nread > 1 && line[nread - 2] == '\r')
 			line[nread - 2] = '\0';
+		parser.buffer = line;
+		parser.input = line;
+		parser.line_number++;
 		if (parse_line(line, &parser) < 0) {
 			free(line);
 			return -1;
@@ -607,7 +647,7 @@ int oshu_beatmap_load(const char *path, struct oshu_beatmap **beatmap)
 	}
 	*beatmap = malloc(sizeof(**beatmap));
 	memcpy(*beatmap, &default_beatmap, sizeof(**beatmap));
-	int rc = parse_file(input, *beatmap);
+	int rc = parse_file(input, path, *beatmap);
 	fclose(input);
 	if (rc < 0)
 		goto fail;

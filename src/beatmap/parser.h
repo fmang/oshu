@@ -144,14 +144,6 @@ struct parser_state {
 };
 
 /**
- * Log a message with contextual information from the parser state.
- *
- * \sa parser_error
- * \sa parser_warning
- */
-static void parser_log(int priority, struct parser_state *parser, const char *message);
-
-/**
  * Log an error with contextual information from the parser state.
  *
  * \sa parser_log
@@ -178,16 +170,14 @@ typedef struct parser_state P;
  * tasks.
  */
 
-/*
-static int consume_string(P*, const char*);
-static int consume_space(P*);
 static int consume_end(P*);
+static int consume_spaces(P*);
+static int consume_string(P*, const char*);
 
 static int parse_int(P*, int*);
 static int parse_double(P*, double*);
 static int parse_token(P*, enum token*);
 static int parse_key(P*, enum token*);
-*/
 
 /*
  * From this point you'll have a pseudo call-graph of the complex parsers and
