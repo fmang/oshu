@@ -702,6 +702,7 @@ static int process_general(struct parser_state *parser)
 		break;
 	case StackLeniency:
 	case LetterboxInBreaks:
+	case EpilepsyWarning:
 	case WidescreenStoryboard:
 		/* Nobody cares. */
 		rc = consume_all(parser);
