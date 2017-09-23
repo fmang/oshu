@@ -12,11 +12,12 @@ oshu_SOURCES = \
 	audio/track.c \
 	audio/track.h \
 	beatmap/beatmap.h \
+	beatmap/geometry.c \
+	beatmap/geometry.h \
 	beatmap/helpers.c \
 	beatmap/parser.c \
 	beatmap/parser.h \
-	beatmap/geometry.c \
-	beatmap/geometry.h \
+	beatmap/tokens.h \
 	game/game.c \
 	game/game.h \
 	game/modes.h \

@@ -44,26 +44,6 @@
 #include "beatmap/beatmap.h"
 
 /**
- * Enumeration to keep track of the section we're currently in.
- *
- * This is especially important before the format inside each section changes
- * significantly, some being INI-like, and others being CSV-like.
- */
-enum beatmap_section {
-	BEATMAP_HEADER = 0, /**< Expect the #osu_file_header. */
-	BEATMAP_ROOT, /**< Between the header and the first section. We expect nothing. */
-	BEATMAP_GENERAL, /**< INI-like. */
-	BEATMAP_EDITOR, /**< INI-like. */
-	BEATMAP_METADATA, /**< INI-like. */
-	BEATMAP_DIFFICULTY, /**< INI-like. */
-	BEATMAP_EVENTS, /**< CSV-like. */
-	BEATMAP_TIMING_POINTS, /**< CSV-like. */
-	BEATMAP_COLOURS, /**< INI-like. */
-	BEATMAP_HIT_OBJECTS, /**< CSV-like. */
-	BEATMAP_UNKNOWN,
-};
-
-/**
  * Enumerate all the special strings that may be found in a header file.
  *
  * Using such a structure makes it easier, and also faster, to branch on
@@ -74,31 +54,36 @@ enum beatmap_section {
  * same strings as the ones in the beatmap, with the same case.
  */
 enum token {
-	BEGIN_CATEGORIES,
-	HEADER, /**< Expect the #osu_file_header. */
-	ROOT, /**< Between the header and the first section. We expect nothing. */
-	General, /**< INI-like. */
-	Editor, /**< INI-like. */
-	Metadata, /**< INI-like. */
-	Difficulty, /**< INI-like. */
-	Events, /**< CSV-like. */
-	TimingPoints, /**< CSV-like. */
-	Colours, /**< INI-like. */
-	HitObjects, /**< CSV-like. */
-	UNKNOWN,
-	END_CATEGORIES,
+#define TOKEN(t) t,
+#include "beatmap/tokens.h"
+#undef TOKEN
+NUM_TOKENS,
+};
 
-	BEGIN_GENERAL,
-	AudioFileName,
-	AudioLeadIn,
-	PreviewTime,
-	Countdown,
-	SampleSet,
-	StackLeniency,
-	Mode,
-	LetterboxInBreaks,
-	WidescreenStoryBoard,
-	END_GENERAL,
+/**
+ * Enumeration to keep track of the section we're currently in.
+ *
+ * This is especially important before the format inside each section changes
+ * significantly, some being INI-like, and others being CSV-like.
+ *
+ * The sections are listed in the order they should appear in in the beatmap
+ * file.
+ *
+ * The value of the constants are the same as their tokens, so that conversion
+ * from token to section is trivial.
+ */
+enum beatmap_section {
+	BEATMAP_HEADER = -3, /**< Expect the #osu_file_header. */
+	BEATMAP_ROOT = -2, /**< Between the header and the first section. We expect nothing. */
+	BEATMAP_UNKNOWN = -1,
+	BEATMAP_GENERAL = General, /**< INI-like. */
+	BEATMAP_EDITOR = Editor, /**< INI-like. */
+	BEATMAP_METADATA = Metadata, /**< INI-like. */
+	BEATMAP_DIFFICULTY = Difficulty, /**< INI-like. */
+	BEATMAP_EVENTS = Events, /**< CSV-like. */
+	BEATMAP_TIMING_POINTS = TimingPoints, /**< CSV-like. */
+	BEATMAP_COLOURS = Colours, /**< INI-like. */
+	BEATMAP_HIT_OBJECTS = HitObjects, /**< CSV-like. */
 };
 
 /**
@@ -128,19 +113,56 @@ struct parser_state {
 	 * #input and #buffer.
 	 */
 	char *buffer;
+	/**
+	 * The line number corresponding to the current #input, starting at 1.
+	 *
+	 * If 0, it means the parsing process hasn't begun.
+	 */
 	int line_number;
 	/**
 	 * The name of the file being read, or something similar, like <stdin>
 	 * or some URL, who knows.
 	 */
 	const char *source;
+	/**
+	 * The beatmap object we're filling.
+	 *
+	 * Its memory isn't handled by us.
+	 */
 	struct oshu_beatmap *beatmap;
-	int section;
-	struct oshu_hit *last_hit;
+	/**
+	 * The current section.
+	 *
+	 * At the beginning, it's #BEATMAP_HEADER, meaning the header hasn't
+	 * been parsed yet. Then it becomes #BEATMAP_ROOT, which should not
+	 * contain anything.
+	 *
+	 * Then, as sections appear like `[General]`, it takes the value of the
+	 * matching token, as mentionned in #beatmap_section. If the section is
+	 * unknown, #section becomes #BEATMAP_UNKNOWN.
+	 */
+	enum beatmap_section section;
+	/**
+	 * Keep track of the last timing point to build the linked list.
+	 */
 	struct oshu_timing_point *last_timing_point;
+	/**
+	 * When parsing hit objects, we need to figure out what its timing
+	 * point is, notably to compute slider durations.
+	 *
+	 * It is NULL until the first hit object is parsed, and keeps increasing.
+	 * It must not become NULL at the end of the chain, because otherwise
+	 * we're back to the first case and will trigger an infinite loop.
+	 */
 	struct oshu_timing_point *current_timing_point;
-	/** This is the last non-inherited timing point. */
+	/**
+	 * This is the last non-inherited timing point.
+	 */
 	struct oshu_timing_point *timing_base;
+	/**
+	 * Keep track of the last hit object to build the linked list.
+	 */
+	struct oshu_hit *last_hit;
 };
 
 /**

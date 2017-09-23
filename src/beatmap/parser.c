@@ -606,6 +606,7 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 {
 	struct parser_state parser;
 	memset(&parser, 0, sizeof(parser));
+	parser.section = BEATMAP_HEADER;
 	parser.source = name;
 	parser.beatmap = beatmap;
 	char *line = NULL;
