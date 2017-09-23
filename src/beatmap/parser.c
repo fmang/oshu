@@ -596,6 +596,81 @@ static int parse_double(struct parser_state *parser, double *value)
 	}
 }
 
+/**
+ * Map each token to its string representation using CPP's magic
+ * stringification operator.
+ */
+static const char* token_strings[NUM_TOKENS] = {
+#define TOKEN(t) #t,
+#include "beatmap/tokens.h"
+#undef TOKEN
+};
+
+/**
+ * Perform a dichotomic search using #token_strings.
+ *
+ * The *str* argument isn't expected to be null-terminated at *len*, so we must
+ * make sure we take the length into account when comparing tokens, and not
+ * listen too much to *strncmp* which would return 0 if *str* is a prefix of
+ * the candidate token.
+ */
+static int search_token(const char *str, int len, enum token *token)
+{
+	int start = 0;
+	int end = NUM_TOKENS - 1; /* inclusive */
+	while (start <= end) {
+		int middle = start + (end - start) / 2;
+		const char *repr = token_strings[middle];
+		int cmp = strncmp(str, repr, len);
+		if (cmp == 0)
+			cmp = len - strlen(repr);
+		if (cmp == 0) {
+			/* Found! */
+			*token = middle;
+			return 0;
+		} else if (cmp < 0) {
+			end = middle - 1;
+		} else {
+			start = middle + 1;
+		}
+	}
+	return -1;
+}
+
+static int parse_token(struct parser_state *parser, enum token *token)
+{
+	if (!parser->input) {
+		parser_error(parser, "unexpected end of line");
+		return -1;
+	}
+	int prefix = 0;
+	for (char *c = parser->input; isalpha(*c); ++c)
+		++prefix;
+	if (prefix == 0) {
+		parser_error(parser, "expected an alphabetic token");
+		return -1;
+	}
+	if (search_token(parser->input, prefix, token) < 0) {
+		parser_error(parser, "unrecognized token");
+		return -1;
+	} else {
+		parser->input += prefix;
+		return 0;
+	}
+}
+
+static int parse_key(struct parser_state *parser, enum token *key)
+{
+	consume_spaces(parser);
+	if (parse_token(parser, key) < 0)
+		return -1;
+	consume_spaces(parser);
+	if (consume_string(parser, ":") < 0)
+		return -1;
+	consume_spaces(parser);
+	return 0;
+}
+
 /* Global interface **********************************************************/
 
 /**
