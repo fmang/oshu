@@ -27,6 +27,7 @@ static const char *osu_file_header = "osu file format v";
  * not 0 by default.
  */
 static const struct oshu_beatmap default_beatmap = {
+	.sample_set = OSHU_SAMPLE_SET_SOFT,
 	.difficulty = {
 		.hp_drain_rate = 1.,
 		.circle_radius = 32.,
@@ -712,6 +713,8 @@ static int process_general(struct parser_state *parser)
 			beatmap->mode = value.i;
 		break;
 	case SampleSet:
+		rc = parse_sample_set(parser, &beatmap->sample_set);
+		break;
 	case StackLeniency:
 	case LetterboxInBreaks:
 	case WidescreenStoryboard:
@@ -723,6 +726,28 @@ static int process_general(struct parser_state *parser)
 		return -1;
 	}
 	return rc;
+}
+
+static int parse_sample_set(struct parser_state *parser, enum oshu_sample_set_family *set)
+{
+	enum token token;
+	if (parse_token(parser, &token) < 0)
+		return -1;
+	switch (token) {
+	case Drum:
+		*set = OSHU_SAMPLE_SET_DRUM;
+		break;
+	case Normal:
+		*set = OSHU_SAMPLE_SET_NORMAL;
+		break;
+	case Soft:
+		*set = OSHU_SAMPLE_SET_SOFT;
+		break;
+	default:
+		parser_error(parser, "invalid sample set");
+		return -1;
+	}
+	return 0;
 }
 
 /* Global interface **********************************************************/

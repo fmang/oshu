@@ -51,7 +51,7 @@ enum oshu_mode {
  * The constant values are taken from the documentation, and correspond to the
  * value a hit object's addition may mention for its sample set.
  */
-enum oshu_sampleset_family {
+enum oshu_sample_set_family {
 	/**
 	 * The beatmap's hit objects often specifiy 0 as the sample set,
 	 * meaning we should use the inherited one.
@@ -59,10 +59,10 @@ enum oshu_sampleset_family {
 	 * However, the parser should in these case replace 0 with the actual
 	 * value, so it should be used in an external module.
 	 */
-	OSHU_SAMPLESET_AUTO = 0,
-	OSHU_SAMPLESET_NORMAL = 1,
-	OSHU_SAMPLESET_SOFT = 2,
-	OSHU_SAMPLESET_DRUM = 3,
+	OSHU_SAMPLE_SET_AUTO = 0,
+	OSHU_SAMPLE_SET_NORMAL = 1,
+	OSHU_SAMPLE_SET_SOFT = 2,
+	OSHU_SAMPLE_SET_DRUM = 3,
 };
 
 /**
@@ -142,7 +142,7 @@ struct oshu_timing_point {
 	/**
 	 * Default sample set to use in that timing section.
 	 */
-	enum oshu_sampleset_family sample_set;
+	enum oshu_sample_set_family sample_set;
 	/**
 	 * Volume of the samples, from 0 to 100%.
 	 *
@@ -336,16 +336,16 @@ struct oshu_hit {
 	 *
 	 * \sa oshu_timing_point::sample_set
 	 */
-	enum oshu_sampleset_family sample_set;
+	enum oshu_sample_set_family sample_set;
 	/**
 	 * Sample set to use when playing #hit_sound over the normal hit sound,
 	 * and not the hit sound itself.
 	 *
 	 * It's similar to #sample_set.
 	 */
-	enum oshu_sampleset_family additions_set;
+	enum oshu_sample_set_family additions_set;
 	/**
-	 * For a given sampleset family, alternative sample may be used.
+	 * For a given sample_set family, alternative sample may be used.
 	 *
 	 * The sample stored in `soft-hitnormal99.wav` may thus be accessed by
 	 * setting the sample index to 99.
@@ -680,12 +680,12 @@ struct oshu_beatmap {
 	 * `Normal`, `Soft`, `Drum` in the beatmap.
 	 *
 	 * Note that timing points or specific hit objects may use their own
-	 * sampleset, so you must check the hit object first before resorting
+	 * sample set, so you must check the hit object first before resorting
 	 * to this variable.
 	 *
-	 * Let's default to #OSHU_SAMPLESET_SOFT.
+	 * Let's default to #OSHU_SAMPLE_SET_SOFT.
 	 */
-	enum oshu_sampleset_family sampleset;
+	enum oshu_sample_set_family sample_set;
 	/**
 	 * From the official documentation:
 	 *
