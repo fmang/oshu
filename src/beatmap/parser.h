@@ -104,6 +104,10 @@ struct parser_state {
 	 * a full line. As the parsing process advances, the cursor is
 	 * incremented, until it reaches the end terminator. It may be NULL
 	 * when there is nothing left to parse.
+	 *
+	 * \todo
+	 * Once we stop using strsep, this field should never be null, so this
+	 * opens room for simplification.
 	 */
 	char *input;
 	/**
@@ -183,12 +187,14 @@ typedef struct parser_state P;
  * tasks.
  */
 
+static int consume_all(P*);
 static int consume_end(P*);
 static int consume_spaces(P*);
 static int consume_string(P*, const char*);
 
 static int parse_int(P*, int*);
 static int parse_double(P*, double*);
+static int parse_string(P*, char**);
 static int parse_token(P*, enum token*);
 static int parse_key(P*, enum token*);
 
@@ -200,9 +206,8 @@ static int parse_key(P*, enum token*);
 static int process_input(P*);
 	static int process_header(P*);
 	static int process_section(P*);
-/*
-	static int process_category(P*);
 	static int process_general(P*);
+/*
 	static int process_metadata(P*);
 	static int process_event(P*);
 	static int process_timing_point(P*);

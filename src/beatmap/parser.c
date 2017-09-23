@@ -81,25 +81,6 @@ static void key_value(char *line, char **key, char **value)
 }
 
 /**
- * Parse a key-value line in the `[General]` section.
- */
-static int parse_general(char *line, struct parser_state *parser)
-{
-	char *key, *value;
-	key_value(line, &key, &value);
-	if (!value)
-		return 0;
-	if (!strcmp(key, "AudioFilename")) {
-		parser->beatmap->audio_filename = strdup(value);
-	} else if (!strcmp(key, "AudioLeadIn")) {
-		parser->beatmap->audio_lead_in = atof(value) / 1000.;
-	} else if (!strcmp(key, "Mode")) {
-		parser->beatmap->mode = atoi(value);
-	}
-	return 0;
-}
-
-/**
  * Parse a key-value line in the `[Difficulty]` section.
  */
 static int parse_difficulty(char *line, struct parser_state *parser)
@@ -428,9 +409,7 @@ static int parse_line(char *line, struct parser_state *parser)
 {
 	int rc = 0;
 	trim(&line);
-	if (parser->section == BEATMAP_GENERAL) {
-		rc = parse_general(line, parser);
-	} else if (parser->section == BEATMAP_DIFFICULTY) {
+	if (parser->section == BEATMAP_DIFFICULTY) {
 		rc = parse_difficulty(line, parser);
 	} else if (parser->section == BEATMAP_EVENTS) {
 		rc = parse_event(line, parser);
@@ -453,6 +432,13 @@ static void parser_error(struct parser_state *parser, const char *message)
 		"%s:%d:%d: %s",
 		parser->source, parser->line_number, column, message
 	);
+}
+
+static int consume_all(struct parser_state *parser)
+{
+	assert (parser->input);
+	parser->input += strlen(parser->input);
+	return 0;
 }
 
 static int consume_end(struct parser_state *parser)
@@ -517,6 +503,24 @@ static int parse_double(struct parser_state *parser, double *value)
 		parser->input = end;
 		return 0;
 	}
+}
+
+static int parse_string(struct parser_state *parser, char **str)
+{
+	if (!parser->input) {
+		parser_error(parser, "unexpected end of line");
+		return -1;
+	}
+	int len = strlen(parser->input);
+	for (int i = len - 1; i >= 0 && isspace(parser->input[i]); --i)
+		parser->input[i] = '\0';
+	if (*parser->input == '\0') {
+		parser_error(parser, "expected a string");
+		return -1;
+	}
+	*str = parser->input;
+	parser->input += len;
+	return 0;
 }
 
 /**
@@ -612,6 +616,8 @@ static int process_input(struct parser_state *parser)
 	} else if (parser->section == BEATMAP_ROOT) {
 		parser_error(parser, "unexpected content outside sections");
 		return -1;
+	} else if (parser->section == BEATMAP_GENERAL) {
+		rc = process_general(parser);
 	} else {
 		return parse_line(parser->input, parser);
 	}
@@ -668,6 +674,55 @@ static int process_section(struct parser_state *parser)
 		parser->section = BEATMAP_UNKNOWN;
 		return -1;
 	}
+}
+
+struct thing {
+	int i;
+	double d;
+	char *s;
+};
+
+static int process_general(struct parser_state *parser)
+{
+	struct oshu_beatmap *beatmap = parser->beatmap;
+	int rc;
+	enum token key;
+	struct thing value;
+	if (parse_key(parser, &key) < 0)
+		return -1;
+	switch (key) {
+	case AudioFilename:
+		if ((rc = parse_string(parser, &value.s)) == 0)
+			beatmap->audio_filename = strdup(value.s);
+		break;
+	case AudioLeadIn:
+		if ((rc = parse_double(parser, &value.d)) == 0)
+			beatmap->audio_lead_in = value.d / 1000.;
+		break;
+	case PreviewTime:
+		if ((rc = parse_double(parser, &value.d)) == 0)
+			beatmap->preview_time = value.d / 1000.;
+		break;
+	case Countdown:
+		if ((rc = parse_int(parser, &value.i)) == 0)
+			beatmap->countdown = value.i;
+		break;
+	case Mode:
+		if ((rc = parse_int(parser, &value.i)) == 0)
+			beatmap->mode = value.i;
+		break;
+	case SampleSet:
+	case StackLeniency:
+	case LetterboxInBreaks:
+	case WidescreenStoryboard:
+		/** \todo Support these properties. */
+		rc = consume_all(parser);
+		break;
+	default:
+		parser_error(parser, "unsupported property");
+		return -1;
+	}
+	return rc;
 }
 
 /* Global interface **********************************************************/
