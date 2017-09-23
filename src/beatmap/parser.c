@@ -39,6 +39,26 @@ static const struct oshu_beatmap default_beatmap = {
 	},
 };
 
+/**
+ * Practical variant type, because switch won't let us declare local variables
+ * without explicitly writing out a code block.
+ */
+union thing {
+	int i;
+	double d;
+	char *s;
+};
+
+/**
+ * Clone of strdup tolerating null strings.
+ *
+ * When a string is NULL, return NULL.
+ */
+static char *strxdup(const char *str)
+{
+	return str ? strdup(str) : NULL;
+}
+
 /*****************************************************************************/
 /* Old parser ****************************************************************/
 
@@ -390,14 +410,13 @@ static void parser_error(struct parser_state *parser, const char *message)
 
 static int consume_all(struct parser_state *parser)
 {
-	assert (parser->input);
 	parser->input += strlen(parser->input);
 	return 0;
 }
 
 static int consume_end(struct parser_state *parser)
 {
-	if (!parser->input || *parser->input == '\0') {
+	if (*parser->input == '\0') {
 		return 0;
 	} else {
 		parser_error(parser, "unexpected end of line");
@@ -407,7 +426,7 @@ static int consume_end(struct parser_state *parser)
 
 static int consume_spaces(struct parser_state *parser)
 {
-	while (parser->input && isspace(*parser->input))
+	while (isspace(*parser->input))
 		parser->input++;
 	return 0;
 }
@@ -415,7 +434,7 @@ static int consume_spaces(struct parser_state *parser)
 static int consume_string(struct parser_state *parser, const char *str)
 {
 	size_t len = strlen(str);
-	if (parser->input && strncmp(parser->input, str, len) == 0) {
+	if (strncmp(parser->input, str, len) == 0) {
 		parser->input += len;
 		return 0;
 	} else {
@@ -427,10 +446,6 @@ static int consume_string(struct parser_state *parser, const char *str)
 
 static int parse_int(struct parser_state *parser, int *value)
 {
-	if (!parser->input) {
-		parser_error(parser, "unexpected end of line");
-		return -1;
-	}
 	char *end;
 	*value = strtol(parser->input, &end, 10);
 	if (end == parser->input) {
@@ -444,10 +459,6 @@ static int parse_int(struct parser_state *parser, int *value)
 
 static int parse_double(struct parser_state *parser, double *value)
 {
-	if (!parser->input) {
-		parser_error(parser, "unexpected end of line");
-		return -1;
-	}
 	char *end;
 	*value = strtod(parser->input, &end);
 	if (end == parser->input) {
@@ -460,26 +471,25 @@ static int parse_double(struct parser_state *parser, double *value)
 }
 
 /**
- * Parse the remaining of the input a a string.
+ * Parse the remaining of the input as a string.
+ *
+ * It is not trimmed here. #process_input trims the end of the string, and
+ * #parse_key will trim the start for you. Otherwise, call #consume_spaces to
+ * trim the start.
  *
  * If the string is empty, `*str` is set to NULL.
  */
 static int parse_string(struct parser_state *parser, char **str)
 {
-	if (!parser->input) {
-		parser_error(parser, "unexpected end of line");
-		return -1;
-	}
-	int len = strlen(parser->input);
-	for (int i = len - 1; i >= 0 && isspace(parser->input[i]); --i)
-		parser->input[i] = '\0';
 	if (*parser->input == '\0') {
 		*str = NULL;
 		return 0;
+	} else {
+		int len = strlen(parser->input);
+		*str = parser->input;
+		parser->input += len;
+		return 0;
 	}
-	*str = parser->input;
-	parser->input += len;
-	return 0;
 }
 
 /**
@@ -525,10 +535,6 @@ static int search_token(const char *str, int len, enum token *token)
 
 static int parse_token(struct parser_state *parser, enum token *token)
 {
-	if (!parser->input) {
-		parser_error(parser, "unexpected end of line");
-		return -1;
-	}
 	int prefix = 0;
 	for (char *c = parser->input; isalpha(*c); ++c)
 		++prefix;
@@ -587,13 +593,11 @@ static int process_input(struct parser_state *parser)
 	}
 	if (rc < 0)
 		return -1;
-	consume_spaces(parser);
 	return consume_end(parser);
 }
 
 static int process_header(struct parser_state *parser)
 {
-	assert (parser->input);
 	/* skip some binary noise: */
 	while (*parser->input && *parser->input != 'o')
 		++parser->input;
@@ -638,21 +642,6 @@ static int process_section(struct parser_state *parser)
 		parser->section = BEATMAP_UNKNOWN;
 		return -1;
 	}
-}
-
-/**
- * Practical variant type, because switch won't let us declare local variables
- * without explicitly writing out a code block.
- */
-union thing {
-	int i;
-	double d;
-	char *s;
-};
-
-static char *strxdup(const char *str)
-{
-	return str ? strdup(str) : NULL;
 }
 
 static int process_general(struct parser_state *parser)
@@ -804,10 +793,8 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 	size_t len = 0;
 	ssize_t nread;
 	while ((nread = getline(&line, &len, input)) != -1) {
-		if (nread > 0 && line[nread - 1] == '\n')
-			line[nread - 1] = '\0';
-		if (nread > 1 && line[nread - 2] == '\r')
-			line[nread - 2] = '\0';
+		for (int i = nread - 1; i >= 0 && isspace(line[i]); --i)
+			line[i] = '\0';
 		parser.buffer = line;
 		parser.input = line;
 		parser.line_number++;

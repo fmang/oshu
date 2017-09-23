@@ -102,12 +102,7 @@ struct parser_state {
 	 *
 	 * Since the parser operates line-by-line, the input buffer starts with
 	 * a full line. As the parsing process advances, the cursor is
-	 * incremented, until it reaches the end terminator. It may be NULL
-	 * when there is nothing left to parse.
-	 *
-	 * \todo
-	 * Once we stop using strsep, this field should never be null, so this
-	 * opens room for simplification.
+	 * incremented, until it reaches the end terminator. It is never NULL.
 	 */
 	char *input;
 	/**
