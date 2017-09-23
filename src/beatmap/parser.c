@@ -521,32 +521,15 @@ static int parse_line(char *line, struct parser_state *parser)
 
 /* New parser ****************************************************************/
 
-/**
- * Log a message with contextual information from the parser state.
- *
- * \sa parser_error
- * \sa parser_warning
- */
-static void parser_log(int priority, struct parser_state *parser, const char *message)
+static void parser_error(struct parser_state *parser, const char *message)
 {
 	int column = 0;
 	if (parser->buffer && parser->input)
 		column = parser->input - parser->buffer;
-	SDL_LogMessage(
-		SDL_LOG_CATEGORY_APPLICATION, priority,
+	oshu_log_error(
 		"%s:%d:%d: %s",
 		parser->source, parser->line_number, column, message
 	);
-}
-
-static void parser_error(struct parser_state *parser, const char *message)
-{
-	parser_log(SDL_LOG_PRIORITY_ERROR, parser, message);
-}
-
-static void parser_warning(struct parser_state *parser, const char *message)
-{
-	parser_log(SDL_LOG_PRIORITY_WARN, parser, message);
 }
 
 static int consume_end(struct parser_state *parser)
