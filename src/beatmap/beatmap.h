@@ -687,35 +687,12 @@ struct oshu_beatmap {
 	 */
 	enum oshu_sample_set_family sample_set;
 	/**
-	 * From the official documentation:
-	 *
-	 * > StackLeniency (Float) is how often closely placed hit objects will
-	 * > be stacked together.
-	 *
-	 * Not sure what it means.
-	 */
-	double stack_leniency;
-	/**
 	 * The game mode. Today, only the standard osu! game is supported.
 	 *
 	 * It is written as a number between 0 and 3, and matches the values in
 	 * #oshu_mode.
 	 */
 	enum oshu_mode mode;
-	/**
-	 * Pseudo-boolean. Unused in oshu!.
-	 *
-	 * > LetterboxInBreaks (Boolean) specifies whether the letterbox
-	 * > appears during breaks.
-	 */
-	int letterbox_in_breaks;
-	/**
-	 * Pseudo-boolean. Unused in oshu!.
-	 *
-	 * > WidescreenStoryboard (Boolean) specifies whether or not the
-	 * > storyboard should be widescreen.
-	 */
-	int widescreen_storyboard;
 	/**
 	 * \brief [Metadata] section.
 	 */

@@ -718,7 +718,7 @@ static int process_general(struct parser_state *parser)
 	case StackLeniency:
 	case LetterboxInBreaks:
 	case WidescreenStoryboard:
-		/** \todo Support these properties. */
+		/* Nobody cares. */
 		rc = consume_all(parser);
 		break;
 	default:
