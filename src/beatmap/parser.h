@@ -183,6 +183,7 @@ typedef struct parser_state P;
  */
 
 static int consume_all(P*);
+static int consume_char(P*, char);
 static int consume_end(P*);
 static int consume_spaces(P*);
 static int consume_string(P*, const char*);
@@ -190,6 +191,7 @@ static int consume_string(P*, const char*);
 static int parse_int(P*, int*);
 static int parse_double(P*, double*);
 static int parse_string(P*, char**);
+static int parse_quoted_string(P*, char**);
 static int parse_token(P*, enum token*);
 static int parse_key(P*, enum token*);
 
@@ -205,8 +207,8 @@ static int process_input(P*);
 		static int parse_sample_set(P*, enum oshu_sample_set_family*);
 	static int process_metadata(P*);
 	static int process_difficulty(P*);
-/*
 	static int process_event(P*);
+/*
 	static int process_timing_point(P*);
 		static int parse_timing_point(P*, struct oshu_timing_point*);
 	static int process_colour(P*);

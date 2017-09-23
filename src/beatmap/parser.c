@@ -75,24 +75,6 @@ static void trim(char **str)
 	for (; rev >= *str && *rev == ' '; rev--);
 }
 
-static int parse_event(char *line, struct parser_state *parser)
-{
-	char *f1 = strsep(&line, ",");
-	char *f2 = strsep(&line, ",");
-	char *file = strsep(&line, ",");
-	if (!file)
-		return 0;
-	if (!strcmp(f1, "0") && !strcmp(f2, "0")) {
-		int len = strlen(file);
-		if (file[len-1] == '"')
-			file[len-1] = '\0';
-		if (file[0] == '"')
-			file++;
-		parser->beatmap->background_file = strdup(file);
-	}
-	return 0;
-}
-
 static int build_timing_point(char *line, struct parser_state *parser, struct oshu_timing_point **tp)
 {
 	char *offset = strsep(&line, ",");
@@ -385,9 +367,7 @@ static int parse_line(char *line, struct parser_state *parser)
 {
 	int rc = 0;
 	trim(&line);
-	if (parser->section == BEATMAP_EVENTS) {
-		rc = parse_event(line, parser);
-	} else if (parser->section == BEATMAP_TIMING_POINTS) {
+	if (parser->section == BEATMAP_TIMING_POINTS) {
 		rc = parse_timing_point(line, parser);
 	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
 		rc = parse_hit_object(line, parser);
@@ -429,6 +409,21 @@ static int consume_spaces(struct parser_state *parser)
 	while (isspace(*parser->input))
 		parser->input++;
 	return 0;
+}
+
+/**
+ * Faster variant of #consume_string for a single character.
+ */
+static int consume_char(struct parser_state *parser, char c)
+{
+	if (*parser->input == c) {
+		++parser->input;
+		return 0;
+	} else {
+		parser_error(parser, "unexpected character");
+		oshu_log_error("expected \'%c\'", c);
+		return -1;
+	}
 }
 
 static int consume_string(struct parser_state *parser, const char *str)
@@ -490,6 +485,29 @@ static int parse_string(struct parser_state *parser, char **str)
 		parser->input += len;
 		return 0;
 	}
+}
+
+/**
+ * Parse a string inside quotes, like `"hello"`.
+ *
+ * Mainly useful for parsing the file name of the background picture in the
+ * events section.
+ */
+static int parse_quoted_string(struct parser_state *parser, char **str)
+{
+	if (consume_char(parser, '"') < 0) {
+		parser_error(parser, "expected double quotes");
+		return -1;
+	}
+	char *end = strchr(parser->input, '"');
+	if (!end) {
+		parser_error(parser, "unterminated string");
+		return -1;
+	}
+	*str = parser->input;
+	*end = '\0';
+	parser->input = end + 1;
+	return 0;
 }
 
 /**
@@ -556,7 +574,7 @@ static int parse_key(struct parser_state *parser, enum token *key)
 	if (parse_token(parser, key) < 0)
 		return -1;
 	consume_spaces(parser);
-	if (consume_string(parser, ":") < 0)
+	if (consume_char(parser, ':') < 0)
 		return -1;
 	consume_spaces(parser);
 	return 0;
@@ -588,6 +606,8 @@ static int process_input(struct parser_state *parser)
 		rc = process_metadata(parser);
 	} else if (parser->section == BEATMAP_DIFFICULTY) {
 		rc = process_difficulty(parser);
+	} else if (parser->section == BEATMAP_EVENTS) {
+		rc = process_event(parser);
 	} else {
 		return parse_line(parser->input, parser);
 	}
@@ -617,13 +637,13 @@ static int process_header(struct parser_state *parser)
 static int process_section(struct parser_state *parser)
 {
 	enum token token;
-	if (consume_string(parser, "[") < 0)
+	if (consume_char(parser, '[') < 0)
 		return -1;
 	consume_spaces(parser);
 	if (parse_token(parser, &token) < 0)
 		return -1;
 	consume_spaces(parser);
-	if (consume_string(parser, "]") < 0)
+	if (consume_char(parser, ']') < 0)
 		return -1;
 
 	switch (token) {
@@ -772,6 +792,19 @@ static int process_difficulty(struct parser_state *parser)
 		parser_error(parser, "unknown difficulty parameter");
 		return -1;
 	}
+	return 0;
+}
+
+static int process_event(struct parser_state *parser)
+{
+	if (!strncmp(parser->input, "0,0,", 4)) {
+		parser->input += 4;
+		char *value;
+		if (parse_quoted_string(parser, &value) < 0)
+			return -1;
+		parser->beatmap->background_filename = strxdup(value);
+	}
+	consume_all(parser);
 	return 0;
 }
 

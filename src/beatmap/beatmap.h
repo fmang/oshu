@@ -713,7 +713,7 @@ struct oshu_beatmap {
 	 *
 	 * May be NULL.
 	 */
-	char *background_file;
+	char *background_filename;
 	/**
 	 * \brief [TimingPoints] section.
 	 *
