@@ -121,9 +121,21 @@ struct parser_state {
 	 * when there is nothing left to parse.
 	 */
 	char *input;
+	/**
+	 * The initial input state when reading a line.
+	 *
+	 * Useful to determine the column number, using the difference between
+	 * #input and #buffer.
+	 */
+	char *buffer;
 	int line_number;
+	/**
+	 * The name of the file being read, or something similar, like <stdin>
+	 * or some URL, who knows.
+	 */
+	const char *source;
 	struct oshu_beatmap *beatmap;
-	enum beatmap_section section;
+	int section;
 	struct oshu_hit *last_hit;
 	struct oshu_timing_point *last_timing_point;
 	struct oshu_timing_point *current_timing_point;
@@ -132,18 +144,28 @@ struct parser_state {
 };
 
 /**
+ * Log a message with contextual information from the parser state.
+ *
+ * \sa parser_error
+ * \sa parser_warn
+ */
+static void parser_log(int priority, struct parser_state *parser, const char *message);
+
+/**
  * Log an error with contextual information from the parser state.
  *
+ * \sa parser_log
  * \sa oshu_log_error
  */
-static void parser_error(struct parser_state *parser, const char *fmt, ...);
+static void parser_error(struct parser_state *parser, const char *message);
 
 /**
  * Log a warning with contextual information from the parser state.
  *
+ * \sa parser_log
  * \sa oshu_log_warn
  */
-static void parser_warn(struct parser_state *parser, const char *fmt, ...);
+static void parser_warn(struct parser_state *parser, const char *message);
 
 /**
  * Convient typedef to help define the prototypes. Don't use it in the

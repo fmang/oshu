@@ -39,6 +39,8 @@ static const struct oshu_beatmap default_beatmap = {
 	},
 };
 
+/* Old parser ****************************************************************/
+
 /**
  * Trim a string.
  *
@@ -516,6 +518,32 @@ static int parse_line(char *line, struct parser_state *parser)
 	}
 	return rc;
 }
+
+/* New parser ****************************************************************/
+
+static void parser_log(int priority, struct parser_state *parser, const char *message)
+{
+	int column = 0;
+	if (parser->buffer && parser->input)
+		column = parser->input - parser->buffer;
+	SDL_LogMessage(
+		SDL_LOG_CATEGORY_APPLICATION, priority,
+		"%s:%d:%d: %s",
+		parser->source, parser->line_number, column, message
+	);
+}
+
+static void parser_error(struct parser_state *parser, const char *message)
+{
+	parser_log(SDL_LOG_PRIORITY_ERROR, parser, message);
+}
+
+static void parser_warn(struct parser_state *parser, const char *message)
+{
+	parser_log(SDL_LOG_PRIORITY_WARN, parser, message);
+}
+
+/* Global interface **********************************************************/
 
 /**
  * Create the parser state, then read the input file line-by-line, feeding it
