@@ -49,16 +49,6 @@ union thing {
 	char *s;
 };
 
-/**
- * Clone of strdup tolerating null strings.
- *
- * When a string is NULL, return NULL.
- */
-static char *strxdup(const char *str)
-{
-	return str ? strdup(str) : NULL;
-}
-
 /*****************************************************************************/
 /* Old parser ****************************************************************/
 
@@ -473,6 +463,9 @@ static int parse_double(struct parser_state *parser, double *value)
  * trim the start.
  *
  * If the string is empty, `*str` is set to NULL.
+ *
+ * Otherwise, return a dynamically allocated string using *strdup*, which you
+ * must not forget to free!
  */
 static int parse_string(struct parser_state *parser, char **str)
 {
@@ -481,7 +474,7 @@ static int parse_string(struct parser_state *parser, char **str)
 		return 0;
 	} else {
 		int len = strlen(parser->input);
-		*str = parser->input;
+		*str = strdup(parser->input);
 		parser->input += len;
 		return 0;
 	}
@@ -492,6 +485,8 @@ static int parse_string(struct parser_state *parser, char **str)
  *
  * Mainly useful for parsing the file name of the background picture in the
  * events section.
+ *
+ * Behaves like #parse_string.
  */
 static int parse_quoted_string(struct parser_state *parser, char **str)
 {
@@ -504,9 +499,14 @@ static int parse_quoted_string(struct parser_state *parser, char **str)
 		parser_error(parser, "unterminated string");
 		return -1;
 	}
-	*str = parser->input;
 	*end = '\0';
-	parser->input = end + 1;
+	if (*parser->input == '\0') {
+		*str = NULL;
+		return 0;
+	} else {
+		*str = strdup(parser->input);
+		parser->input = end + 1;
+	}
 	return 0;
 }
 
@@ -674,8 +674,12 @@ static int process_general(struct parser_state *parser)
 		return -1;
 	switch (key) {
 	case AudioFilename:
-		if ((rc = parse_string(parser, &value.s)) == 0)
-			beatmap->audio_filename = strxdup(value.s);
+		if ((rc = parse_string(parser, &beatmap->audio_filename)) == 0) {
+			if (strchr(beatmap->audio_filename, '/') != NULL) {
+				parser_error(parser, "slashes are forbidden in audio file names");
+				rc = -1;
+			}
+		}
 		break;
 	case AudioLeadIn:
 		if ((rc = parse_double(parser, &value.d)) == 0)
@@ -735,29 +739,25 @@ static int process_metadata(struct parser_state *parser)
 {
 	struct oshu_metadata *meta = &parser->beatmap->metadata;
 	enum token key;
-	char *value;
 	if (parse_key(parser, &key) < 0)
 		return -1;
-	if (key == BeatmapID)
-		return parse_int(parser, &meta->beatmap_id);
-	else if (key == BeatmapSetID)
-		return parse_int(parser, &meta->beatmap_set_id);
-	if (parse_string(parser, &value) < 0)
-		return -1;
+	int rc;
 	switch (key) {
-	case Title:         meta->title = strxdup(value); break;
-	case TitleUnicode:  meta->title_unicode = strxdup(value); break;
-	case Artist:        meta->artist = strxdup(value); break;
-	case ArtistUnicode: meta->artist_unicode = strxdup(value); break;
-	case Creator:       meta->creator = strxdup(value); break;
-	case Version:       meta->version = strxdup(value); break;
-	case Source:        meta->source = strxdup(value); break;
-	case Tags:          /* TODO */ break;
+	case Title:         rc = parse_string(parser, &meta->title); break;
+	case TitleUnicode:  rc = parse_string(parser, &meta->title_unicode); break;
+	case Artist:        rc = parse_string(parser, &meta->artist); break;
+	case ArtistUnicode: rc = parse_string(parser, &meta->artist_unicode); break;
+	case Creator:       rc = parse_string(parser, &meta->creator); break;
+	case Version:       rc = parse_string(parser, &meta->version); break;
+	case Source:        rc = parse_string(parser, &meta->source); break;
+	case Tags:          rc = consume_all(parser); /* TODO */ break;
+	case BeatmapID:     rc = parse_int(parser, &meta->beatmap_id); break;
+	case BeatmapSetID:  rc = parse_int(parser, &meta->beatmap_set_id); break;
 	default:
 		parser_error(parser, "unrecognized metadata");
 		return -1;
 	}
-	return 0;
+	return rc;
 }
 
 static int process_difficulty(struct parser_state *parser)
@@ -799,10 +799,8 @@ static int process_event(struct parser_state *parser)
 {
 	if (!strncmp(parser->input, "0,0,", 4)) {
 		parser->input += 4;
-		char *value;
-		if (parse_quoted_string(parser, &value) < 0)
+		if (parse_quoted_string(parser, &parser->beatmap->background_filename) < 0)
 			return -1;
-		parser->beatmap->background_filename = strxdup(value);
 	}
 	consume_all(parser);
 	return 0;
@@ -857,9 +855,6 @@ static int validate(struct oshu_beatmap *beatmap)
 {
 	if (!beatmap->audio_filename) {
 		oshu_log_error("no audio file mentionned");
-		return -1;
-	} else if (strchr(beatmap->audio_filename, '/') != NULL) {
-		oshu_log_error("slashes are forbidden in audio file names");
 		return -1;
 	}
 	if (!beatmap->hits) {
@@ -926,6 +921,7 @@ static void free_timing_points(struct oshu_timing_point *t)
 void oshu_destroy_beatmap(struct oshu_beatmap *beatmap)
 {
 	free(beatmap->audio_filename);
+	free(beatmap->background_filename);
 	free_metadata(&beatmap->metadata);
 	if (beatmap->hits)
 		free_hits(beatmap->hits);
