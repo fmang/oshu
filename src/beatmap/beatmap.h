@@ -495,19 +495,11 @@ struct oshu_metadata {
  *
  * A lot of its fields use an obscure unit. Because oshu! is still a prototype,
  * we'll try to guess at first, then maybe compare later, or ask around.
+ *
+ * Looks like 5 in the beatmap file usually means average. Higher than 5 is
+ * harder, and lower than 5 is easier.
  */
 struct oshu_difficulty {
-	/**
-	 * Health point drain rate.
-	 *
-	 * This is how much a missed mark lowers your health bar until you
-	 * lose, especially in the standard osu! game mode.
-	 *
-	 * It's a float, but its unit is obscure.
-	 *
-	 * Defaults to 1, whatever that means.
-	 */
-	double hp_drain_rate;
 	/**
 	 * \brief Radius of the hit object's circles, in pixels.
 	 *
@@ -520,29 +512,40 @@ struct oshu_difficulty {
 	 * - Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2
 	 * - Radius = OBJECT_RADIUS * Scale
 	 *
-	 * Defaults to 32.
+	 * Defaults to 32 pixels.
 	 */
 	double circle_radius;
 	/**
-	 * Number of stars of the song.
+	 * Number of stars of the song. It's a nice thing to display.
+	 *
+	 * > OverallDifficulty (Float) specifies the amount of time allowed to
+	 * > click a hit object on time.
+	 *
+	 * You should not use it for any other purpose. The useful information
+	 * it yields should be stored in computed fields, like #leniency.
 	 */
 	double overall_difficulty;
 	/**
 	 * \brief Time tolerance to make a click good, in seconds.
 	 *
-	 * > OverallDifficulty (Float) specifies the amount of time allowed to
-	 * > click a hit object on time.
+	 * Its value is computed from the #overall_difficulty.
 	 *
-	 * It's probably also the number of stars that appear.
+	 * References:
 	 *
-	 * In the beatmap file, it's an obscure float. Let's try to apply some
-	 * inverse function, where an *overall difficulty* of 1 yields a
-	 * leniency of 0.3 seconds. 3 will be 0.1 seconds, 6 will be 0.05
-	 * seconds (getting hard).
+	 * - osu.Game.Rulesets.Taiko/Objects/Hit.cs:
+	 *     HitWindowMiss = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 135, 95, 70);
+	 *
+	 * - osu.Game/Beatmaps/BeatmapDifficulty.cs:
+	 *     if (difficulty > 5) return mid + (max - mid) * (difficulty - 5) / 5;
+	 *     if (difficulty < 5) return mid - (mid - min) * (5 - difficulty) / 5;
+	 *
+	 * - osu.Game.Rulesets.Mania/Judgements/HitWindows.cs:
+	 *     private const double miss_min = 316;
+	 *     private const double miss_mid = 346;
+	 *     private const double miss_max = 376;
+	 *     Miss = BeatmapDifficulty.DifficultyRange(difficulty, miss_max, miss_mid, miss_min);
 	 *
 	 * Defaults to 0.1 seconds.
-	 *
-	 * \sa overall_difficulty
 	 */
 	double leniency;
 	/**
@@ -551,9 +554,7 @@ struct oshu_difficulty {
 	 * > ApproachRate (Float) specifies the amount of time taken for the
 	 * > approach circle and hit object to appear.
 	 *
-	 * Another obscure field. Let's say an approach rate of 5 maps to 1
-	 * second. So, this field will receive on fifth of the value in the
-	 * beatmap.
+	 * Looks like most settings, 1 is easy, 5 is normal, and 9 is hard.
 	 *
 	 * Defaults to 1 second.
 	 */
@@ -572,7 +573,7 @@ struct oshu_difficulty {
 	double approach_size;
 	/**
 	 * Makes the link between a slider's pixel length and the time.
-	 * 1 beat maps to 100 pixels multiplied by this factor.
+	 * 1 beat is mapped to 100 pixels multiplied by this factor.
 	 *
 	 * Therefore, the total duration in beats of a slider is
 	 * `pixel_length / (100 * slider_multiplier)`. Multiply this by

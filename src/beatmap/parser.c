@@ -29,17 +29,17 @@ static const char *osu_file_header = "osu file format v";
 static const struct oshu_beatmap default_beatmap = {
 	.sample_set = OSHU_SOFT_SAMPLE_SET,
 	.difficulty = {
-		.hp_drain_rate = 1.,
 		.circle_radius = 32.,
 		.leniency = .1,
 		.approach_time = .8,
 		.approach_size = 96.,
 		.slider_multiplier = 1.4,
 		.slider_tick_rate = 1.,
-		.slider_tolerance = 64.
+		.slider_tolerance = 64.,
 	},
 };
 
+/*****************************************************************************/
 /* Old parser ****************************************************************/
 
 /**
@@ -53,51 +53,6 @@ static void trim(char **str)
 	for (; **str == ' '; (*str)++);
 	char *rev = *str + strlen(*str) - 1;
 	for (; rev >= *str && *rev == ' '; rev--);
-}
-
-/**
- * Extract a key-value pair from a line like `key: value`.
- *
- * This function receives two pointers to uninitialized pointers, which this
- * function will make point to valid zero-terminated strings. Both the key and
- * the value are trimmed using #trim.
- *
- * If no colon deliminter was found, the whole line is saved into `*key` and
- * `*value` is set to *NULL*.
- */
-static void key_value(char *line, char **key, char **value)
-{
-	char *colon = strchr(line, ':');
-	if (colon) {
-		*colon = '\0';
-		*key = line;
-		*value = colon + 1;
-		trim(key);
-		trim(value);
-	} else {
-		*key = line;
-		*value = NULL;
-		trim(key);
-	}
-}
-
-/**
- * Parse a key-value line in the `[Difficulty]` section.
- */
-static int parse_difficulty(char *line, struct parser_state *parser)
-{
-	char *key, *value;
-	key_value(line, &key, &value);
-	if (!value)
-		return 0;
-	if (!strcmp(key, "SliderMultiplier")) {
-		parser->beatmap->difficulty.slider_multiplier = atof(value);
-	} else if (!strcmp(key, "CircleSize")) {
-		double r = (atof(value) - 5.) / 5.;
-		parser->beatmap->difficulty.circle_radius = 32. * (1. - .7 * r);
-		assert (parser->beatmap->difficulty.circle_radius > 0.);
-	}
-	return 0;
 }
 
 static int parse_event(char *line, struct parser_state *parser)
@@ -410,9 +365,7 @@ static int parse_line(char *line, struct parser_state *parser)
 {
 	int rc = 0;
 	trim(&line);
-	if (parser->section == BEATMAP_DIFFICULTY) {
-		rc = parse_difficulty(line, parser);
-	} else if (parser->section == BEATMAP_EVENTS) {
+	if (parser->section == BEATMAP_EVENTS) {
 		rc = parse_event(line, parser);
 	} else if (parser->section == BEATMAP_TIMING_POINTS) {
 		rc = parse_timing_point(line, parser);
@@ -506,6 +459,11 @@ static int parse_double(struct parser_state *parser, double *value)
 	}
 }
 
+/**
+ * Parse the remaining of the input a a string.
+ *
+ * If the string is empty, `*str` is set to NULL.
+ */
 static int parse_string(struct parser_state *parser, char **str)
 {
 	if (!parser->input) {
@@ -516,8 +474,8 @@ static int parse_string(struct parser_state *parser, char **str)
 	for (int i = len - 1; i >= 0 && isspace(parser->input[i]); --i)
 		parser->input[i] = '\0';
 	if (*parser->input == '\0') {
-		parser_error(parser, "expected a string");
-		return -1;
+		*str = NULL;
+		return 0;
 	}
 	*str = parser->input;
 	parser->input += len;
@@ -598,6 +556,7 @@ static int parse_key(struct parser_state *parser, enum token *key)
 	return 0;
 }
 
+/*****************************************************************************/
 /* New parser ****************************************************************/
 
 static int process_input(struct parser_state *parser)
@@ -621,6 +580,8 @@ static int process_input(struct parser_state *parser)
 		rc = process_general(parser);
 	} else if (parser->section == BEATMAP_METADATA) {
 		rc = process_metadata(parser);
+	} else if (parser->section == BEATMAP_DIFFICULTY) {
+		rc = process_difficulty(parser);
 	} else {
 		return parse_line(parser->input, parser);
 	}
@@ -679,24 +640,33 @@ static int process_section(struct parser_state *parser)
 	}
 }
 
-struct thing {
+/**
+ * Practical variant type, because switch won't let us declare local variables
+ * without explicitly writing out a code block.
+ */
+union thing {
 	int i;
 	double d;
 	char *s;
 };
+
+static char *strxdup(const char *str)
+{
+	return str ? strdup(str) : NULL;
+}
 
 static int process_general(struct parser_state *parser)
 {
 	struct oshu_beatmap *beatmap = parser->beatmap;
 	int rc;
 	enum token key;
-	struct thing value;
+	union thing value;
 	if (parse_key(parser, &key) < 0)
 		return -1;
 	switch (key) {
 	case AudioFilename:
 		if ((rc = parse_string(parser, &value.s)) == 0)
-			beatmap->audio_filename = strdup(value.s);
+			beatmap->audio_filename = strxdup(value.s);
 		break;
 	case AudioLeadIn:
 		if ((rc = parse_double(parser, &value.d)) == 0)
@@ -766,13 +736,13 @@ static int process_metadata(struct parser_state *parser)
 	if (parse_string(parser, &value) < 0)
 		return -1;
 	switch (key) {
-	case Title:         meta->title = strdup(value); break;
-	case TitleUnicode:  meta->title_unicode = strdup(value); break;
-	case Artist:        meta->artist = strdup(value); break;
-	case ArtistUnicode: meta->artist_unicode = strdup(value); break;
-	case Creator:       meta->creator = strdup(value); break;
-	case Version:       meta->version = strdup(value); break;
-	case Source:        meta->source = strdup(value); break;
+	case Title:         meta->title = strxdup(value); break;
+	case TitleUnicode:  meta->title_unicode = strxdup(value); break;
+	case Artist:        meta->artist = strxdup(value); break;
+	case ArtistUnicode: meta->artist_unicode = strxdup(value); break;
+	case Creator:       meta->creator = strxdup(value); break;
+	case Version:       meta->version = strxdup(value); break;
+	case Source:        meta->source = strxdup(value); break;
 	case Tags:          /* TODO */ break;
 	default:
 		parser_error(parser, "unrecognized metadata");
@@ -781,6 +751,42 @@ static int process_metadata(struct parser_state *parser)
 	return 0;
 }
 
+static int process_difficulty(struct parser_state *parser)
+{
+	struct oshu_difficulty *difficulty = &parser->beatmap->difficulty;
+	enum token key;
+	double value;
+	if (parse_key(parser, &key) < 0)
+		return -1;
+	if (parse_double(parser, &value) < 0)
+		return -1;
+	switch (key) {
+	case CircleSize:
+		difficulty->circle_radius = 32. * (1. - .7 * (value - 5.) / 5.);
+		assert (difficulty->circle_radius > 0.);
+		difficulty->approach_size = 3. * difficulty->circle_radius;
+		difficulty->slider_tolerance = 2. * difficulty->circle_radius;
+		break;
+	case OverallDifficulty:
+		difficulty->overall_difficulty = value;
+		break;
+	case SliderMultiplier:
+		difficulty->slider_multiplier = value;
+		break;
+	case SliderTickRate:
+		difficulty->slider_tick_rate = value;
+		break;
+	case ApproachRate:
+	case HPDrainRate:
+		break;
+	default:
+		parser_error(parser, "unknown difficulty parameter");
+		return -1;
+	}
+	return 0;
+}
+
+/*****************************************************************************/
 /* Global interface **********************************************************/
 
 /**
@@ -837,7 +843,7 @@ static int validate(struct oshu_beatmap *beatmap)
 		return -1;
 	}
 	if (!beatmap->hits) {
-		oshu_log_error("no hit objectings found");
+		oshu_log_error("no hit objects found");
 		return -1;
 	}
 	return 0;
