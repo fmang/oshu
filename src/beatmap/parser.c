@@ -579,6 +579,40 @@ static int consume_string(struct parser_state *parser, const char *str)
 	}
 }
 
+static int parse_int(struct parser_state *parser, int *value)
+{
+	if (!parser->input) {
+		parser_error(parser, "unexpected end of line");
+		return -1;
+	}
+	char *end;
+	*value = strtol(parser->input, &end, 10);
+	if (end == parser->input) {
+		parser_error(parser, "expected a number");
+		return -1;
+	} else {
+		parser->input = end;
+		return 0;
+	}
+}
+
+static int parse_double(struct parser_state *parser, double *value)
+{
+	if (!parser->input) {
+		parser_error(parser, "unexpected end of line");
+		return -1;
+	}
+	char *end;
+	*value = strtod(parser->input, &end);
+	if (end == parser->input) {
+		parser_error(parser, "expected a floating number");
+		return -1;
+	} else {
+		parser->input = end;
+		return 0;
+	}
+}
+
 /* Global interface **********************************************************/
 
 /**
