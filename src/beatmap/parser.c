@@ -701,14 +701,21 @@ static int process_general(struct parser_state *parser)
 		rc = parse_sample_set(parser, &beatmap->sample_set);
 		break;
 	case StackLeniency:
+		/* Looks like this is a stat more than something that affects
+		 * the gameplay. */
 	case LetterboxInBreaks:
+		/* From the official doc:
+		 * > LetterboxInBreaks (Boolean) specifies whether the
+		 * > letterbox appears during breaks.
+		 * Very funny. */
 	case EpilepsyWarning:
+		/* No fear of epilepsy with oshu's current state. */
 	case WidescreenStoryboard:
-		/* Nobody cares. */
+		/* Storyboard are far from being supported. */
 		rc = consume_all(parser);
 		break;
 	default:
-		parser_error(parser, "unsupported property");
+		parser_error(parser, "unknown general property");
 		return -1;
 	}
 	return rc;
