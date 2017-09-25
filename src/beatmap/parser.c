@@ -65,46 +65,6 @@ static void trim(char **str)
 	for (; rev >= *str && *rev == ' '; rev--);
 }
 
-static int build_timing_point(char *line, struct parser_state *parser, struct oshu_timing_point **tp)
-{
-	char *offset = strsep(&line, ",");
-	char *beat_length = strsep(&line, ",");
-	assert (beat_length != NULL);
-	*tp = calloc(1, sizeof(**tp));
-	(*tp)->offset = atoi(offset);
-	double beat = atof(beat_length);
-	if (beat < 0) {
-		assert (parser->timing_base != NULL);
-		(*tp)->beat_duration = (-beat / 100.) * parser->timing_base->beat_duration;
-	} else {
-		(*tp)->beat_duration = beat / 1000.;
-		parser->timing_base = *tp;
-	}
-	return 0;
-}
-
-/**
- * Parse one timing point.
- *
- * Sample input:
- * `129703,731.707317073171,4,2,1,50,1,0`
- */
-static int parse_timing_point(char *line, struct parser_state *parser)
-{
-	struct oshu_timing_point *tp;
-	if (build_timing_point(line, parser, &tp) < 0)
-		return 0; /* ignore */
-	/* link it to the timing point list */
-	if (parser->last_timing_point != NULL) {
-		assert (parser->last_timing_point->offset <= tp->offset);
-		parser->last_timing_point->next = tp;
-	} else {
-		parser->beatmap->timing_points = tp;
-	}
-	parser->last_timing_point = tp;
-	return 0;
-}
-
 /**
  * Parse a point.
  *
@@ -357,9 +317,7 @@ static int parse_line(char *line, struct parser_state *parser)
 {
 	int rc = 0;
 	trim(&line);
-	if (parser->section == BEATMAP_TIMING_POINTS) {
-		rc = parse_timing_point(line, parser);
-	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
+	if (parser->section == BEATMAP_HIT_OBJECTS) {
 		rc = parse_hit_object(line, parser);
 	}
 	return rc;
@@ -442,6 +400,20 @@ static int parse_int(struct parser_state *parser, int *value)
 	}
 }
 
+/**
+ * Parse an int and then consume a separator.
+ *
+ * This is a convenience function.
+ */
+static int parse_int_sep(struct parser_state *parser, int *value, char sep)
+{
+	if (parse_int(parser, value) < 0)
+		return -1;
+	if (consume_char(parser, sep) < 0)
+		return -1;
+	return 0;
+}
+
 static int parse_double(struct parser_state *parser, double *value)
 {
 	char *end;
@@ -453,6 +425,18 @@ static int parse_double(struct parser_state *parser, double *value)
 		parser->input = end;
 		return 0;
 	}
+}
+
+/**
+ * \sa parse_int_sep
+ */
+static int parse_double_sep(struct parser_state *parser, double *value, char sep)
+{
+	if (parse_double(parser, value) < 0)
+		return -1;
+	if (consume_char(parser, sep) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -608,6 +592,8 @@ static int process_input(struct parser_state *parser)
 		rc = process_difficulty(parser);
 	} else if (parser->section == BEATMAP_EVENTS) {
 		rc = process_event(parser);
+	} else if (parser->section == BEATMAP_TIMING_POINTS) {
+		rc = process_timing_point(parser);
 	} else {
 		return parse_line(parser->input, parser);
 	}
@@ -815,6 +801,89 @@ static int process_event(struct parser_state *parser)
 	}
 	consume_all(parser);
 	return 0;
+}
+
+/**
+ * Parse one timing point and link it.
+ *
+ * Sample input:
+ * `129703,731.707317073171,4,2,1,50,1,0`
+ */
+static int process_timing_point(struct parser_state *parser)
+{
+	struct oshu_timing_point *timing;
+	if (parse_timing_point(parser, &timing) < 0)
+		return -1;
+	if (parser->last_timing_point && timing->offset < parser->last_timing_point->offset) {
+		parser_error(parser, "misordered timing point");
+		free(timing);
+		return -1;
+	}
+	/* link it to the timing points list */
+	if (parser->last_timing_point)
+		parser->last_timing_point->next = timing;
+	else
+		parser->beatmap->timing_points = timing;
+	parser->last_timing_point = timing;
+	return 0;
+}
+
+static int parse_timing_point(struct parser_state *parser, struct oshu_timing_point **timing)
+{
+	int value;
+	*timing = calloc(1, sizeof(**timing));
+	assert (timing != NULL);
+	/* 1. Timing offset. */
+	if (parse_double_sep(parser, &(*timing)->offset, ',') < 0)
+		goto fail;
+	/* 2. Beat duration, in milliseconds. */
+	if (parse_double_sep(parser, &(*timing)->beat_duration, ',') < 0)
+		goto fail;
+	if ((*timing)->beat_duration > 0.) {
+		(*timing)->beat_duration /= 1000.;
+		parser->timing_base = (*timing)->beat_duration;
+	} else if ((*timing)->beat_duration < 0.) {
+		if (!parser->timing_base) {
+			parser_error(parser, "inherited timing point has no parent");
+			goto fail;
+		}
+		(*timing)->beat_duration = - (*timing)->beat_duration / 100. * parser->timing_base;
+	} else {
+		parser_error(parser, "invalid beat duration");
+		goto fail;
+	}
+	/* 3. Number of beats per measure. */
+	if (parse_int_sep(parser, &(*timing)->meter, ',') < 0)
+		goto fail;
+	if ((*timing)->meter <= 0) {
+		parser_error(parser, "invalid meter value");
+		goto fail;
+	}
+	/* 4. Sample set. */
+	if (parse_int_sep(parser, &value, ',') < 0)
+		goto fail;
+	(*timing)->sample_set = value;
+	/* 5. Pretty much like 4, but skipped in the official parser. */
+	if (parse_int_sep(parser, &value, ',') < 0)
+		goto fail;
+	/* 6. Volume, from 0 to 100%. */
+	if (parse_int_sep(parser, &value, ',') < 0)
+		goto fail;
+	if (value < 0 || value > 100) {
+		parser_error(parser, "invalid volume");
+		goto fail;
+	}
+	(*timing)->volume = (double) value / 100.;
+	/* 7. Inherited flag. Useless? */
+	if (parse_int_sep(parser, &value, ',') < 0)
+		goto fail;
+	/* 8. Kiai mode. */
+	if (parse_int(parser, &(*timing)->kiai) < 0)
+		goto fail;
+	return 0;
+fail:
+	free(*timing);
+	return -1;
 }
 
 /*****************************************************************************/

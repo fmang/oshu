@@ -71,12 +71,12 @@ enum oshu_sample_set_family {
  *
  * They can be OR'd, so you should store them in an *int*.
  */
-enum oshu_hit_sound {
+enum oshu_sample_type {
 	/**
-	 * The first bit is undocumented, let's assume it stands for normal.
+	 * The first bit is undocumented, but it stands for Normal according to
+	 * the source code of osu.
 	 *
-	 * If it's unset, maybe we should play the normal sound? Needs more
-	 * research.
+	 * 0 means None, so I guess it's a silent note.
 	 */
 	OSHU_NORMAL_SAMPLE = 1,
 	OSHU_WHISTLE_SAMPLE = 2,
@@ -137,10 +137,6 @@ struct oshu_timing_point {
 	 */
 	int meter;
 	/**
-	 * Default sample type to use in that timing section.
-	 */
-	enum oshu_hit_sound sample_type;
-	/**
 	 * Default sample set to use in that timing section.
 	 */
 	enum oshu_sample_set_family sample_set;
@@ -150,16 +146,6 @@ struct oshu_timing_point {
 	 * It's an integer in the beatmap file.
 	 */
 	double volume;
-	/**
-	 * Pseudo-boolean telling whether the timing point was inherited or
-	 * not. It's looks redundant with the negative #beat_duration.
-	 *
-	 * Looking at a random beatmap file, I found tons of negative beat
-	 * durations but not a single inherited flag. Maybe this flag should
-	 * make the parser reuse the sample set, type and volume of the
-	 * previous hit point?
-	 */
-	int inherited;
 	/**
 	 * Kiai mode. I guess it's when everything flashes on the screen.
 	 *
@@ -233,7 +219,7 @@ struct oshu_slider {
 	/**
 	 * Sounds to play on top of the normal sound. One per slider cicle.
 	 *
-	 * It's an OR'd combination of #oshu_hit_sound.
+	 * It's an OR'd combination of #oshu_sample_type.
 	 *
 	 * \sa edge_additions_set
 	 * \sa oshu_hit::hit_sound
@@ -320,7 +306,7 @@ struct oshu_hit {
 	 */
 	int type;
 	/**
-	 * Combination of flags from #oshu_hit_sound.
+	 * Combination of flags from #oshu_sample_type.
 	 *
 	 * Things to play on top of the normal sound.
 	 *

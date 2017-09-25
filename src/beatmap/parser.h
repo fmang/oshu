@@ -155,9 +155,10 @@ struct parser_state {
 	 */
 	struct oshu_timing_point *current_timing_point;
 	/**
-	 * This is the last non-inherited timing point.
+	 * This is the #oshu_timing_point::beat_duration of the last
+	 * non-inherited timing point.
 	 */
-	struct oshu_timing_point *timing_base;
+	double timing_base;
 	/**
 	 * Keep track of the last hit object to build the linked list.
 	 */
@@ -189,7 +190,9 @@ static int consume_spaces(P*);
 static int consume_string(P*, const char*);
 
 static int parse_int(P*, int*);
+static int parse_int_sep(P*, int*, char);
 static int parse_double(P*, double*);
+static int parse_double_sep(P*, double*, char);
 static int parse_string(P*, char**);
 static int parse_quoted_string(P*, char**);
 static int parse_token(P*, enum token*);
@@ -208,9 +211,9 @@ static int process_input(P*);
 	static int process_metadata(P*);
 	static int process_difficulty(P*);
 	static int process_event(P*);
-/*
 	static int process_timing_point(P*);
-		static int parse_timing_point(P*, struct oshu_timing_point*);
+		static int parse_timing_point(P*, struct oshu_timing_point**);
+/*
 	static int process_colour(P*);
 	static int process_hit_object(P*);
 		static int parse_hit_object(P*, struct oshu_hit*);
