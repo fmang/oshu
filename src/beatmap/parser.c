@@ -584,6 +584,8 @@ static int process_input(struct parser_state *parser)
 		rc = process_event(parser);
 	} else if (parser->section == BEATMAP_TIMING_POINTS) {
 		rc = process_timing_point(parser);
+	} else if (parser->section == BEATMAP_COLOURS) {
+		rc = process_color(parser);
 	} else {
 		return parse_line(parser->input, parser);
 	}
@@ -878,6 +880,60 @@ fail:
 	return -1;
 }
 
+static int process_color(struct parser_state *parser)
+{
+	struct oshu_color *color;
+	if (parse_color(parser, &color) < 0)
+		return -1;
+	if (parser->last_color)
+		parser->last_color->next = color;
+	parser->last_color = color;
+	if (!parser->beatmap->colors)
+		parser->beatmap->colors = color;
+	color->next = parser->beatmap->colors;
+	return 0;
+}
+
+static int parse_color(struct parser_state *parser, struct oshu_color **color)
+{
+	int n;
+	*color = calloc(1, sizeof(**color));
+	assert (color != NULL);
+	if (consume_string(parser, "Combo") < 0)
+		goto fail;
+	if (parse_int(parser, &n) < 0)
+		goto fail;
+	consume_spaces(parser);
+	if (consume_char(parser, ':') < 0)
+		goto fail;
+	consume_spaces(parser);
+	if (parse_color_channel(parser, &(*color)->red) < 0)
+		goto fail;
+	if (consume_char(parser, ',') < 0)
+		goto fail;
+	if (parse_color_channel(parser, &(*color)->green) < 0)
+		goto fail;
+	if (consume_char(parser, ',') < 0)
+		goto fail;
+	if (parse_color_channel(parser, &(*color)->blue) < 0)
+		goto fail;
+	return 0;
+fail:
+	free(*color);
+	return -1;
+}
+
+static int parse_color_channel(struct parser_state *parser, int *c)
+{
+	if (parse_int(parser, c) < 0)
+		return -1;
+	if (*c < 0 || *c > 255) {
+		parser_error(parser, "color values must be comprised between 0 and 255, inclusive");
+		return -1;
+	}
+	return 0;
+}
+
 /*****************************************************************************/
 /* Global interface **********************************************************/
 
@@ -990,13 +1046,24 @@ static void free_timing_points(struct oshu_timing_point *t)
 	}
 }
 
+static void free_colors(struct oshu_color *colors)
+{
+	if (!colors)
+		return;
+	struct oshu_color *current = colors;
+	do {
+		struct oshu_color *next = current->next;
+		free(current);
+		current = next;
+	} while (current != colors);
+}
+
 void oshu_destroy_beatmap(struct oshu_beatmap *beatmap)
 {
 	free(beatmap->audio_filename);
 	free(beatmap->background_filename);
 	free_metadata(&beatmap->metadata);
-	if (beatmap->hits)
-		free_hits(beatmap->hits);
-	if (beatmap->timing_points)
-		free_timing_points(beatmap->timing_points);
+	free_timing_points(beatmap->timing_points);
+	free_colors(beatmap->colors);
+	free_hits(beatmap->hits);
 }

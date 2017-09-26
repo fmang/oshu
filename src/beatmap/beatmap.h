@@ -92,11 +92,16 @@ enum oshu_sample_type {
  * \brief An RGB color.
  *
  * Each field represents a component ranging from 0 to 255 (inclusive).
+ *
+ * It is meant to be used as a *circular* linked list, meaning the last
+ * element's next element is the first element. Keep that in mind when looping
+ * over it.
  */
 struct oshu_color {
 	int red;
 	int green;
 	int blue;
+	struct oshu_color *next;
 };
 
 /**
@@ -714,17 +719,9 @@ struct oshu_beatmap {
 	/**
 	 * \brief [Colours] section.
 	 *
-	 * It's an array owned by the beatmap. Its size is stored in the
-	 * #colors_count field.
-	 *
-	 * These colors are used to display combos, so its index is going to be
-	 * a combo identifier modulo the size of this array.
+	 * It's a circular linked list, as described in #oshu_color.
 	 */
 	struct oshu_color *colors;
-	/**
-	 * Number of elements in the #colors array.
-	 */
-	int colors_count;
 	/**
 	 * \brief [HitObjects] section.
 	 *

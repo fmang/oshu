@@ -146,6 +146,10 @@ struct parser_state {
 	 */
 	struct oshu_timing_point *last_timing_point;
 	/**
+	 * Keep track of the last color to build the circular linked list.
+	 */
+	struct oshu_color *last_color;
+	/**
 	 * When parsing hit objects, we need to figure out what its timing
 	 * point is, notably to compute slider durations.
 	 *
@@ -213,8 +217,10 @@ static int process_input(P*);
 	static int process_event(P*);
 	static int process_timing_point(P*);
 		static int parse_timing_point(P*, struct oshu_timing_point**);
+	static int process_color(P*);
+		static int parse_color(P*, struct oshu_color**);
+			static int parse_color_channel(P*, int*);
 /*
-	static int process_colour(P*);
 	static int process_hit_object(P*);
 		static int parse_hit_object(P*, struct oshu_hit*);
 			static int parse_slider(P*, struct oshu_hit*);
