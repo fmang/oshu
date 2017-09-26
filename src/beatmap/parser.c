@@ -39,16 +39,6 @@ static const struct oshu_beatmap default_beatmap = {
 	},
 };
 
-/**
- * Practical variant type, because switch won't let us declare local variables
- * without explicitly writing out a code block.
- */
-union thing {
-	int i;
-	double d;
-	char *s;
-};
-
 /*****************************************************************************/
 /* Old parser ****************************************************************/
 
@@ -655,7 +645,8 @@ static int process_general(struct parser_state *parser)
 	struct oshu_beatmap *beatmap = parser->beatmap;
 	int rc;
 	enum token key;
-	union thing value;
+	int i;
+	double d;
 	if (parse_key(parser, &key) < 0)
 		return -1;
 	switch (key) {
@@ -668,20 +659,20 @@ static int process_general(struct parser_state *parser)
 		}
 		break;
 	case AudioLeadIn:
-		if ((rc = parse_double(parser, &value.d)) == 0)
-			beatmap->audio_lead_in = value.d / 1000.;
+		if ((rc = parse_double(parser, &d)) == 0)
+			beatmap->audio_lead_in = d / 1000.;
 		break;
 	case PreviewTime:
-		if ((rc = parse_double(parser, &value.d)) == 0)
-			beatmap->preview_time = value.d / 1000.;
+		if ((rc = parse_double(parser, &d)) == 0)
+			beatmap->preview_time = d / 1000.;
 		break;
 	case Countdown:
-		if ((rc = parse_int(parser, &value.i)) == 0)
-			beatmap->countdown = value.i;
+		if ((rc = parse_int(parser, &i)) == 0)
+			beatmap->countdown = i;
 		break;
 	case Mode:
-		if ((rc = parse_int(parser, &value.i)) == 0)
-			beatmap->mode = value.i;
+		if ((rc = parse_int(parser, &i)) == 0)
+			beatmap->mode = i;
 		break;
 	case SampleSet:
 		rc = parse_sample_set(parser, &beatmap->sample_set);
