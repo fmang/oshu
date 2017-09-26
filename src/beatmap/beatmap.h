@@ -50,6 +50,10 @@ enum oshu_mode {
  *
  * The constant values are taken from the documentation, and correspond to the
  * value a hit object's addition may mention for its sample set.
+ *
+ * It tends to be called *sample banks* in osu's source code, but as my friend
+ * shiro rightfully said, you'd prefer families because families are good while
+ * banks are evil.
  */
 enum oshu_sample_set_family {
 	/**
