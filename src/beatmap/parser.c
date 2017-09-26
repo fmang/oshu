@@ -212,10 +212,10 @@ static void parse_hold_note(char *line, struct oshu_hold_note *hold_note)
 }
 
 /**
- * Set the parser's current timing point to the position in msecs specified in
- * offset.
+ * Set the parser's current timing point to the position in seconds specified
+ * in offset.
  */
-static void seek_timing_point(int offset, struct parser_state *parser)
+static void seek_timing_point(double offset, struct parser_state *parser)
 {
 	struct oshu_timing_point **tp;
 	if (parser->current_timing_point == NULL)
@@ -257,7 +257,7 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 	(*hit)->time = (double) atoi(time) / 1000;
 	(*hit)->type = atoi(type);
 	(*hit)->hit_sound = atoi(hit_sound);
-	seek_timing_point(atoi(time), parser);
+	seek_timing_point((*hit)->time, parser);
 	if ((*hit)->type & OSHU_HIT_SLIDER)
 		build_slider(line, parser, *hit);
 	if ((*hit)->type & OSHU_HIT_SPINNER)
@@ -836,6 +836,7 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 	/* 1. Timing offset. */
 	if (parse_double_sep(parser, &(*timing)->offset, ',') < 0)
 		goto fail;
+	(*timing)->offset /= 1000.;
 	/* 2. Beat duration, in milliseconds. */
 	if (parse_double_sep(parser, &(*timing)->beat_duration, ',') < 0)
 		goto fail;
