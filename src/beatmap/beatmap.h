@@ -240,7 +240,7 @@ struct oshu_hit_sound {
 	 */
 	enum oshu_sample_set_family additions_set;
 	/**
-	 * For a given sample_set family, alternative sample may be used.
+	 * For a given #sample_set family, alternative samples may be used.
 	 *
 	 * The sample stored in `soft-hitnormal99.wav` may thus be accessed by
 	 * setting the sample index to 99.
@@ -248,13 +248,13 @@ struct oshu_hit_sound {
 	 * By default, it's 1, and means the sample `soft-hitnormal.wav` would
 	 * be used instead.
 	 */
-	int sample_index;
+	int index;
 	/**
 	 * Volume of the sample, from 0 to 100%.
 	 *
 	 * \sa #oshu_timing_point::volume
 	 */
-	double sample_volume;
+	double volume;
 };
 
 /**
