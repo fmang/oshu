@@ -246,7 +246,7 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 	(*hit)->p.y = atoi(y);
 	(*hit)->time = (double) atoi(time) / 1000;
 	(*hit)->type = atoi(type);
-	(*hit)->hit_sound = atoi(hit_sound);
+	(*hit)->sound.additions = atoi(hit_sound);
 	seek_timing_point((*hit)->time, parser);
 	if ((*hit)->type & OSHU_HIT_SLIDER)
 		build_slider(line, parser, *hit);

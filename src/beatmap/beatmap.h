@@ -190,11 +190,71 @@ enum oshu_hit_type {
 	OSHU_HIT_HOLD = 0b10000000, /**< Mania mode only. */
 };
 
+/**
+ * Transient state of a hit object.
+ *
+ * It's technically not part of the beatmap but it's really handy. You wouldn't
+ * want to maintain a parallel linked list to keep track of the state of every
+ * hit.
+ */
 enum oshu_hit_state {
 	OSHU_HIT_INITIAL = 0,
 	OSHU_HIT_GOOD,
 	OSHU_HIT_MISSED,
 	OSHU_HIT_SLIDING,
+};
+
+/**
+ * Structure to encompass all the sound effects information of hit objects.
+ *
+ * Its fields will look confusing and overlapping, like #sample_index which
+ * looks like it applies to both #sample_set and #additions_set, even though
+ * they're different sample sets?
+ */
+struct oshu_hit_sound {
+	/**
+	 * Sample set to use when playing the hit sound.
+	 *
+	 * It's often set to 0 in the beatmap files, but the parser should
+	 * replace that value by the sample set to use, computed from the
+	 * context.
+	 *
+	 * \sa oshu_timing_point::sample_set
+	 */
+	enum oshu_sample_set_family sample_set;
+	/**
+	 * Combination of flags from #oshu_sample_type.
+	 *
+	 * To play the normal sound, #OSHU_NORMAL_SAMPLE must be enabled.
+	 *
+	 * The sample set to use for these additions is defined by the
+	 * #additions_set field, while the normal sound's sample set is defined
+	 * by #sample_set.
+	 */
+	int additions;
+	/**
+	 * Sample set to use when playing #hit_sound over the normal hit sound,
+	 * and not the hit sound itself.
+	 *
+	 * It's similar to #sample_set.
+	 */
+	enum oshu_sample_set_family additions_set;
+	/**
+	 * For a given sample_set family, alternative sample may be used.
+	 *
+	 * The sample stored in `soft-hitnormal99.wav` may thus be accessed by
+	 * setting the sample index to 99.
+	 *
+	 * By default, it's 1, and means the sample `soft-hitnormal.wav` would
+	 * be used instead.
+	 */
+	int sample_index;
+	/**
+	 * Volume of the sample, from 0 to 100%.
+	 *
+	 * \sa #oshu_timing_point::volume
+	 */
+	double sample_volume;
 };
 
 /**
@@ -231,7 +291,10 @@ struct oshu_slider {
 	 * It's an OR'd combination of #oshu_sample_type.
 	 *
 	 * \sa edge_additions_set
-	 * \sa oshu_hit::hit_sound
+	 *
+	 * \todo
+	 * Use #oshu_hit_sound instead, once we figure how it really works.
+	 * What's the point of having 2 ends? Why not more? Why not 1?
 	 */
 	int edge_hit_sound[2];
 	/**
@@ -315,47 +378,11 @@ struct oshu_hit {
 	 */
 	int type;
 	/**
-	 * Combination of flags from #oshu_sample_type.
+	 * Sound effect to play when the hit object is successfully hit.
 	 *
-	 * Things to play on top of the normal sound.
-	 *
-	 * The sample set to use for these additions is defined by the
-	 * #additions_set field.
+	 * Sliders have some more sounds on the edges, don't forget them.
 	 */
-	int hit_sound;
-	/**
-	 * Sample set to use when playing the hit sound.
-	 *
-	 * It's often set to 0 in the beatmap files, but the parser should
-	 * replace that value by the sample set to use computed from the
-	 * context.
-	 *
-	 * \sa oshu_timing_point::sample_set
-	 */
-	enum oshu_sample_set_family sample_set;
-	/**
-	 * Sample set to use when playing #hit_sound over the normal hit sound,
-	 * and not the hit sound itself.
-	 *
-	 * It's similar to #sample_set.
-	 */
-	enum oshu_sample_set_family additions_set;
-	/**
-	 * For a given sample_set family, alternative sample may be used.
-	 *
-	 * The sample stored in `soft-hitnormal99.wav` may thus be accessed by
-	 * setting the sample index to 99.
-	 *
-	 * By default, it's 1, and means the sample `soft-hitnormal.wav` would
-	 * be used instead.
-	 */
-	int sample_index;
-	/**
-	 * Volume of the sample, from 0 to 100%.
-	 *
-	 * \sa #oshu_timing_point::volume
-	 */
-	double sample_volume;
+	struct oshu_hit_sound sound;
 	/**
 	 * Type-specific properties.
 	 */
@@ -365,13 +392,11 @@ struct oshu_hit {
 		struct oshu_hold_note hold_note;
 	};
 	/**
-	 * Dynamic state of the hit. Whether it was clicked or not.
-	 *
-	 * It should be left to 0 (#OSHU_HIT_INITIAL) by the parser.
-	 */
-	enum oshu_hit_state state;
-	/**
 	 * \brief Timing point in effect when the hit object should be clicked.
+	 *
+	 * It is used by the parser to compute the duration of sliders, and may
+	 * also be needed by the game or graphics module to handle the slider
+	 * ticks, using the #oshu_timing_point::beat_duration property.
 	 */
 	struct oshu_timing_point *timing_point;
 	/**
@@ -380,6 +405,9 @@ struct oshu_hit {
 	 * Starts at 0 at the beginning of the beatmap, and increases at every
 	 * hit object with #OSHU_HIT_NEW_COMBO. Its value may increase by more
 	 * than 1 if the hit object specifies a non-zero combo skip.
+	 *
+	 * Two hit objects belong in the same combo if and only if they have
+	 * the same combo identifier, unlike #color which wraps.
 	 */
 	int combo;
 	/**
@@ -390,6 +418,26 @@ struct oshu_hit {
 	 * which resets the sequence number to 1.
 	 */
 	int combo_seq;
+	/**
+	 * Color of the hit object, or more specifically, color of the hit's
+	 * combo.
+	 *
+	 * It's closely linked to #combo, and increases in the same way, taking
+	 * into account combo skips.
+	 */
+	struct oshu_color *color;
+	/**
+	 * Dynamic state of the hit. Whether it was clicked or not.
+	 *
+	 * It should be left to 0 (#OSHU_HIT_INITIAL) by the parser.
+	 */
+	enum oshu_hit_state state;
+	/**
+	 * Pointer to the previous element of the linked list.
+	 *
+	 * NULL if it's the first element.
+	 */
+	struct oshu_hit *previous;
 	/**
 	 * Pointer to the next element of the linked list.
 	 *
