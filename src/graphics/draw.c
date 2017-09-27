@@ -148,10 +148,10 @@ static void connect_hits(struct oshu_display *display, struct oshu_beatmap *beat
 	oshu_draw_line(display, (P) {end.x + d.x, end.y + d.y}, (P) {next->p.x - d.x, next->p.y - d.y});
 }
 
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now)
+void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now)
 {
 	struct oshu_hit *prev = NULL;
-	for (struct oshu_hit *hit = beatmap->hit_cursor; hit; hit = hit->next) {
+	for (struct oshu_hit *hit = cursor; hit; hit = hit->next) {
 		if (hit->time > now + beatmap->difficulty.approach_time)
 			break;
 		if (prev && !(hit->type & OSHU_HIT_NEW_COMBO))

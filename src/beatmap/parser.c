@@ -1004,7 +1004,6 @@ int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap)
 	fclose(input);
 	if (rc < 0)
 		goto fail;
-	beatmap->hit_cursor = beatmap->hits;
 	dump_beatmap_info(beatmap);
 	if (validate(beatmap) < 0)
 		goto fail;

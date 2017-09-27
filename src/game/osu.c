@@ -19,7 +19,7 @@
  */
 static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
 {
-	for (struct oshu_hit *hit = game->beatmap.hit_cursor; hit; hit = hit->next) {
+	for (struct oshu_hit *hit = game->hit_cursor; hit; hit = hit->next) {
 		if (hit->time > game->clock.now + game->beatmap.difficulty.approach_time)
 			break;
 		if (hit->time < game->clock.now - game->beatmap.difficulty.approach_time)
@@ -121,7 +121,7 @@ static void check_slider(struct oshu_game *game)
 static void check_audio(struct oshu_game *game)
 {
 	if (game->autoplay) {
-		for (struct oshu_hit *hit = game->beatmap.hit_cursor; hit; hit = hit->next) {
+		for (struct oshu_hit *hit = game->hit_cursor; hit; hit = hit->next) {
 			if (hit->time > game->clock.now) {
 				break;
 			} else if (hit->state == OSHU_HIT_INITIAL) {
@@ -136,7 +136,7 @@ static void check_audio(struct oshu_game *game)
 		}
 	} else {
 		/* Mark dead notes as missed. */
-		for (struct oshu_hit *hit = game->beatmap.hit_cursor; hit; hit = hit->next) {
+		for (struct oshu_hit *hit = game->hit_cursor; hit; hit = hit->next) {
 			if (hit->time > game->clock.now - game->beatmap.difficulty.leniency)
 				break;
 			if (hit->state == OSHU_HIT_INITIAL)
@@ -144,7 +144,7 @@ static void check_audio(struct oshu_game *game)
 		}
 	}
 	for (
-		struct oshu_hit **hit = &game->beatmap.hit_cursor;
+		struct oshu_hit **hit = &game->hit_cursor;
 		*hit && oshu_hit_end_time(*hit) < game->clock.now - game->beatmap.difficulty.approach_time;
 		*hit = (*hit)->next
 	);
@@ -159,7 +159,7 @@ static int check(struct oshu_game *game)
 
 static int draw(struct oshu_game *game)
 {
-	oshu_draw_beatmap(game->display, &game->beatmap, game->clock.now);
+	oshu_draw_beatmap(game->display, &game->beatmap, game->hit_cursor, game->clock.now);
 	return 0;
 }
 

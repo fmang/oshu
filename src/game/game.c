@@ -32,6 +32,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		oshu_log_error("unsupported game mode");
 		goto fail;
 	}
+	(*game)->hit_cursor = (*game)->beatmap.hits;
 
 	if (oshu_open_audio((*game)->beatmap.audio_filename, &(*game)->audio) < 0) {
 		oshu_log_error("no audio, aborting");

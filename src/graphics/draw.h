@@ -36,7 +36,7 @@
  *
  * `now` is the current position in the playing song, in seconds.
  */
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, double now);
+void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now);
 
 /**
  * Draw a hit object.

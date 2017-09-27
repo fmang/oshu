@@ -87,6 +87,18 @@ struct oshu_game {
 	union {
 		struct oshu_osu_state osu;
 	};
+	/**
+	 * Pointer to the current hit, according to the context of the game.
+	 *
+	 * Typically, it would point to the first non-obsolete hit, where a hit
+	 * is said to be obsolete when it is nor displayable (not even its
+	 * fade-out shadow remains), nor clickable.
+	 *
+	 * Its goal is to improve the performance of the beatmap drawing
+	 * routine and the reactivity on user click, because the obsolete hits
+	 * are already skipped.
+	 */
+	struct oshu_hit *hit_cursor;
 };
 
 /**
