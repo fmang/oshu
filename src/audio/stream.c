@@ -227,6 +227,8 @@ static int open_decoder(struct oshu_stream *stream)
 		oshu_log_error("error opening the codec");
 		goto fail;
 	}
+	if (!stream->decoder->channel_layout)
+		stream->decoder->channel_layout = av_get_default_channel_layout(stream->decoder->channels);
 	stream->frame = av_frame_alloc();
 	if (stream->frame == NULL) {
 		oshu_log_error("could not allocate the codec frame");
