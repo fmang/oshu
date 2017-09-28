@@ -39,6 +39,54 @@ static const struct oshu_beatmap default_beatmap = {
 	},
 };
 
+/**
+ * Set the parser's current timing point to the position in seconds specified
+ * in *offset*.
+ *
+ * Return the appropriate object, or NULL on error.
+ *
+ * The result is stored in #parser_state::current_timing_point for faster
+ * results on further calls, assuming you'd never seek to a point before the
+ * last seek.
+ */
+static struct oshu_timing_point* seek_timing_point(double offset, struct parser_state *parser)
+{
+	if (parser->current_timing_point == NULL)
+		parser->current_timing_point = parser->beatmap->timing_points;
+	/* update the parser state as we loop */
+	struct oshu_timing_point **tp = &parser->current_timing_point;
+	for (; *tp && (*tp)->next; *tp = (*tp)->next) {
+		if ((*tp)->next->offset > offset)
+			break;
+	}
+	return *tp;
+}
+
+/**
+ * Compute #oshu_hit::combo and #oshu_hit::combo_seq of a single #oshu_hit.
+ *
+ * Also the update the #oshu_hit::color.
+ */
+static void compute_hit_combo(struct parser_state *parser, struct oshu_hit *hit)
+{
+	if (parser->last_hit == NULL) {
+		hit->combo = 0;
+		hit->combo_seq = 1;
+		hit->color = parser->beatmap->colors;
+	} else if (hit->type & OSHU_HIT_NEW_COMBO) {
+		int skip_combo = (hit->type & OSHU_HIT_COMBO_MASK) >> OSHU_HIT_COMBO_OFFSET;
+		hit->combo = parser->last_hit->combo + 1 + skip_combo;
+		hit->combo_seq = 1;
+		hit->color = parser->last_hit->color;
+		for (int i = 0; hit->color && i < 1 + skip_combo; ++i)
+			hit->color = hit->color->next;
+	} else {
+		hit->combo = parser->last_hit->combo;
+		hit->combo_seq = parser->last_hit->combo_seq + 1;
+		hit->color = parser->last_hit->color;
+	}
+}
+
 /*****************************************************************************/
 /* Old parser ****************************************************************/
 
@@ -186,7 +234,7 @@ static void build_slider(char *line, struct parser_state *parser, struct oshu_hi
 /**
  * Parse specific parts of a spinner.
  */
-static void parse_spinner(char *line, struct oshu_spinner *spinner)
+static void build_spinner(char *line, struct oshu_spinner *spinner)
 {
 	char *end_time = strsep(&line, ",");
 	spinner->end_time = (double) atoi(end_time) / 1000;
@@ -195,25 +243,10 @@ static void parse_spinner(char *line, struct oshu_spinner *spinner)
 /**
  * Parse specific parts of a hold note.
  */
-static void parse_hold_note(char *line, struct oshu_hold_note *hold_note)
+static void build_hold_note(char *line, struct oshu_hold_note *hold_note)
 {
 	char *end_time = strsep(&line, ",");
 	hold_note->end_time = (double) atoi(end_time) / 1000;
-}
-
-/**
- * Set the parser's current timing point to the position in seconds specified
- * in offset.
- */
-static void seek_timing_point(double offset, struct parser_state *parser)
-{
-	struct oshu_timing_point **tp;
-	if (parser->current_timing_point == NULL)
-		parser->current_timing_point = parser->beatmap->timing_points;
-	for (tp = &parser->current_timing_point; *tp && (*tp)->next; *tp = (*tp)->next) {
-		if ((*tp)->next->offset > offset)
-			break;
-	}
 }
 
 /**
@@ -251,28 +284,10 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 	if ((*hit)->type & OSHU_HIT_SLIDER)
 		build_slider(line, parser, *hit);
 	if ((*hit)->type & OSHU_HIT_SPINNER)
-		parse_spinner(line, &(*hit)->spinner);
+		build_spinner(line, &(*hit)->spinner);
 	if ((*hit)->type & OSHU_HIT_HOLD)
-		parse_hold_note(line, &(*hit)->hold_note);
+		build_hold_note(line, &(*hit)->hold_note);
 	return 0;
-}
-
-/**
- * Compute #oshu_hit::combo and #oshu_hit::combo_seq of a single #oshu_hit.
- */
-static void compute_hit_combo(struct oshu_hit *previous, struct oshu_hit *hit)
-{
-	if (previous == NULL) {
-		hit->combo = 0;
-		hit->combo_seq = 1;
-	} else if (hit->type & OSHU_HIT_NEW_COMBO) {
-		int skip_combo = (hit->type & OSHU_HIT_COMBO_MASK) >> OSHU_HIT_COMBO_OFFSET;
-		hit->combo = previous->combo + 1 + skip_combo;
-		hit->combo_seq = 1;
-	} else {
-		hit->combo = previous->combo;
-		hit->combo_seq = previous->combo_seq + 1;
-	}
 }
 
 /**
@@ -280,7 +295,7 @@ static void compute_hit_combo(struct oshu_hit *previous, struct oshu_hit *hit)
  *
  * Skip invalid hit objects.
  */
-static int parse_hit_object(char *line, struct parser_state *parser)
+static int legacy_parse_hit_object(char *line, struct parser_state *parser)
 {
 	struct oshu_hit *hit;
 	if (build_hit(line, parser, &hit) < 0)
@@ -291,7 +306,7 @@ static int parse_hit_object(char *line, struct parser_state *parser)
 		assert(parser->last_hit->time <= hit->time);
 		parser->last_hit->next = hit;
 	}
-	compute_hit_combo(parser->last_hit, hit);
+	compute_hit_combo(parser, hit);
 	parser->last_hit = hit;
 	return 0;
 }
@@ -308,7 +323,7 @@ static int parse_line(char *line, struct parser_state *parser)
 	int rc = 0;
 	trim(&line);
 	if (parser->section == BEATMAP_HIT_OBJECTS) {
-		rc = parse_hit_object(line, parser);
+		rc = legacy_parse_hit_object(line, parser);
 	}
 	return rc;
 }

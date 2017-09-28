@@ -220,11 +220,14 @@ static int process_input(P*);
 	static int process_color(P*);
 		static int parse_color(P*, struct oshu_color**);
 			static int parse_color_channel(P*, int*);
-/*
 	static int process_hit_object(P*);
 		static int parse_hit_object(P*, struct oshu_hit*);
+			static int parse_common_hit(P*, struct oshu_hit*);
 			static int parse_slider(P*, struct oshu_hit*);
 				static int parse_point(P*, struct oshu_point*);
+				static int parse_linear_slider(P*, struct oshu_hit*);
+				static int parse_perfect_slider(P*, struct oshu_hit*);
+				static int parse_bezier_slider(P*, struct oshu_hit*);
 			static int parse_spinner(P*, struct oshu_hit*);
 			static int parse_hold_note(P*, struct oshu_hit*);
-*/
+			static int parse_additions(P*, struct oshu_hit*);
