@@ -392,6 +392,17 @@ static int consume_string(struct parser_state *parser, const char *str)
 	}
 }
 
+static int parse_char(struct parser_state *parser, char *c)
+{
+	if (*parser->input == '\0') {
+		parser_error(parser, "unexpected end of line");
+		return -1;
+	}
+	*c = *parser->input;
+	++parser->input;
+	return 0;
+}
+
 static int parse_int(struct parser_state *parser, int *value)
 {
 	char *end;
@@ -948,6 +959,184 @@ static int parse_color_channel(struct parser_state *parser, int *c)
 	}
 	return 0;
 }
+
+/*****************************************************************************/
+/* Hit objects ***************************************************************/
+
+static int process_hit_object(struct parser_state *parser)
+{
+	struct oshu_hit *hit;
+	if (parse_hit_object(parser, &hit) < 0)
+		return -1;
+	compute_hit_combo(parser, hit);
+	if (parser->last_hit) {
+		if (hit->time < parser->last_hit->time) {
+			parser_error(parser, "missorted hit object");
+			free(hit);
+			return -1;
+		}
+		parser->last_hit->next = hit;
+		hit->previous = parser->last_hit;
+	} else {
+		parser->beatmap->hits = hit;
+	}
+	parser->last_hit = hit;
+	return 0;
+}
+
+/**
+ * Allocate and parse one hit object.
+ *
+ * On failure, return -1, free any allocated memory, and leave `*hit`
+ * unspecified.
+ *
+ * Sample input:
+ * `288,256,8538,2,0,P|254:261|219:255,1,70,8|0,0:0|0:0,0:0:0:0:`
+ */
+static int parse_hit_object(struct parser_state *parser, struct oshu_hit **hit)
+{
+	*hit = calloc(1, sizeof(**hit));
+	assert (*hit != NULL);
+	if (parse_common_hit(parser, *hit) < 0)
+		goto fail;
+	(*hit)->timing_point = seek_timing_point((*hit)->time, parser);
+	if ((*hit)->timing_point == NULL) {
+		parser_error(parser, "could not find the timing point for this hit");
+		goto fail;
+	}
+	int rc;
+	if ((*hit)->type & OSHU_HIT_SLIDER) {
+		rc = parse_slider(parser, *hit);
+	} else if ((*hit)->type & OSHU_HIT_SPINNER) {
+		rc = parse_spinner(parser, *hit);
+	} else if ((*hit)->type & OSHU_HIT_HOLD) {
+		rc = parse_hold_note(parser, *hit);
+	} else {
+		parser_error(parser, "unknown type");
+		goto fail;
+	}
+	if (rc < 0)
+		goto fail;
+	if (parse_additions(parser, *hit) < 0)
+		goto fail;
+	return 0;
+fail:
+	free(*hit);
+	return -1;
+}
+
+/**
+ * Parse the prefix of every hit object.
+ *
+ * Sample input:
+ * `288,256,8538,2,0,`
+ */
+static int parse_common_hit(struct parser_state *parser, struct oshu_hit *hit)
+{
+	if (parse_double_sep(parser, &hit->p.x, ',') < 0)
+		return -1;
+	if (parse_double_sep(parser, &hit->p.y, ',') < 0)
+		return -1;
+	if (parse_double_sep(parser, &hit->time, ',') < 0)
+		return -1;
+	hit->time /= 1000.;
+	if (parse_int_sep(parser, &hit->type, ',') < 0)
+		return -1;
+	if (parse_int_sep(parser, &hit->sound.additions, ',') < 0)
+		return -1;
+	return 0;
+}
+
+/**
+ * Parse the specific parts of a slider hit object.
+ *
+ * Sample input:
+ * - `P|396:140|448:80,1,140,0|8,1:0|0:0,0:0:0:0:`,
+ * - `L|168:88,1,70,8|0,0:0|0:0,0:0:0:0:`,
+ * - `B|460:188|408:240|408:240|416:280,1,140,4|2,1:2|0:3,0:0:0:0:`.
+ */
+static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
+{
+	char type;
+	if (parse_char(parser, &type) < 0)
+		return -1;
+	int rc;
+	switch (type) {
+	case OSHU_PATH_LINEAR:  rc = parse_linear_slider(parser, hit); break;
+	case OSHU_PATH_PERFECT: rc = parse_perfect_slider(parser, hit); break;
+	case OSHU_PATH_BEZIER:  rc = parse_bezier_slider(parser, hit); break;
+	default:
+		parser_error(parser, "unknown slider type");
+		return -1;
+	}
+	if (rc < 0)
+		return -1;
+	if (consume_char(parser, ',') < 0)
+		return -1;
+	if (parse_int_sep(parser, &hit->slider.repeat, ',') < 0)
+		return -1;
+	double length;
+	if (parse_double_sep(parser, &length, ',') < 0)
+		return -1;
+	hit->slider.duration = length / (100. * parser->beatmap->difficulty.slider_multiplier) * hit->timing_point->beat_duration;
+	if (parse_slider_additions(parser, hit) < 0)
+		return -1;
+	if (consume_char(parser, ',') < 0)
+		return -1;
+	return 0;
+}
+
+static int parse_point(struct parser_state *parser, struct oshu_point *p)
+{
+	if (parse_double_sep(parser, &p->x, ':') < 0)
+		return -1;
+	if (parse_double(parser, &p->y) < 0)
+		return -1;
+	return 0;
+}
+
+static int parse_linear_slider(struct parser_state *parser, struct oshu_hit *hit)
+{
+	return 0;
+}
+
+static int parse_perfect_slider(struct parser_state *parser, struct oshu_hit *hit)
+{
+	return 0;
+}
+
+static int parse_bezier_slider(struct parser_state *parser, struct oshu_hit *hit)
+{
+	return 0;
+}
+
+/**
+ * Parse the slider-specific sound additions, right before the final and common
+ * ones.
+ *
+ * Sample input:
+ * - `4|2,1:2|0:3
+ */
+static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *hit)
+{
+	return 0;
+}
+
+static int parse_spinner(struct parser_state *parser, struct oshu_hit *hit)
+{
+	return 0;
+}
+
+static int parse_hold_note(struct parser_state *parser, struct oshu_hit *hit)
+{
+	return 0;
+}
+
+static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
+{
+	return 0;
+}
+
 
 /*****************************************************************************/
 /* Global interface **********************************************************/
