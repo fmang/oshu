@@ -61,7 +61,7 @@ double oshu_distance2(struct oshu_point p, struct oshu_point q);
 /**
  * A simple line, with a start point and end point.
  *
- * Used by #OSHU_PATH_LINEAR segments.
+ * Used by #OSHU_LINEAR_PATH segments.
  *
  * It's formally the same as a degree 1 Bézier curve, but we'll keep that type
  * to make experiments.
@@ -74,7 +74,7 @@ struct oshu_line {
 /**
  * An arc, defined as a section of a circle.
  *
- * Used by #OSHU_PATH_PERFECT segments.
+ * Used by #OSHU_PERFECT_PATH segments.
  *
  * In the beatmaps, these arc are called *perfect* and are defined with 3
  * points. The first point beging the start of the arc, the second one (called
@@ -139,7 +139,7 @@ int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c
  * A Bézier segment is defined by its degree, and a number of control points
  * equal to its degree plus one.
  *
- * Used by #OSHU_PATH_BEZIER segments.
+ * Used by #OSHU_BEZIER_PATH segments.
  *
  * For example, a degree 2 Bézier segment (called *quadratic*) has 3 control
  * points.
@@ -263,36 +263,36 @@ void oshu_normalize_bezier(struct oshu_bezier *bezier);
  * Their value is the letter that appears in the beatmaps to identify the type.
  */
 enum oshu_path_type {
-	OSHU_PATH_LINEAR = 'L',
-	OSHU_PATH_PERFECT = 'P',
-	OSHU_PATH_BEZIER = 'B',
-	OSHU_PATH_CATMULL = 'C',
+	OSHU_LINEAR_PATH = 'L',
+	OSHU_PERFECT_PATH = 'P',
+	OSHU_BEZIER_PATH = 'B',
+	OSHU_CATMULL_PATH = 'C',
 };
 
 /**
- * The linear paths (#OSHU_PATH_LINEAR) are the simplest and only have 2
+ * The linear paths (#OSHU_LINEAR_PATH) are the simplest and only have 2
  * points. See #oshu_line.
  *
- * Perfect paths (#OSHU_PATH_PERFECT) are bits of circle and have 3 points.
+ * Perfect paths (#OSHU_PERFECT_PATH) are bits of circle and have 3 points.
  * The 3 non-aligned points define a circle in a unique way. The perfect path
  * is the part of that circle that starts with the first point, passes through
  * the second point, and ends at the third point. See #oshu_arc.
  *
- * Bézier paths (#OSHU_PATH_BEZIER) have 2 to an arbitrary large number of
+ * Bézier paths (#OSHU_BEZIER_PATH) have 2 to an arbitrary large number of
  * control points. A 2-point Bézier path is nothing but a linear path. A
  * 3-point Bézier path is a quadratic curve, also called a parabola. Things get
  * interesting with the 4-point cubic Bézier curve, which is the one you see in
  * most painting tools. See #oshu_bezier.
  *
- * Catmull paths (#OSHU_PATH_CATMULL) are officially deprecated, but we should
+ * Catmull paths (#OSHU_CATMULL_PATH) are officially deprecated, but we should
  * support them someday in order to support old beatmaps.
  */
 struct oshu_path {
 	enum oshu_path_type type;
 	union {
-		struct oshu_line line; /**< For #OSHU_PATH_LINEAR. */
-		struct oshu_arc arc; /**< For #OSHU_PATH_PERFECT. */
-		struct oshu_bezier bezier; /**< For #OSHU_PATH_BEZIER. */
+		struct oshu_line line; /**< For #OSHU_LINEAR_PATH. */
+		struct oshu_arc arc; /**< For #OSHU_PERFECT_PATH. */
+		struct oshu_bezier bezier; /**< For #OSHU_BEZIER_PATH. */
 	};
 };
 

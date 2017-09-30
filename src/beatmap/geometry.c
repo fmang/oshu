@@ -320,15 +320,15 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 	t = fabs(remainder(t, 2.));
 	assert (-epsilon <= t && t <= 1 + epsilon);
 	switch (path->type) {
-	case OSHU_PATH_LINEAR:
+	case OSHU_LINEAR_PATH:
 		return line_at(&path->line, t);
-	case OSHU_PATH_BEZIER:
+	case OSHU_BEZIER_PATH:
 		t = l_to_t(&path->bezier, t);
 		return bezier_at(&path->bezier, t);
-	case OSHU_PATH_PERFECT:
+	case OSHU_PERFECT_PATH:
 		return arc_at(&path->arc, t);
-	case OSHU_PATH_CATMULL:
-		assert (path->type != OSHU_PATH_CATMULL);
+	case OSHU_CATMULL_PATH:
+		assert (path->type != OSHU_CATMULL_PATH);
 	default:
 		assert (path->type != path->type);
 	}
@@ -344,18 +344,18 @@ struct oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 	assert (-epsilon <= t && t <= 1 + epsilon);
 
 	switch (path->type) {
-	case OSHU_PATH_LINEAR:
+	case OSHU_LINEAR_PATH:
 		d = line_derive(&path->line, t);
 		break;
-	case OSHU_PATH_BEZIER:
+	case OSHU_BEZIER_PATH:
 		t = l_to_t(&path->bezier, t);
 		d = bezier_derive(&path->bezier, t);
 		break;
-	case OSHU_PATH_PERFECT:
+	case OSHU_PERFECT_PATH:
 		d = arc_derive(&path->arc, t);
 		break;
-	case OSHU_PATH_CATMULL:
-		assert (path->type != OSHU_PATH_CATMULL);
+	case OSHU_CATMULL_PATH:
+		assert (path->type != OSHU_CATMULL_PATH);
 	default:
 		assert (path->type != path->type);
 	}

@@ -127,7 +127,7 @@ static void build_point(char *line, struct oshu_point *p)
 static void build_linear_slider(char *line, struct oshu_hit *hit)
 {
 	struct oshu_path *path = &hit->slider.path;
-	path->type = OSHU_PATH_LINEAR;
+	path->type = OSHU_LINEAR_PATH;
 	path->line.start = hit->p;
 	build_point(line, &path->line.end);
 }
@@ -143,7 +143,7 @@ static void build_linear_slider(char *line, struct oshu_hit *hit)
  */
 static void build_perfect_slider(char *line, struct oshu_hit *hit)
 {
-	hit->slider.path.type = OSHU_PATH_PERFECT;
+	hit->slider.path.type = OSHU_PERFECT_PATH;
 	char *pass = strsep(&line, "|");
 	char *end = line;
 	assert (end != NULL);
@@ -155,7 +155,7 @@ static void build_perfect_slider(char *line, struct oshu_hit *hit)
 
 	if (oshu_build_arc(a, b, c, &hit->slider.path.arc) < 0) {
 		/* tranform it into a linear path */
-		hit->slider.path.type = OSHU_PATH_LINEAR;
+		hit->slider.path.type = OSHU_LINEAR_PATH;
 		hit->slider.path.line.start = a;
 		hit->slider.path.line.end = c;
 	}
@@ -175,7 +175,7 @@ static void build_bezier_slider(char *line, struct oshu_hit *hit)
 			count++;
 	}
 
-	hit->slider.path.type = OSHU_PATH_BEZIER;
+	hit->slider.path.type = OSHU_BEZIER_PATH;
 	struct oshu_bezier *bezier = &hit->slider.path.bezier;
 	bezier->control_points = calloc(count, sizeof(*bezier->control_points));
 	bezier->control_points[0] = hit->p;
@@ -221,11 +221,11 @@ static void build_slider(char *line, struct parser_state *parser, struct oshu_hi
 	assert (parser->current_timing_point != NULL);
 	assert (parser->beatmap->difficulty.slider_multiplier != 0);
 	hit->slider.duration = atof(length) / (100. * parser->beatmap->difficulty.slider_multiplier) * parser->current_timing_point->beat_duration;
-	if (*type == OSHU_PATH_LINEAR)
+	if (*type == OSHU_LINEAR_PATH)
 		build_linear_slider(path, hit);
-	else if (*type == OSHU_PATH_PERFECT)
+	else if (*type == OSHU_PERFECT_PATH)
 		build_perfect_slider(path, hit);
-	else if (*type == OSHU_PATH_BEZIER)
+	else if (*type == OSHU_BEZIER_PATH)
 		build_bezier_slider(path, hit);
 	else
 		assert(*type != *type);
@@ -1062,9 +1062,9 @@ static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 		return -1;
 	int rc;
 	switch (type) {
-	case OSHU_PATH_LINEAR:  rc = parse_linear_slider(parser, hit); break;
-	case OSHU_PATH_PERFECT: rc = parse_perfect_slider(parser, hit); break;
-	case OSHU_PATH_BEZIER:  rc = parse_bezier_slider(parser, hit); break;
+	case OSHU_LINEAR_PATH:  rc = parse_linear_slider(parser, hit); break;
+	case OSHU_PERFECT_PATH: rc = parse_perfect_slider(parser, hit); break;
+	case OSHU_BEZIER_PATH:  rc = parse_bezier_slider(parser, hit); break;
 	default:
 		parser_error(parser, "unknown slider type");
 		return -1;
@@ -1108,7 +1108,7 @@ static int parse_point(struct parser_state *parser, struct oshu_point *p)
 static int parse_linear_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
 	struct oshu_path *path = &hit->slider.path;
-	path->type = OSHU_PATH_LINEAR;
+	path->type = OSHU_LINEAR_PATH;
 	path->line.start = hit->p;
 	if (parse_point(parser, &path->line.end) < 0)
 		return -1;
@@ -1135,10 +1135,10 @@ static int parse_perfect_slider(struct parser_state *parser, struct oshu_hit *hi
 	if (parse_point(parser, &c) < 0)
 		return -1;
 
-	hit->slider.path.type = OSHU_PATH_PERFECT;
+	hit->slider.path.type = OSHU_PERFECT_PATH;
 	if (oshu_build_arc(a, b, c, &hit->slider.path.arc) < 0) {
 		/* tranform it into a linear path */
-		hit->slider.path.type = OSHU_PATH_LINEAR;
+		hit->slider.path.type = OSHU_LINEAR_PATH;
 		hit->slider.path.line.start = a;
 		hit->slider.path.line.end = c;
 	}
