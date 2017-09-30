@@ -647,6 +647,7 @@ static int process_color(struct parser_state *parser)
 		break;
 	case SliderTrackOverride:
 	case SliderBorder:
+		consume_all(parser);
 		break;
 	default:
 		parser_error(parser, "unknown color property");
