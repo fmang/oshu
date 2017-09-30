@@ -306,29 +306,27 @@ static int process_input(struct parser_state *parser)
 		return 0;
 	} else if (parser->section == BEATMAP_HEADER) {
 		rc = process_header(parser);
+		goto end;
 	} else if (parser->input[0] == '[') {
 		rc = process_section(parser);
-	} else if (parser->section == BEATMAP_ROOT) {
+		goto end;
+	}
+	switch (parser->section) {
+	case BEATMAP_ROOT:
 		parser_error(parser, "unexpected content outside sections");
 		return -1;
-	} else if (parser->section == BEATMAP_GENERAL) {
-		rc = process_general(parser);
-	} else if (parser->section == BEATMAP_METADATA) {
-		rc = process_metadata(parser);
-	} else if (parser->section == BEATMAP_DIFFICULTY) {
-		rc = process_difficulty(parser);
-	} else if (parser->section == BEATMAP_EVENTS) {
-		rc = process_event(parser);
-	} else if (parser->section == BEATMAP_TIMING_POINTS) {
-		rc = process_timing_point(parser);
-	} else if (parser->section == BEATMAP_COLOURS) {
-		rc = process_color(parser);
-	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
-		rc = process_hit_object(parser);
-	} else {
+	case BEATMAP_GENERAL:       rc = process_general(parser); break;
+	case BEATMAP_METADATA:      rc = process_metadata(parser); break;
+	case BEATMAP_DIFFICULTY:    rc = process_difficulty(parser); break;
+	case BEATMAP_EVENTS:        rc = process_event(parser); break;
+	case BEATMAP_TIMING_POINTS: rc = process_timing_point(parser); break;
+	case BEATMAP_COLOURS:       rc = process_color(parser); break;
+	case BEATMAP_HIT_OBJECTS:   rc = process_hit_object(parser); break;
+	default:
 		/** skip the line */
 		rc = consume_all(parser);
 	}
+end:
 	if (rc < 0)
 		return -1;
 	return consume_end(parser);
