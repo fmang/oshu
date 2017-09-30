@@ -1225,4 +1225,5 @@ void oshu_destroy_beatmap(struct oshu_beatmap *beatmap)
 	free_timing_points(beatmap->timing_points);
 	free_colors(beatmap->colors);
 	free_hits(beatmap->hits);
+	beatmap->hits = NULL;
 }

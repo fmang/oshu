@@ -273,7 +273,8 @@ void oshu_game_destroy(struct oshu_game **game)
 		SDL_DestroyTexture((*game)->background);
 	if ((*game)->display)
 		oshu_close_display(&(*game)->display);
-	oshu_destroy_beatmap(&(*game)->beatmap);
+	if ((*game)->beatmap.hits)
+		oshu_destroy_beatmap(&(*game)->beatmap);
 	free(*game);
 	*game = NULL;
 }
