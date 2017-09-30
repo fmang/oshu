@@ -1086,6 +1086,10 @@ static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 	return 0;
 }
 
+/**
+ * Sample input:
+ * `168:88`
+ */
 static int parse_point(struct parser_state *parser, struct oshu_point *p)
 {
 	if (parse_double_sep(parser, &p->x, ':') < 0)
@@ -1095,13 +1099,49 @@ static int parse_point(struct parser_state *parser, struct oshu_point *p)
 	return 0;
 }
 
+/**
+ * Build a linear path.
+ *
+ * sample input:
+ * `168:88`
+ */
 static int parse_linear_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
+	struct oshu_path *path = &hit->slider.path;
+	path->type = OSHU_PATH_LINEAR;
+	path->line.start = hit->p;
+	if (parse_point(parser, &path->line.end) < 0)
+		return -1;
 	return 0;
 }
 
+/**
+ * Build a perfect arc.
+ *
+ * If the points are aligned or something weird, transform it into a linear
+ * slider.
+ *
+ * Sample input:
+ * `396:140|448:80'
+ */
 static int parse_perfect_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
+	struct oshu_point a, b, c;
+	a = hit->p;
+	if (parse_point(parser, &b) < 0)
+		return -1;
+	if (consume_char(parser, '|') < 0)
+		return -1;
+	if (parse_point(parser, &c) < 0)
+		return -1;
+
+	hit->slider.path.type = OSHU_PATH_PERFECT;
+	if (oshu_build_arc(a, b, c, &hit->slider.path.arc) < 0) {
+		/* tranform it into a linear path */
+		hit->slider.path.type = OSHU_PATH_LINEAR;
+		hit->slider.path.line.start = a;
+		hit->slider.path.line.end = c;
+	}
 	return 0;
 }
 
