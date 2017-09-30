@@ -73,8 +73,8 @@ static void compute_hit_combo(struct parser_state *parser, struct oshu_hit *hit)
 		hit->combo = 0;
 		hit->combo_seq = 1;
 		hit->color = parser->beatmap->colors;
-	} else if (hit->type & OSHU_HIT_NEW_COMBO) {
-		int skip_combo = (hit->type & OSHU_HIT_COMBO_MASK) >> OSHU_HIT_COMBO_OFFSET;
+	} else if (hit->type & OSHU_NEW_HIT_COMBO) {
+		int skip_combo = (hit->type & OSHU_COMBO_HIT_MASK) >> OSHU_COMBO_HIT_OFFSET;
 		hit->combo = parser->last_hit->combo + 1 + skip_combo;
 		hit->combo_seq = 1;
 		hit->color = parser->last_hit->color;
@@ -270,7 +270,7 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 		*hit = NULL;
 		return -1;
 	}
-	if (atoi(type) & OSHU_HIT_SPINNER) {
+	if (atoi(type) & OSHU_SPINNER_HIT) {
 		oshu_log_debug("skipping spinner");
 		return -1;
 	}
@@ -281,11 +281,11 @@ static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **
 	(*hit)->type = atoi(type);
 	(*hit)->sound.additions = atoi(hit_sound);
 	seek_timing_point((*hit)->time, parser);
-	if ((*hit)->type & OSHU_HIT_SLIDER)
+	if ((*hit)->type & OSHU_SLIDER_HIT)
 		build_slider(line, parser, *hit);
-	if ((*hit)->type & OSHU_HIT_SPINNER)
+	if ((*hit)->type & OSHU_SPINNER_HIT)
 		build_spinner(line, &(*hit)->spinner);
-	if ((*hit)->type & OSHU_HIT_HOLD)
+	if ((*hit)->type & OSHU_HOLD_HIT)
 		build_hold_note(line, &(*hit)->hold_note);
 	return 0;
 }
@@ -1005,11 +1005,11 @@ static int parse_hit_object(struct parser_state *parser, struct oshu_hit **hit)
 		goto fail;
 	}
 	int rc;
-	if ((*hit)->type & OSHU_HIT_SLIDER) {
+	if ((*hit)->type & OSHU_SLIDER_HIT) {
 		rc = parse_slider(parser, *hit);
-	} else if ((*hit)->type & OSHU_HIT_SPINNER) {
+	} else if ((*hit)->type & OSHU_SPINNER_HIT) {
 		rc = parse_spinner(parser, *hit);
-	} else if ((*hit)->type & OSHU_HIT_HOLD) {
+	} else if ((*hit)->type & OSHU_HOLD_HIT) {
 		rc = parse_hold_note(parser, *hit);
 	} else {
 		parser_error(parser, "unknown type");
@@ -1234,7 +1234,7 @@ static void free_hits(struct oshu_hit *hits)
 	struct oshu_hit *current = hits;
 	while (current != NULL) {
 		struct oshu_hit *next = current->next;
-		if (current->type & OSHU_HIT_SLIDER)
+		if (current->type & OSHU_SLIDER_HIT)
 			free(current->slider.sounds);
 		free(current);
 		current = next;

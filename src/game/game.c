@@ -153,9 +153,9 @@ static void end(struct oshu_game *game)
 	int good = 0;
 	int missed = 0;
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
-		if (hit->state == OSHU_HIT_MISSED)
+		if (hit->state == OSHU_MISSED_HIT)
 			missed++;
-		else if (hit->state == OSHU_HIT_GOOD)
+		else if (hit->state == OSHU_GOOD_HIT)
 			good++;
 	}
 	printf(

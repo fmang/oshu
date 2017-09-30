@@ -39,7 +39,7 @@ void oshu_draw_line(struct oshu_display *display, struct oshu_point p1, struct o
 static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
 	double radius = beatmap->difficulty.circle_radius;
-	if (hit->state == OSHU_HIT_INITIAL || hit->state == OSHU_HIT_SLIDING) {
+	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 		double xradius = radius * .9;
 		oshu_draw_circle(display, hit->p, radius);
@@ -52,11 +52,11 @@ static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *b
 			double ratio = (double) (hit->time - now) / beatmap->difficulty.approach_time;
 			oshu_draw_circle(display, hit->p, radius + ratio * beatmap->difficulty.approach_size);
 		}
-	} else if (hit->state == OSHU_HIT_GOOD) {
+	} else if (hit->state == OSHU_GOOD_HIT) {
 		struct oshu_point p = oshu_end_point(hit);
 		SDL_SetRenderDrawColor(display->renderer, 64, 255, 64, 255);
 		oshu_draw_circle(display, p, radius / 3);
-	} else if (hit->state == OSHU_HIT_MISSED) {
+	} else if (hit->state == OSHU_MISSED_HIT) {
 		SDL_SetRenderDrawColor(display->renderer, 255, 64, 64, 255);
 		struct oshu_point p = oshu_end_point(hit);
 		int d = radius / 3;
@@ -69,11 +69,11 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 {
 	double radius = beatmap->difficulty.circle_radius;
 	draw_hit_circle(display, beatmap, hit, now);
-	if (hit->state == OSHU_HIT_INITIAL || hit->state == OSHU_HIT_SLIDING) {
+	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
 		double t = (now - hit->time) / hit->slider.duration;
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 		oshu_draw_thick_path(display, &hit->slider.path, 2 * radius);
-		if (hit->state == OSHU_HIT_SLIDING) {
+		if (hit->state == OSHU_SLIDING_HIT) {
 			SDL_SetRenderDrawColor(display->renderer, 255, 255, 0, 255);
 			struct oshu_point ball = oshu_path_at(&hit->slider.path, t < 0 ? 0 : t);
 			oshu_draw_circle(display, ball, radius / 2);
@@ -89,7 +89,7 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 
 void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
-	if (hit->type & OSHU_HIT_SLIDER && hit->slider.path.type)
+	if (hit->type & OSHU_SLIDER_HIT && hit->slider.path.type)
 		draw_slider(display, beatmap, hit, now);
 	else
 		draw_hit_circle(display, beatmap, hit, now);
@@ -135,9 +135,9 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 
 static void connect_hits(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *prev, struct oshu_hit *next)
 {
-	if (prev->state != OSHU_HIT_INITIAL && prev->state != OSHU_HIT_SLIDING)
+	if (prev->state != OSHU_INITIAL_HIT && prev->state != OSHU_SLIDING_HIT)
 		return;
-	if (next->state != OSHU_HIT_INITIAL && next->state != OSHU_HIT_SLIDING)
+	if (next->state != OSHU_INITIAL_HIT && next->state != OSHU_SLIDING_HIT)
 		return;
 	SDL_SetRenderDrawColor(display->renderer, 0, 128, 196, 255);
 	struct oshu_point end = oshu_end_point(prev);
@@ -154,7 +154,7 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->next) {
 		if (hit->time > now + beatmap->difficulty.approach_time)
 			break;
-		if (prev && !(hit->type & OSHU_HIT_NEW_COMBO))
+		if (prev && !(hit->type & OSHU_NEW_HIT_COMBO))
 			connect_hits(display, beatmap, prev, hit);
 		oshu_draw_hit(display, beatmap, hit, now);
 		prev = hit;

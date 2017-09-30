@@ -176,18 +176,18 @@ struct oshu_timing_point {
 /**
  * Flags defining the type of a hit object.
  *
- * To check if it's a circle, you should use `type & OSHU_HIT_CIRCLE` rather
+ * To check if it's a circle, you should use `type & OSHU_CIRCLE_HIT` rather
  * than check for equality, because it will often be combined with
- * #OSHU_HIT_NEW_COMBO.
+ * #OSHU_NEW_HIT_COMBO.
  */
 enum oshu_hit_type {
-	OSHU_HIT_CIRCLE = 0b1,
-	OSHU_HIT_SLIDER = 0b10,
-	OSHU_HIT_NEW_COMBO = 0b100,
-	OSHU_HIT_SPINNER = 0b1000,
-	OSHU_HIT_COMBO_MASK = 0b1110000, /**< How many combos to skip. */
-	OSHU_HIT_COMBO_OFFSET = 4, /**< How many bits to shift. */
-	OSHU_HIT_HOLD = 0b10000000, /**< Mania mode only. */
+	OSHU_CIRCLE_HIT = 0b1,
+	OSHU_SLIDER_HIT = 0b10,
+	OSHU_NEW_HIT_COMBO = 0b100,
+	OSHU_SPINNER_HIT = 0b1000,
+	OSHU_COMBO_HIT_MASK = 0b1110000, /**< How many combos to skip. */
+	OSHU_COMBO_HIT_OFFSET = 4, /**< How many bits to shift. */
+	OSHU_HOLD_HIT = 0b10000000, /**< Mania mode only. */
 };
 
 /**
@@ -198,10 +198,10 @@ enum oshu_hit_type {
  * hit.
  */
 enum oshu_hit_state {
-	OSHU_HIT_INITIAL = 0,
-	OSHU_HIT_GOOD,
-	OSHU_HIT_MISSED,
-	OSHU_HIT_SLIDING,
+	OSHU_INITIAL_HIT = 0,
+	OSHU_GOOD_HIT,
+	OSHU_MISSED_HIT,
+	OSHU_SLIDING_HIT,
 };
 
 /**
@@ -396,7 +396,7 @@ struct oshu_hit {
 	 * \brief Combo identifier.
 	 *
 	 * Starts at 0 at the beginning of the beatmap, and increases at every
-	 * hit object with #OSHU_HIT_NEW_COMBO. Its value may increase by more
+	 * hit object with #OSHU_NEW_HIT_COMBO. Its value may increase by more
 	 * than 1 if the hit object specifies a non-zero combo skip.
 	 *
 	 * Two hit objects belong in the same combo if and only if they have
@@ -407,7 +407,7 @@ struct oshu_hit {
 	 * \brief Sequence number of the hit inside its combo.
 	 *
 	 * The first hit object will have the sequence number 1, the next one
-	 * 2, and so on until a hit object's type includes #OSHU_HIT_NEW_COMBO,
+	 * 2, and so on until a hit object's type includes #OSHU_NEW_HIT_COMBO,
 	 * which resets the sequence number to 1.
 	 */
 	int combo_seq;
@@ -422,7 +422,7 @@ struct oshu_hit {
 	/**
 	 * Dynamic state of the hit. Whether it was clicked or not.
 	 *
-	 * It should be left to 0 (#OSHU_HIT_INITIAL) by the parser.
+	 * It should be left to 0 (#OSHU_INITIAL_HIT) by the parser.
 	 */
 	enum oshu_hit_state state;
 	/**
