@@ -989,24 +989,27 @@ static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *
 	/* First field: the hit sounds. */
 	for (int i = 0; i <= hit->slider.repeat; ++i) {
 		if (i > 1 && consume_char(parser, '|') < 0)
-			return -1;
+			goto fail;
 		if (parse_int(parser, &hit->slider.sounds[i].additions) < 0)
-			return -1;
+			goto fail;
 	}
 	if (consume_char(parser, ',') < 0)
-		return -1;
+		goto fail;
 	/* Second field: the sample sets, for the normal sound and the additions. */
 	for (int i = 0; i <= hit->slider.repeat; ++i) {
 		if (i > 1 && consume_char(parser, '|') < 0)
-			return -1;
+			goto fail;
 		if (parse_int_sep(parser, &hit->slider.sounds[i].sample_set, ':') < 0)
-			return -1;
+			goto fail;
 		if (parse_int(parser, &hit->slider.sounds[i].additions_set) < 0)
-			return -1;
+			goto fail;
 	}
 	if (consume_char(parser, ',') < 0)
-		return -1;
+		goto fail;
 	return 0;
+fail:
+	free(hit->slider.sounds);
+	return -1;
 }
 
 /**
