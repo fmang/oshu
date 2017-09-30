@@ -845,6 +845,8 @@ static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 	char type;
 	if (parse_char(parser, &type) < 0)
 		return -1;
+	if (consume_char(parser, '|') < 0)
+		return -1;
 	int rc;
 	switch (type) {
 	case OSHU_LINEAR_PATH:  rc = parse_linear_slider(parser, hit); break;
@@ -988,7 +990,7 @@ static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *
 	assert (hit->slider.sounds != NULL);
 	/* First field: the hit sounds. */
 	for (int i = 0; i <= hit->slider.repeat; ++i) {
-		if (i > 1 && consume_char(parser, '|') < 0)
+		if (i > 0 && consume_char(parser, '|') < 0)
 			goto fail;
 		if (parse_int(parser, &hit->slider.sounds[i].additions) < 0)
 			goto fail;
@@ -997,7 +999,7 @@ static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *
 		goto fail;
 	/* Second field: the sample sets, for the normal sound and the additions. */
 	for (int i = 0; i <= hit->slider.repeat; ++i) {
-		if (i > 1 && consume_char(parser, '|') < 0)
+		if (i > 0 && consume_char(parser, '|') < 0)
 			goto fail;
 		if (parse_int_sep(parser, &hit->slider.sounds[i].sample_set, ':') < 0)
 			goto fail;
