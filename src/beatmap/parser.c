@@ -1234,6 +1234,8 @@ static void free_hits(struct oshu_hit *hits)
 	struct oshu_hit *current = hits;
 	while (current != NULL) {
 		struct oshu_hit *next = current->next;
+		if (current->type & OSHU_HIT_SLIDER)
+			free(current->slider.sounds);
 		free(current);
 		current = next;
 	}

@@ -286,23 +286,16 @@ struct oshu_slider {
 	 */
 	double duration;
 	/**
-	 * Sounds to play on top of the normal sound. One per slider cicle.
+	 * Array of sounds to play over each circle.
 	 *
-	 * It's an OR'd combination of #oshu_sample_type.
+	 * #oshu_hit::sound contains the sample for the body of the slider, not
+	 * the edges of the slider.
 	 *
-	 * \sa edge_additions_set
-	 *
-	 * \todo
-	 * Use #oshu_hit_sound instead, once we figure how it really works.
-	 * What's the point of having 2 ends? Why not more? Why not 1?
+	 * The size of the array is #repeat + 1. A non-repeating slider will
+	 * have 2 sounds. For a repeating slider, it implies the sound for the
+	 * same circle will change every time it is repeated.
 	 */
-	int edge_hit_sound[2];
-	/**
-	 * The sample set to use when playing the #edge_hit_sound.
-	 *
-	 * \sa oshu_hit::additions_set
-	 */
-	int edge_additions_set[2];
+	struct oshu_hit_sound *sounds;
 };
 
 /**
