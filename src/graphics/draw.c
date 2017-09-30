@@ -89,9 +89,9 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 
 void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
-	if (hit->type & OSHU_SLIDER_HIT && hit->slider.path.type)
+	if (hit->type & OSHU_SLIDER_HIT)
 		draw_slider(display, beatmap, hit, now);
-	else
+	else if (hit->type & OSHU_CIRCLE_HIT)
 		draw_hit_circle(display, beatmap, hit, now);
 }
 
@@ -152,6 +152,8 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 {
 	struct oshu_hit *prev = NULL;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->next) {
+		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
+			continue;
 		if (hit->time > now + beatmap->difficulty.approach_time)
 			break;
 		if (prev && !(hit->type & OSHU_NEW_HIT_COMBO))
