@@ -429,6 +429,8 @@ static int process_general(struct parser_state *parser)
 		 * Very funny. */
 	case EpilepsyWarning:
 		/* No fear of epilepsy with oshu's current state. */
+	case SkinPreference:
+		/* Known values so far: `Default`. */
 	case WidescreenStoryboard:
 		/* Storyboard are far from being supported. */
 		rc = consume_all(parser);
