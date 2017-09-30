@@ -878,7 +878,7 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 	/* 4. Sample set. */
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;
-	(*timing)->sample_set = value;
+	(*timing)->sample_set = value ? value : parser->beatmap->sample_set;
 	/* 5. Pretty much like 4, but skipped in the official parser. */
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;
@@ -959,6 +959,27 @@ static int parse_color_channel(struct parser_state *parser, int *c)
 /*****************************************************************************/
 /* Hit objects ***************************************************************/
 
+/**
+ * The hit's sound additions are parsed after the slider-specific additions,
+ * and the slider-specific additions are not complete.
+ *
+ * Therefore, we need to re-process the slider's sounds after the hit is
+ * completely parser.
+ */
+static void fill_slider_additions(struct oshu_hit *hit)
+{
+	assert (hit->type & OSHU_SLIDER_HIT);
+	for (int i = 0; i <= hit->slider.repeat; ++i) {
+		struct oshu_hit_sound *s = &hit->slider.sounds[i];
+		if (!s->sample_set)
+			s->sample_set = hit->sound.sample_set;
+		if (!s->additions_set)
+			s->additions_set = hit->sound.additions_set;
+		s->index = hit->sound.index;
+		s->volume = hit->sound.volume;
+	}
+}
+
 static int process_hit_object(struct parser_state *parser)
 {
 	struct oshu_hit *hit;
@@ -1015,6 +1036,8 @@ static int parse_hit_object(struct parser_state *parser, struct oshu_hit **hit)
 		goto fail;
 	if (parse_additions(parser, *hit) < 0)
 		goto fail;
+	if ((*hit)->type & OSHU_SLIDER_HIT)
+		fill_slider_additions(*hit);
 	return 0;
 fail:
 	free(*hit);
