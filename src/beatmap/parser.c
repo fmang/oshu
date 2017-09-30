@@ -1047,9 +1047,9 @@ static int parse_common_hit(struct parser_state *parser, struct oshu_hit *hit)
  * Parse the specific parts of a slider hit object.
  *
  * Sample input:
- * - `P|396:140|448:80,1,140,0|8,1:0|0:0,0:0:0:0:`,
- * - `L|168:88,1,70,8|0,0:0|0:0,0:0:0:0:`,
- * - `B|460:188|408:240|408:240|416:280,1,140,4|2,1:2|0:3,0:0:0:0:`.
+ * - `P|396:140|448:80,1,140,0|8,1:0|0:0,`,
+ * - `L|168:88,1,70,8|0,0:0|0:0,`,
+ * - `B|460:188|408:240|408:240|416:280,1,140,4|2,1:2|0:3,`.
  */
 static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
@@ -1076,8 +1076,6 @@ static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 		return -1;
 	hit->slider.duration = length / (100. * parser->beatmap->difficulty.slider_multiplier) * hit->timing_point->beat_duration;
 	if (parse_slider_additions(parser, hit) < 0)
-		return -1;
-	if (consume_char(parser, ',') < 0)
 		return -1;
 	return 0;
 }
@@ -1141,9 +1139,51 @@ static int parse_perfect_slider(struct parser_state *parser, struct oshu_hit *hi
 	return 0;
 }
 
+/**
+ * Parse a Bezier slider.
+ *
+ * Sample input:
+ * `460:188|408:240|408:240|416:280`
+ */
 static int parse_bezier_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
+	int count = 2;
+	for (char *c = parser->input; *c != '\0' && *c != ','; ++c) {
+		if (*c == '|')
+			count++;
+	}
+
+	hit->slider.path.type = OSHU_BEZIER_PATH;
+	struct oshu_bezier *bezier = &hit->slider.path.bezier;
+	bezier->control_points = calloc(count, sizeof(*bezier->control_points));
+	assert (bezier->control_points != NULL);
+	bezier->control_points[0] = hit->p;
+
+	int index = 0;
+	bezier->indices = calloc(count, sizeof(*bezier->indices));
+	assert (bezier->indices != NULL);
+	bezier->indices[index] = 0;
+
+	struct oshu_point prev = bezier->control_points[0];
+	for (int i = 1; i < count; i++) {
+		if (i > 1 && consume_char(parser, '|') < 0)
+			goto fail;
+		struct oshu_point p;
+		if (parse_point(parser, &p) < 0)
+			goto fail;
+		bezier->control_points[i] = p;
+		if (p.x == prev.x && p.y == prev.y)
+			bezier->indices[++index] = i;
+		prev = p;
+	}
+	bezier->indices[++index] = count;
+	bezier->segment_count = index;
+	oshu_normalize_bezier(bezier);
 	return 0;
+fail:
+	free(bezier->control_points);
+	free(bezier->indices);
+	return -1;
 }
 
 /**
@@ -1155,6 +1195,28 @@ static int parse_bezier_slider(struct parser_state *parser, struct oshu_hit *hit
  */
 static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *hit)
 {
+	hit->slider.sounds = calloc(hit->slider.repeat + 1, sizeof(*hit->slider.sounds));
+	assert (hit->slider.sounds != NULL);
+	/* First field: the hit sounds. */
+	for (int i = 0; i <= hit->slider.repeat; ++i) {
+		if (i > 1 && consume_char(parser, '|') < 0)
+			return -1;
+		if (parse_int(parser, &hit->slider.sounds[i].additions) < 0)
+			return -1;
+	}
+	if (consume_char(parser, ',') < 0)
+		return -1;
+	/* Second field: the sample sets, for the normal sound and the additions. */
+	for (int i = 0; i <= hit->slider.repeat; ++i) {
+		if (i > 1 && consume_char(parser, '|') < 0)
+			return -1;
+		if (parse_int_sep(parser, &hit->slider.sounds[i].sample_set, ':') < 0)
+			return -1;
+		if (parse_int(parser, &hit->slider.sounds[i].additions_set) < 0)
+			return -1;
+	}
+	if (consume_char(parser, ',') < 0)
+		return -1;
 	return 0;
 }
 
@@ -1193,8 +1255,8 @@ static int parse_hold_note(struct parser_state *parser, struct oshu_hit *hit)
  *
  * Sample inputs:
  * - ``
- * - `:0:0:0:0:`
- * - `:1:2:3:100:quack.wav`
+ * - `0:0:0:0:`
+ * - `1:2:3:100:quack.wav`
  */
 static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 {
@@ -1206,8 +1268,6 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 		return 0;
 	}
 	int value;
-	if (consume_char(parser, ':') < 0)
-		return -1;
 	/* 1. Sample set. */
 	if (parse_int_sep(parser, &value, ':') < 0)
 		return -1;
@@ -1321,13 +1381,23 @@ static void free_metadata(struct oshu_metadata *meta)
 	free(meta->source);
 }
 
+static void free_path(struct oshu_path *path)
+{
+	if (path->type & OSHU_BEZIER_PATH) {
+		free(path->bezier.control_points);
+		free(path->bezier.indices);
+	}
+}
+
 static void free_hits(struct oshu_hit *hits)
 {
 	struct oshu_hit *current = hits;
 	while (current != NULL) {
 		struct oshu_hit *next = current->next;
-		if (current->type & OSHU_SLIDER_HIT)
+		if (current->type & OSHU_SLIDER_HIT) {
+			free_path(&current->slider.path);
 			free(current->slider.sounds);
+		}
 		free(current);
 		current = next;
 	}
