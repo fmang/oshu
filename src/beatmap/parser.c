@@ -623,30 +623,40 @@ fail:
 static int process_color(struct parser_state *parser)
 {
 	struct oshu_color *color;
-	if (parse_color(parser, &color) < 0)
+	int trash;
+	enum token token;
+	if (parse_token(parser, &token) < 0)
 		return -1;
-	if (parser->last_color)
-		parser->last_color->next = color;
-	parser->last_color = color;
-	if (!parser->beatmap->colors)
-		parser->beatmap->colors = color;
-	color->next = parser->beatmap->colors;
+	switch (token) {
+	case Combo:
+		if (parse_int(parser, &trash) < 0)
+			return -1;
+		consume_spaces(parser);
+		if (consume_char(parser, ':') < 0)
+			return -1;
+		if (parse_color(parser, &color) < 0)
+			return -1;
+		if (parser->last_color)
+			parser->last_color->next = color;
+		parser->last_color = color;
+		if (!parser->beatmap->colors)
+			parser->beatmap->colors = color;
+		color->next = parser->beatmap->colors;
+		break;
+	case SliderTrackOverride:
+	case SliderBorder:
+		break;
+	default:
+		parser_error(parser, "unknown color property");
+		return -1;
+	}
 	return 0;
 }
 
 static int parse_color(struct parser_state *parser, struct oshu_color **color)
 {
-	int n;
 	*color = calloc(1, sizeof(**color));
 	assert (color != NULL);
-	if (consume_string(parser, "Combo") < 0)
-		goto fail;
-	if (parse_int(parser, &n) < 0)
-		goto fail;
-	consume_spaces(parser);
-	if (consume_char(parser, ':') < 0)
-		goto fail;
-	consume_spaces(parser);
 	if (parse_color_channel(parser, &(*color)->red) < 0)
 		goto fail;
 	if (consume_char(parser, ',') < 0)
