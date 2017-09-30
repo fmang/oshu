@@ -1158,18 +1158,74 @@ static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *
 	return 0;
 }
 
+/**
+ * Parse the specific parts of a spinner.
+ *
+ * Sample input:
+ * - `16620`
+ */
 static int parse_spinner(struct parser_state *parser, struct oshu_hit *hit)
 {
+	if (parse_double(parser, &hit->spinner.end_time) < 0)
+		return -1;
+	hit->spinner.end_time /= 1000.;
 	return 0;
 }
 
+/**
+ * Parse the specific parts of a hold note.
+ *
+ * Sample input:
+ * - `16620`
+ */
 static int parse_hold_note(struct parser_state *parser, struct oshu_hit *hit)
 {
+	if (parse_double(parser, &hit->hold_note.end_time) < 0)
+		return -1;
+	hit->hold_note.end_time /= 1000.;
 	return 0;
 }
 
+/**
+ * Parse the additions, common to every type of note.
+ *
+ * The whole field is optional.
+ *
+ * Sample inputs:
+ * - ``
+ * - `:0:0:0:0:`
+ * - `:1:2:3:100:quack.wav`
+ */
 static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 {
+	if (*parser->input == '\0') {
+		hit->sound.sample_set = hit->timing_point->sample_set;
+		hit->sound.additions_set = hit->timing_point->sample_set;
+		hit->sound.index = 0;
+		hit->sound.volume = 1.;
+		return 0;
+	}
+	int value;
+	if (consume_char(parser, ':') < 0)
+		return -1;
+	/* 1. Sample set. */
+	if (parse_int_sep(parser, &value, ':') < 0)
+		return -1;
+	hit->sound.sample_set = value ? value : hit->timing_point->sample_set;
+	/* 2. Additions set. */
+	if (parse_int_sep(parser, &value, ':') < 0)
+		return -1;
+	hit->sound.additions_set = value ? value : hit->timing_point->sample_set;
+	/* 3. Custom sample set index. */
+	if (parse_int_sep(parser, &hit->sound.index, ':') < 0)
+		return -1;
+	/* 4. Volume. */
+	if (parse_int_sep(parser, &value, ':') < 0)
+		return -1;
+	hit->sound.volume = value ? value / 100. : 1.;
+	/* 5. File name. */
+	/* Unsupported, so we consume everything. */
+	consume_all(parser);
 	return 0;
 }
 
