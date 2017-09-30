@@ -39,291 +39,6 @@ static const struct oshu_beatmap default_beatmap = {
 	},
 };
 
-/**
- * Set the parser's current timing point to the position in seconds specified
- * in *offset*.
- *
- * Return the appropriate object, or NULL on error.
- *
- * The result is stored in #parser_state::current_timing_point for faster
- * results on further calls, assuming you'd never seek to a point before the
- * last seek.
- */
-static struct oshu_timing_point* seek_timing_point(double offset, struct parser_state *parser)
-{
-	if (parser->current_timing_point == NULL)
-		parser->current_timing_point = parser->beatmap->timing_points;
-	/* update the parser state as we loop */
-	struct oshu_timing_point **tp = &parser->current_timing_point;
-	for (; *tp && (*tp)->next; *tp = (*tp)->next) {
-		if ((*tp)->next->offset > offset)
-			break;
-	}
-	return *tp;
-}
-
-/**
- * Compute #oshu_hit::combo and #oshu_hit::combo_seq of a single #oshu_hit.
- *
- * Also the update the #oshu_hit::color.
- */
-static void compute_hit_combo(struct parser_state *parser, struct oshu_hit *hit)
-{
-	if (parser->last_hit == NULL) {
-		hit->combo = 0;
-		hit->combo_seq = 1;
-		hit->color = parser->beatmap->colors;
-	} else if (hit->type & OSHU_NEW_HIT_COMBO) {
-		int skip_combo = (hit->type & OSHU_COMBO_HIT_MASK) >> OSHU_COMBO_HIT_OFFSET;
-		hit->combo = parser->last_hit->combo + 1 + skip_combo;
-		hit->combo_seq = 1;
-		hit->color = parser->last_hit->color;
-		for (int i = 0; hit->color && i < 1 + skip_combo; ++i)
-			hit->color = hit->color->next;
-	} else {
-		hit->combo = parser->last_hit->combo;
-		hit->combo_seq = parser->last_hit->combo_seq + 1;
-		hit->color = parser->last_hit->color;
-	}
-}
-
-/*****************************************************************************/
-/* Old parser ****************************************************************/
-
-/**
- * Trim a string.
- *
- * The passed pointer is moved to the first non-space character, and the
- * trailing spaces are replaced with null characters.
- */
-static void trim(char **str)
-{
-	for (; **str == ' '; (*str)++);
-	char *rev = *str + strlen(*str) - 1;
-	for (; rev >= *str && *rev == ' '; rev--);
-}
-
-/**
- * Parse a point.
- *
- * Sample input:
- * `168:88`
- */
-static void build_point(char *line, struct oshu_point *p)
-{
-	char *x = strsep(&line, ":");
-	char *y = line;
-	assert (y != NULL);
-	p->x = atoi(x);
-	p->y = atoi(y);
-}
-
-/**
- * Build a linear path.
- *
- * Sample input:
- * `168:88`
- */
-static void build_linear_slider(char *line, struct oshu_hit *hit)
-{
-	struct oshu_path *path = &hit->slider.path;
-	path->type = OSHU_LINEAR_PATH;
-	path->line.start = hit->p;
-	build_point(line, &path->line.end);
-}
-
-/**
- * Build a perfect arc.
- *
- * If the points are aligned or something weird, transform it into a linear
- * slider.
- *
- * Sample input:
- * `396:140|448:80'
- */
-static void build_perfect_slider(char *line, struct oshu_hit *hit)
-{
-	hit->slider.path.type = OSHU_PERFECT_PATH;
-	char *pass = strsep(&line, "|");
-	char *end = line;
-	assert (end != NULL);
-
-	struct oshu_point a, b, c;
-	a = hit->p;
-	build_point(pass, &b);
-	build_point(end, &c);
-
-	if (oshu_build_arc(a, b, c, &hit->slider.path.arc) < 0) {
-		/* tranform it into a linear path */
-		hit->slider.path.type = OSHU_LINEAR_PATH;
-		hit->slider.path.line.start = a;
-		hit->slider.path.line.end = c;
-	}
-}
-
-/**
- * Build a Bezier slider.
- *
- * Sample input:
- * `460:188|408:240|408:240|416:280`
- */
-static void build_bezier_slider(char *line, struct oshu_hit *hit)
-{
-	int count = 2;
-	for (char *c = line; *c != '\0'; ++c) {
-		if (*c == '|')
-			count++;
-	}
-
-	hit->slider.path.type = OSHU_BEZIER_PATH;
-	struct oshu_bezier *bezier = &hit->slider.path.bezier;
-	bezier->control_points = calloc(count, sizeof(*bezier->control_points));
-	bezier->control_points[0] = hit->p;
-
-	int index = 0;
-	bezier->indices = calloc(count, sizeof(*bezier->indices));
-	bezier->indices[index] = 0; /* useless but let's remind it */
-
-	struct oshu_point prev = bezier->control_points[0];
-	for (int i = 1; i < count; i++) {
-		struct oshu_point p;
-		char *frag = strsep(&line, "|");
-		build_point(frag, &p);
-		bezier->control_points[i] = p;
-		if (p.x == prev.x && p.y == prev.y) {
-			bezier->indices[++index] = i;
-		}
-		prev = p;
-	}
-	bezier->indices[++index] = count;
-	bezier->segment_count = index;
-	oshu_normalize_bezier(bezier);
-}
-
-
-/**
- * Parse the specific parts of a slider hit object.
- *
- * Sample input:
- * - `P|396:140|448:80,1,140,0|8,1:0|0:0,0:0:0:0:`,
- * - `L|168:88,1,70,8|0,0:0|0:0,0:0:0:0:`,
- * - `B|460:188|408:240|408:240|416:280,1,140,4|2,1:2|0:3,0:0:0:0:`.
- */
-static void build_slider(char *line, struct parser_state *parser, struct oshu_hit *hit)
-{
-	char *type = strsep(&line, "|");
-	char *path = strsep(&line, ",");
-	char *repeat = strsep(&line, ",");
-	char *length = strsep(&line, ",");
-	assert (length != NULL);
-	assert (strlen(type) == 1);
-	hit->slider.repeat = atoi(repeat);
-	assert (parser->current_timing_point != NULL);
-	assert (parser->beatmap->difficulty.slider_multiplier != 0);
-	hit->slider.duration = atof(length) / (100. * parser->beatmap->difficulty.slider_multiplier) * parser->current_timing_point->beat_duration;
-	if (*type == OSHU_LINEAR_PATH)
-		build_linear_slider(path, hit);
-	else if (*type == OSHU_PERFECT_PATH)
-		build_perfect_slider(path, hit);
-	else if (*type == OSHU_BEZIER_PATH)
-		build_bezier_slider(path, hit);
-	else
-		assert(*type != *type);
-}
-
-/**
- * Parse specific parts of a spinner.
- */
-static void build_spinner(char *line, struct oshu_spinner *spinner)
-{
-	char *end_time = strsep(&line, ",");
-	spinner->end_time = (double) atoi(end_time) / 1000;
-}
-
-/**
- * Parse specific parts of a hold note.
- */
-static void build_hold_note(char *line, struct oshu_hold_note *hold_note)
-{
-	char *end_time = strsep(&line, ",");
-	hold_note->end_time = (double) atoi(end_time) / 1000;
-}
-
-/**
- * Allocate and parse one hit object.
- *
- * On failure, return -1, free any allocated memory, and leave `*hit`
- * unspecified.
- *
- * Sample input:
- * `288,256,8538,2,0,P|254:261|219:255,1,70,8|0,0:0|0:0,0:0:0:0:`
- */
-static int build_hit(char *line, struct parser_state *parser, struct oshu_hit **hit)
-{
-	char *x = strsep(&line, ",");
-	char *y = strsep(&line, ",");
-	char *time = strsep(&line, ",");
-	char *type = strsep(&line, ",");
-	char *hit_sound = strsep(&line, ",");
-	if (!hit_sound) {
-		oshu_log_warning("invalid hit object");
-		*hit = NULL;
-		return -1;
-	}
-	*hit = calloc(1, sizeof(**hit));
-	(*hit)->p.x = atoi(x);
-	(*hit)->p.y = atoi(y);
-	(*hit)->time = (double) atoi(time) / 1000;
-	(*hit)->type = atoi(type);
-	(*hit)->sound.additions = atoi(hit_sound);
-	seek_timing_point((*hit)->time, parser);
-	if ((*hit)->type & OSHU_SLIDER_HIT)
-		build_slider(line, parser, *hit);
-	if ((*hit)->type & OSHU_SPINNER_HIT)
-		build_spinner(line, &(*hit)->spinner);
-	if ((*hit)->type & OSHU_HOLD_HIT)
-		build_hold_note(line, &(*hit)->hold_note);
-	return 0;
-}
-
-/**
- * Parse one hit using #build_hit, and link it into the whole beatmap.
- *
- * Skip invalid hit objects.
- */
-static int legacy_parse_hit_object(char *line, struct parser_state *parser)
-{
-	struct oshu_hit *hit;
-	if (build_hit(line, parser, &hit) < 0)
-		return 0; /* ignore it */
-	if (!parser->beatmap->hits)
-		parser->beatmap->hits = hit;
-	if (parser->last_hit) {
-		assert(parser->last_hit->time <= hit->time);
-		parser->last_hit->next = hit;
-	}
-	compute_hit_combo(parser, hit);
-	parser->last_hit = hit;
-	return 0;
-}
-
-/**
- * The main parser transition function.
- *
- * Dispatch the current line according to the parser state.
- *
- * Trim the lines, and skip comments and empty lines.
- */
-static int parse_line(char *line, struct parser_state *parser)
-{
-	int rc = 0;
-	trim(&line);
-	if (parser->section == BEATMAP_HIT_OBJECTS) {
-		rc = legacy_parse_hit_object(line, parser);
-	}
-	return rc;
-}
-
 /* Primitives ****************************************************************/
 
 static void parser_error(struct parser_state *parser, const char *message)
@@ -608,8 +323,11 @@ static int process_input(struct parser_state *parser)
 		rc = process_timing_point(parser);
 	} else if (parser->section == BEATMAP_COLOURS) {
 		rc = process_color(parser);
+	} else if (parser->section == BEATMAP_HIT_OBJECTS) {
+		rc = process_hit_object(parser);
 	} else {
-		return parse_line(parser->input, parser);
+		/** skip the line */
+		rc = consume_all(parser);
 	}
 	if (rc < 0)
 		return -1;
@@ -958,6 +676,54 @@ static int parse_color_channel(struct parser_state *parser, int *c)
 
 /*****************************************************************************/
 /* Hit objects ***************************************************************/
+
+/**
+ * Set the parser's current timing point to the position in seconds specified
+ * in *offset*.
+ *
+ * Return the appropriate object, or NULL on error.
+ *
+ * The result is stored in #parser_state::current_timing_point for faster
+ * results on further calls, assuming you'd never seek to a point before the
+ * last seek.
+ */
+static struct oshu_timing_point* seek_timing_point(double offset, struct parser_state *parser)
+{
+	if (parser->current_timing_point == NULL)
+		parser->current_timing_point = parser->beatmap->timing_points;
+	/* update the parser state as we loop */
+	struct oshu_timing_point **tp = &parser->current_timing_point;
+	for (; *tp && (*tp)->next; *tp = (*tp)->next) {
+		if ((*tp)->next->offset > offset)
+			break;
+	}
+	return *tp;
+}
+
+/**
+ * Compute #oshu_hit::combo and #oshu_hit::combo_seq of a single #oshu_hit.
+ *
+ * Also the update the #oshu_hit::color.
+ */
+static void compute_hit_combo(struct parser_state *parser, struct oshu_hit *hit)
+{
+	if (parser->last_hit == NULL) {
+		hit->combo = 0;
+		hit->combo_seq = 1;
+		hit->color = parser->beatmap->colors;
+	} else if (hit->type & OSHU_NEW_HIT_COMBO) {
+		int skip_combo = (hit->type & OSHU_COMBO_HIT_MASK) >> OSHU_COMBO_HIT_OFFSET;
+		hit->combo = parser->last_hit->combo + 1 + skip_combo;
+		hit->combo_seq = 1;
+		hit->color = parser->last_hit->color;
+		for (int i = 0; hit->color && i < 1 + skip_combo; ++i)
+			hit->color = hit->color->next;
+	} else {
+		hit->combo = parser->last_hit->combo;
+		hit->combo_seq = parser->last_hit->combo_seq + 1;
+		hit->color = parser->last_hit->color;
+	}
+}
 
 /**
  * The hit's sound additions are parsed after the slider-specific additions,
