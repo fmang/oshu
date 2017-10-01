@@ -39,18 +39,25 @@ static const struct oshu_beatmap default_beatmap = {
 	},
 };
 
-/* Primitives ****************************************************************/
+/**
+ * Log an error with contextual information from the parser state.
+ *
+ * It's implemented as a macro because variadic functions are a pain to
+ * implement in pure C. Besides, it's something that inlines well. One
+ * limitation though: the format string must be a raw string literal.
+ *
+ * \sa oshu_log_error
+ */
+#define parser_error(parser, fmt, ...) \
+	oshu_log_error( \
+		"%s:%d:%ld: " fmt, \
+		(parser)->source, \
+		(parser)->line_number, \
+		(parser)->input - (parser)->buffer + 1, \
+		##__VA_ARGS__ \
+	)
 
-static void parser_error(struct parser_state *parser, const char *message)
-{
-	int column = 0;
-	if (parser->buffer && parser->input)
-		column = parser->input - parser->buffer + 1;
-	oshu_log_error(
-		"%s:%d:%d: %s",
-		parser->source, parser->line_number, column, message
-	);
-}
+/* Primitives ****************************************************************/
 
 static int consume_all(struct parser_state *parser)
 {
@@ -63,7 +70,7 @@ static int consume_end(struct parser_state *parser)
 	if (*parser->input == '\0') {
 		return 0;
 	} else {
-		parser_error(parser, "unexpected end of line");
+		parser_error(parser, "expected end of line, got '%c'", *parser->input);
 		return -1;
 	}
 }
@@ -84,8 +91,7 @@ static int consume_char(struct parser_state *parser, char c)
 		++parser->input;
 		return 0;
 	} else {
-		parser_error(parser, "unexpected character");
-		oshu_log_error("expected \'%c\'", c);
+		parser_error(parser, "expected '%c', got '%c'", c, *parser->input);
 		return -1;
 	}
 }
@@ -97,8 +103,7 @@ static int consume_string(struct parser_state *parser, const char *str)
 		parser->input += len;
 		return 0;
 	} else {
-		parser_error(parser, "unexpected input");
-		oshu_log_error("expected \"%s\"", str);
+		parser_error(parser, "unexpected input; expected \"%s\"", str);
 		return -1;
 	}
 }
@@ -268,7 +273,7 @@ static int parse_token(struct parser_state *parser, enum token *token)
 	for (char *c = parser->input; isalpha(*c); ++c)
 		++prefix;
 	if (prefix == 0) {
-		parser_error(parser, "expected an alphabetic token");
+		parser_error(parser, "expected an alphabetic token, got '%c'", *parser->input);
 		return -1;
 	}
 	if (search_token(parser->input, prefix, token) < 0) {
@@ -583,14 +588,14 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 		}
 		(*timing)->beat_duration = - (*timing)->beat_duration / 100. * parser->timing_base;
 	} else {
-		parser_error(parser, "invalid beat duration");
+		parser_error(parser, "invalid beat duration %f", (*timing)->beat_duration);
 		goto fail;
 	}
 	/* 3. Number of beats per measure. */
 	if (parse_int_sep(parser, &(*timing)->meter, ',') < 0)
 		goto fail;
 	if ((*timing)->meter <= 0) {
-		parser_error(parser, "invalid meter value");
+		parser_error(parser, "invalid meter value %d", (*timing)->meter);
 		goto fail;
 	}
 	/* 4. Sample set. */
@@ -604,7 +609,7 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;
 	if (value < 0 || value > 100) {
-		parser_error(parser, "invalid volume");
+		parser_error(parser, "invalid volume %d", value);
 		goto fail;
 	}
 	(*timing)->volume = (double) value / 100.;
@@ -1103,7 +1108,11 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 	/* 4. Volume. */
 	if (parse_int_sep(parser, &value, ':') < 0)
 		return -1;
-	hit->sound.volume = value ? value / 100. : 1.;
+	if (value < 0 || value > 100) {
+		parser_error(parser, "invalid volume %d", value);
+		return -1;
+	}
+	hit->sound.volume = value ? (double) value / 100. : 1.;
 	/* 5. File name. */
 	/* Unsupported, so we consume everything. */
 	consume_all(parser);

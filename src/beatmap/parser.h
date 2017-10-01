@@ -170,13 +170,6 @@ struct parser_state {
 };
 
 /**
- * Log an error with contextual information from the parser state.
- *
- * \sa oshu_log_error
- */
-static void parser_error(struct parser_state *parser, const char *message);
-
-/**
  * Convient typedef to help define the prototypes. Don't use it in the
  * implementation.
  */
