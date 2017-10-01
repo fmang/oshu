@@ -1073,6 +1073,9 @@ static int parse_hold_note(struct parser_state *parser, struct oshu_hit *hit)
  * - ``
  * - `,0:0:0:0:`
  * - `,1:2:3:100:quack.wav`
+ *
+ * \todo
+ * Store the optional filename at the end when present.
  */
 static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 {
