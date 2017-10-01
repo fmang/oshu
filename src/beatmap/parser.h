@@ -28,17 +28,17 @@
  * containing the input, and any transient state required for parsing.
  *
  * A *parser* is a function that reads input from the parser state, and returns
- * the parsed object. See #parse_int, #parse_float.
+ * the parsed object. See #parse_int, #parse_double.
  *
  * A *consumer* is a special parser that returns nothing. See #consume_string,
- * #consume_space, #consume_end.
+ * #consume_spaces, #consume_end.
  *
  * A *processor* is a kind of parser that don't return the parsed state to the
  * caller, but instead writes its results directly into the beatmap referenced
  * in the parser state.
  *
  * All these functions return 0 on success, and -1 on failure. The callee
- * should print an message using #parser_error or #parser_warning on failure.
+ * should print an message using #parser_error failure.
  */
 
 #include "beatmap/beatmap.h"
@@ -119,8 +119,8 @@ struct parser_state {
 	 */
 	int line_number;
 	/**
-	 * The name of the file being read, or something similar, like <stdin>
-	 * or some URL, who knows.
+	 * The name of the file being read, or something similar, like
+	 * `<stdin>` or some URL, who knows.
 	 */
 	const char *source;
 	/**

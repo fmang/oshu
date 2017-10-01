@@ -1,5 +1,5 @@
 /**
- * \file audio/pipeline.c
+ * \file audio/audio.c
  * \ingroup audio
  *
  * \brief

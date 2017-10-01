@@ -1134,7 +1134,7 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 
 /**
  * Create the parser state, then read the input file line-by-line, feeding it
- * to the parser automaton with #parse_line.
+ * to the parser automaton with #process_input.
  */
 static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatmap)
 {

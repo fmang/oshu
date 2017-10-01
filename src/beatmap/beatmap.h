@@ -159,8 +159,7 @@ struct oshu_timing_point {
 	 * Kiai mode. I guess it's when everything flashes on the screen.
 	 *
 	 * It's a pseudo-boolean, and its position in the timing point line is
-	 * unclear. Something tells me it's possibly before the #inherited
-	 * field.
+	 * unclear.
 	 */
 	int kiai;
 	/**
@@ -207,9 +206,9 @@ enum oshu_hit_state {
 /**
  * Structure to encompass all the sound effects information of hit objects.
  *
- * Its fields will look confusing and overlapping, like #sample_index which
- * looks like it applies to both #sample_set and #additions_set, even though
- * they're different sample sets?
+ * Its fields will look confusing and overlapping, like #index which looks like
+ * it applies to both #sample_set and #additions_set, even though they're
+ * different sample sets?
  */
 struct oshu_hit_sound {
 	/**
@@ -233,8 +232,7 @@ struct oshu_hit_sound {
 	 */
 	int additions;
 	/**
-	 * Sample set to use when playing #hit_sound over the normal hit sound,
-	 * and not the hit sound itself.
+	 * Sample set to use when playing additions over the normal hit sound.
 	 *
 	 * It's similar to #sample_set.
 	 */
@@ -658,8 +656,9 @@ struct oshu_difficulty {
  * It also focuses on ease of use by SDL when rendering rather than providing
  * an accurate abstract syntax tree of the original file.
  *
- * Most string values are dynamically allocated inside this structure. Make
- * sure you free it with #oshu_beatmap_free.
+ * Most string values are dynamically allocated inside this structure. Some
+ * linked structures are allocated on the heap too. Make sure you free
+ * everything with #oshu_destroy_beatmap.
  */
 struct oshu_beatmap {
 	/**
@@ -721,7 +720,7 @@ struct oshu_beatmap {
 	 * sample set, so you must check the hit object first before resorting
 	 * to this variable.
 	 *
-	 * Let's default to #OSHU_SAMPLE_SET_SOFT.
+	 * Let's default to #OSHU_SOFT_SAMPLE_SET.
 	 */
 	enum oshu_sample_set_family sample_set;
 	/**

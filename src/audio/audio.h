@@ -203,7 +203,7 @@ void oshu_play_audio(struct oshu_audio *audio);
 /**
  * Pause the stream.
  *
- * Calling #oshu_audio_play will resume the audio playback where it was
+ * Calling #oshu_play_audio will resume the audio playback where it was
  * left playing.
  */
 void oshu_pause_audio(struct oshu_audio *audio);
