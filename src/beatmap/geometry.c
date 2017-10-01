@@ -12,11 +12,13 @@
  * When we get a value under this in our computation, we'll assume the value is
  * almost 0 and possibly trigger an error, depending on the context.
  */
-static double epsilon = 0.1;
+static double epsilon = 0.01;
 
 struct oshu_vector oshu_normalize(struct oshu_vector p)
 {
 	double norm = sqrt(p.x * p.x + p.y * p.y);
+	if (norm < epsilon)
+		return (struct oshu_vector) {0, 0};
 	p.x /= norm;
 	p.y /= norm;
 	return p;

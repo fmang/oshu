@@ -5,6 +5,8 @@
 
 #include "graphics/draw.h"
 
+#include <assert.h>
+
 /**
  * Handy alias to write point literals, like `(P) {x, y}`.
  *
@@ -118,6 +120,13 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 		struct oshu_point p = oshu_path_at(path, i * step);
 		struct oshu_vector d = oshu_path_derive(path, i * step);
 		d = oshu_normalize(d);
+		if (d.x == 0 && d.y == 0) {
+			/* degenerate case */
+			assert (i != 0);
+			left[i] = left[i-1];
+			right[i] = right[i-1];
+			continue;
+		}
 		struct oshu_point l = oshu_project(display, (P) {
 			.x = p.x - radius* d.y,
 			.y = p.y + radius* d.x,
