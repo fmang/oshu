@@ -78,9 +78,10 @@ int run(const char *beatmap_path, int autoplay, int pause)
 	current_game->paused = pause;
 
 	char *title;
-	asprintf(&title, "%s - oshu!", beatmap_path);
-	SDL_SetWindowTitle(current_game->display->window, title);
-	free(title);
+	if (asprintf(&title, "%s - oshu!", beatmap_path) >= 0) {
+		SDL_SetWindowTitle(current_game->display->window, title);
+		free(title);
+	}
 
 	if ((rc = oshu_game_run(current_game)) < 0) {
 		oshu_log_error("error while running the game, aborting");
