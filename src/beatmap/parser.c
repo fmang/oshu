@@ -968,6 +968,20 @@ static int parse_perfect_slider(struct parser_state *parser, struct oshu_hit *hi
  *
  * Consumes:
  * `460:188|408:240|408:240|416:280`
+ *
+ * Segments are cut when a point repeats, as the osu format specifies, but this
+ * is a terrible representation. Consider the following path, as it appears in
+ * the beatmap: ABBC. There are 2 segments: AB, and BC. Now consider ABBBC. Is
+ * it AB+BBC, AB+B+BC, ABB+BC? The naive parsing would do AB+B+BC, which is
+ * what's implemented here. This is dumb, but luckily this case is rare enough.
+ *
+ * More generally, any segment whose control points are all the same points is
+ * degenerate, and will be annoying to derive and draw. This requires a special
+ * case in the drawing procedure. A smart processing could handle some cases,
+ * but there are no right solution since the format is inherently ambiguous.
+ *
+ * \todo
+ * Reclaim the unused memory in the indices aray.
  */
 static int parse_bezier_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
