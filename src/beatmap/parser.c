@@ -720,6 +720,15 @@ static struct oshu_timing_point* seek_timing_point(double offset, struct parser_
  * Compute #oshu_hit::combo and #oshu_hit::combo_seq of a single #oshu_hit.
  *
  * Also the update the #oshu_hit::color.
+ *
+ * The common case for a new combo is to have the #OSHU_NEW_HIT_COMBO flag set
+ * and the combo skip at 0.
+ *
+ * \todo
+ * Explore the edge cases:
+ * - What if the initial hit is marked as a new combo?
+ * - What if the initial hit has a combo skip?
+ * - What if the combo skip is non-zero but the new combo flag is unset?
  */
 static void compute_hit_combo(struct parser_state *parser, struct oshu_hit *hit)
 {
