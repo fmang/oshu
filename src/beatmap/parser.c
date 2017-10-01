@@ -49,7 +49,7 @@ static const struct oshu_beatmap default_beatmap = {
  * \sa oshu_log_error
  */
 #define parser_error(parser, fmt, ...) \
-	oshu_log_error( \
+	oshu_log_warning( \
 		"%s:%d:%ld: " fmt, \
 		(parser)->source, \
 		(parser)->line_number, \
@@ -1143,10 +1143,8 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 		parser.buffer = line;
 		parser.input = line;
 		parser.line_number++;
-		if (process_input(&parser) < 0) {
-			free(line);
-			return -1;
-		}
+		process_input(&parser);
+		/* ignore parsing errors */
 	}
 	free(line);
 	return 0;
