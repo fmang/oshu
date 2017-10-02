@@ -33,10 +33,9 @@ Code structure
 \dot
 digraph modules {
 	rankdir=BT;
-	graph [splines=line];
 	node [shape=rect];
-	Audio;
 	Beatmap;
+	Audio -> Beatmap;
 	Graphics -> Beatmap;
 	Game -> Audio;
 	Game -> Beatmap;
