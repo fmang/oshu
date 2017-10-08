@@ -6,6 +6,7 @@
 #include "../config.h"
 
 #include "audio/library.h"
+#include "audio/audio.h"
 #include "audio/sample.h"
 #include "log.h"
 
@@ -270,4 +271,48 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
 		}
 		oshu_register_sound(library, &hit->sound);
 	}
+}
+
+/**
+ * Find a sample given its attributes.
+ *
+ * If the wanted sample couldn't be found, return a sane replacement or, in the
+ * worst case scenario, NULL.
+ *
+ * \sa oshu_play_sound
+ */
+struct oshu_sample* find_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type)
+{
+	struct oshu_sound_room *room = get_room(library, set);
+	if (!room)
+		return NULL;
+	struct oshu_sound_shelf *shelf = find_shelf(room, index);
+	if (!shelf)
+		return NULL;
+	struct oshu_sample **sample = get_sample(shelf, type);
+	if (!sample)
+		return NULL;
+	return *sample;
+}
+
+/**
+ * Find a single sample and play it.
+ */
+static void play_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type, struct oshu_audio *audio)
+{
+	struct oshu_sample *sample = find_sample(library, set, index, type);
+	if (sample)
+		oshu_play_sample(audio, sample);
+}
+
+void oshu_play_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio)
+{
+	if (sound->additions & OSHU_NORMAL_SAMPLE)
+		play_sample(library, sound->sample_set, sound->index, OSHU_NORMAL_SAMPLE, audio);
+	if (sound->additions & OSHU_WHISTLE_SAMPLE)
+		play_sample(library, sound->additions_set, sound->index, OSHU_WHISTLE_SAMPLE, audio);
+	if (sound->additions & OSHU_FINISH_SAMPLE)
+		play_sample(library, sound->additions_set, sound->index, OSHU_FINISH_SAMPLE, audio);
+	if (sound->additions & OSHU_CLAP_SAMPLE)
+		play_sample(library, sound->additions_set, sound->index, OSHU_CLAP_SAMPLE, audio);
 }

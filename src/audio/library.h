@@ -159,16 +159,6 @@ void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sou
 void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap);
 
 /**
- * Find a sample given its attributes.
- *
- * If the wanted sample couldn't be found, return a sane replacement or, in the
- * worst case scenario, set `*sample` to NULL.
- *
- * \sa oshu_play_sound
- */
-int oshu_find_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type, struct oshu_sample **sample);
-
-/**
  * Play all the samples associated to the hit sound.
  *
  * If one of the required samples wasn't found, it is ignored.
