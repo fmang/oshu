@@ -84,7 +84,7 @@ enum oshu_sample_type {
 	 */
 	OSHU_NORMAL_SAMPLE = 1,
 	OSHU_WHISTLE_SAMPLE = 2,
-	OSHU_FISNISH_SAMPLE = 4,
+	OSHU_FINISH_SAMPLE = 4,
 	OSHU_CLAP_SAMPLE = 8,
 };
 

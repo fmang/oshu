@@ -3,8 +3,10 @@
  * \ingroup audio_library
  */
 
-#include "audio/sample.h"
 #include "beatmap/beatmap.h"
+
+struct oshu_audio;
+struct oshu_sample;
 
 struct SDL_AudioSpec;
 
@@ -87,9 +89,16 @@ struct oshu_sound_room {
 	/**
 	 * Number of shelves.
 	 *
-	 * This is also the size of the #shelves and #indices arrays.
+	 * This is also the minimum size of the #shelves and #indices arrays.
 	 */
 	int size;
+	/**
+	 * Actual size of the memory block of #shelves and #indices.
+	 *
+	 * Rooms may grow using a spatio-temporal expansion often called
+	 * *realloc*.
+	 */
+	int capacity;
 };
 
 /**
@@ -112,16 +121,20 @@ struct oshu_sound_library {
 /**
  * Initialize a sound library.
  *
- * The format define the format of the samples that are going to be stored.
+ * The format define the format of the samples that are going to be stored. The
+ * point is stored without duplication of the underlying data. Make sure it
+ * stays alive!
+ *
+ * The library object must be zero-initalized.
  *
  * \sa oshu_close_sound_library
  */
-int oshu_open_sound_library(struct SDL_AudioSpec *format);
+void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format);
 
 /**
  * Delete all the loaded samples from the library.
  */
-void oshu_close_sound_library(struct SDL_AudioSpec *format);
+void oshu_close_sound_library(struct oshu_sound_library *library);
 
 /**
  * Locate a sample on the filesystem and insert it into the library.
