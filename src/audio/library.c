@@ -3,6 +3,8 @@
  * \ingroup audio_library
  */
 
+#include "../config.h"
+
 #include "audio/library.h"
 #include "audio/sample.h"
 #include "log.h"
@@ -11,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format)
 {
@@ -179,11 +182,33 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, enu
 	return 0;
 }
 
-int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type)
+/**
+ * Look up a sample file from various directories.
+ *
+ * Return a dynamically allocated buffer with the path to a WAV file on
+ * success, NULL on failure.
+ */
+static char* locate_sample(enum oshu_sample_set_family set, int index, enum oshu_sample_type type)
 {
 	char filename[32];
 	if (make_sample_file_name(set, index, type, filename, sizeof(filename)) < 0)
-		return -1;
+		return NULL;
+	/* 1. Check the current directory. */
+	if (access(filename, R_OK) == 0)
+		return strdup(filename);
+	/* 2. Check the installation's data directory. */
+	char *path;
+	int rc = asprintf(&path, "%s/samples/%s", PKGDATADIR, filename);
+	assert (rc >= 0);
+	if (access(path, R_OK) == 0)
+		return path;
+	free(path);
+	/* 3. Fail. */
+	return NULL;
+}
+
+int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type)
+{
 	struct oshu_sound_room *room = get_room(library, set);
 	if (!room)
 		return -1;
@@ -197,11 +222,16 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
 		return -1;
 	if (*sample) /* already loaded */
 		return 0;
-	oshu_log_debug("registering %s", filename);
+	char *path = locate_sample(set, index, type);
+	if (!path)
+		return -1;
+	oshu_log_debug("registering %s", path);
 	*sample = calloc(1, sizeof(**sample));
 	assert (*sample != NULL);
 	assert (library->format != NULL);
-	if (oshu_load_sample(filename, library->format, *sample) < 0) {
+	int rc = oshu_load_sample(path, library->format, *sample);
+	free(path);
+	if (rc < 0) {
 		free(*sample);
 		*sample = NULL;
 		return -1;
