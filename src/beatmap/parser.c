@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
 /**
  * Every osu beatmap file must begin with this.
@@ -1201,9 +1202,19 @@ static int validate(struct oshu_beatmap *beatmap)
 
 int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap)
 {
+	oshu_log_debug("loading beatmap %s", path);
+	struct stat s;
+	if (stat(path, &s) < 0) {
+		oshu_log_error("could not find the beatmap: %s", strerror(errno));
+		return -1;
+	}
+	if (!(S_ISREG(s.st_mode) || S_ISLNK(s.st_mode))) {
+		oshu_log_error("not a file: %s", path);
+		return -1;
+	}
 	FILE *input = fopen(path, "r");
 	if (input == NULL) {
-		oshu_log_error("couldn't open the beatmap: %s", strerror(errno));
+		oshu_log_error("could not open the beatmap: %s", strerror(errno));
 		return -1;
 	}
 	memcpy(beatmap, &default_beatmap, sizeof(*beatmap));
