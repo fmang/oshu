@@ -69,6 +69,9 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 	}
 	(*game)->clock.ticks = SDL_GetTicks();
 
+	oshu_open_sound_library(&(*game)->library, &(*game)->audio.device_spec);
+	oshu_populate_library(&(*game)->library, &(*game)->beatmap);
+
 	return 0;
 fail:
 	oshu_game_destroy(game);

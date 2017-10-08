@@ -8,6 +8,7 @@
 #pragma once
 
 #include "audio/audio.h"
+#include "audio/library.h"
 #include "beatmap/beatmap.h"
 #include "game/modes.h"
 #include "graphics/display.h"
@@ -72,6 +73,7 @@ struct oshu_game {
 	struct oshu_beatmap beatmap;
 	struct oshu_audio audio;
 	struct oshu_sample hit_sound;
+	struct oshu_sound_library library;
 	struct oshu_display *display;
 	struct oshu_game_mode *mode;
 	struct oshu_clock clock;
