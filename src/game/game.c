@@ -39,15 +39,6 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		goto fail;
 	}
 
-	const char *hit_path = "hit.wav";
-	if (access(hit_path, F_OK) != 0)
-		hit_path = PKGDATADIR "/hit.wav";
-	oshu_log_debug("loading %s", hit_path);
-	if (oshu_load_sample(hit_path, &(*game)->audio.device_spec, &(*game)->hit_sound) < 0) {
-		oshu_log_error("could not load hit.wav, aborting");
-		goto fail;
-	}
-
 	if (oshu_open_display(&(*game)->display) < 0) {
 		oshu_log_error("no display, aborting");
 		goto fail;
