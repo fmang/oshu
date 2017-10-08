@@ -163,7 +163,7 @@ struct oshu_audio {
 	 * When the need for looping samples arise, it would be smart to
 	 * dedicate a track for them.
 	 */
-	struct oshu_track effects[8];
+	struct oshu_track effects[16];
 	/**
 	 * A device ID returned by SDL, and required by most SDL audio
 	 * functions.
@@ -216,7 +216,7 @@ void oshu_pause_audio(struct oshu_audio *audio);
  * reached because all the effects tracks are used, the playback of one of
  * the samples is stopped to play the new sample.
  */
-void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample);
+void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, int volume);
 
 /**
  * Close the audio stream and free everything associated to it.
