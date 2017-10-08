@@ -150,6 +150,15 @@ struct oshu_timing_point {
 	 */
 	enum oshu_sample_set_family sample_set;
 	/**
+	 * Index of the sample set.
+	 *
+	 * Like 99 in `normal-hitclap99.wav`.
+	 *
+	 * This feature is not documented, but from a few beatmaps this is what
+	 * I have deduced so far.
+	 */
+	int sample_index;
+	/**
 	 * Volume of the samples, from 0 to 100%.
 	 *
 	 * It's an integer in the beatmap file.

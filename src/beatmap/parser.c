@@ -603,8 +603,8 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;
 	(*timing)->sample_set = value ? value : parser->beatmap->sample_set;
-	/* 5. Pretty much like 4, but skipped in the official parser. */
-	if (parse_int_sep(parser, &value, ',') < 0)
+	/* 5. Looks like this is the sample set index. */
+	if (parse_int_sep(parser, &(*timing)->sample_index, ',') < 0)
 		goto fail;
 	/* 6. Volume, from 0 to 100%. */
 	if (parse_int_sep(parser, &value, ',') < 0)
@@ -1127,8 +1127,9 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 		return -1;
 	hit->sound.additions_set = value ? value : hit->timing_point->sample_set;
 	/* 3. Custom sample set index. */
-	if (parse_int_sep(parser, &hit->sound.index, ':') < 0)
+	if (parse_int_sep(parser, &value, ':') < 0)
 		return -1;
+	hit->sound.index = value ? value : hit->timing_point->sample_index;
 	/* 4. Volume. */
 	if (parse_int_sep(parser, &value, ':') < 0)
 		return -1;
