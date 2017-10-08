@@ -161,9 +161,8 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
 /**
  * Find a sample given its attributes.
  *
- * If no appropriate sample was found, `*sample` is set to *NULL* and -1 is
- * returned. That kind of pseudo-error is safe to ignore, as it wouldn't fail
- * in any other way.
+ * If the wanted sample couldn't be found, return a sane replacement or, in the
+ * worst case scenario, set `*sample` to NULL.
  *
  * \sa oshu_play_sound
  */

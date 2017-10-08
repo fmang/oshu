@@ -166,9 +166,9 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, enu
 	/* Combine everything. */
 	int rc;
 	if (!index) /* augh */
-		rc = snprintf(buffer, size, "%s-%s.wav", set_name, type_name);
+		rc = snprintf(buffer, size, "%s-hit%s.wav", set_name, type_name);
 	else
-		rc = snprintf(buffer, size, "%s-%s%d.wav", set_name, type_name, index);
+		rc = snprintf(buffer, size, "%s-hit%s%d.wav", set_name, type_name, index);
 	if (rc < 0) {
 		oshu_log_error("sample file name formatting failed");
 		return -1;
@@ -184,7 +184,6 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
 	char filename[32];
 	if (make_sample_file_name(set, index, type, filename, sizeof(filename)) < 0)
 		return -1;
-	oshu_log_debug("registering %s", filename);
 	struct oshu_sound_room *room = get_room(library, set);
 	if (!room)
 		return -1;
@@ -196,6 +195,9 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
 	struct oshu_sample **sample = get_sample(shelf, type);
 	if (!sample)
 		return -1;
+	if (*sample) /* already loaded */
+		return 0;
+	oshu_log_debug("registering %s", filename);
 	*sample = calloc(1, sizeof(**sample));
 	assert (*sample != NULL);
 	assert (library->format != NULL);
@@ -219,8 +221,20 @@ void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sou
 		oshu_register_sample(library, sound->additions_set, sound->index, OSHU_CLAP_SAMPLE);
 }
 
+/**
+ * \todo
+ * Always load the default sample set.
+ *
+ * \todo
+ * Ensure that 0 is always the first shelf.
+ */
 void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap)
 {
-	for (struct oshu_hit *hit = beatmap->hits; hit; hit = hit->next)
+	for (struct oshu_hit *hit = beatmap->hits; hit; hit = hit->next) {
+		if (hit->type & OSHU_SLIDER_HIT) {
+			for (int i = 0; i <= hit->slider.repeat; ++i)
+				oshu_register_sound(library, &hit->slider.sounds[i]);
+		}
 		oshu_register_sound(library, &hit->sound);
+	}
 }
