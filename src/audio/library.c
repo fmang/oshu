@@ -221,15 +221,18 @@ void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sou
 		oshu_register_sample(library, sound->additions_set, sound->index, OSHU_CLAP_SAMPLE);
 }
 
-/**
- * \todo
- * Always load the default sample set.
- *
- * \todo
- * Ensure that 0 is always the first shelf.
- */
+static void populate_default(struct oshu_sound_library *library, enum oshu_sample_set_family set)
+{
+	oshu_register_sample(library, set, 0, OSHU_NORMAL_SAMPLE);
+	oshu_register_sample(library, set, 0, OSHU_WHISTLE_SAMPLE);
+	oshu_register_sample(library, set, 0, OSHU_FINISH_SAMPLE);
+	oshu_register_sample(library, set, 0, OSHU_CLAP_SAMPLE);
+}
+
 void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap)
 {
+	populate_default(library, OSHU_NORMAL_SAMPLE_SET);
+	populate_default(library, OSHU_SOFT_SAMPLE_SET);
 	for (struct oshu_hit *hit = beatmap->hits; hit; hit = hit->next) {
 		if (hit->type & OSHU_SLIDER_HIT) {
 			for (int i = 0; i <= hit->slider.repeat; ++i)
