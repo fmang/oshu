@@ -614,7 +614,7 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 		parser_error(parser, "invalid volume %d", value);
 		goto fail;
 	}
-	(*timing)->volume = (double) value / 100.;
+	(*timing)->volume = (float) value / 100.;
 	/* 7. Inherited flag. Useless? */
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;
@@ -1113,7 +1113,7 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 		hit->sound.sample_set = hit->timing_point->sample_set;
 		hit->sound.additions_set = hit->timing_point->sample_set;
 		hit->sound.index = hit->timing_point->sample_index;
-		hit->sound.volume = 1.;
+		hit->sound.volume = hit->timing_point->volume;
 		return 0;
 	}
 	if (consume_char(parser, ',') < 0)
@@ -1138,7 +1138,7 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 		parser_error(parser, "invalid volume %d", value);
 		return -1;
 	}
-	hit->sound.volume = value ? (double) value / 100. : 1.;
+	hit->sound.volume = value ? (float) value / 100. : hit->timing_point->volume;
 	/* 5. File name. */
 	/* Unsupported, so we consume everything. */
 	consume_all(parser);

@@ -302,7 +302,7 @@ static void play_sample(struct oshu_sound_library *library, enum oshu_sample_set
 {
 	struct oshu_sample *sample = find_sample(library, set, index, type);
 	if (sample)
-		oshu_play_sample(audio, sample, volume * .5);
+		oshu_play_sample(audio, sample, volume);
 }
 
 void oshu_play_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio)
