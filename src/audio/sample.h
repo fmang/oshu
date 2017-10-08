@@ -66,6 +66,8 @@ struct oshu_sample {
  * required. Note that this means the sample will be specific to that stream
  * only.
  *
+ * On failure, you may, but are not required to, call #oshu_destroy_sample.
+ *
  * \param path Path to the WAV file to load.
  * \param spec Target format of the sample. Must be stereo float samples.
  * \param sample An allocated #oshu_sample, initialized or not.

@@ -149,14 +149,14 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
  * \sa oshu_register_sample
  * \sa oshu_populate_library
  */
-int oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound);
+void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound);
 
 /**
  * Find every sample reference into a beatmap and load them into the library.
  *
  * \sa oshu_register_sounds
  */
-int oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap);
+void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap);
 
 /**
  * Find a sample given its attributes.
