@@ -164,8 +164,11 @@ struct oshu_timing_point {
 	 * Volume of the samples, from 0 to 100%.
 	 *
 	 * It's an integer in the beatmap file.
+	 *
+	 * It's stored as a float because the sample format the audio module
+	 * uses is also float.
 	 */
-	double volume;
+	float volume;
 	/**
 	 * Kiai mode. I guess it's when everything flashes on the screen.
 	 *

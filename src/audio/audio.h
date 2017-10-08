@@ -216,7 +216,7 @@ void oshu_pause_audio(struct oshu_audio *audio);
  * reached because all the effects tracks are used, the playback of one of
  * the samples is stopped to play the new sample.
  */
-void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, int volume);
+void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, float volume);
 
 /**
  * Close the audio stream and free everything associated to it.

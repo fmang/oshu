@@ -298,11 +298,11 @@ struct oshu_sample* find_sample(struct oshu_sound_library *library, enum oshu_sa
 /**
  * Find a single sample and play it.
  */
-static void play_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type, int volume, struct oshu_audio *audio)
+static void play_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type, float volume, struct oshu_audio *audio)
 {
 	struct oshu_sample *sample = find_sample(library, set, index, type);
 	if (sample)
-		oshu_play_sample(audio, sample, volume);
+		oshu_play_sample(audio, sample, volume * .5);
 }
 
 void oshu_play_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio)

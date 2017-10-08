@@ -157,13 +157,12 @@ static struct oshu_track *select_track(struct oshu_audio *audio)
 	return best_track;
 }
 
-void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, int volume)
+void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, float volume)
 {
 	SDL_LockAudioDevice(audio->device_id);
 	struct oshu_track *track = select_track(audio);
 	if (track->sample != NULL)
 		oshu_log_debug("all the effect tracks are taken, stealing one");
-	/* scale down the volume because it gets noisy */
-	oshu_start_track(track, sample, volume * .7);
+	oshu_start_track(track, sample, volume);
 	SDL_UnlockAudioDevice(audio->device_id);
 }
