@@ -31,13 +31,16 @@ struct SDL_AudioSpec;
  * 	Hall -> "Normal room"
  * 	Hall -> "Soft room"
  * 	Hall -> "Drum room"
- * 	"Normal room" -> "Shelf #0"
- * 	"Shelf #0" -> "Normal sound"
- * 	"Shelf #0" -> "Whistle sound"
- * 	"Shelf #0" -> "Finish sound"
- * 	"Shelf #0" -> "Clap sound"
+ * 	"Normal room" -> "Shelf #1"
+ * 	"Shelf #1" -> "Normal sound"
+ * 	"Shelf #1" -> "Whistle sound"
+ * 	"Shelf #1" -> "Finish sound"
+ * 	"Shelf #1" -> "Clap sound"
  * }
  * \enddot
+ *
+ * The default index is 1. The beatmap may mention the special 0 value which
+ * means it's the default index, or the inherited one.
  *
  * \{
  */

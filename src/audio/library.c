@@ -169,7 +169,7 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, enu
 	}
 	/* Combine everything. */
 	int rc;
-	if (!index) /* augh */
+	if (index == 1) /* augh */
 		rc = snprintf(buffer, size, "%s-hit%s.wav", set_name, type_name);
 	else
 		rc = snprintf(buffer, size, "%s-hit%s%d.wav", set_name, type_name, index);
@@ -254,10 +254,10 @@ void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sou
 
 static void populate_default(struct oshu_sound_library *library, enum oshu_sample_set_family set)
 {
-	oshu_register_sample(library, set, 0, OSHU_NORMAL_SAMPLE);
-	oshu_register_sample(library, set, 0, OSHU_WHISTLE_SAMPLE);
-	oshu_register_sample(library, set, 0, OSHU_FINISH_SAMPLE);
-	oshu_register_sample(library, set, 0, OSHU_CLAP_SAMPLE);
+	oshu_register_sample(library, set, 1, OSHU_NORMAL_SAMPLE);
+	oshu_register_sample(library, set, 1, OSHU_WHISTLE_SAMPLE);
+	oshu_register_sample(library, set, 1, OSHU_FINISH_SAMPLE);
+	oshu_register_sample(library, set, 1, OSHU_CLAP_SAMPLE);
 }
 
 void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap)

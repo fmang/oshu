@@ -156,6 +156,8 @@ struct oshu_timing_point {
 	 *
 	 * This feature is not documented, but from a few beatmaps this is what
 	 * I have deduced so far.
+	 *
+	 * When it's written 0 in the beatmap, it actually means 1.
 	 */
 	int sample_index;
 	/**
