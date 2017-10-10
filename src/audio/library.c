@@ -240,11 +240,8 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
 	assert (library->format != NULL);
 	int rc = oshu_load_sample(path, library->format, *sample);
 	free(path);
-	if (rc < 0) {
-		free(*sample);
-		*sample = NULL;
-		return -1;
-	}
+	if (rc < 0)
+		oshu_log_debug("continuing the process with an empty sample");
 	return 0;
 }
 

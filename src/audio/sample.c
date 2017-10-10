@@ -55,7 +55,7 @@ int oshu_load_sample(const char *path, SDL_AudioSpec *spec, struct oshu_sample *
 	SDL_AudioSpec wav_spec;
 	SDL_AudioSpec *wav = SDL_LoadWAV(path, &wav_spec, (Uint8**) &sample->samples, &sample->size);
 	if (wav == NULL) {
-		oshu_log_error("SDL error when loading the sample: %s", SDL_GetError());
+		oshu_log_debug("SDL error when loading the sample: %s", SDL_GetError());
 		goto fail;
 	}
 	if (convert_audio(spec, wav, sample) < 0)
