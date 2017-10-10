@@ -27,6 +27,9 @@ void oshu_stop_track(struct oshu_track *track)
 
 int oshu_mix_track(struct oshu_track *track, float *samples, int nb_samples)
 {
+	if (track->sample->nb_samples == 0)
+		return 0;
+		/* ^ prevent looping on an empty sample */
 	int wanted = nb_samples;
 	while (wanted > 0 && track->sample) {
 		int left = track->sample->nb_samples - track->cursor;
