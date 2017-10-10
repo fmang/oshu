@@ -6,6 +6,7 @@
 #include "audio/sample.h"
 #include "audio/track.h"
 
+#include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -14,6 +15,8 @@ static const int channels = 2;
 
 void oshu_start_track(struct oshu_track *track, struct oshu_sample *sample, float volume, int loop)
 {
+	if (sample && sample->nb_samples == 0)
+		sample = NULL;
 	track->sample = sample;
 	track->cursor = 0;
 	track->volume = volume;
@@ -27,17 +30,16 @@ void oshu_stop_track(struct oshu_track *track)
 
 int oshu_mix_track(struct oshu_track *track, float *samples, int nb_samples)
 {
-	if (track->sample->nb_samples == 0)
-		return 0;
-		/* ^ prevent looping on an empty sample */
 	int wanted = nb_samples;
 	while (wanted > 0 && track->sample) {
 		int left = track->sample->nb_samples - track->cursor;
 		if (left == 0) {
-			if (track->loop)
+			if (track->loop) {
+				assert (track->sample->nb_samples > 0);
 				track->cursor = 0;
-			else
+			} else {
 				track->sample = NULL;
+			}
 			continue;
 		}
 		int consume = left < wanted ? left : wanted;
