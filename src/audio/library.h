@@ -45,6 +45,10 @@ struct SDL_AudioSpec;
  * \{
  */
 
+enum oshu_sound_shelf_index {
+	OSHU_DEFAULT_SHELF = 1,
+};
+
 /**
  * Each sample in a shelf is a pointer to a sample.
  *

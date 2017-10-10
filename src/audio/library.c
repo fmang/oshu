@@ -254,10 +254,10 @@ void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sou
 
 static void populate_default(struct oshu_sound_library *library, enum oshu_sample_set_family set)
 {
-	oshu_register_sample(library, set, 1, OSHU_NORMAL_SAMPLE);
-	oshu_register_sample(library, set, 1, OSHU_WHISTLE_SAMPLE);
-	oshu_register_sample(library, set, 1, OSHU_FINISH_SAMPLE);
-	oshu_register_sample(library, set, 1, OSHU_CLAP_SAMPLE);
+	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_NORMAL_SAMPLE);
+	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_WHISTLE_SAMPLE);
+	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_FINISH_SAMPLE);
+	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_CLAP_SAMPLE);
 }
 
 void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap)
@@ -288,8 +288,15 @@ struct oshu_sample* find_sample(struct oshu_sound_library *library, enum oshu_sa
 		return NULL;
 	struct oshu_sound_shelf *shelf = find_shelf(room, index);
 	if (!shelf)
-		return NULL;
+		goto round2;
 	struct oshu_sample **sample = get_sample(shelf, type);
+	if (sample && *sample)
+		return *sample;
+round2:
+	shelf = find_shelf(room, OSHU_DEFAULT_SHELF);
+	if (!shelf)
+		return NULL;
+	sample = get_sample(shelf, type);
 	if (!sample)
 		return NULL;
 	return *sample;
