@@ -765,7 +765,7 @@ static void fill_slider_additions(struct oshu_hit *hit)
 	for (int i = 0; i <= hit->slider.repeat; ++i) {
 		struct oshu_hit_sound *s = &hit->slider.sounds[i];
 		if (!s->additions)
-			s->additions = OSHU_NORMAL_SAMPLE;
+			s->additions = OSHU_NORMAL_SOUND;
 		if (!s->sample_set)
 			s->sample_set = hit->sound.sample_set;
 		if (!s->additions_set)
@@ -863,7 +863,9 @@ static int parse_common_hit(struct parser_state *parser, struct oshu_hit *hit)
 	if (parse_int(parser, &hit->sound.additions) < 0)
 		return -1;
 	if (!hit->sound.additions)
-		hit->sound.additions = OSHU_NORMAL_SAMPLE;
+		hit->sound.additions = OSHU_NORMAL_SOUND;
+	if (hit->type & OSHU_SLIDER_HIT)
+		hit->sound.additions |= OSHU_SLIDER_SOUND;
 	return 0;
 }
 

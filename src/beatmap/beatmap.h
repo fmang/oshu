@@ -71,21 +71,52 @@ enum oshu_sample_set_family {
 };
 
 /**
- * Hit sounds to play on top of the normal hit sound.
+ * Types of hit sounds.
+ *
+ * They're composed of two parts. The low bits store the sound effect, like
+ * normal, whistle, finish and clap. The higher bits store the target object
+ * type, like hit or slider.
  *
  * They can be OR'd, so you should store them in an *int*.
  */
-enum oshu_sample_type {
+enum oshu_sound_type {
 	/**
 	 * The first bit is undocumented, but it stands for Normal according to
 	 * the source code of osu.
 	 *
 	 * 0 means None, so I guess it's a silent note.
 	 */
-	OSHU_NORMAL_SAMPLE = 1,
-	OSHU_WHISTLE_SAMPLE = 2,
-	OSHU_FINISH_SAMPLE = 4,
-	OSHU_CLAP_SAMPLE = 8,
+	OSHU_NORMAL_SOUND = 1,
+	OSHU_WHISTLE_SOUND = 2,
+	OSHU_FINISH_SOUND = 4,
+	OSHU_CLAP_SOUND = 8,
+	/**
+	 * OR this with your sound type to make it a hit sound.
+	 *
+	 * Note that it's set to 0, and therefore is theoritically optional.
+	 */
+	OSHU_HIT_SOUND = 0,
+	/**
+	 * OR this with your sound type and you'll make it a sliding slider
+	 * sound.
+	 *
+	 * Looks like only OSHU_NORMAL_SOUND and OSHU_WHISTLE_SOUND may be
+	 * combined with these.
+	 *
+	 * Slider sounds are meant to be looped, unlike hit sounds.
+	 */
+	OSHU_SLIDER_SOUND = 0x80,
+	/**
+	 * AND this with your combined sound type to retrieve the sound type:
+	 * #OSHU_NORMAL_SOUND, #OSHU_WHISTLE_SOUND, #OSHU_FINISH_SOUND,
+	 * #OSHU_CLAP_SOUND.
+	 */
+	OSHU_SOUND_MASK = 0x7F,
+	/**
+	 * AND this with your combined sound type to retrieve the target hit:
+	 * #OSHU_HIT_SOUND, #OSHU_SLIDER_SOUND.
+	 */
+	OSHU_SOUND_TARGET = 0x80,
 };
 
 /**

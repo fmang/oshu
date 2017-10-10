@@ -55,10 +55,12 @@ enum oshu_sound_shelf_index {
  * These pointers are NULL when no sample is available.
  */
 struct oshu_sound_shelf {
-	struct oshu_sample *normal;
-	struct oshu_sample *whistle;
-	struct oshu_sample *finish;
-	struct oshu_sample *clap;
+	struct oshu_sample *hit_normal;
+	struct oshu_sample *hit_whistle;
+	struct oshu_sample *hit_finish;
+	struct oshu_sample *hit_clap;
+	struct oshu_sample *slider_slide;
+	struct oshu_sample *slider_whistle;
 };
 
 /**
@@ -146,9 +148,11 @@ void oshu_close_sound_library(struct oshu_sound_library *library);
 /**
  * Locate a sample on the filesystem and insert it into the library.
  *
+ * *type* is an OR'd combination of #oshu_sound_type.
+ *
  * \sa oshu_register_sounds
  */
-int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sample_type type);
+int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type);
 
 /**
  * Load every sample required to play a hit sound effect.
@@ -169,6 +173,8 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
  * Play all the samples associated to the hit sound.
  *
  * If one of the required samples wasn't found, it is ignored.
+ *
+ * If the sound is for a slider, its sample is looped until you call #oshu_stop_loop.
  *
  * \sa oshu_find_sample
  */
