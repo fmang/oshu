@@ -162,8 +162,18 @@ struct oshu_audio {
 	 *
 	 * When the need for looping samples arise, it would be smart to
 	 * dedicate a track for them.
+	 *
+	 * \sa oshu_play_sample
 	 */
 	struct oshu_track effects[16];
+	/**
+	 * Special track for the looping sample.
+	 *
+	 * As you can see, only one loop is supported.
+	 *
+	 * \sa oshu_play_loop
+	 */
+	struct oshu_track looping;
 	/**
 	 * A device ID returned by SDL, and required by most SDL audio
 	 * functions.
@@ -217,6 +227,28 @@ void oshu_pause_audio(struct oshu_audio *audio);
  * the samples is stopped to play the new sample.
  */
 void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, float volume);
+
+/**
+ * Play a looping sample.
+ *
+ * Currently, only one looping sample may be played at a time. Calling this
+ * function cancels any other looping sample.
+ *
+ * \sa oshu_play_sample
+ * \sa oshu_stop_loop
+ */
+void oshu_play_loop(struct oshu_audio *audio, struct oshu_sample *sample, float volume);
+
+/**
+ * Stop the looping sample.
+ *
+ * Since only one sample may be played at a time, it's not ambiguous. In the
+ * future, if more looping samples are supported, this function's prototype
+ * would change.
+ *
+ * \sa oshu_play_loop
+ */
+void oshu_stop_loop(struct oshu_audio *audio);
 
 /**
  * Close the audio stream and free everything associated to it.

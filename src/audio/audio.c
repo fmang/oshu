@@ -71,6 +71,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
 	int tracks = sizeof(audio->effects) / sizeof(*audio->effects);
 	for (int i = 0; i < tracks; i++)
 		oshu_mix_track(&audio->effects[i], samples, nb_samples);
+	oshu_mix_track(&audio->looping, samples, nb_samples);
 
 	clip(samples, nb_samples, audio->device_spec.channels);
 }
@@ -163,6 +164,20 @@ void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, floa
 	struct oshu_track *track = select_track(audio);
 	if (track->sample != NULL)
 		oshu_log_debug("all the effect tracks are taken, stealing one");
-	oshu_start_track(track, sample, volume);
+	oshu_start_track(track, sample, volume, 0);
+	SDL_UnlockAudioDevice(audio->device_id);
+}
+
+void oshu_play_loop(struct oshu_audio *audio, struct oshu_sample *sample, float volume)
+{
+	SDL_LockAudioDevice(audio->device_id);
+	oshu_start_track(&audio->looping, sample, volume, 1);
+	SDL_UnlockAudioDevice(audio->device_id);
+}
+
+void oshu_stop_loop(struct oshu_audio *audio)
+{
+	SDL_LockAudioDevice(audio->device_id);
+	oshu_stop_track(&audio->looping);
 	SDL_UnlockAudioDevice(audio->device_id);
 }

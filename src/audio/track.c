@@ -12,12 +12,12 @@
 /** Work in stereo. */
 static const int channels = 2;
 
-void oshu_start_track(struct oshu_track *track, struct oshu_sample *sample, float volume)
+void oshu_start_track(struct oshu_track *track, struct oshu_sample *sample, float volume, int loop)
 {
 	track->sample = sample;
 	track->cursor = 0;
 	track->volume = volume;
-	track->loop = 0;
+	track->loop = loop;
 }
 
 void oshu_stop_track(struct oshu_track *track)

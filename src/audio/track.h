@@ -69,7 +69,7 @@ struct oshu_track {
  *
  * \sa oshu_track
  */
-void oshu_start_track(struct oshu_track *track, struct oshu_sample *sample, float volume);
+void oshu_start_track(struct oshu_track *track, struct oshu_sample *sample, float volume, int loop);
 
 /**
  * Stop the playback on a track.
