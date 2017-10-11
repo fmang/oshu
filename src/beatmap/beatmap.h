@@ -104,6 +104,11 @@ enum oshu_sound_type {
 	 * combined with these.
 	 *
 	 * Slider sounds are meant to be looped, unlike hit sounds.
+	 *
+	 * \todo
+	 * Figure out what the sound type 8 means for sliders, because it *is*
+	 * used by some beatmaps. It can't be a looping clap, right? Besides,
+	 * there's no such file as `sliderclap.wav`.
 	 */
 	OSHU_SLIDER_SOUND = 0x80,
 	/**
