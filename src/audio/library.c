@@ -115,7 +115,7 @@ static struct oshu_sound_room* get_room(struct oshu_sound_library *library, enum
 	case OSHU_SOFT_SAMPLE_SET:   return &library->soft;
 	case OSHU_DRUM_SAMPLE_SET:   return &library->drum;
 	default:
-		oshu_log_warning("unknown sample set %d", (int) set);
+		oshu_log_debug("unknown sample set %d", (int) set);
 		return NULL;
 	}
 }
@@ -135,7 +135,7 @@ static struct oshu_sample** get_sample(struct oshu_sound_shelf *shelf, int type)
 	case OSHU_SLIDER_SOUND|OSHU_NORMAL_SOUND:  return &shelf->slider_slide;
 	case OSHU_SLIDER_SOUND|OSHU_WHISTLE_SOUND: return &shelf->slider_whistle;
 	default:
-		oshu_log_warning("unknown sample type %d", (int) type);
+		oshu_log_debug("unknown sample type %d", (int) type);
 		return NULL;
 	}
 }
@@ -159,7 +159,7 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, int
 	case OSHU_SOFT_SAMPLE_SET:   set_name = "soft"; break;
 	case OSHU_DRUM_SAMPLE_SET:   set_name = "drum"; break;
 	default:
-		oshu_log_warning("unknown sample set %d", (int) set);
+		oshu_log_debug("unknown sample set %d", (int) set);
 		return -1;
 	}
 	/* Type name. */
@@ -172,7 +172,7 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, int
 	case OSHU_SLIDER_SOUND|OSHU_NORMAL_SOUND:  type_name = "sliderslide"; break;
 	case OSHU_SLIDER_SOUND|OSHU_WHISTLE_SOUND: type_name = "sliderwhistle"; break;
 	default:
-		oshu_log_warning("unknown sample type %d", (int) set);
+		oshu_log_debug("unknown sample type %d", (int) set);
 		return -1;
 	}
 	/* Combine everything. */
