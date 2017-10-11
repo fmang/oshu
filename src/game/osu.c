@@ -49,6 +49,7 @@ static void hit(struct oshu_game *game)
 			if (hit->type & OSHU_SLIDER_HIT) {
 				hit->state = OSHU_SLIDING_HIT;
 				game->osu.current_slider = hit;
+				oshu_play_sound(&game->library, &hit->sound, &game->audio);
 				oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
 			} else if (hit->type & OSHU_CIRCLE_HIT) {
 				hit->state = OSHU_GOOD_HIT;
@@ -77,6 +78,7 @@ static void release_hit(struct oshu_game *game)
 		hit->state = OSHU_GOOD_HIT;
 		oshu_play_sound(&game->library, &hit->slider.sounds[hit->slider.repeat], &game->audio);
 	}
+	oshu_stop_loop(&game->audio);
 	game->osu.current_slider = NULL;
 }
 
@@ -95,6 +97,7 @@ static void check_slider(struct oshu_game *game)
 	double t = (game->clock.now - hit->time) / hit->slider.duration;
 	double prev_t = (game->clock.before - hit->time) / hit->slider.duration;
 	if (game->clock.now > oshu_hit_end_time(hit)) {
+		oshu_stop_loop(&game->audio);
 		game->osu.current_slider = NULL;
 		hit->state = OSHU_GOOD_HIT;
 		oshu_play_sound(&game->library, &hit->slider.sounds[hit->slider.repeat], &game->audio);
@@ -107,6 +110,7 @@ static void check_slider(struct oshu_game *game)
 	struct oshu_point mouse = oshu_get_mouse(game->display);
 	double dist = oshu_distance(ball, mouse);
 	if (dist > game->beatmap.difficulty.slider_tolerance) {
+		oshu_stop_loop(&game->audio);
 		game->osu.current_slider = NULL;
 		hit->state = OSHU_MISSED_HIT;
 	}
@@ -131,6 +135,7 @@ static void check_audio(struct oshu_game *game)
 				if (hit->type & OSHU_SLIDER_HIT) {
 					hit->state = OSHU_SLIDING_HIT;
 					game->osu.current_slider = hit;
+					oshu_play_sound(&game->library, &hit->sound, &game->audio);
 					oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
 				} else if (hit->type & OSHU_CIRCLE_HIT) {
 					hit->state = OSHU_GOOD_HIT;
