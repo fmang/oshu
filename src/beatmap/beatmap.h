@@ -272,9 +272,9 @@ struct oshu_hit_sound {
 	 */
 	enum oshu_sample_set_family sample_set;
 	/**
-	 * Combination of flags from #oshu_sample_type.
+	 * Combination of flags from #oshu_sound_type.
 	 *
-	 * To play the normal sound, #OSHU_NORMAL_SAMPLE must be enabled.
+	 * To play the normal sound, #OSHU_NORMAL_SOUND must be enabled.
 	 *
 	 * The sample set to use for these additions is defined by the
 	 * #additions_set field, while the normal sound's sample set is defined
