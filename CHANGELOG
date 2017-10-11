@@ -1,6 +1,23 @@
 Changelog
 =========
 
+1.3.0 - ETA 2017-10-15
+----------------------
+
+Hit sounds!
+
+While the hi-hat was a perfectly decent generic soft sound, exploiting the full
+audio sample range gives a completely different experience. Now you'll hear
+rythmic drums if you play well, and somethings other nice sound effects.
+
+With this release comes a new parser, much more accurate than the previous one.
+When a beatmap contains an error, the error is displayed and everyone is
+invited to report them as oshu issues, because it's likely something is
+missing.
+
+The audio backend is also completely revamped to feature a flexible way to play
+many sound effects at once. It should also be much more readable and organized.
+
 1.2.0 - 2017-09-16
 ------------------
 
