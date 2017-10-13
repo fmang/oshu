@@ -22,5 +22,7 @@ Makefile.in
 /docs/latex
 /docs/oshu.1
 
+/share/samples*
+
 /src/oshu
 /oshu-*.tar.*
