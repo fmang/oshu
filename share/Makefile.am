@@ -23,11 +23,9 @@ dist_samples_DATA = \
 	samples/drum-sliderwhistle.wav \
 	samples/normal-slidertick.wav
 
-samples/README.md: samples-v1.tar.bz2
+samples/README.md:
+	wget -c https://www.mg0.fr/oshu/samples-v1.tar.bz2
 	tar xf samples-v1.tar.bz2
-
-samples-v1.tar.bz2:
-	wget https://www.mg0.fr/oshu/samples-v1.tar.bz2
-	@sha256sum --check - <<< '3a7c47d0be9e820d2384adb77a0edc3ddd22b9a0689efe9c090f69246e0ea623  samples-v1.tar.bz2' || echo -e "\nWARNING:\nThe SHA-256 sum of the sample archive is not correct. This means it has been modified after the current code release. Use it at your own risk!\n"
+	@sha256sum --check samples.SHA256SUMS || echo -e "\nWARNING:\nThe SHA-256 sum of the sample archive is not correct. This means it has been modified after the current code release. Use it at your own risk!\n"
 
 EXTRA_DIST = CREDITS
