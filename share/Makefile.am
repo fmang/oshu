@@ -48,5 +48,3 @@ samples/README.md:
 		false ; \
 	fi
 	tar xf samples-v1.tar.bz2
-
-EXTRA_DIST = CREDITS
