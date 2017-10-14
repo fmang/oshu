@@ -20,12 +20,6 @@ terms are dereferenced.
 \fB.osz\fR files are not supported, but since they're just fancy ZIP files, you
 just have to unzip them into a sub-directory. Be careful though, it won't
 create the sub-directory by itself if you naively unzip it.
-.PP
-A \fIhit.wav\fR file is required in order to play the sound effect when
-clicking on a hit object. oshu! will first look into the current directory for
-a file named like that. If it cannot find it, it will look into the default
-data directory, configured at build time. By default,
-\fI/usr/local/share/oshu/hit.wav\fR.
 .TP
 \fB\-v, \-\-verbose\fR
 Increase the verbosity. This will print debugging messages, which may contain
