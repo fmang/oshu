@@ -105,16 +105,16 @@ struct oshu_game {
 /**
  * Create the game context for a beatmap, and load all the associated assets.
  */
-int oshu_game_create(const char *beatmap_path, struct oshu_game **game);
+int oshu_create_game(const char *beatmap_path, struct oshu_game *game);
 
 /**
  * Free the memory for everything, and set `*game` to *NULL*.
  */
-void oshu_game_destroy(struct oshu_game **game);
+void oshu_destroy_game(struct oshu_game *game);
 
 /**
  * Start the main event loop.
  */
-int oshu_game_run(struct oshu_game *game);
+int oshu_run_game(struct oshu_game *game);
 
 /** \} */

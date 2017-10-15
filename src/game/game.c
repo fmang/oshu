@@ -25,54 +25,56 @@ static void setup_view(struct oshu_display *display)
 	oshu_resize_view(&display->view, 512, 384);
 }
 
-int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
+/**
+ * \todo
+ * Cleanup the allocated memory on failure.
+ */
+int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 {
-	*game = calloc(1, sizeof(**game));
-
-	if (oshu_load_beatmap(beatmap_path, &(*game)->beatmap) < 0) {
+	if (oshu_load_beatmap(beatmap_path, &game->beatmap) < 0) {
 		oshu_log_error("no beatmap, aborting");
 		goto fail;
 	}
-	if ((*game)->beatmap.mode == OSHU_OSU_MODE) {
-		(*game)->mode = &oshu_osu_mode;
+	if (game->beatmap.mode == OSHU_OSU_MODE) {
+		game->mode = &oshu_osu_mode;
 	} else {
 		oshu_log_error("unsupported game mode");
 		goto fail;
 	}
-	(*game)->hit_cursor = (*game)->beatmap.hits;
+	game->hit_cursor = game->beatmap.hits;
 
-	if (oshu_open_audio((*game)->beatmap.audio_filename, &(*game)->audio) < 0) {
+	if (oshu_open_audio(game->beatmap.audio_filename, &game->audio) < 0) {
 		oshu_log_error("no audio, aborting");
 		goto fail;
 	}
 
-	if (oshu_open_display(&(*game)->display) < 0) {
+	if (oshu_open_display(&game->display) < 0) {
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
-	setup_view(&(*game)->display);
+	setup_view(&game->display);
 
-	if ((*game)->beatmap.background_filename) {
-		(*game)->background = IMG_LoadTexture((*game)->display.renderer, (*game)->beatmap.background_filename);
-		if ((*game)->background)
-			SDL_SetTextureColorMod((*game)->background, 64, 64, 64);
+	if (game->beatmap.background_filename) {
+		game->background = IMG_LoadTexture(game->display.renderer, game->beatmap.background_filename);
+		if (game->background)
+			SDL_SetTextureColorMod(game->background, 64, 64, 64);
 	}
 
-	if ((*game)->beatmap.audio_lead_in > 0) {
-		(*game)->clock.now = - (*game)->beatmap.audio_lead_in;
+	if (game->beatmap.audio_lead_in > 0) {
+		game->clock.now = - game->beatmap.audio_lead_in;
 	} else {
-		double first_hit = (*game)->beatmap.hits->time;
+		double first_hit = game->beatmap.hits->time;
 		if (first_hit < 1.)
-			(*game)->clock.now = first_hit - 1.;
+			game->clock.now = first_hit - 1.;
 	}
-	(*game)->clock.ticks = SDL_GetTicks();
+	game->clock.ticks = SDL_GetTicks();
 
-	oshu_open_sound_library(&(*game)->library, &(*game)->audio.device_spec);
-	oshu_populate_library(&(*game)->library, &(*game)->beatmap);
+	oshu_open_sound_library(&game->library, &game->audio.device_spec);
+	oshu_populate_library(&game->library, &game->beatmap);
 
 	return 0;
+
 fail:
-	oshu_game_destroy(game);
 	return -1;
 }
 
@@ -240,7 +242,7 @@ static void update_clock(struct oshu_game *game)
 		clock->now = clock->before;
 }
 
-int oshu_game_run(struct oshu_game *game)
+int oshu_run_game(struct oshu_game *game)
 {
 	SDL_Event event;
 	if (!game->paused && game->clock.now >= 0)
@@ -263,19 +265,15 @@ int oshu_game_run(struct oshu_game *game)
 	return 0;
 }
 
-void oshu_game_destroy(struct oshu_game **game)
+void oshu_destroy_game(struct oshu_game *game)
 {
 	if (!game)
 		return;
-	if (!*game)
-		return;
-	if ((*game)->background)
-		SDL_DestroyTexture((*game)->background);
-	oshu_close_display(&(*game)->display);
-	oshu_close_sound_library(&(*game)->library);
-	oshu_close_audio(&(*game)->audio);
-	if ((*game)->beatmap.hits)
-		oshu_destroy_beatmap(&(*game)->beatmap);
-	free(*game);
-	*game = NULL;
+	if (game->background)
+		SDL_DestroyTexture(game->background);
+	oshu_close_display(&game->display);
+	oshu_close_sound_library(&game->library);
+	oshu_close_audio(&game->audio);
+	if (game->beatmap.hits)
+		oshu_destroy_beatmap(&game->beatmap);
 }

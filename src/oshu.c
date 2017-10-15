@@ -52,12 +52,11 @@ static const char *help =
 	"Check the man page oshu(1) for details.\n"
 ;
 
-static struct oshu_game *current_game;
+static struct oshu_game current_game;
 
 static void signal_handler(int signum)
 {
-	if (current_game)
-		current_game->stop = 1;
+	current_game.stop = 1;
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -69,28 +68,26 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		return -1;
 	}
 
-	if ((rc = oshu_game_create(beatmap_path, &current_game)) < 0) {
+	if ((rc = oshu_create_game(beatmap_path, &current_game)) < 0) {
 		oshu_log_error("game initialization failed");
-		goto done;
+		return -1;
 	}
 
-	current_game->autoplay = autoplay;
-	current_game->paused = pause;
+	current_game.autoplay = autoplay;
+	current_game.paused = pause;
 
 	char *title;
 	if (asprintf(&title, "%s - oshu!", beatmap_path) >= 0) {
-		SDL_SetWindowTitle(current_game->display.window, title);
+		SDL_SetWindowTitle(current_game.display.window, title);
 		free(title);
 	}
 
-	if ((rc = oshu_game_run(current_game)) < 0) {
+	if ((rc = oshu_run_game(&current_game)) < 0) {
 		oshu_log_error("error while running the game, aborting");
-		goto done;
+		return -1;
 	}
 
-done:
-	if (current_game)
-		oshu_game_destroy(&current_game);
+	oshu_destroy_game(&current_game);
 	SDL_Quit();
 	return rc;
 }
