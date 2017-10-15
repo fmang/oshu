@@ -21,6 +21,30 @@ mania and taiko mode could be played in a terminal!
 Let's make a compatible lightweight version of the game!
 
 
+Getting started
+---------------
+
+First, you need to download a few beatmaps from osu's website.
+See https://osu.ppy.sh/p/packlist to get packs, or
+https://osu.ppy.sh/p/beatmaplist for a finer selection.
+
+The beatmaps are distributed as *.osz* files, which are disguised ZIP files.
+You need to extract using *unzip* or a similar tool. Rename them to *.zip* if
+your file archiver can't process it. Once extracted, you'll see one or more
+*.osu* files with various difficulty levels.
+
+oshu! is meant to be started from the command-line, so go spawn your terminal
+and run `oshu path/to/your/beatmap.osu`.
+
+A window will open and you'll see circles appear on the screen. You got to
+click the crosses when the orange circle reaches the white one. Hold the button
+pressed for long notes. Most players point with the mouse and press the Z/X
+keyboard keys instead of clicking.
+
+For more detailed explainations, see:
+https://www.youtube.com/results?search_query=osu+tutorial
+
+
 Install
 -------
 
