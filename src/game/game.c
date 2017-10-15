@@ -269,10 +269,11 @@ void oshu_game_destroy(struct oshu_game **game)
 		return;
 	if (!*game)
 		return;
-	oshu_close_audio(&(*game)->audio);
-	oshu_close_display(&(*game)->display);
 	if ((*game)->background)
 		SDL_DestroyTexture((*game)->background);
+	oshu_close_display(&(*game)->display);
+	oshu_close_sound_library(&(*game)->library);
+	oshu_close_audio(&(*game)->audio);
 	if ((*game)->beatmap.hits)
 		oshu_destroy_beatmap(&(*game)->beatmap);
 	free(*game);
