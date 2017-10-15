@@ -73,7 +73,7 @@ struct oshu_game {
 	struct oshu_beatmap beatmap;
 	struct oshu_audio audio;
 	struct oshu_sound_library library;
-	struct oshu_display *display;
+	struct oshu_display display;
 	struct oshu_game_mode *mode;
 	struct oshu_clock clock;
 	/** Will stop a the next iteration if this is true. */

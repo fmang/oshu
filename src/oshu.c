@@ -79,7 +79,7 @@ int run(const char *beatmap_path, int autoplay, int pause)
 
 	char *title;
 	if (asprintf(&title, "%s - oshu!", beatmap_path) >= 0) {
-		SDL_SetWindowTitle(current_game->display->window, title);
+		SDL_SetWindowTitle(current_game->display.window, title);
 		free(title);
 	}
 

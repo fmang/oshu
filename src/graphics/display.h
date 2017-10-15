@@ -201,14 +201,18 @@ struct oshu_display {
 /**
  * Create a display structure, open the SDL window and create the renderer.
  *
+ * *display* must be null-initialized.
+ *
  * \sa oshu_close_display
  */
-int oshu_open_display(struct oshu_display **display);
+int oshu_open_display(struct oshu_display *display);
 
 /**
  * Free the display structure and everything associated to it.
+ *
+ * *display* is left in an unspecified state.
  */
-void oshu_close_display(struct oshu_display **display);
+void oshu_close_display(struct oshu_display *display);
 
 /**
  * Resize the game area to fit the new size of the window.

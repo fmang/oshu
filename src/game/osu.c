@@ -42,7 +42,7 @@ static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
  */
 static void hit(struct oshu_game *game)
 {
-	struct oshu_point mouse = oshu_get_mouse(game->display);
+	struct oshu_point mouse = oshu_get_mouse(&game->display);
 	struct oshu_hit *hit = find_hit(game, mouse);
 	if (hit) {
 		if (fabs(hit->time - game->clock.now) < game->beatmap.difficulty.leniency) {
@@ -107,7 +107,7 @@ static void check_slider(struct oshu_game *game)
 	if (game->autoplay)
 		return;
 	struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
-	struct oshu_point mouse = oshu_get_mouse(game->display);
+	struct oshu_point mouse = oshu_get_mouse(&game->display);
 	double dist = oshu_distance(ball, mouse);
 	if (dist > game->beatmap.difficulty.slider_tolerance) {
 		oshu_stop_loop(&game->audio);
@@ -172,7 +172,7 @@ static int check(struct oshu_game *game)
 
 static int draw(struct oshu_game *game)
 {
-	oshu_draw_beatmap(game->display, &game->beatmap, game->hit_cursor, game->clock.now);
+	oshu_draw_beatmap(&game->display, &game->beatmap, game->hit_cursor, game->clock.now);
 	return 0;
 }
 

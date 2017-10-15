@@ -50,10 +50,10 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
-	setup_view((*game)->display);
+	setup_view(&(*game)->display);
 
 	if ((*game)->beatmap.background_filename) {
-		(*game)->background = IMG_LoadTexture((*game)->display->renderer, (*game)->beatmap.background_filename);
+		(*game)->background = IMG_LoadTexture((*game)->display.renderer, (*game)->beatmap.background_filename);
 		if ((*game)->background)
 			SDL_SetTextureColorMod((*game)->background, 64, 64, 64);
 	}
@@ -129,7 +129,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			setup_view(game->display);
+			setup_view(&game->display);
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
@@ -193,10 +193,10 @@ static void dump_state(struct oshu_game *game)
 
 static void draw(struct oshu_game *game)
 {
-	SDL_SetRenderDrawColor(game->display->renderer, 0, 0, 0, 255);
-	SDL_RenderClear(game->display->renderer);
+	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
+	SDL_RenderClear(game->display.renderer);
 	if (game->background)
-		oshu_draw_background(game->display, game->background);
+		oshu_draw_background(&game->display, game->background);
 	if (game->mode->draw)
 		game->mode->draw(game);
 }
@@ -270,10 +270,9 @@ void oshu_game_destroy(struct oshu_game **game)
 	if (!*game)
 		return;
 	oshu_close_audio(&(*game)->audio);
+	oshu_close_display(&(*game)->display);
 	if ((*game)->background)
 		SDL_DestroyTexture((*game)->background);
-	if ((*game)->display)
-		oshu_close_display(&(*game)->display);
 	if ((*game)->beatmap.hits)
 		oshu_destroy_beatmap(&(*game)->beatmap);
 	free(*game);

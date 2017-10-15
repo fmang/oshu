@@ -76,33 +76,23 @@ fail:
 	return -1;
 }
 
-int load_textures(struct oshu_display *display)
+int oshu_open_display(struct oshu_display *display)
 {
-	return 0;
-}
-
-int oshu_open_display(struct oshu_display **display)
-{
-	*display = calloc(1, sizeof(**display));
-	if (create_window(*display) < 0)
+	if (create_window(display) < 0)
 		goto fail;
-	if (load_textures(*display) < 0)
-		goto fail;
-	oshu_reset_view(*display);
+	oshu_reset_view(display);
 	return 0;
 fail:
 	oshu_close_display(display);
 	return -1;
 }
 
-void oshu_close_display(struct oshu_display **display)
+void oshu_close_display(struct oshu_display *display)
 {
-	if ((*display)->renderer)
-		SDL_DestroyRenderer((*display)->renderer);
-	if ((*display)->window)
-		SDL_DestroyWindow((*display)->window);
-	free(*display);
-	*display = NULL;
+	if (display->renderer)
+		SDL_DestroyRenderer(display->renderer);
+	if (display->window)
+		SDL_DestroyWindow(display->window);
 }
 
 void oshu_reset_view(struct oshu_display *display)
