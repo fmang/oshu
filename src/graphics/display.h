@@ -38,6 +38,9 @@
  * game coordinates are used throughout the beatmap, this will be your usual
  * reference.
  *
+ * Note that different modes may use differents coordinate systems. The
+ * following section will focus on the standard osu mode.
+ *
  * ### Coordinate systems
  *
  * The coordinate system the beatmaps use is not the same as the coordinate
@@ -106,7 +109,7 @@
  * factor and (x, y) the constant. `v(p) = z p + o`
  *
  * Transformation operations on the view like #oshu_resize_view,
- * #oshu_scale_view and #oshu_fit_vieware composed on the right:
+ * #oshu_scale_view and #oshu_fit_view are composed on the right:
  * `v(v'(p)) = z (z' p + o') + o = z z' p + z o' + o`
  *
  * For ease of understanding, transformation of views are explained in terms of
@@ -228,6 +231,10 @@ void oshu_reset_view(struct oshu_display *display);
 
 /**
  * Project a point from logical coordinates to physical coordinates.
+ *
+ * Applies the affine transformation: `v(p) = z p + o`.
+ *
+ * \sa oshu_unproject
  */
 struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
 
@@ -236,10 +243,8 @@ struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p
  *
  * This is the opposite operation of #oshu_project.
  *
- * ```
- * v(p) = z p + o
- * p = (v(p) - o) / z
- * ```
+ * From the definition of the view, `v(p) = z p + o`,
+ * we deduce `p = (v(p) - o) / z`.
  */
 struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p);
 
@@ -250,7 +255,6 @@ struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point
  * current coordinate system for the display.
  *
  * \sa oshu_unproject
- * \sa oshu_display::system
  */
 struct oshu_point oshu_get_mouse(struct oshu_display *display);
 
