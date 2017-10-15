@@ -18,6 +18,13 @@
  */
 static const double frame_duration = 17;
 
+static void setup_view(struct oshu_display *display)
+{
+	oshu_reset_view(display);
+	oshu_fit_view(&display->view, 640, 480);
+	oshu_resize_view(&display->view, 512, 384);
+}
+
 int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 {
 	*game = calloc(1, sizeof(**game));
@@ -43,7 +50,7 @@ int oshu_game_create(const char *beatmap_path, struct oshu_game **game)
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
-	(*game)->display->system = OSHU_GAME_COORDINATES;
+	setup_view((*game)->display);
 
 	if ((*game)->beatmap.background_filename) {
 		(*game)->background = IMG_LoadTexture((*game)->display->renderer, (*game)->beatmap.background_filename);
@@ -122,7 +129,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			oshu_resize_display(game->display);
+			setup_view(game->display);
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:

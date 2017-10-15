@@ -8,12 +8,48 @@
 
 #include <assert.h>
 
-/*
- * These two constants are crucial for correctly defining the viewport.
- * They're not arbitrary and required by osu's beatmap format.
- */
-static const int game_width = 640; /* px */
-static const int game_height = 480; /* px */
+void oshu_scale_view(struct oshu_view *view, double factor)
+{
+	view->zoom *= factor;
+	view->width /= factor;
+	view->height /= factor;
+}
+
+void oshu_resize_view(struct oshu_view *view, double w, double h)
+{
+	view->x += view->zoom * (view->width - w) / 2.;
+	view->y += view->zoom * (view->height - h) / 2.;
+	view->width = w;
+	view->height = h;
+}
+
+void oshu_fit_view(struct oshu_view *view, double w, double h)
+{
+	double wanted_ratio = w / h;
+	double current_ratio = view->width / view->height;
+	if (current_ratio > wanted_ratio) {
+		/* the window is too wide */
+		oshu_scale_view(view, view->height / h);
+	} else {
+		/* the window is too high */
+		oshu_scale_view(view, view->width / w);
+	}
+	oshu_resize_view(view, w, h);
+}
+
+struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p)
+{
+	p.x = p.x * display->view.zoom + display->view.x;
+	p.y = p.y * display->view.zoom + display->view.y;
+	return p;
+}
+
+struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p)
+{
+	p.x = (p.x - display->view.x) / display->view.zoom;
+	p.y = (p.y - display->view.y) / display->view.zoom;
+	return p;
+}
 
 /**
  * Open the window and create the rendered.
@@ -52,7 +88,7 @@ int oshu_open_display(struct oshu_display **display)
 		goto fail;
 	if (load_textures(*display) < 0)
 		goto fail;
-	oshu_resize_display(*display);
+	oshu_reset_view(*display);
 	return 0;
 fail:
 	oshu_close_display(display);
@@ -69,23 +105,15 @@ void oshu_close_display(struct oshu_display **display)
 	*display = NULL;
 }
 
-void oshu_resize_display(struct oshu_display *display)
+void oshu_reset_view(struct oshu_display *display)
 {
 	int w, h;
 	SDL_GetWindowSize(display->window, &w, &h);
-	double original_ratio = (double) game_width / game_height;
-	double actual_ratio = (double) w / h;
-	if (actual_ratio > original_ratio) {
-		/* the window is too wide */
-		display->viewport.zoom = (double) h / game_height;
-		display->viewport.x = (w - game_width * display->viewport.zoom) / 2.;
-		display->viewport.y = 0.;
-	} else {
-		/* the window is too high */
-		display->viewport.zoom = (double) w / game_width;
-		display->viewport.x = 0.;
-		display->viewport.y = (h - game_height * display->viewport.zoom) / 2.;
-	}
+	display->view.zoom = 1.;
+	display->view.x = 0;
+	display->view.y = 0;
+	display->view.width = w;
+	display->view.height = h;
 }
 
 struct oshu_point oshu_get_mouse(struct oshu_display *display)
@@ -93,41 +121,4 @@ struct oshu_point oshu_get_mouse(struct oshu_display *display)
 	int x, y;
 	SDL_GetMouseState(&x, &y);
 	return oshu_unproject(display, (struct oshu_point) {x, y});
-}
-
-struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p)
-{
-	switch (display->system) {
-	case OSHU_GAME_COORDINATES:
-		p.x += 64.;
-		p.y += 48.;
-	case OSHU_VIEWPORT_COORDINATES:
-		p.x = (p.x * display->viewport.zoom) + display->viewport.x;
-		p.y = (p.y * display->viewport.zoom) + display->viewport.y;
-	case OSHU_WINDOW_COORDINATES:
-		break;
-	default:
-		assert (display->system != display->system);
-	}
-	return p;
-}
-
-struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p)
-{
-	switch (display->system) {
-	case OSHU_WINDOW_COORDINATES:
-		break;
-	case OSHU_VIEWPORT_COORDINATES:
-	case OSHU_GAME_COORDINATES:
-		p.x = (p.x - display->viewport.x) / display->viewport.zoom;
-		p.y = (p.y - display->viewport.y) / display->viewport.zoom;
-		if (display->system == OSHU_GAME_COORDINATES) {
-			p.x -= 64.;
-			p.y -= 48.;
-		}
-		break;
-	default:
-		assert (display->system != display->system);
-	}
-	return p;
 }

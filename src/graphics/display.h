@@ -96,46 +96,86 @@
  *                window width = 640 × zoom
  * ```
  *
- * To convert a point from game coordinates to window coordinates, you must,
- * in that order:
- *
- * 1. Translate the point by (64, 48) to obtain viewport coordinates.
- * 2. Multiply by the *zoom* factor for relative window coordinates.
- * 3. Translate by (0, (window height - 480 × zoom) / 2) if the window is too
- *    high, or by ((window width - 640 × zoom) / 2, 0) if the window is too
-*     wide.
-*
-*  Where *zoom* is *window width / 640* if *window width / window height < 640
-*  / 480*, or *window height / 480* otherwise.
-*
-*  The reverse operation, from window coordinates to game coordinates:
-*
-*  1. Translate by the negative horizontal margin or vertical margin in point 3
-*     above.
-*  2. Divide both coordinates by the *zoom* factor.
- * 3. Translate the point by (-64, -48).
- *
  * \{
  */
 
 /**
- * See the module's description to understand what these coordinates are.
+ * Define a coordinate system.
+ *
+ * More concretely, this is an affine transformation system, where zoom is the
+ * factor and (x, y) the constant. `v(p) = z p + o`
+ *
+ * Transformation operations on the view like #oshu_resize_view,
+ * #oshu_scale_view and #oshu_fit_vieware composed on the right:
+ * `v(v'(p)) = z (z' p + o') + o = z z' p + z o' + o`
+ *
+ * For ease of understanding, transformation of views are explained in terms of
+ * logical coordinates and physical coordinates. Views convert logical
+ * coordinates into physical coordinates, so the logical one is the input, and
+ * physical one the output.
  */
-enum oshu_coordinate_system {
-	OSHU_WINDOW_COORDINATES,
-	OSHU_VIEWPORT_COORDINATES,
-	OSHU_GAME_COORDINATES,
-};
-
-/**
- * Position of the viewport in window coordinates, and zoom factor to scale
- * viewport coordinates.
- */
-struct oshu_viewport {
+struct oshu_view {
 	double zoom;
 	double x;
 	double y;
+	double width;
+	double height;
 };
+
+/**
+ * Change the size of the view without zooming.
+ *
+ * The new view's center is aligned with the old one by translating the origin
+ * accordingly.
+ *
+ * This lets you cut the view to introduce margins. Say, you're original view
+ * is 400x300, and you resize it to 300x200, then you'll have 50px margins on
+ * every side.
+ *
+ * The aspect ratio needs no be preserved.
+ *
+ * Definition:
+ * - `v(x) = x + (physical width - logical width) / 2`
+ *
+ * Properties:
+ * - `v(logical width / 2) = physical width / 2`
+ *
+ */
+void oshu_resize_view(struct oshu_view *view, double w, double h);
+
+/**
+ * Scale the coordinate system.
+ *
+ * Scaling by 2 means that a length of 10px will be displayed as 20px.
+ *
+ * The logical view is downscaled so that it still reflects the physical
+ * screen. Scaling a 800x600 view by 2 means that you'll only have 400x300
+ * pixels left to draw on.
+ *
+ * Definition:
+ * - `v(x) = factor * x`
+ * - `logical width = physical width / factor`
+ *
+ * Properties:
+ * - `v(0) = 0`
+ * - `v(logical width) = physical width`
+ *
+ */
+void oshu_scale_view(struct oshu_view *view, double factor);
+
+/**
+ * Scale and resize the view while preserving the aspect ratio.
+ *
+ * The resulting view's logical size is *w × h*, and appears centered and as
+ * big as possible in the window, without cutting it.
+ *
+ * Properties:
+ * - The center of the view is the center of the window:
+ *   `v(logical width / 2) = physical width / 2`
+ * - The view is not cut:
+ *   `0 ≤ v(0) ≤ v(logical width) ≤ physical width`
+ */
+void oshu_fit_view(struct oshu_view *view, double w, double h);
 
 /**
  * Store everything related to the current display.
@@ -150,22 +190,12 @@ struct oshu_display {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	/**
-	 * Current coordinate system.
+	 * The current view, used to project coordinates when drawing.
 	 *
-	 * Its initial value after #oshu_open_display is unspecified, so you
-	 * should set it before drawing anything.
-	 *
-	 * No function in the graphics module is going to change it for you,
-	 * so you need not check its value between every call to drawing
-	 * functions.
+	 * When the window is resized, make sure you reset it with
+	 * #oshu_reset_view and recreate your view from it.
 	 */
-	enum oshu_coordinate_system system;
-	/**
-	 * Cached information for fast viewport-to-window projections.
-	 *
-	 * Update it with #oshu_resize_display.
-	 */
-	struct oshu_viewport viewport;
+	struct oshu_view view;
 };
 
 /**
@@ -190,7 +220,24 @@ void oshu_close_display(struct oshu_display **display);
  *
  * Call this function when you receive a `SDL_WINDOWEVENT_SIZE_CHANGED`.
  */
-void oshu_resize_display(struct oshu_display *display);
+void oshu_reset_view(struct oshu_display *display);
+
+/**
+ * Project a point from logical coordinates to physical coordinates.
+ */
+struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
+
+/**
+ * Unproject a point from physical coordinates to logical coordinates.
+ *
+ * This is the opposite operation of #oshu_project.
+ *
+ * ```
+ * v(p) = z p + o
+ * p = (v(p) - o) / z
+ * ```
+ */
+struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p);
 
 /**
  * Get the mouse position.
@@ -202,20 +249,5 @@ void oshu_resize_display(struct oshu_display *display);
  * \sa oshu_display::system
  */
 struct oshu_point oshu_get_mouse(struct oshu_display *display);
-
-/**
- * Project a point on the current coordinate system to SDL window coordinates.
- *
- * \sa oshu_display::system
- */
-struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
-
-/**
- * Unproject from SDL window coordinates to the current coordinate system.
- *
- * \sa oshu_display::system
- */
-struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p);
-
 
 /** \} */
