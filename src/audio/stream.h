@@ -186,6 +186,8 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
  *
  * The offset must be positive, but may be arbitrary large. If it is greater
  * than the current position, then the stream is rewinded to its start.
+ *
+ * You should use #oshu_rewind_music instead.
  */
 int oshu_rewind_stream(struct oshu_stream *stream, double offset);
 

@@ -97,11 +97,8 @@ static void toggle_pause(struct oshu_game *game)
 
 static void rewind_music(struct oshu_game *game, double offset)
 {
-	oshu_rewind_stream(&game->audio.music, offset);
-	oshu_stop_loop(&game->audio);
-	game->clock.now -= offset;
-	if (game->clock.now < 0.)
-		game->clock.now = 0.;
+	oshu_rewind_music(&game->audio, offset);
+	game->clock.now = game->audio.music.current_timestamp;
 
 	assert (game->hit_cursor != NULL);
 	while (game->hit_cursor->time > game->clock.now) {

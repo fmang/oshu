@@ -320,5 +320,6 @@ int oshu_rewind_stream(struct oshu_stream *stream, double offset)
 		log_av_error(rc);
 		return -1;
 	}
+	stream->current_timestamp = target;
 	return 0;
 }
