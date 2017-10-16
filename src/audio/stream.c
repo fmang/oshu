@@ -304,3 +304,21 @@ void oshu_close_stream(struct oshu_stream *stream)
 	if (stream->converter)
 		swr_free(&stream->converter);
 }
+
+int oshu_rewind_stream(struct oshu_stream *stream, double offset)
+{
+	double target = stream->current_timestamp - offset;
+	if (target < 0.)
+		target = 0.;
+	int rc = av_seek_frame(
+		stream->demuxer,
+		stream->stream->index,
+		target / stream->time_base,
+		AVSEEK_FLAG_BACKWARD
+	);
+	if (rc < 0) {
+		log_av_error(rc);
+		return -1;
+	}
+	return 0;
+}

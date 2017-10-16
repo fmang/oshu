@@ -182,6 +182,14 @@ int oshu_open_stream(const char *url, struct oshu_stream *stream);
 int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples);
 
 /**
+ * Rewind the stream by the specified offset in seconds.
+ *
+ * The offset must be positive, but may be arbitrary large. If it is greater
+ * than the current position, then the stream is rewinded to its start.
+ */
+int oshu_rewind_stream(struct oshu_stream *stream, double offset);
+
+/**
  * Close an audio stream, and free everything we can.
  */
 void oshu_close_stream(struct oshu_stream *stream);

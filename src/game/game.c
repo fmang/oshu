@@ -9,6 +9,7 @@
 #include "graphics/draw.h"
 #include "log.h"
 
+#include <assert.h>
 #include <unistd.h>
 
 #include <SDL2/SDL_image.h>
@@ -94,6 +95,24 @@ static void toggle_pause(struct oshu_game *game)
 	}
 }
 
+static void rewind_music(struct oshu_game *game, double offset)
+{
+	oshu_rewind_stream(&game->audio.music, offset);
+	oshu_stop_loop(&game->audio);
+	game->clock.now -= offset;
+	if (game->clock.now < 0.)
+		game->clock.now = 0.;
+
+	assert (game->hit_cursor != NULL);
+	while (game->hit_cursor->time > game->clock.now) {
+		game->hit_cursor->state = OSHU_INITIAL_HIT;
+		if (game->hit_cursor->previous)
+			game->hit_cursor = game->hit_cursor->previous;
+		else
+			break;
+	}
+}
+
 /**
  * React to an event got from SDL.
  */
@@ -110,6 +129,9 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		case SDLK_ESCAPE:
 		case SDLK_SPACE:
 			toggle_pause(game);
+			break;
+		case SDLK_LEFT:
+			rewind_music(game, 5.);
 			break;
 		default:
 			if (!game->paused && !game->autoplay && game->mode->key_pressed)
