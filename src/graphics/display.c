@@ -89,10 +89,14 @@ fail:
 
 void oshu_close_display(struct oshu_display *display)
 {
-	if (display->renderer)
+	if (display->renderer) {
 		SDL_DestroyRenderer(display->renderer);
-	if (display->window)
+		display->renderer = NULL;
+	}
+	if (display->window) {
 		SDL_DestroyWindow(display->window);
+		display->window = NULL;
+	}
 }
 
 void oshu_reset_view(struct oshu_display *display)

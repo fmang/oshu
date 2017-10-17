@@ -69,6 +69,8 @@ fail:
 
 void oshu_destroy_sample(struct oshu_sample *sample)
 {
-	if (sample->samples)
+	if (sample->samples) {
 		SDL_FreeWAV((Uint8*) sample->samples);
+		sample->samples = NULL;
+	}
 }

@@ -39,12 +39,14 @@ static void free_shelf(struct oshu_sound_shelf *shelf)
 
 static void free_room(struct oshu_sound_room *room)
 {
-	if (!room->shelves)
-		return;
-	for (int i = 0; i < room->size; ++i)
-		free_shelf(&room->shelves[i]);
-	free(room->shelves);
+	if (room->shelves) {
+		for (int i = 0; i < room->size; ++i)
+			free_shelf(&room->shelves[i]);
+		free(room->shelves);
+		room->shelves = NULL;
+	}
 	free(room->indices);
+	room->indices = NULL;
 }
 
 void oshu_close_sound_library(struct oshu_sound_library *library)

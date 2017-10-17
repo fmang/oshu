@@ -295,6 +295,7 @@ fail:
 
 void oshu_close_stream(struct oshu_stream *stream)
 {
+	/* the av routines set the pointers to NULL */
 	if (stream->frame)
 		av_frame_free(&stream->frame);
 	if (stream->decoder)

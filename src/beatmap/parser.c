@@ -624,6 +624,7 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 	return 0;
 fail:
 	free(*timing);
+	*timing = NULL;
 	return -1;
 }
 
@@ -678,6 +679,7 @@ static int parse_color(struct parser_state *parser, struct oshu_color **color)
 	return 0;
 fail:
 	free(*color);
+	*color = NULL;
 	return -1;
 }
 
@@ -840,6 +842,7 @@ static int parse_hit_object(struct parser_state *parser, struct oshu_hit **hit)
 	return 0;
 fail:
 	free(*hit);
+	*hit = NULL;
 	return -1;
 }
 
@@ -1024,7 +1027,9 @@ static int parse_bezier_slider(struct parser_state *parser, struct oshu_hit *hit
 	return 0;
 fail:
 	free(bezier->control_points);
+	bezier->control_points = NULL;
 	free(bezier->indices);
+	bezier->indices = NULL;
 	return -1;
 }
 
@@ -1065,6 +1070,7 @@ static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *
 	return 0;
 fail:
 	free(hit->slider.sounds);
+	hit->slider.sounds = NULL;
 	return -1;
 }
 
@@ -1299,5 +1305,5 @@ void oshu_destroy_beatmap(struct oshu_beatmap *beatmap)
 	free_timing_points(beatmap->timing_points);
 	free_colors(beatmap->colors);
 	free_hits(beatmap->hits);
-	beatmap->hits = NULL;
+	memset(beatmap, 0, sizeof(*beatmap));
 }
