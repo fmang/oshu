@@ -95,12 +95,20 @@ static void toggle_pause(struct oshu_game *game)
 	}
 }
 
+/**
+ * \todo
+ * Allow rewinding, even after the last note was played.
+ */
 static void rewind_music(struct oshu_game *game, double offset)
 {
+	if (!game->hit_cursor) {
+		/* the song is about to end. cannot rewind.. */
+		return;
+	}
+
 	oshu_rewind_music(&game->audio, offset);
 	game->clock.now = game->audio.music.current_timestamp;
 
-	assert (game->hit_cursor != NULL);
 	while (game->hit_cursor->time > game->clock.now) {
 		game->hit_cursor->state = OSHU_INITIAL_HIT;
 		if (game->hit_cursor->previous)
