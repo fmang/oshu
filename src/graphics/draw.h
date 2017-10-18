@@ -3,6 +3,8 @@
  * \ingroup draw
  */
 
+#pragma once
+
 #include "beatmap/beatmap.h"
 #include "graphics/display.h"
 

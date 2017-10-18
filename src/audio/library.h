@@ -3,6 +3,8 @@
  * \ingroup audio_library
  */
 
+#pragma once
+
 #include "beatmap/beatmap.h"
 
 struct oshu_audio;

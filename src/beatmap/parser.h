@@ -41,6 +41,8 @@
  * should print an message using #parser_error failure.
  */
 
+#pragma once
+
 #include "beatmap/beatmap.h"
 
 /**
