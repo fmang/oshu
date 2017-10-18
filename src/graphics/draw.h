@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "beatmap/beatmap.h"
+#include "beatmap/geometry.h"
 #include "graphics/display.h"
 
 /**
@@ -28,25 +28,6 @@
  *
  * \{
  */
-
-/**
- * Draw all the visible nodes from the beatmap, according to the current
- * position in the song.
- *
- * \todo
- * Since it's too specific to the Osu! mode, it should be moved in the future.
- *
- * `now` is the current position in the playing song, in seconds.
- */
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now);
-
-/**
- * Draw a hit object.
- *
- * \todo
- * Since it's too specific to the Osu! mode, it should be moved in the future.
- */
-void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
 
 /**
  * Draw a 1-pixel aliased stroke following the path.

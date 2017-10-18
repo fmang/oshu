@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "game/mode.h"
-
+struct oshu_beatmap;
+struct oshu_display;
+struct oshu_game_mode;
 struct oshu_hit;
 
 /**
@@ -30,6 +31,19 @@ struct oshu_osu_state {
 	 */
 	struct oshu_hit *current_slider;
 };
+
+/**
+ * Draw a hit object.
+ */
+void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
+
+/**
+ * Draw all the visible nodes from the beatmap, according to the current
+ * position in the song.
+ *
+ * `now` is the current position in the playing song, in seconds.
+ */
+void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now);
 
 /**
  * Implementation of the standard osu! game mode.
