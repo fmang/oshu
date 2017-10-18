@@ -1,8 +1,9 @@
 /**
- * \file game/modes.h
- * \ingroup game-modes
+ * \file game/mode.h
+ * \ingroup game
  *
- * Define the game module.
+ * \brief
+ * Generic interface to all game modes.
  */
 
 #pragma once
@@ -10,12 +11,7 @@
 #include <SDL2/SDL.h>
 
 /**
- * \defgroup game-modes Modes
  * \ingroup game
- *
- * \brief
- * Generic interface to all game modes.
- *
  * \{
  */
 
@@ -82,22 +78,5 @@ struct oshu_game_mode {
 	 */
 	int (*mouse_released)(struct oshu_game *game, Uint8 button);
 };
-
-/**
- * Parts of the game state specific to the Osu! standard mode.
- */
-struct oshu_osu_state {
-	/**
-	 * Slider hit object the user is holding.
-	 *
-	 * NULL most of the time.
-	 */
-	struct oshu_hit *current_slider;
-};
-
-/**
- * Implementation of the standard osu! game mode.
- */
-extern struct oshu_game_mode oshu_osu_mode;
 
 /** \} */

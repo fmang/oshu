@@ -1,12 +1,11 @@
 /**
- * \file game/osu.c
+ * \file game/osu/osu.c
  * \ingroup game-modes
  *
  * Implement the osu! standard mode.
  */
 
 #include "game/game.h"
-#include "game/modes.h"
 #include "graphics/draw.h"
 
 /**

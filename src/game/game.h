@@ -10,7 +10,8 @@
 #include "audio/audio.h"
 #include "audio/library.h"
 #include "beatmap/beatmap.h"
-#include "game/modes.h"
+#include "game/mode.h"
+#include "game/osu/osu.h"
 #include "graphics/display.h"
 
 /**
@@ -84,7 +85,7 @@ struct oshu_game {
 	int paused;
 	/** Background picture. */
 	SDL_Texture *background;
-	/** Mode-specific data, defined in the \ref game-modes module. */
+	/** Mode-specific data, defined inside each mode's header file. */
 	union {
 		struct oshu_osu_state osu;
 	};

@@ -22,8 +22,9 @@ oshu_SOURCES = \
 	beatmap/tokens.h \
 	game/game.c \
 	game/game.h \
-	game/modes.h \
-	game/osu.c \
+	game/mode.h \
+	game/osu/osu.c \
+	game/osu/osu.h \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/draw.c \
