@@ -87,7 +87,7 @@ struct oshu_game {
 	SDL_Texture *background;
 	/** Mode-specific data, defined inside each mode's header file. */
 	union {
-		struct oshu_osu_state osu;
+		struct osu_state osu;
 	};
 	/**
 	 * Pointer to the current hit, according to the context of the game.

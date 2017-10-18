@@ -69,7 +69,7 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 	}
 }
 
-void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
+void osu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
 	if (hit->type & OSHU_SLIDER_HIT)
 		draw_slider(display, beatmap, hit, now);
@@ -92,7 +92,7 @@ static void connect_hits(struct oshu_display *display, struct oshu_beatmap *beat
 	oshu_draw_line(display, (P) {end.x + d.x, end.y + d.y}, (P) {next->p.x - d.x, next->p.y - d.y});
 }
 
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now)
+void osu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now)
 {
 	struct oshu_hit *prev = NULL;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->next) {
@@ -102,7 +102,7 @@ void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatma
 			break;
 		if (prev && !(hit->type & OSHU_NEW_HIT_COMBO))
 			connect_hits(display, beatmap, prev, hit);
-		oshu_draw_hit(display, beatmap, hit, now);
+		osu_draw_hit(display, beatmap, hit, now);
 		prev = hit;
 	}
 	SDL_RenderPresent(display->renderer);

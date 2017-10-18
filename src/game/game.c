@@ -37,7 +37,7 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 		goto fail;
 	}
 	if (game->beatmap.mode == OSHU_OSU_MODE) {
-		game->mode = &oshu_osu_mode;
+		game->mode = &osu_mode;
 	} else {
 		oshu_log_error("unsupported game mode");
 		goto fail;

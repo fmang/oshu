@@ -23,7 +23,7 @@ struct oshu_hit;
 /**
  * Parts of the game state specific to the Osu! standard mode.
  */
-struct oshu_osu_state {
+struct osu_state {
 	/**
 	 * Slider hit object the user is holding.
 	 *
@@ -35,7 +35,7 @@ struct oshu_osu_state {
 /**
  * Draw a hit object.
  */
-void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
+void osu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
 
 /**
  * Draw all the visible nodes from the beatmap, according to the current
@@ -43,11 +43,11 @@ void oshu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, s
  *
  * `now` is the current position in the playing song, in seconds.
  */
-void oshu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now);
+void osu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now);
 
 /**
  * Implementation of the standard osu! game mode.
  */
-extern struct oshu_game_mode oshu_osu_mode;
+extern struct oshu_game_mode osu_mode;
 
 /** \} */

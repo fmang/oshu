@@ -171,7 +171,7 @@ static int check(struct oshu_game *game)
 
 static int draw(struct oshu_game *game)
 {
-	oshu_draw_beatmap(&game->display, &game->beatmap, game->hit_cursor, game->clock.now);
+	osu_draw_beatmap(&game->display, &game->beatmap, game->hit_cursor, game->clock.now);
 	return 0;
 }
 
@@ -211,7 +211,7 @@ static int mouse_released(struct oshu_game *game, Uint8 button)
 	return 0;
 }
 
-struct oshu_game_mode oshu_osu_mode = {
+struct oshu_game_mode osu_mode = {
 	.check = check,
 	.draw = draw,
 	.key_pressed = key_pressed,
