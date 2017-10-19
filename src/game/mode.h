@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
-
 /**
  * \ingroup game
  * \{
@@ -62,6 +60,10 @@ enum oshu_key {
 	OSHU_LEFT_BUTTON = -1,
 	OSHU_MIDDLE_BUTTON = 0,
 	OSHU_RIGHT_BUTTON = 1,
+	/**
+	 * Special value
+	 */
+        OSHU_UNKNOWN_KEY = -100,
 };
 
 /**
@@ -90,40 +92,24 @@ struct oshu_game_mode {
 	 */
 	int (*draw)(struct oshu_game *game);
 	/**
-	 * Handle a key press keyboard event.
+	 * Handle a key press keyboard event, or mouse button press event.
 	 *
 	 * Key repeats are filtered out by the parent module, along with any
 	 * key used by the game module itself, like escape or space to pause, q
-	 * to quit, &c.
-	 *
-	 * This callback isn't called when the game is paused or on autoplay.
-	 *
-	 * \sa key_released
-	 */
-	int (*key_pressed)(struct oshu_game *game, SDL_Keysym *key);
-	/**
-	 * See #key_released.
-	 */
-	int (*key_released)(struct oshu_game *game, SDL_Keysym *key);
-	/**
-	 * Handle a mouse button press event.
-	 *
-	 * Mouse click events may be filtered by the parent game module in the
-	 * future to implement mode-agnotistic features, but you should not
-	 * worry about it.
+	 * to quit, &c. Same goes for mouse buttons.
 	 *
 	 * If you need the mouse position, use #oshu_get_mouse to have it in
 	 * game coordinates.
 	 *
 	 * This callback isn't called when the game is paused or on autoplay.
 	 *
-	 * \sa mouse_released.
+	 * \sa released
 	 */
-	int (*mouse_pressed)(struct oshu_game *game, Uint8 button);
+	int (*pressed)(struct oshu_game *game, enum oshu_key key);
 	/**
-	 * See #mouse_released.
+	 * See #pressed.
 	 */
-	int (*mouse_released)(struct oshu_game *game, Uint8 button);
+	int (*released)(struct oshu_game *game, enum oshu_key key);
 };
 
 /** \} */

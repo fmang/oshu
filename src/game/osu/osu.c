@@ -175,37 +175,13 @@ static int draw(struct oshu_game *game)
 	return 0;
 }
 
-static int key_pressed(struct oshu_game *game, SDL_Keysym *key)
-{
-	switch (key->sym) {
-	case SDLK_w:
-	case SDLK_x:
-	case SDLK_z:
-		hit(game);
-		break;
-	}
-	return 0;
-}
-
-static int key_released(struct oshu_game *game, SDL_Keysym *key)
-{
-	switch (key->sym) {
-	case SDLK_w:
-	case SDLK_x:
-	case SDLK_z:
-		release_hit(game);
-		break;
-	}
-	return 0;
-}
-
-static int mouse_pressed(struct oshu_game *game, Uint8 button)
+static int pressed(struct oshu_game *game, enum oshu_key key)
 {
 	hit(game);
 	return 0;
 }
 
-static int mouse_released(struct oshu_game *game, Uint8 button)
+static int released(struct oshu_game *game, enum oshu_key key)
 {
 	release_hit(game);
 	return 0;
@@ -214,8 +190,6 @@ static int mouse_released(struct oshu_game *game, Uint8 button)
 struct oshu_game_mode osu_mode = {
 	.check = check,
 	.draw = draw,
-	.key_pressed = key_pressed,
-	.key_released = key_released,
-	.mouse_pressed = mouse_pressed,
-	.mouse_released = mouse_released,
+	.pressed = pressed,
+	.released = released,
 };

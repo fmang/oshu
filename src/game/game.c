@@ -118,6 +118,15 @@ static void rewind_music(struct oshu_game *game, double offset)
 	}
 }
 
+enum oshu_key translate_key(SDL_Keysym *keysym)
+{
+	switch (keysym->scancode) {
+	case SDL_SCANCODE_Z: return OSHU_LEFT_MIDDLE;
+	case SDL_SCANCODE_X: return OSHU_LEFT_INDEX;
+	default:             return OSHU_UNKNOWN_KEY;
+	}
+}
+
 /**
  * React to an event got from SDL.
  */
@@ -139,21 +148,27 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			rewind_music(game, 5.);
 			break;
 		default:
-			if (!game->paused && !game->autoplay && game->mode->key_pressed)
-				game->mode->key_pressed(game, &event->key.keysym);
+			if (!game->paused && !game->autoplay && game->mode->pressed) {
+				enum oshu_key key = translate_key(&event->key.keysym);
+				if (key != OSHU_UNKNOWN_KEY)
+					game->mode->pressed(game, key);
+			}
 		}
 		break;
 	case SDL_KEYUP:
-		if (!game->paused && !game->autoplay && game->mode->key_pressed)
-			game->mode->key_released(game, &event->key.keysym);
+		if (!game->paused && !game->autoplay && game->mode->released) {
+			enum oshu_key key = translate_key(&event->key.keysym);
+			if (key != OSHU_UNKNOWN_KEY)
+				game->mode->released(game, key);
+		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		if (!game->paused && !game->autoplay && game->mode->mouse_released)
-			game->mode->mouse_pressed(game, event->button.button);
+		if (!game->paused && !game->autoplay && game->mode->pressed)
+			game->mode->pressed(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_MOUSEBUTTONUP:
-		if (!game->paused && !game->autoplay && game->mode->mouse_released)
-			game->mode->mouse_released(game, event->button.button);
+		if (!game->paused && !game->autoplay && game->mode->released)
+			game->mode->released(game, OSHU_RIGHT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
