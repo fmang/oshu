@@ -182,10 +182,10 @@ void oshu_stop_loop(struct oshu_audio *audio)
 	SDL_UnlockAudioDevice(audio->device_id);
 }
 
-int oshu_rewind_music(struct oshu_audio *audio, double offset)
+int oshu_seek_music(struct oshu_audio *audio, double target)
 {
 	SDL_LockAudioDevice(audio->device_id);
-	int rc = oshu_rewind_stream(&audio->music, offset);
+	int rc = oshu_seek_stream(&audio->music, target);
 	oshu_stop_track(&audio->looping);
 	int tracks = sizeof(audio->effects) / sizeof(*audio->effects);
 	for (int i = 0; i < tracks; ++i)

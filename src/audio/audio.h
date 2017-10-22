@@ -240,16 +240,15 @@ void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, floa
 void oshu_play_loop(struct oshu_audio *audio, struct oshu_sample *sample, float volume);
 
 /**
- * Rewind the stream by the specified offset in seconds.
+ * Seek the music stream to the specifed target position in seconds.
  *
- * The offset must be positive, but may be arbitrary large. If it is greater
- * than the current position, then the stream is rewinded to its start.
+ * See #oshu_seek_stream for details.
  *
- * It is similar to #oshu_rewind_stream, with the different that this function
+ * It is similar to #oshu_seek_stream, with the different that this function
  * locks the audio thread, and stops all the currently playing sound effects,
  * which is definitely what you want.
  */
-int oshu_rewind_music(struct oshu_audio *audio, double offset);
+int oshu_seek_music(struct oshu_audio *audio, double target);
 
 /**
  * Stop the looping sample.

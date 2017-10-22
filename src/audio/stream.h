@@ -182,14 +182,19 @@ int oshu_open_stream(const char *url, struct oshu_stream *stream);
 int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples);
 
 /**
- * Rewind the stream by the specified offset in seconds.
+ * Seek the stream to the specifed target position in seconds.
  *
- * The offset must be positive, but may be arbitrary large. If it is greater
- * than the current position, then the stream is rewinded to its start.
+ * If the target is negative, the stream is rewinded to its beginning.
  *
- * You should use #oshu_rewind_music instead.
+ * To determine the new position of the stream after seeking, use
+ * #oshu_stream::current_timestamp.
+ *
+ * You should probably use #oshu_rewind_music instead.
+ *
+ * \todo
+ * What if the target position is past the end of stream?
  */
-int oshu_rewind_stream(struct oshu_stream *stream, double offset);
+int oshu_seek_stream(struct oshu_stream *stream, double target);
 
 /**
  * Close an audio stream, and free everything we can.

@@ -101,21 +101,20 @@ static void toggle_pause(struct oshu_game *game)
  */
 static void rewind_music(struct oshu_game *game, double offset)
 {
-	if (!game->hit_cursor) {
-		/* the song is about to end. cannot rewind.. */
-		return;
-	}
-
-	oshu_rewind_music(&game->audio, offset);
+	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
 	game->clock.now = game->audio.music.current_timestamp;
 
+	assert (game->hit_cursor != NULL);
 	while (game->hit_cursor->time > game->clock.now) {
 		game->hit_cursor->state = OSHU_INITIAL_HIT;
-		if (game->hit_cursor->previous)
-			game->hit_cursor = game->hit_cursor->previous;
-		else
-			break;
+		game->hit_cursor = game->hit_cursor->previous;
 	}
+}
+
+static void forward_music(struct oshu_game *game, double offset)
+{
+	oshu_seek_music(&game->audio, game->audio.music.current_timestamp + offset);
+	game->clock.now = game->audio.music.current_timestamp;
 }
 
 enum oshu_key translate_key(SDL_Keysym *keysym)
@@ -146,6 +145,9 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			break;
 		case SDLK_LEFT:
 			rewind_music(game, 5.);
+			break;
+		case SDLK_RIGHT:
+			forward_music(game, 5.);
 			break;
 		default:
 			if (!game->paused && !game->autoplay && game->mode->pressed) {
