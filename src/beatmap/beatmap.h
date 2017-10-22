@@ -247,10 +247,41 @@ enum oshu_hit_type {
  * hit.
  */
 enum oshu_hit_state {
+	/**
+	 * The default state.
+	 *
+	 * The hit has never been clicked not skipped nor anything. This also
+	 * means the user can interact with the hit object.
+	 */
 	OSHU_INITIAL_HIT = 0,
-	OSHU_GOOD_HIT,
-	OSHU_MISSED_HIT,
+	/**
+	 * The slider is currently being held.
+	 *
+	 * Only meaningful for spinners and mania hold notes.
+	 */
 	OSHU_SLIDING_HIT,
+	/**
+	 * The hit was clicked on time.
+	 */
+	OSHU_GOOD_HIT,
+	/**
+	 * The hit was missed, either because it wasn't clicked at the right
+	 * time, or because it wasn't clicked at all.
+	 */
+	OSHU_MISSED_HIT,
+	/**
+	 * A hit obejct may be skipped when the user seeks forward.
+	 */
+	OSHU_SKIPPED_HIT,
+	/**
+	 * Hit objects are marked unknown when the current game mode cannot
+	 * interpret it.
+	 *
+	 * For example, mania hold notes in taiko mode, or spinners in any
+	 * other mode than osu. Also spinners in osu mode because they're not
+	 * supported yet.
+	 */
+	OSHU_UNKNOWN_HIT,
 };
 
 /**

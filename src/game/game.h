@@ -99,6 +99,26 @@ struct oshu_game {
 	 * Its goal is to improve the performance of the beatmap drawing
 	 * routine and the reactivity on user click, because the obsolete hits
 	 * are already skipped.
+	 *
+	 * **Future version:**
+	 *
+	 * Pointer to the next clickable hit.
+	 *
+	 * Any hit before this cursor has already been dealt with, and its
+	 * state should be anything but #OSHU_INITIAL_HIT.
+	 *
+	 * On the contrary, any hit past this cursor is *usually* in its
+	 * initial state, but that's not an absolute necessity. The user might
+	 * click a hit far in the future, but still be able to click the one
+	 * right before it.
+	 *
+	 * This cursor is mostly here to speed things up. It is technically
+	 * okay for it to always point to the first hit, but the performance
+	 * will suffer. It's ideal position is right at the first *fresh*
+	 * (= #OSHU_INITIAL_HIT) hit object.
+	 *
+	 * With the two sentinels in the beatmap's hits linked list, this
+	 * cursor is never null, even after the last hit was played.
 	 */
 	struct oshu_hit *hit_cursor;
 };
