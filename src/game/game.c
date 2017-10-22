@@ -64,7 +64,7 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	if (game->beatmap.audio_lead_in > 0) {
 		game->clock.now = - game->beatmap.audio_lead_in;
 	} else {
-		double first_hit = game->beatmap.hits->time;
+		double first_hit = game->beatmap.hits->next->time;
 		if (first_hit < 1.)
 			game->clock.now = first_hit - 1.;
 	}

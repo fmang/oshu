@@ -816,6 +816,12 @@ struct oshu_beatmap {
 	 * \brief [HitObjects] section.
 	 *
 	 * It's a linked list of hit objects, in chronological order.
+	 *
+	 * The list is enclosed by two special unreachable hit objects. All
+	 * their fields are zero except the time field which is *-INFINITY* for
+	 * the first object, and *+INFINITY* for the last one; and also the
+	 * *next* and *previous* pointers. This lets you ensure your hit cursor
+	 * is never null.
 	 */
 	struct oshu_hit *hits;
 };

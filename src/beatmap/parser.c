@@ -783,17 +783,14 @@ static int process_hit_object(struct parser_state *parser)
 	if (parse_hit_object(parser, &hit) < 0)
 		return -1;
 	compute_hit_combo(parser, hit);
-	if (parser->last_hit) {
-		if (hit->time < parser->last_hit->time) {
-			parser_error(parser, "missorted hit object");
-			free(hit);
-			return -1;
-		}
-		parser->last_hit->next = hit;
-		hit->previous = parser->last_hit;
-	} else {
-		parser->beatmap->hits = hit;
+	assert (parser->last_hit != NULL);
+	if (hit->time < parser->last_hit->time) {
+		parser_error(parser, "missorted hit object");
+		free(hit);
+		return -1;
 	}
+	parser->last_hit->next = hit;
+	hit->previous = parser->last_hit;
 	parser->last_hit = hit;
 	return 0;
 }
@@ -1168,6 +1165,7 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 	parser.section = BEATMAP_HEADER;
 	parser.source = name;
 	parser.beatmap = beatmap;
+	parser.last_hit = beatmap->hits;
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t nread;
@@ -1181,6 +1179,13 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 		/* ignore parsing errors */
 	}
 	free(line);
+	/* Finalize the hits sequence. */
+	struct oshu_hit *end;
+	end = calloc(1, sizeof(*end));
+	assert (end != NULL);
+	end->time = INFINITY;
+	parser.last_hit->next = end;
+	end->previous = parser.last_hit;
 	return 0;
 }
 
@@ -1194,6 +1199,18 @@ static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 }
 
 /**
+ * Initialize the beatmap to its defaults, and add the first unreachable hit
+ * object.
+ */
+void initialize(struct oshu_beatmap *beatmap)
+{
+	memcpy(beatmap, &default_beatmap, sizeof(*beatmap));
+	beatmap->hits = calloc(1, sizeof(*beatmap->hits));
+	assert (beatmap->hits != NULL);
+	beatmap->hits->time = -INFINITY;
+}
+
+/**
  * Perform a variety of checks on a beatmap file to ensure it was parsed well
  * enough to be played.
  */
@@ -1201,10 +1218,6 @@ static int validate(struct oshu_beatmap *beatmap)
 {
 	if (!beatmap->audio_filename) {
 		oshu_log_error("no audio file mentionned");
-		return -1;
-	}
-	if (!beatmap->hits) {
-		oshu_log_error("no hit objects found");
 		return -1;
 	}
 	return 0;
@@ -1227,7 +1240,7 @@ int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap)
 		oshu_log_error("could not open the beatmap: %s", strerror(errno));
 		return -1;
 	}
-	memcpy(beatmap, &default_beatmap, sizeof(*beatmap));
+	initialize(beatmap);
 	int rc = parse_file(input, path, beatmap);
 	fclose(input);
 	if (rc < 0)
