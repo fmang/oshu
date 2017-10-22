@@ -193,7 +193,7 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
  * To determine the new position of the stream after seeking, use
  * #oshu_stream::current_timestamp.
  *
- * You should probably use #oshu_rewind_music instead.
+ * You should probably use #oshu_seek_music instead.
  *
  * \todo
  * What if the target position is past the end of stream?
