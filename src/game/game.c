@@ -147,7 +147,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			rewind_music(game, 5.);
 			break;
 		case SDLK_RIGHT:
-			forward_music(game, 5.);
+			forward_music(game, 20.);
 			break;
 		default:
 			if (!game->paused && !game->autoplay && game->mode->pressed) {

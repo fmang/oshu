@@ -122,6 +122,10 @@ struct oshu_stream {
 	 */
 	double time_base;
 	/**
+	 * The duration of the stream in seconds.
+	 */
+	double duration;
+	/**
 	 * The current temporal position in the playing stream, expressed in
 	 * floating seconds.
 	 *

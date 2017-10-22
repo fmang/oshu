@@ -162,7 +162,9 @@ static void dump_stream_info(struct oshu_stream *stream)
 	oshu_log_info("      Sample rate: %d Hz.", stream->decoder->sample_rate);
 	oshu_log_info(" Average bit rate: %ld kbps.", stream->decoder->bit_rate / 1000);
 	oshu_log_info("    Sample format: %s.", av_get_sample_fmt_name(stream->decoder->sample_fmt));
-	oshu_log_info("         Duration: %d seconds.", (int) (stream->stream->duration * stream->time_base));
+	int minutes = stream->duration / 60.;
+	int seconds = stream->duration - minutes * 60;
+	oshu_log_info("         Duration: %d:%02d", minutes, seconds);
 }
 
 /**
@@ -198,6 +200,7 @@ static int open_demuxer(const char *url, struct oshu_stream *stream)
 	}
 	stream->stream = stream->demuxer->streams[rc];
 	stream->time_base = av_q2d(stream->stream->time_base);
+	stream->duration = stream->time_base * stream->stream->duration;
 	return 0;
 fail:
 	log_av_error(rc);
@@ -308,8 +311,12 @@ void oshu_close_stream(struct oshu_stream *stream)
 
 int oshu_seek_stream(struct oshu_stream *stream, double target)
 {
-	if (target < 0.)
+	if (target < 0.) {
 		target = 0.;
+	} else if (target >= stream->duration) {
+		oshu_log_warning("cannot seek past the end of the stream");
+		return -1;
+	}
 	int rc = av_seek_frame(
 		stream->demuxer,
 		stream->stream->index,
