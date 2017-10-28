@@ -315,15 +315,15 @@ int oshu_run_game(struct oshu_game *game)
 
 void oshu_destroy_game(struct oshu_game *game)
 {
-	if (!game)
-		return;
-	if (game->background)
-		SDL_DestroyTexture(game->background);
-	oshu_close_display(&game->display);
-	oshu_close_sound_library(&game->library);
+	assert (game != NULL);
+	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
-	if (game->beatmap.hits)
-		oshu_destroy_beatmap(&game->beatmap);
+	oshu_close_sound_library(&game->library);
+	oshu_close_display(&game->display);
+	if (game->background) {
+		SDL_DestroyTexture(game->background);
+		game->background = NULL;
+	}
 }
 
 struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset)

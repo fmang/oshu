@@ -75,8 +75,13 @@ struct oshu_game {
 	struct oshu_audio audio;
 	struct oshu_sound_library library;
 	struct oshu_display display;
-	struct oshu_game_mode *mode;
 	struct oshu_clock clock;
+	/**
+	 * The game mode configuration.
+	 *
+	 * It is always allocated statically, so you must not free it.
+	 */
+	struct oshu_game_mode *mode;
 	/** Will stop a the next iteration if this is true. */
 	int stop;
 	/** On autoplay mode, the user interactions are ignored and every
@@ -113,11 +118,20 @@ struct oshu_game {
 
 /**
  * Create the game context for a beatmap, and load all the associated assets.
+ *
+ * After creating the game, you're free to toy with the options of the game,
+ * especially autoplay and pause.
+ *
+ * When you're done settings the game up, call #oshu_run_game.
+ *
+ * On failure, the game object is destroyed and left in an unspecified state.
+ * On success, it's up to you to destroy it with #oshu_destroy_game.
  */
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game);
 
 /**
- * Free the memory for everything, and set `*game` to *NULL*.
+ * Free all the dynamic memory associated to the game object, but no the object
+ * itself.
  */
 void oshu_destroy_game(struct oshu_game *game);
 
