@@ -15,6 +15,12 @@
  * clicked.
  *
  * If two hit objects overlap, yield the oldest unclicked one.
+ *
+ * \todo
+ * Simplify the code using the new properties of the hits list.
+ *
+ * \todo
+ * Use #oshu_look_hit_back for robustness.
  */
 static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
 {
@@ -38,6 +44,12 @@ static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
  * Get the current mouse position, get the hit object, and change its state.
  *
  * Play a sample depending on what was clicked, and when.
+ *
+ * \todo
+ * Handle the held key.
+ *
+ * \todo
+ * Merge with #press.
  */
 static void hit(struct oshu_game *game)
 {
@@ -63,6 +75,12 @@ static void hit(struct oshu_game *game)
 /**
  * When the user is holding a slider or a hold note in mania mode, do
  * something.
+ *
+ * \todo
+ * Rename to `release_slider` for specifity. Add the relevant assertions.
+ *
+ * \todo
+ * Merge with #release.
  */
 static void release_hit(struct oshu_game *game)
 {
@@ -85,6 +103,9 @@ static void release_hit(struct oshu_game *game)
  * Check the state of the current slider.
  *
  * Make it end if it's done.
+ *
+ * \todo
+ * This function is too complex, split it.
  */
 static void check_slider(struct oshu_game *game)
 {
@@ -135,6 +156,11 @@ static void check_audio(struct oshu_game *game)
 	}
 }
 
+/**
+ * \todo
+ * Merge with #check_audio maybe.
+ * For sliders, see how it can be factor with autoplay.
+ */
 static int check(struct oshu_game *game)
 {
 	check_slider(game);
@@ -142,6 +168,13 @@ static int check(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * \todo
+ * Factor the slider logic.
+ *
+ * \todo
+ * Factor the hit actions.
+ */
 static int autoplay(struct oshu_game *game)
 {
 	check_slider(game);
@@ -163,6 +196,10 @@ static int autoplay(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * \todo
+ * Export to the draw sub-module.
+ */
 static int draw(struct oshu_game *game)
 {
 	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
@@ -170,12 +207,26 @@ static int draw(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * \todo
+ * Update game->osu.held_key for sliders.
+ *
+ * \todo
+ * Merge with #hit.
+ */
 static int press(struct oshu_game *game, enum oshu_key key)
 {
 	hit(game);
 	return 0;
 }
 
+/**
+ * \todo
+ * Check key == game->osu.held_key
+ *
+ * \todo
+ * Merge with #release_hit.
+ */
 static int release(struct oshu_game *game, enum oshu_key key)
 {
 	release_hit(game);

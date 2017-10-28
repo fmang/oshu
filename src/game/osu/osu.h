@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "game/mode.h"
+
 struct oshu_beatmap;
 struct oshu_display;
 struct oshu_game_mode;
@@ -30,6 +32,16 @@ struct osu_state {
 	 * NULL most of the time.
 	 */
 	struct oshu_hit *current_slider;
+	/**
+	 * Keyboard key or mouse button associated to the #current_slider.
+	 *
+	 * When the #current_slider is NULL, the value of this field is
+	 * irrelevant.
+	 *
+	 * \todo
+	 * Use it in the implementation.
+	 */
+	struct oshu_key held_key;
 };
 
 /**
