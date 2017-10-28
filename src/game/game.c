@@ -164,7 +164,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			if (!game->paused && !game->autoplay) {
 				enum oshu_key key = translate_key(&event->key.keysym);
 				if (key != OSHU_UNKNOWN_KEY)
-					game->mode->pressed(game, key);
+					game->mode->press(game, key);
 			}
 		}
 		break;
@@ -172,16 +172,16 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		if (!game->paused && !game->autoplay) {
 			enum oshu_key key = translate_key(&event->key.keysym);
 			if (key != OSHU_UNKNOWN_KEY)
-				game->mode->released(game, key);
+				game->mode->release(game, key);
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 		if (!game->paused && !game->autoplay)
-			game->mode->pressed(game, OSHU_LEFT_BUTTON);
+			game->mode->press(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_MOUSEBUTTONUP:
 		if (!game->paused && !game->autoplay)
-			game->mode->released(game, OSHU_RIGHT_BUTTON);
+			game->mode->release(game, OSHU_RIGHT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {

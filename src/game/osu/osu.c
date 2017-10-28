@@ -170,13 +170,13 @@ static int draw(struct oshu_game *game)
 	return 0;
 }
 
-static int pressed(struct oshu_game *game, enum oshu_key key)
+static int press(struct oshu_game *game, enum oshu_key key)
 {
 	hit(game);
 	return 0;
 }
 
-static int released(struct oshu_game *game, enum oshu_key key)
+static int release(struct oshu_game *game, enum oshu_key key)
 {
 	release_hit(game);
 	return 0;
@@ -196,7 +196,7 @@ struct oshu_game_mode osu_mode = {
 	.check = check,
 	.autoplay = autoplay,
 	.draw = draw,
-	.pressed = pressed,
-	.released = released,
+	.press = press,
+	.release = release,
 	.relinquish = relinquish,
 };

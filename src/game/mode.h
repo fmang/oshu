@@ -72,7 +72,7 @@ enum oshu_key {
 	 * which makes it look like it's for the left hand.
 	 *
 	 * Anyway, this key is only meant as a temporary value, and it is never
-	 * passed to the #oshu_game_mode::pressed. No need to make special
+	 * passed to the #oshu_game_mode::press. No need to make special
 	 * cases for it. However, because new keys might be added in the future
 	 * (who knows?) you should have a sane default case for keys your
 	 * module doesn't handle, if relevant.
@@ -122,13 +122,13 @@ struct oshu_game_mode {
 	 *
 	 * This callback isn't called when the game is paused or on autoplay.
 	 *
-	 * \sa released
+	 * \sa release
 	 */
-	int (*pressed)(struct oshu_game *game, enum oshu_key key);
+	int (*press)(struct oshu_game *game, enum oshu_key key);
 	/**
-	 * See #pressed.
+	 * See #press.
 	 */
-	int (*released)(struct oshu_game *game, enum oshu_key key);
+	int (*release)(struct oshu_game *game, enum oshu_key key);
 	/**
 	 * Release any held object, like sliders or hold notes.
 	 *
