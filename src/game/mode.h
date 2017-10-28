@@ -107,6 +107,15 @@ struct oshu_game_mode {
 	 */
 	int (*autoplay)(struct oshu_game *game);
 	/**
+	 * Called when something in the environment change, and in particular
+	 * when the window is resized.
+	 *
+	 * This function should at least adjust the display.
+	 *
+	 * It is also called when the game starts.
+	 */
+	int (*adjust)(struct oshu_game *game);
+	/**
 	 * Draw the game on the display.
 	 */
 	int (*draw)(struct oshu_game *game);

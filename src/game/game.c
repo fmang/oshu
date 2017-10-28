@@ -19,19 +19,6 @@
  */
 static const double frame_duration = 17;
 
-/**
- * Reset and setup the game coordinates again.
- *
- * Call it whenever the window is resized, and right after the window is
- * opened.
- */
-static void setup_view(struct oshu_display *display)
-{
-	oshu_reset_view(display);
-	oshu_fit_view(&display->view, 640, 480);
-	oshu_resize_view(&display->view, 512, 384);
-}
-
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 {
 	/* 1. Beatmap */
@@ -62,7 +49,7 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
-	setup_view(&game->display);
+	game->mode->adjust(game);
 	if (game->beatmap.background_filename) {
 		game->background = IMG_LoadTexture(game->display.renderer, game->beatmap.background_filename);
 		if (game->background)
@@ -186,7 +173,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			setup_view(&game->display);
+			game->mode->adjust(game);
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:

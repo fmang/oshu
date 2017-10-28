@@ -192,9 +192,18 @@ static int relinquish(struct oshu_game *game)
 	return 0;
 }
 
+static int adjust(struct oshu_game *game)
+{
+	oshu_reset_view(&game->display);
+	oshu_fit_view(&game->display.view, 640, 480);
+	oshu_resize_view(&game->display.view, 512, 384);
+	return 0;
+}
+
 struct oshu_game_mode osu_mode = {
 	.check = check,
 	.autoplay = autoplay,
+	.adjust = adjust,
 	.draw = draw,
 	.press = press,
 	.release = release,
