@@ -19,6 +19,12 @@
  */
 static const double frame_duration = 17;
 
+/**
+ * Reset and setup the game coordinates again.
+ *
+ * Call it whenever the window is resized, and right after the window is
+ * opened.
+ */
 static void setup_view(struct oshu_display *display)
 {
 	oshu_reset_view(display);
@@ -26,12 +32,9 @@ static void setup_view(struct oshu_display *display)
 	oshu_resize_view(&display->view, 512, 384);
 }
 
-/**
- * \todo
- * Cleanup the allocated memory on failure.
- */
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 {
+	/* 1. Beatmap */
 	if (oshu_load_beatmap(beatmap_path, &game->beatmap) < 0) {
 		oshu_log_error("no beatmap, aborting");
 		goto fail;
@@ -42,26 +45,32 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 		oshu_log_error("unsupported game mode");
 		goto fail;
 	}
+	assert (game->beatmap.hits != NULL);
 	game->hit_cursor = game->beatmap.hits;
 
+	/* 2. Audio */
+	assert (game->beatmap.audio_filename != NULL);
 	if (oshu_open_audio(game->beatmap.audio_filename, &game->audio) < 0) {
 		oshu_log_error("no audio, aborting");
 		goto fail;
 	}
+	oshu_open_sound_library(&game->library, &game->audio.device_spec);
+	oshu_populate_library(&game->library, &game->beatmap);
 
+	/* 3. Display */
 	if (oshu_open_display(&game->display) < 0) {
 		oshu_log_error("no display, aborting");
 		goto fail;
 	}
 	setup_view(&game->display);
-
 	if (game->beatmap.background_filename) {
 		game->background = IMG_LoadTexture(game->display.renderer, game->beatmap.background_filename);
 		if (game->background)
 			SDL_SetTextureColorMod(game->background, 64, 64, 64);
 	}
 
-	if (game->beatmap.audio_lead_in > 0) {
+	/* 4. Clock */
+	if (game->beatmap.audio_lead_in > 0.) {
 		game->clock.now = - game->beatmap.audio_lead_in;
 	} else {
 		double first_hit = game->beatmap.hits->next->time;
@@ -70,12 +79,10 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	}
 	game->clock.ticks = SDL_GetTicks();
 
-	oshu_open_sound_library(&game->library, &game->audio.device_spec);
-	oshu_populate_library(&game->library, &game->beatmap);
-
 	return 0;
 
 fail:
+	oshu_destroy_game(game);
 	return -1;
 }
 
