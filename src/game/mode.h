@@ -129,6 +129,13 @@ struct oshu_game_mode {
 	 * See #pressed.
 	 */
 	int (*released)(struct oshu_game *game, enum oshu_key key);
+	/**
+	 * Release any held object, like sliders or hold notes.
+	 *
+	 * This function is called whenever the user seeks somewhere in the
+	 * song.
+	 */
+	int (*relinquish)(struct oshu_game *game);
 };
 
 /** \} */

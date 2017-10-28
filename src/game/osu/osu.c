@@ -182,10 +182,21 @@ static int released(struct oshu_game *game, enum oshu_key key)
 	return 0;
 }
 
+static int relinquish(struct oshu_game *game)
+{
+	if (game->osu.current_slider) {
+		game->osu.current_slider->state = OSHU_INITIAL_HIT;
+		oshu_stop_loop(&game->audio);
+		game->osu.current_slider = NULL;
+	}
+	return 0;
+}
+
 struct oshu_game_mode osu_mode = {
 	.check = check,
 	.autoplay = autoplay,
 	.draw = draw,
 	.pressed = pressed,
 	.released = released,
+	.relinquish = relinquish,
 };
