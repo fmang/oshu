@@ -159,7 +159,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			forward_music(game, 20.);
 			break;
 		default:
-			if (!game->paused && !game->autoplay && game->mode->pressed) {
+			if (!game->paused && !game->autoplay) {
 				enum oshu_key key = translate_key(&event->key.keysym);
 				if (key != OSHU_UNKNOWN_KEY)
 					game->mode->pressed(game, key);
@@ -167,18 +167,18 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		}
 		break;
 	case SDL_KEYUP:
-		if (!game->paused && !game->autoplay && game->mode->released) {
+		if (!game->paused && !game->autoplay) {
 			enum oshu_key key = translate_key(&event->key.keysym);
 			if (key != OSHU_UNKNOWN_KEY)
 				game->mode->released(game, key);
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		if (!game->paused && !game->autoplay && game->mode->pressed)
+		if (!game->paused && !game->autoplay)
 			game->mode->pressed(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_MOUSEBUTTONUP:
-		if (!game->paused && !game->autoplay && game->mode->released)
+		if (!game->paused && !game->autoplay)
 			game->mode->released(game, OSHU_RIGHT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
@@ -252,8 +252,7 @@ static void draw(struct oshu_game *game)
 	SDL_RenderClear(game->display.renderer);
 	if (game->background)
 		oshu_draw_background(&game->display, game->background);
-	if (game->mode->draw)
-		game->mode->draw(game);
+	game->mode->draw(game);
 }
 
 /**
@@ -306,9 +305,9 @@ int oshu_run_game(struct oshu_game *game)
 			oshu_play_audio(&game->audio);
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
-		if (!game->paused && !game->autoplay && game->mode->check)
+		if (!game->paused && !game->autoplay)
 			game->mode->check(game);
-		else if (!game->paused && game->autoplay && game->mode->autoplay)
+		else if (!game->paused && game->autoplay)
 			game->mode->autoplay(game);
 		draw(game);
 		dump_state(game);

@@ -87,9 +87,8 @@ enum oshu_key {
  * error. An error is likely to stop the game in the future, so make sure it's
  * worth it.
  *
- * When a callback is null, it means there's nothing to do, and that's
- * perfectly fine. For example, the taiko or mania modes have no reason to use
- * the mouse.
+ * All the callbacks must be defined! It's okay if it doesn't do anything, but
+ * the pointers must point somewhere.
  */
 struct oshu_game_mode {
 	/**
