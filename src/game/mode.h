@@ -99,8 +99,14 @@ struct oshu_game_mode {
 	 * were missed, or other things of the same kind.
 	 *
 	 * There's no guarantee this callback is called at regular intervals.
+	 *
+	 * For autoplay, use #autoplay instead.
 	 */
 	int (*check)(struct oshu_game *game);
+	/**
+	 * Called pretty much like #check, except it's for autoplay mode.
+	 */
+	int (*autoplay)(struct oshu_game *game);
 	/**
 	 * Draw the game on the display.
 	 */

@@ -90,18 +90,6 @@ struct oshu_game {
 		struct osu_state osu;
 	};
 	/**
-	 * Pointer to the current hit, according to the context of the game.
-	 *
-	 * Typically, it would point to the first non-obsolete hit, where a hit
-	 * is said to be obsolete when it is nor displayable (not even its
-	 * fade-out shadow remains), nor clickable.
-	 *
-	 * Its goal is to improve the performance of the beatmap drawing
-	 * routine and the reactivity on user click, because the obsolete hits
-	 * are already skipped.
-	 *
-	 * **Future version:**
-	 *
 	 * Pointer to the next clickable hit.
 	 *
 	 * Any hit before this cursor has already been dealt with, and its
@@ -137,5 +125,15 @@ void oshu_destroy_game(struct oshu_game *game);
  * Start the main event loop.
  */
 int oshu_run_game(struct oshu_game *game);
+
+/**
+ * Find the first hit object after *now - offset*.
+ *
+ * It bases the search on the #oshu_game::hit_cursor for performance, but its
+ * position won't affect the results.
+ *
+ * For long notes like sliders, the end time is used, not the start time.
+ */
+struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset);
 
 /** \} */

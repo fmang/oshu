@@ -95,10 +95,6 @@ static void toggle_pause(struct oshu_game *game)
 	}
 }
 
-/**
- * \todo
- * Allow rewinding, even after the last note was played.
- */
 static void rewind_music(struct oshu_game *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
@@ -115,6 +111,12 @@ static void forward_music(struct oshu_game *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp + offset);
 	game->clock.now = game->audio.music.current_timestamp;
+
+	assert (game->hit_cursor != NULL);
+	while (game->hit_cursor->time < game->clock.now) {
+		game->hit_cursor->state = OSHU_SKIPPED_HIT;
+		game->hit_cursor = game->hit_cursor->next;
+	}
 }
 
 enum oshu_key translate_key(SDL_Keysym *keysym)
@@ -297,8 +299,10 @@ int oshu_run_game(struct oshu_game *game)
 			oshu_play_audio(&game->audio);
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
-		if (!game->paused && game->mode->check)
+		if (!game->paused && !game->autoplay && game->mode->check)
 			game->mode->check(game);
+		else if (!game->paused && game->autoplay && game->mode->autoplay)
+			game->mode->autoplay(game);
 		draw(game);
 		dump_state(game);
 		long int advance = frame_duration - (SDL_GetTicks() - game->clock.ticks);
@@ -320,4 +324,18 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_close_audio(&game->audio);
 	if (game->beatmap.hits)
 		oshu_destroy_beatmap(&game->beatmap);
+}
+
+struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset)
+{
+	struct oshu_hit *hit = game->hit_cursor;
+	double target = game->clock.now - offset;
+	/* seek backward */
+	while (oshu_hit_end_time(hit) > target)
+		hit = hit->previous;
+	/* seek forward */
+	while (oshu_hit_end_time(hit) < target)
+		hit = hit->next;
+	/* here we have the guarantee that hit->time >= target */
+	return hit;
 }

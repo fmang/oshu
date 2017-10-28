@@ -120,46 +120,19 @@ static void check_slider(struct oshu_game *game)
  *
  * For example, when the audio is past a hit object and beyond the threshold of
  * tolerance, mark that hit as missed.
- *
- * Also move the beatmap's hit cursor to optimize the beatmap manipulation
- * routines.
  */
 static void check_audio(struct oshu_game *game)
 {
-	if (game->autoplay) {
-		for (struct oshu_hit *hit = game->hit_cursor; hit; hit = hit->next) {
-			if (hit->time > game->clock.now) {
-				break;
-			} else if (hit->state == OSHU_INITIAL_HIT) {
-				if (hit->type & OSHU_SLIDER_HIT) {
-					hit->state = OSHU_SLIDING_HIT;
-					game->osu.current_slider = hit;
-					oshu_play_sound(&game->library, &hit->sound, &game->audio);
-					oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
-				} else if (hit->type & OSHU_CIRCLE_HIT) {
-					hit->state = OSHU_GOOD_HIT;
-					oshu_play_sound(&game->library, &hit->sound, &game->audio);
-				} else {
-					continue;
-				}
-			}
-		}
-	} else {
+	double left_wall = game->clock.now - game->beatmap.difficulty.leniency;
+	while (game->hit_cursor->time < left_wall) {
+		struct oshu_hit *hit = game->hit_cursor;
 		/* Mark dead notes as missed. */
-		for (struct oshu_hit *hit = game->hit_cursor; hit; hit = hit->next) {
-			if (hit->time > game->clock.now - game->beatmap.difficulty.leniency)
-				break;
-			if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
-				continue;
-			if (hit->state == OSHU_INITIAL_HIT)
-				hit->state = OSHU_MISSED_HIT;
-		}
+		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
+			hit->state = OSHU_UNKNOWN_HIT;
+		else if (hit->state == OSHU_INITIAL_HIT)
+			hit->state = OSHU_MISSED_HIT;
+		game->hit_cursor = hit->next;
 	}
-	for (
-		struct oshu_hit **hit = &game->hit_cursor;
-		*hit && oshu_hit_end_time(*hit) < game->clock.now - game->beatmap.difficulty.approach_time;
-		*hit = (*hit)->next
-	);
 }
 
 static int check(struct oshu_game *game)
@@ -169,9 +142,31 @@ static int check(struct oshu_game *game)
 	return 0;
 }
 
+static int autoplay(struct oshu_game *game)
+{
+	check_slider(game);
+	while (game->hit_cursor->time < game->clock.now) {
+		struct oshu_hit *hit = game->hit_cursor;
+		if (hit->type & OSHU_SLIDER_HIT) {
+			hit->state = OSHU_SLIDING_HIT;
+			game->osu.current_slider = hit;
+			oshu_play_sound(&game->library, &hit->sound, &game->audio);
+			oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
+		} else if (hit->type & OSHU_CIRCLE_HIT) {
+			hit->state = OSHU_GOOD_HIT;
+			oshu_play_sound(&game->library, &hit->sound, &game->audio);
+		} else {
+			hit->state = OSHU_UNKNOWN_HIT;
+		}
+		game->hit_cursor = hit->next;
+	}
+	return 0;
+}
+
 static int draw(struct oshu_game *game)
 {
-	osu_draw_beatmap(&game->display, &game->beatmap, game->hit_cursor, game->clock.now);
+	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
+	osu_draw_beatmap(&game->display, &game->beatmap, start, game->clock.now);
 	return 0;
 }
 
@@ -189,6 +184,7 @@ static int released(struct oshu_game *game, enum oshu_key key)
 
 struct oshu_game_mode osu_mode = {
 	.check = check,
+	.autoplay = autoplay,
 	.draw = draw,
 	.pressed = pressed,
 	.released = released,
