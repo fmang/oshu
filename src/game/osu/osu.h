@@ -42,17 +42,11 @@ struct osu_state {
 };
 
 /**
- * Draw a hit object.
- */
-void osu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now);
-
-/**
- * Draw all the visible nodes from the beatmap, according to the current
- * position in the song.
+ * The main drawing callback of the mode.
  *
- * `now` is the current position in the playing song, in seconds.
+ * Exported in its own sub-module.
  */
-void osu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now);
+int osu_draw(struct oshu_game *game);
 
 /**
  * Implementation of the standard osu! game mode.

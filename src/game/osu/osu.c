@@ -6,7 +6,6 @@
  */
 
 #include "game/game.h"
-#include "graphics/draw.h"
 
 #include <assert.h>
 
@@ -140,17 +139,6 @@ static int autoplay(struct oshu_game *game)
 }
 
 /**
- * \todo
- * Export to the draw sub-module.
- */
-static int draw(struct oshu_game *game)
-{
-	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
-	osu_draw_beatmap(&game->display, &game->beatmap, start, game->clock.now);
-	return 0;
-}
-
-/**
  * Release the held slider, either because the held key is released, or because
  * a new slider is activated (somehow).
  */
@@ -232,7 +220,7 @@ struct oshu_game_mode osu_mode = {
 	.check = check,
 	.autoplay = autoplay,
 	.adjust = adjust,
-	.draw = draw,
+	.draw = osu_draw,
 	.press = press,
 	.release = release,
 	.relinquish = relinquish,

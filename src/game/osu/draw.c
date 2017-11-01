@@ -7,6 +7,7 @@
  */
 
 #include "beatmap/beatmap.h"
+#include "game/game.h"
 #include "graphics/display.h"
 #include "graphics/draw.h"
 
@@ -69,7 +70,7 @@ static void draw_slider(struct oshu_display *display, struct oshu_beatmap *beatm
 	}
 }
 
-void osu_draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
+static void draw_hit(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
 	if (hit->type & OSHU_SLIDER_HIT)
 		draw_slider(display, beatmap, hit, now);
@@ -92,7 +93,13 @@ static void connect_hits(struct oshu_display *display, struct oshu_beatmap *beat
 	oshu_draw_line(display, (P) {end.x + d.x, end.y + d.y}, (P) {next->p.x - d.x, next->p.y - d.y});
 }
 
-void osu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now)
+/**
+ * Draw all the visible nodes from the beatmap, according to the current
+ * position in the song.
+ *
+ * `now` is the current position in the playing song, in seconds.
+ */
+static void draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now)
 {
 	struct oshu_hit *prev = NULL;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->next) {
@@ -102,8 +109,15 @@ void osu_draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap
 			break;
 		if (prev && !(hit->type & OSHU_NEW_HIT_COMBO))
 			connect_hits(display, beatmap, prev, hit);
-		osu_draw_hit(display, beatmap, hit, now);
+		draw_hit(display, beatmap, hit, now);
 		prev = hit;
 	}
 	SDL_RenderPresent(display->renderer);
+}
+
+int osu_draw(struct oshu_game *game)
+{
+	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
+	draw_beatmap(&game->display, &game->beatmap, start, game->clock.now);
+	return 0;
 }
