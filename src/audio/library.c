@@ -21,20 +21,23 @@ void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_Audi
 	library->format = format;
 }
 
+static void free_sample(struct oshu_sample **sample)
+{
+	if (*sample) {
+		oshu_destroy_sample(*sample);
+		free(*sample);
+		*sample = NULL;
+	}
+}
+
 static void free_shelf(struct oshu_sound_shelf *shelf)
 {
-	if (shelf->hit_normal)
-		oshu_destroy_sample(shelf->hit_normal);
-	if (shelf->hit_whistle)
-		oshu_destroy_sample(shelf->hit_whistle);
-	if (shelf->hit_finish)
-		oshu_destroy_sample(shelf->hit_finish);
-	if (shelf->hit_clap)
-		oshu_destroy_sample(shelf->hit_clap);
-	if (shelf->slider_slide)
-		oshu_destroy_sample(shelf->slider_slide);
-	if (shelf->slider_whistle)
-		oshu_destroy_sample(shelf->slider_whistle);
+	free_sample(&shelf->hit_normal);
+	free_sample(&shelf->hit_whistle);
+	free_sample(&shelf->hit_finish);
+	free_sample(&shelf->hit_clap);
+	free_sample(&shelf->slider_slide);
+	free_sample(&shelf->slider_whistle);
 }
 
 static void free_room(struct oshu_sound_room *room)
