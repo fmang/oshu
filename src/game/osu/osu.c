@@ -111,26 +111,40 @@ static int check(struct oshu_game *game)
 }
 
 /**
- * \todo
- * Factor the hit actions.
+ * Mark a hit as active.
+ *
+ * For a circle hit, mark it as good. For a slider, mark it as sliding.
+ * Unknown hits are marked as unknown.
+ *
+ * The key is the held key, relevant only for sliders. In autoplay mode, it's
+ * value doesn't matter.
+ */
+static void activate_hit(struct oshu_game *game, struct oshu_hit *hit, enum oshu_key key)
+{
+	if (hit->type & OSHU_SLIDER_HIT) {
+		release_slider(game);
+		hit->state = OSHU_SLIDING_HIT;
+		game->osu.current_slider = hit;
+		game->osu.held_key = key;
+		oshu_play_sound(&game->library, &hit->sound, &game->audio);
+		oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
+	} else if (hit->type & OSHU_CIRCLE_HIT) {
+		hit->state = OSHU_GOOD_HIT;
+		oshu_play_sound(&game->library, &hit->sound, &game->audio);
+	} else {
+		hit->state = OSHU_UNKNOWN_HIT;
+	}
+}
+
+/**
+ * Automatically activate the sliders on time.
  */
 static int autoplay(struct oshu_game *game)
 {
 	sonorize_slider(game);
 	while (game->hit_cursor->time < game->clock.now) {
-		struct oshu_hit *hit = game->hit_cursor;
-		if (hit->type & OSHU_SLIDER_HIT) {
-			hit->state = OSHU_SLIDING_HIT;
-			game->osu.current_slider = hit;
-			oshu_play_sound(&game->library, &hit->sound, &game->audio);
-			oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
-		} else if (hit->type & OSHU_CIRCLE_HIT) {
-			hit->state = OSHU_GOOD_HIT;
-			oshu_play_sound(&game->library, &hit->sound, &game->audio);
-		} else {
-			hit->state = OSHU_UNKNOWN_HIT;
-		}
-		game->hit_cursor = hit->next;
+		activate_hit(game, game->hit_cursor, OSHU_UNKNOWN_KEY);
+		game->hit_cursor = game->hit_cursor->next;
 	}
 	return 0;
 }
@@ -147,17 +161,7 @@ static int press(struct oshu_game *game, enum oshu_key key)
 	if (!hit)
 		return 0;
 	if (fabs(hit->time - game->clock.now) < game->beatmap.difficulty.leniency) {
-		if (hit->type & OSHU_SLIDER_HIT) {
-			release_slider(game);
-			hit->state = OSHU_SLIDING_HIT;
-			game->osu.current_slider = hit;
-			game->osu.held_key = key;
-			oshu_play_sound(&game->library, &hit->sound, &game->audio);
-			oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
-		} else if (hit->type & OSHU_CIRCLE_HIT) {
-			hit->state = OSHU_GOOD_HIT;
-			oshu_play_sound(&game->library, &hit->sound, &game->audio);
-		}
+		activate_hit(game, hit, key);
 	} else {
 		hit->state = OSHU_MISSED_HIT;
 	}
