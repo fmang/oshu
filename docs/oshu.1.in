@@ -23,7 +23,8 @@ create the sub-directory by itself if you naively unzip it.
 .TP
 \fB\-v, \-\-verbose\fR
 Increase the verbosity. This will print debugging messages, which may contain
-useful information for understanding errors when fixing issues.
+useful information for understanding errors when fixing issues. Mention it
+twice and you'll get verbose debugging messages.
 .TP
 \fB\-h, \-\-help\fR
 Show a brief help message.

@@ -86,11 +86,9 @@ int run(const char *beatmap_path, int autoplay, int pause)
 
 int main(int argc, char **argv)
 {
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
-
 	int autoplay = 0;
 	int pause = 0;
+	int verbosity = SDL_LOG_PRIORITY_INFO;
 
 	for (;;) {
 		int c = getopt_long(argc, argv, flags, options, NULL);
@@ -98,7 +96,7 @@ int main(int argc, char **argv)
 			break;
 		switch (c) {
 		case OPT_VERBOSE:
-			SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
+			verbosity = (verbosity == SDL_LOG_PRIORITY_INFO) ? SDL_LOG_PRIORITY_DEBUG : SDL_LOG_PRIORITY_VERBOSE;
 			break;
 		case OPT_HELP:
 			puts("oshu! version " VERSION);
@@ -121,6 +119,9 @@ int main(int argc, char **argv)
 		fputs(usage, stderr);
 		return 2;
 	}
+
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, verbosity);
 
 	char *beatmap_path = realpath(argv[optind], NULL);
 	if (beatmap_path == NULL) {
