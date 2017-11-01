@@ -16,26 +16,17 @@
  * clicked.
  *
  * If two hit objects overlap, yield the oldest unclicked one.
- *
- * \todo
- * Simplify the code using the new properties of the hits list.
- *
- * \todo
- * Use #oshu_look_hit_back for robustness.
  */
 static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
 {
-	for (struct oshu_hit *hit = game->hit_cursor; hit; hit = hit->next) {
-		if (hit->time > game->clock.now + game->beatmap.difficulty.approach_time)
-			break;
-		if (hit->time < game->clock.now - game->beatmap.difficulty.approach_time)
-			continue;
+	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
+	double max_time = game->clock.now + game->beatmap.difficulty.approach_time;
+	for (struct oshu_hit *hit = start; hit->time <= max_time; hit = hit->next) {
 		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
 			continue;
 		if (hit->state != OSHU_INITIAL_HIT)
 			continue;
-		double dist = oshu_distance(p, hit->p);
-		if (dist <= game->beatmap.difficulty.circle_radius)
+		if (oshu_distance(p, hit->p) <= game->beatmap.difficulty.circle_radius)
 			return hit;
 	}
 	return NULL;
