@@ -5,11 +5,14 @@
  * Game module implementation.
  */
 
+#include "../config.h"
+
 #include "game/game.h"
 #include "graphics/draw.h"
 #include "log.h"
 
 #include <assert.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #include <SDL2/SDL_image.h>
@@ -48,6 +51,11 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	if (oshu_open_display(&game->display) < 0) {
 		oshu_log_error("no display, aborting");
 		goto fail;
+	}
+	char *title;
+	if (asprintf(&title, "%s - oshu!", beatmap_path) >= 0) {
+		SDL_SetWindowTitle(game->display.window, title);
+		free(title);
 	}
 	game->mode->adjust(game);
 	if (game->beatmap.background_filename) {
