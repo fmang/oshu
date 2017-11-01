@@ -8,6 +8,8 @@
 #include "game/game.h"
 #include "graphics/draw.h"
 
+#include <assert.h>
+
 /**
  * Find the first clickable hit object that contains the given x/y coordinates.
  *
@@ -38,65 +40,6 @@ static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
 			return hit;
 	}
 	return NULL;
-}
-
-/**
- * Get the current mouse position, get the hit object, and change its state.
- *
- * Play a sample depending on what was clicked, and when.
- *
- * \todo
- * Handle the held key.
- *
- * \todo
- * Merge with #press.
- */
-static void hit(struct oshu_game *game)
-{
-	struct oshu_point mouse = oshu_get_mouse(&game->display);
-	struct oshu_hit *hit = find_hit(game, mouse);
-	if (hit) {
-		if (fabs(hit->time - game->clock.now) < game->beatmap.difficulty.leniency) {
-			if (hit->type & OSHU_SLIDER_HIT) {
-				hit->state = OSHU_SLIDING_HIT;
-				game->osu.current_slider = hit;
-				oshu_play_sound(&game->library, &hit->sound, &game->audio);
-				oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
-			} else if (hit->type & OSHU_CIRCLE_HIT) {
-				hit->state = OSHU_GOOD_HIT;
-				oshu_play_sound(&game->library, &hit->sound, &game->audio);
-			}
-		} else {
-			hit->state = OSHU_MISSED_HIT;
-		}
-	}
-}
-
-/**
- * When the user is holding a slider or a hold note in mania mode, do
- * something.
- *
- * \todo
- * Rename to `release_slider` for specifity. Add the relevant assertions.
- *
- * \todo
- * Merge with #release.
- */
-static void release_hit(struct oshu_game *game)
-{
-	struct oshu_hit *hit = game->osu.current_slider;
-	if (!hit)
-		return;
-	if (!(hit->type & OSHU_SLIDER_HIT))
-		return;
-	if (game->clock.now < oshu_hit_end_time(hit) - game->beatmap.difficulty.leniency) {
-		hit->state = OSHU_MISSED_HIT;
-	} else {
-		hit->state = OSHU_GOOD_HIT;
-		oshu_play_sound(&game->library, &hit->slider.sounds[hit->slider.repeat], &game->audio);
-	}
-	oshu_stop_loop(&game->audio);
-	game->osu.current_slider = NULL;
 }
 
 /**
@@ -208,28 +151,62 @@ static int draw(struct oshu_game *game)
 }
 
 /**
- * \todo
- * Update game->osu.held_key for sliders.
+ * Release the held slider, either because the held key is released, or because
+ * a new slider is activated (somehow).
+ */
+static void release_slider(struct oshu_game *game)
+{
+	struct oshu_hit *hit = game->osu.current_slider;
+	if (!hit)
+		return;
+	assert (hit->type & OSHU_SLIDER_HIT);
+	if (game->clock.now < oshu_hit_end_time(hit) - game->beatmap.difficulty.leniency) {
+		hit->state = OSHU_MISSED_HIT;
+	} else {
+		hit->state = OSHU_GOOD_HIT;
+		oshu_play_sound(&game->library, &hit->slider.sounds[hit->slider.repeat], &game->audio);
+	}
+	oshu_stop_loop(&game->audio);
+	game->osu.current_slider = NULL;
+}
+
+/**
+ * Get the current mouse position, get the hit object, and change its state.
  *
- * \todo
- * Merge with #hit.
+ * Play a sample depending on what was clicked, and when.
  */
 static int press(struct oshu_game *game, enum oshu_key key)
 {
-	hit(game);
+	struct oshu_point mouse = oshu_get_mouse(&game->display);
+	struct oshu_hit *hit = find_hit(game, mouse);
+	if (!hit)
+		return 0;
+	if (fabs(hit->time - game->clock.now) < game->beatmap.difficulty.leniency) {
+		if (hit->type & OSHU_SLIDER_HIT) {
+			release_slider(game);
+			hit->state = OSHU_SLIDING_HIT;
+			game->osu.current_slider = hit;
+			game->osu.held_key = key;
+			oshu_play_sound(&game->library, &hit->sound, &game->audio);
+			oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
+		} else if (hit->type & OSHU_CIRCLE_HIT) {
+			hit->state = OSHU_GOOD_HIT;
+			oshu_play_sound(&game->library, &hit->sound, &game->audio);
+		}
+	} else {
+		hit->state = OSHU_MISSED_HIT;
+	}
 	return 0;
 }
 
 /**
- * \todo
- * Check key == game->osu.held_key
- *
- * \todo
- * Merge with #release_hit.
+ * When the user is holding a slider or a hold note in mania mode, release the
+ * thing.
  */
 static int release(struct oshu_game *game, enum oshu_key key)
 {
-	release_hit(game);
+	if (game->osu.held_key == key)
+		release_slider(game);
 	return 0;
 }
 

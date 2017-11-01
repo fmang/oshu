@@ -37,11 +37,8 @@ struct osu_state {
 	 *
 	 * When the #current_slider is NULL, the value of this field is
 	 * irrelevant.
-	 *
-	 * \todo
-	 * Use it in the implementation.
 	 */
-	struct oshu_key held_key;
+	enum oshu_key held_key;
 };
 
 /**
