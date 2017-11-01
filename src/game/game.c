@@ -314,11 +314,11 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);
-	oshu_close_display(&game->display);
 	if (game->background) {
 		SDL_DestroyTexture(game->background);
 		game->background = NULL;
 	}
+	oshu_close_display(&game->display);
 }
 
 struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset)
