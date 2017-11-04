@@ -36,6 +36,8 @@ double oshu_distance(struct oshu_point p, struct oshu_point q)
 	return sqrt(oshu_distance2(p, q));
 }
 
+/* Bézier *********************************************************************/
+
 /**
  * Split the [0, 1] range into n equal sub-segments.
  *
@@ -267,6 +269,8 @@ static double l_to_t(struct oshu_bezier *bezier, double l)
 	return (1. - l) * bezier->anchors[i] + l * bezier->anchors[i + 1];
 }
 
+/* Lines **********************************************************************/
+
 /**
  * Simple weighted average of the starting point and end point.
  */
@@ -288,6 +292,18 @@ static struct oshu_vector line_derive(struct oshu_line *line, double t)
 		.y = - line->start.y + line->end.y,
 	};
 }
+
+static void normalize_line(struct oshu_line *line, double target_length)
+{
+	double actual_length = oshu_distance(line->start, line->end);
+	assert (target_length > 0);
+	assert (actual_length > 0);
+	double factor = target_length / actual_length;
+	line->end.x = line->start.x + (line->end.x - line->start.x) * factor;
+	line->end.y = line->start.y + (line->end.y - line->start.y) * factor;
+}
+
+/* Perfect circle arcs ********************************************************/
 
 static struct oshu_point arc_at(struct oshu_arc *arc, double t)
 {
@@ -352,9 +368,22 @@ int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c
 	return 0;
 }
 
+static void normalize_arc(struct oshu_arc *arc, double target_length)
+{
+	double target_angle = target_length / arc->radius;
+	double diff = copysign(target_angle, arc->end_angle - arc->start_angle);
+	arc->end_angle = arc->start_angle + diff;
+}
+
+/* Generic interface **********************************************************/
+
 void oshu_normalize_path(struct oshu_path *path, double length)
 {
 	switch (path->type) {
+	case OSHU_LINEAR_PATH:
+		return normalize_line(&path->line, length);
+	case OSHU_PERFECT_PATH:
+		return normalize_arc(&path->arc, length);
 	case OSHU_BEZIER_PATH:
 		return normalize_bezier(&path->bezier, length);
 	default:
