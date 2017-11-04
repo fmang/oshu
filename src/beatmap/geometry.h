@@ -228,36 +228,6 @@ struct oshu_bezier {
 };
 
 /**
- * Approximate the length of the segment and set-up the l-coordinate system.
- *
- * Receives a Bézier path whose #oshu_bezier::segment_count,
- * #oshu_bezier::indices and #oshu_bezier::control_points are filled, and use
- * these data to compute the #oshu_bezier::anchors field.
- *
- * Here are the steps of the normalization process:
- *
- * 1. Pick `n + 1` points `p_0, …, p_n` on the curve, with their t-coordinates
- *    `t_0, … t_n` such that `t_0 = 0`, `t_n = 1`, and for every i ≤ j,
- *    `t_i ≤ t_j`. The sanest choice is to take `t_i = i / n`.
- *
- * 2. For each point, compute its distance from the beginning, following the
- *    curve. `L_0 = 0` and `L_(i+1) = L_i + || p_(i+1) - p_i ||`.
- *    With this, `L_n` is the length of the path.
- *
- * 3. Deduce the l-coordinates of the points by normalizing the L-coordinates
- *    above such that `l_0 = 0` and `l_n = 1`: let `l_i = L_i / L_n`.
- *
- * 4. Now, let's compute #oshu_bezier::anchors.
- *    For every anchor index `j`, let `l = j / (# of anchors - 1)`, and find
- *    `i` such that `l_i ≤ l ≤ l_(i+1)`.
- *    Compute `k` such that `l = (1-k) * l_i + k * l_(i+1)`.
- *    Hint: `k = (l - l_i) / (l_(i+1) - l_i)`.
- *    Finally, let `anchors[j] = (1-k) * t_i + k * t_(i+1)`.
- *
- */
-void oshu_normalize_bezier(struct oshu_bezier *bezier);
-
-/**
  * The curve types for a slider.
  *
  * Their value is the letter that appears in the beatmaps to identify the type.
@@ -295,6 +265,15 @@ struct oshu_path {
 		struct oshu_bezier bezier; /**< For #OSHU_BEZIER_PATH. */
 	};
 };
+
+/**
+ * Adjust the length-related properties of a path.
+ *
+ * The path described by its control points may not have the same length as the
+ * wanted length specified as argument, in which case the path is shrinked or
+ * expanded.
+ */
+void oshu_normalize_path(struct oshu_path *path, double length);
 
 /**
  * Express the path in floating t-coordinates.

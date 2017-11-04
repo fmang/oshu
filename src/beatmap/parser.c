@@ -903,6 +903,7 @@ static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 	if (parse_double(parser, &length) < 0)
 		return -1;
 	hit->slider.duration = length / (100. * parser->beatmap->difficulty.slider_multiplier) * hit->timing_point->beat_duration;
+	oshu_normalize_path(&hit->slider.path, length);
 	if (parse_slider_additions(parser, hit) < 0)
 		return -1;
 	return 0;
@@ -1020,7 +1021,6 @@ static int parse_bezier_slider(struct parser_state *parser, struct oshu_hit *hit
 	}
 	bezier->indices[++index] = count;
 	bezier->segment_count = index;
-	oshu_normalize_bezier(bezier);
 	return 0;
 fail:
 	free(bezier->control_points);
