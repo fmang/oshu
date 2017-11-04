@@ -192,10 +192,13 @@ static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
  *
  * 2. For each point, compute its distance from the beginning, following the
  *    curve. `L_0 = 0` and `L_(i+1) = L_i + || p_(i+1) - p_i ||`.
- *    With this, `L_n` is the length of the path.
+ *    With this, `L_n` is the actual length of the path.
  *
  * 3. Deduce the l-coordinates of the points by normalizing the L-coordinates
- *    above such that `l_0 = 0` and `l_n = 1`: let `l_i = L_i / L_n`.
+ *    above such that `l_0 = 0` and `l_n = 1`: let `l_i = L_i / L`. Note that
+ *    here, `L` is the *wanted* length, assuming `L ≤ L_n`. This implies
+ *    `l_n ≥ 1`, which in turns implies that the final curve is cut, the
+ *    desired effect.
  *
  * 4. Now, let's compute #oshu_bezier::anchors.
  *    For every anchor index `j`, let `l = j / (# of anchors - 1)`, and find
@@ -205,7 +208,7 @@ static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
  *    Finally, let `anchors[j] = (1-k) * t_i + k * t_(i+1)`.
  *
  */
-void normalize_bezier(struct oshu_bezier *bezier)
+void normalize_bezier(struct oshu_bezier *bezier, double target_length)
 {
 	/* 1. Prepare the field. */
 	int n = 32;  /* arbitrary */
@@ -221,11 +224,17 @@ void normalize_bezier(struct oshu_bezier *bezier)
 		l[i] = length;
 		prev = current;
 	}
+	if (length < target_length) {
+		double delta = target_length - length;
+		if (delta > length / 100.)
+			oshu_log_warning("bezier slider is %f pixels short", delta);
+		target_length = length;
+	}
 
 	/* 3. Deduce the l-coordinates. */
 	assert (length > 0);
 	for (int i = 0; i <= n; i++)
-		l[i] /= length;
+		l[i] /= target_length;
 
 	/* 4. Set up the anchors. */
 	int i = 0;
