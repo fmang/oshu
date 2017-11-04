@@ -223,7 +223,7 @@ void normalize_bezier(struct oshu_bezier *bezier, double target_length)
 	}
 	if (length < target_length) {
 		double delta = target_length - length;
-		if (delta > length / 100.)
+		if (delta > 5.)
 			oshu_log_warning("bezier slider is %f pixels short", delta);
 		target_length = length;
 	}
