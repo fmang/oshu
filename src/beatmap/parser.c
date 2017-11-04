@@ -651,6 +651,7 @@ static int process_color(struct parser_state *parser)
 			parser->beatmap->colors = color;
 		color->next = parser->beatmap->colors;
 		break;
+	case SliderBody:
 	case SliderTrackOverride:
 	case SliderBorder:
 		consume_all(parser);
