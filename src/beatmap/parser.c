@@ -852,10 +852,12 @@ fail:
  */
 static int parse_common_hit(struct parser_state *parser, struct oshu_hit *hit)
 {
-	if (parse_double_sep(parser, &hit->p.x, ',') < 0)
+	double x, y;
+	if (parse_double_sep(parser, &x, ',') < 0)
 		return -1;
-	if (parse_double_sep(parser, &hit->p.y, ',') < 0)
+	if (parse_double_sep(parser, &y, ',') < 0)
 		return -1;
+	hit->p = x + y * I;
 	if (parse_double_sep(parser, &hit->time, ',') < 0)
 		return -1;
 	hit->time /= 1000.;
@@ -914,12 +916,14 @@ static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
  * Consumes:
  * `168:88`
  */
-static int parse_point(struct parser_state *parser, struct oshu_point *p)
+static int parse_point(struct parser_state *parser, oshu_point *p)
 {
-	if (parse_double_sep(parser, &p->x, ':') < 0)
+	double x, y;
+	if (parse_double_sep(parser, &x, ':') < 0)
 		return -1;
-	if (parse_double(parser, &p->y) < 0)
+	if (parse_double(parser, &y) < 0)
 		return -1;
+	*p = x + y * I;
 	return 0;
 }
 
@@ -950,7 +954,7 @@ static int parse_linear_slider(struct parser_state *parser, struct oshu_hit *hit
  */
 static int parse_perfect_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
-	struct oshu_point a, b, c;
+	oshu_point a, b, c;
 	a = hit->p;
 	if (parse_point(parser, &b) < 0)
 		return -1;
@@ -1008,15 +1012,15 @@ static int parse_bezier_slider(struct parser_state *parser, struct oshu_hit *hit
 	assert (bezier->indices != NULL);
 	bezier->indices[index] = 0;
 
-	struct oshu_point prev = bezier->control_points[0];
+	oshu_point prev = bezier->control_points[0];
 	for (int i = 1; i < count; i++) {
 		if (i > 1 && consume_char(parser, '|') < 0)
 			goto fail;
-		struct oshu_point p;
+		oshu_point p;
 		if (parse_point(parser, &p) < 0)
 			goto fail;
 		bezier->control_points[i] = p;
-		if (p.x == prev.x && p.y == prev.y)
+		if (p == prev)
 			bezier->indices[++index] = i;
 		prev = p;
 	}

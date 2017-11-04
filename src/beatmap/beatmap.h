@@ -435,7 +435,7 @@ struct oshu_hit {
 	 *
 	 * From (0, 0) for top-left to (512, 384) for bottom-right.
 	 */
-	struct oshu_point p;
+	oshu_point p;
 	/**
 	 * \brief When the hit object should be clicked, in seconds.
 	 *
@@ -533,7 +533,7 @@ double oshu_hit_end_time(struct oshu_hit *hit);
  * the position at the end of the slide. If the slider repeats, it may be the
  * same as the starting point though.
  */
-struct oshu_point oshu_end_point(struct oshu_hit *hit);
+oshu_point oshu_end_point(struct oshu_hit *hit);
 
 /**
  * \brief Complete definition of the [Metadata] section.

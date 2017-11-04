@@ -220,7 +220,7 @@ static int process_input(P*);
 		static int parse_hit_object(P*, struct oshu_hit**);
 			static int parse_common_hit(P*, struct oshu_hit*);
 			static int parse_slider(P*, struct oshu_hit*);
-				static int parse_point(P*, struct oshu_point*);
+				static int parse_point(P*, oshu_point*);
 				static int parse_linear_slider(P*, struct oshu_hit*);
 				static int parse_perfect_slider(P*, struct oshu_hit*);
 				static int parse_bezier_slider(P*, struct oshu_hit*);

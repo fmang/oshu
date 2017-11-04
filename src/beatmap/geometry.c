@@ -14,26 +14,24 @@
  */
 static double epsilon = 0.01;
 
-struct oshu_vector oshu_normalize(struct oshu_vector p)
+oshu_vector oshu_normalize(oshu_vector p)
 {
-	double norm = sqrt(p.x * p.x + p.y * p.y);
+	double norm = cabs(p);
 	if (norm < epsilon)
-		return (struct oshu_vector) {0, 0};
-	p.x /= norm;
-	p.y /= norm;
-	return p;
+		return 0;
+	return p / norm;
 }
 
-double oshu_distance2(struct oshu_point p, struct oshu_point q)
+double oshu_distance2(oshu_point p, oshu_point q)
 {
-	double dx = p.x - q.x;
-	double dy = p.y - q.y;
+	double dx = creal(p - q);
+	double dy = cimag(p - q);
 	return dx * dx + dy * dy;
 }
 
-double oshu_distance(struct oshu_point p, struct oshu_point q)
+double oshu_distance(oshu_point p, oshu_point q)
 {
-	return sqrt(oshu_distance2(p, q));
+	return cabs(p - q);
 }
 
 /* Bézier *********************************************************************/
@@ -121,7 +119,7 @@ static int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 3991
  *
  * \sa focus
  */
-static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct oshu_point **control_points)
+static void bezier_map(struct oshu_bezier *path, double *t, int *degree, oshu_point **control_points)
 {
 	int segment = focus(t, path->segment_count);
 	*degree = path->indices[segment+1] - path->indices[segment] - 1;
@@ -139,17 +137,16 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, struct 
  * algorithm. However, since I'm not sure it would let us derive, maybe that's
  * gonna wait until we switch to a new Bézier drawing engine.
  */
-static struct oshu_point bezier_at(struct oshu_bezier *path, double t)
+static oshu_point bezier_at(struct oshu_bezier *path, double t)
 {
 	int degree;
-	struct oshu_point *points;
+	oshu_point *points;
 	bezier_map(path, &t, &degree, &points);
-	struct oshu_point p = {0, 0};
+	oshu_point p = 0;
 	for (int i = 0; i <= degree; i++) {
 		double bin = fac[degree] / (fac[i] * fac[degree - i]);
 		double factor = bin * pow(t, i) * pow(1 - t, degree - i);
-		p.x += factor * points[i].x;
-		p.y += factor * points[i].y;
+		p += factor * points[i];
 	}
 	return p;
 }
@@ -162,20 +159,18 @@ static struct oshu_point bezier_at(struct oshu_bezier *path, double t)
  * because the resulting vector is normalized at the end anyway, it doesn't
  * matter.
  */
-static struct oshu_vector bezier_derive(struct oshu_bezier *path, double t)
+static oshu_vector bezier_derive(struct oshu_bezier *path, double t)
 {
-	struct oshu_vector d = {0, 0};
+	oshu_vector d = 0;
 	int degree;
-	struct oshu_point *points;
+	oshu_point *points;
 	bezier_map(path, &t, &degree, &points);
 	for (int i = 0; i <= degree - 1; i++) {
 		double bin = fac[degree - 1] / (fac[i] * fac[degree - 1 - i]);
 		double factor = bin * pow(t, i) * pow(1 - t, degree - 1 - i);
-		d.x += factor * (points[i + 1].x - points[i].x);
-		d.y += factor * (points[i + 1].y - points[i].y);
+		d += factor * (points[i + 1] - points[i]);
 	}
-	d.x *= degree;
-	d.y *= degree;
+	d *= degree;
 	return d;
 }
 
@@ -218,10 +213,10 @@ void normalize_bezier(struct oshu_bezier *bezier, double target_length)
 
 	/* 2. Compute the length of the path. */
 	double length = 0;
-	struct oshu_point prev = bezier->control_points[0];
+	oshu_point prev = bezier->control_points[0];
 	for (int i = 0; i <= n; i++) {
 		double t = (double) i / n;
-		struct oshu_point current = bezier_at(bezier, t);
+		oshu_point current = bezier_at(bezier, t);
 		length += oshu_distance(prev, current);
 		l[i] = length;
 		prev = current;
@@ -274,23 +269,17 @@ static double l_to_t(struct oshu_bezier *bezier, double l)
 /**
  * Simple weighted average of the starting point and end point.
  */
-static struct oshu_point line_at(struct oshu_line *line, double t)
+static oshu_point line_at(struct oshu_line *line, double t)
 {
-	return (struct oshu_point) {
-		.x = (1 - t) * line->start.x + t * line->end.x,
-		.y = (1 - t) * line->start.y + t * line->end.y,
-	};
+	return (1 - t) * line->start + t * line->end;
 }
 
 /**
  * Derive the equation in #line_at to get the derivative.
  */
-static struct oshu_vector line_derive(struct oshu_line *line, double t)
+static oshu_vector line_derive(struct oshu_line *line, double t)
 {
-	return (struct oshu_vector) {
-		.x = - line->start.x + line->end.x,
-		.y = - line->start.y + line->end.y,
-	};
+	return - line->start + line->end;
 }
 
 static void normalize_line(struct oshu_line *line, double target_length)
@@ -299,32 +288,25 @@ static void normalize_line(struct oshu_line *line, double target_length)
 	assert (target_length > 0);
 	assert (actual_length > 0);
 	double factor = target_length / actual_length;
-	line->end.x = line->start.x + (line->end.x - line->start.x) * factor;
-	line->end.y = line->start.y + (line->end.y - line->start.y) * factor;
+	line->end = line->start + (line->end - line->start) * factor;
 }
 
 /* Perfect circle arcs ********************************************************/
 
-static struct oshu_point arc_at(struct oshu_arc *arc, double t)
+static oshu_point arc_at(struct oshu_arc *arc, double t)
 {
 	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
-	return (struct oshu_point) {
-		.x = arc->center.x + arc->radius * cos(angle),
-		.y = arc->center.y + arc->radius * sin(angle),
-	};
+	return arc->center + arc->radius * cexp(angle * I);
 }
 
 /**
  * Naive derivative of #arc_at.
  */
-static struct oshu_vector arc_derive(struct oshu_arc *arc, double t)
+static oshu_vector arc_derive(struct oshu_arc *arc, double t)
 {
 	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
 	double deriv_angle = - arc->start_angle + arc->end_angle;
-	return (struct oshu_vector) {
-		.x = arc->radius * deriv_angle * (- sin(angle)),
-		.y = arc->radius * deriv_angle * cos(angle),
-	};
+	return arc->radius * deriv_angle * I * cexp(angle * I);
 }
 
 /**
@@ -332,7 +314,7 @@ static struct oshu_vector arc_derive(struct oshu_arc *arc, double t)
  *
  * This code is inspired by the official osu! client's source code.
  */
-int arc_center(struct oshu_point a, struct oshu_point b, struct oshu_point c, struct oshu_point *center)
+int arc_center(oshu_point a, oshu_point b, oshu_point c, oshu_point *center)
 {
 	double a2 = oshu_distance2(b, c);
 	double b2 = oshu_distance2(a, c);
@@ -347,20 +329,20 @@ int arc_center(struct oshu_point a, struct oshu_point b, struct oshu_point c, st
 	if (abs(sum) < epsilon)
 		return -1;
 
-	center->x = (s * a.x + t * b.x + u * c.x) / sum;
-	center->y = (s * a.y + t * b.y + u * c.y) / sum;
+	*center = (s * a + t * b + u * c) / sum;
 	return 0;
 }
 
-int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c, struct oshu_arc *arc)
+int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *arc)
 {
 	if (arc_center(a, b, c, &arc->center))
 		return -1;
 
 	arc->radius = oshu_distance(a, arc->center);
-	arc->start_angle = atan2(a.y - arc->center.y, a.x - arc->center.x);
-	arc->end_angle = atan2(c.y - arc->center.y, c.x - arc->center.x);
-	int cross = (c.x - a.x) * (b.y - a.y) - (b.x - a.x) * (c.y - a.y);
+	arc->start_angle = carg(a - arc->center);
+	arc->end_angle = carg(c - arc->center);
+	double cross = cimag(conj(c - a) * (b - a));
+
 	if (cross < 0 && arc->start_angle > arc->end_angle)
 		arc->end_angle += 2. * M_PI;
 	else if (cross > 0 && arc->start_angle < arc->end_angle)
@@ -391,7 +373,7 @@ void oshu_normalize_path(struct oshu_path *path, double length)
 	}
 }
 
-struct oshu_point oshu_path_at(struct oshu_path *path, double t)
+oshu_point oshu_path_at(struct oshu_path *path, double t)
 {
 	/* map t from ℝ to [0,1] */
 	t = fabs(remainder(t, 2.));
@@ -409,12 +391,12 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t)
 	default:
 		assert (path->type != path->type);
 	}
-	return (struct oshu_point) {};
+	return 0;
 }
 
-struct oshu_vector oshu_path_derive(struct oshu_path *path, double t)
+oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 {
-	struct oshu_vector d;
+	oshu_vector d;
 	t = remainder(t, 2.);
 	int revert = t < 0;
 	t = fabs(t);
@@ -437,9 +419,5 @@ struct oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 		assert (path->type != path->type);
 	}
 
-	if (revert) {
-		d.x = - d.x;
-		d.y = - d.y;
-	}
-	return d;
+	return revert ? -d : d;
 }

@@ -17,8 +17,8 @@ void oshu_scale_view(struct oshu_view *view, double factor)
 
 void oshu_resize_view(struct oshu_view *view, double w, double h)
 {
-	view->x += view->zoom * (view->width - w) / 2.;
-	view->y += view->zoom * (view->height - h) / 2.;
+	view->origin += view->zoom * (view->width - w) / 2.;
+	view->origin += view->zoom * (view->height - h) / 2. * I;
 	view->width = w;
 	view->height = h;
 }
@@ -37,18 +37,14 @@ void oshu_fit_view(struct oshu_view *view, double w, double h)
 	oshu_resize_view(view, w, h);
 }
 
-struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p)
+oshu_point oshu_project(struct oshu_display *display, oshu_point p)
 {
-	p.x = p.x * display->view.zoom + display->view.x;
-	p.y = p.y * display->view.zoom + display->view.y;
-	return p;
+	return p * display->view.zoom + display->view.origin;
 }
 
-struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p)
+oshu_point oshu_unproject(struct oshu_display *display, oshu_point p)
 {
-	p.x = (p.x - display->view.x) / display->view.zoom;
-	p.y = (p.y - display->view.y) / display->view.zoom;
-	return p;
+	return (p - display->view.origin) / display->view.zoom;
 }
 
 /**
@@ -104,15 +100,14 @@ void oshu_reset_view(struct oshu_display *display)
 	int w, h;
 	SDL_GetWindowSize(display->window, &w, &h);
 	display->view.zoom = 1.;
-	display->view.x = 0;
-	display->view.y = 0;
+	display->view.origin = 0;
 	display->view.width = w;
 	display->view.height = h;
 }
 
-struct oshu_point oshu_get_mouse(struct oshu_display *display)
+oshu_point oshu_get_mouse(struct oshu_display *display)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	return oshu_unproject(display, (struct oshu_point) {x, y});
+	return oshu_unproject(display, x + y * I);
 }

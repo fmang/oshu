@@ -7,35 +7,24 @@
 
 #include <assert.h>
 
-/**
- * Handy alias to write point literals, like `(P) {x, y}`.
- *
- * We don't want that kind of shortcut to propagate outside of this module
- * though.
- */
-typedef struct oshu_point P;
-
-void oshu_draw_circle(struct oshu_display *display, struct oshu_point center, double radius)
+void oshu_draw_circle(struct oshu_display *display, oshu_point center, double radius)
 {
 	int resolution = 32;
 	SDL_Point points[resolution];
 	double step = 2 * M_PI / (resolution - 1);
 	for (int i = 0; i < resolution; i++) {
-		struct oshu_point p = oshu_project(display, (P) {
-			.x = center.x + radius * cos(i * step),
-			.y = center.y + radius * sin(i * step),
-		});
-		points[i] = (SDL_Point) {p.x, p.y};
+		oshu_point p = oshu_project(display, center + radius * cexp(i * step * I));
+		points[i] = (SDL_Point) {creal(p), cimag(p)};
 	}
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
 
-void oshu_draw_line(struct oshu_display *display, struct oshu_point p1, struct oshu_point p2)
+void oshu_draw_line(struct oshu_display *display, oshu_point p1, oshu_point p2)
 {
 	p1 = oshu_project(display, p1);
 	p2 = oshu_project(display, p2);
-	SDL_RenderDrawLine(display->renderer, p1.x, p1.y, p2.x, p2.y);
+	SDL_RenderDrawLine(display->renderer, creal(p1), cimag(p1), creal(p2), cimag(p2));
 }
 
 void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
@@ -44,8 +33,8 @@ void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
 	SDL_Point points[resolution];
 	double step = 1. / (resolution - 1);
 	for (int i = 0; i < resolution; i++) {
-		struct oshu_point p = oshu_project(display, oshu_path_at(path, i * step));
-		points[i] = (SDL_Point) {p.x, p.y};
+		oshu_point p = oshu_project(display, oshu_path_at(path, i * step));
+		points[i] = (SDL_Point) {creal(p), cimag(p)};
 	}
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
@@ -58,26 +47,20 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 	double step = 1. / (resolution - 1);
 	double radius = width / 2.;
 	for (int i = 0; i < resolution; i++) {
-		struct oshu_point p = oshu_path_at(path, i * step);
-		struct oshu_vector d = oshu_path_derive(path, i * step);
+		oshu_point p = oshu_path_at(path, i * step);
+		oshu_vector d = oshu_path_derive(path, i * step);
 		d = oshu_normalize(d);
-		if (d.x == 0 && d.y == 0) {
+		if (d == 0) {
 			/* degenerate case */
 			assert (i != 0);
 			left[i] = left[i-1];
 			right[i] = right[i-1];
 			continue;
 		}
-		struct oshu_point l = oshu_project(display, (P) {
-			.x = p.x - radius* d.y,
-			.y = p.y + radius* d.x,
-		});
-		struct oshu_point r= oshu_project(display, (P) {
-			.x = p.x + radius * d.y,
-			.y = p.y - radius * d.x,
-		});
-		left[i] = (SDL_Point) {l.x, l.y};
-		right[i] = (SDL_Point) {r.x, r.y};
+		oshu_point l = oshu_project(display, p + radius * d * I);
+		oshu_point r = oshu_project(display, p - radius * d * I);
+		left[i] = (SDL_Point) {creal(l), cimag(l)};
+		right[i] = (SDL_Point) {creal(r), cimag(r)};
 	}
 	SDL_RenderDrawLines(display->renderer, left, resolution);
 	SDL_RenderDrawLines(display->renderer, right, resolution);

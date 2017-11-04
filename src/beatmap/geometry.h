@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <complex.h>
+
 /**
  * \defgroup geometry Geometry
  * \ingroup beatmap
@@ -20,26 +22,19 @@
  *
  * The coordinate system is arbitrary.
  */
-struct oshu_point {
-	double x;
-	double y;
-};
+typedef double complex oshu_point;
 
 /**
  * A 2D vector.
  *
- * This is distinct from #oshu_point for readability, and to prevent some
- * potential mistakes.
+ * This is distinct from #oshu_point for readability.
  */
-struct oshu_vector {
-	double x;
-	double y;
-};
+typedef double complex oshu_vector;
 
 /**
  * Normalize a vector, making its norm equal to 1.
  */
-struct oshu_vector oshu_normalize(struct oshu_vector p);
+oshu_vector oshu_normalize(oshu_vector p);
 
 /**
  * Compute the Euclidean distance between *p* and *q*.
@@ -48,7 +43,7 @@ struct oshu_vector oshu_normalize(struct oshu_vector p);
  *
  * \sa oshu_distance2
  */
-double oshu_distance(struct oshu_point p, struct oshu_point q);
+double oshu_distance(oshu_point p, oshu_point q);
 
 /**
  * Compute the squared Euclidean distance between *p* and *q*: Δx² + Δy².
@@ -56,7 +51,7 @@ double oshu_distance(struct oshu_point p, struct oshu_point q);
  * This function is faster and more accurate that #oshu_distance, when only the
  * squared distances are needed.
  */
-double oshu_distance2(struct oshu_point p, struct oshu_point q);
+double oshu_distance2(oshu_point p, oshu_point q);
 
 /**
  * A simple line, with a start point and end point.
@@ -67,8 +62,8 @@ double oshu_distance2(struct oshu_point p, struct oshu_point q);
  * to make experiments.
  */
 struct oshu_line {
-	struct oshu_point start;
-	struct oshu_point end;
+	oshu_point start;
+	oshu_point end;
 };
 
 /**
@@ -90,7 +85,7 @@ struct oshu_line {
  * \sa oshu_build_arc
  */
 struct oshu_arc {
-	struct oshu_point center;
+	oshu_point center;
 	double radius;
 	double start_angle;
 	double end_angle;
@@ -131,7 +126,7 @@ struct oshu_arc {
  *
  * \return 0 on success, -1 if the arc computation failed.
  */
-int oshu_build_arc(struct oshu_point a, struct oshu_point b, struct oshu_point c, struct oshu_arc *arc);
+int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *arc);
 
 /**
  * A Bézier path, made up of one or many Bézier segments.
@@ -212,7 +207,7 @@ struct oshu_bezier {
 	 * To identify the segments these points belong to, you need to use the
 	 * #indices array.
 	 */
-	struct oshu_point *control_points;
+	oshu_point *control_points;
 	/**
 	 * Translation map from l-coordinates to t-coordinates.
 	 *
@@ -313,7 +308,7 @@ void oshu_normalize_path(struct oshu_path *path, double length);
  * defined in the C standard library, by 2.
  *
  */
-struct oshu_point oshu_path_at(struct oshu_path *path, double t);
+oshu_point oshu_path_at(struct oshu_path *path, double t);
 
 /**
  * Return the derivative vector of the path at point t in t-coordinates.
@@ -322,6 +317,6 @@ struct oshu_point oshu_path_at(struct oshu_path *path, double t);
  * defined in #oshu_path_at. When t is on a decreasing slope, the derivative
  * vector is reversed, as you'd expect if you like maths.
  */
-struct oshu_vector oshu_path_derive(struct oshu_path *path, double t);
+oshu_vector oshu_path_derive(struct oshu_path *path, double t);
 
 /** \} */

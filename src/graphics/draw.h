@@ -45,12 +45,12 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 /**
  * Draw a regular polyline that should look like a circle.
  */
-void oshu_draw_circle(struct oshu_display *display, struct oshu_point center, double radius);
+void oshu_draw_circle(struct oshu_display *display, oshu_point center, double radius);
 
 /**
  * Draw one line, plain and simple.
  */
-void oshu_draw_line(struct oshu_display *display, struct oshu_point p1, struct oshu_point p2);
+void oshu_draw_line(struct oshu_display *display, oshu_point p1, oshu_point p2);
 
 /**
  * Draw a background image.

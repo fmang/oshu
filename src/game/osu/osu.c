@@ -17,7 +17,7 @@
  *
  * If two hit objects overlap, yield the oldest unclicked one.
  */
-static struct oshu_hit* find_hit(struct oshu_game *game, struct oshu_point p)
+static struct oshu_hit* find_hit(struct oshu_game *game, oshu_point p)
 {
 	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
 	double max_time = game->clock.now + game->beatmap.difficulty.approach_time;
@@ -89,8 +89,8 @@ static int check(struct oshu_game *game)
 	if (game->osu.current_slider) {
 		struct oshu_hit *hit = game->osu.current_slider;
 		double t = (game->clock.now - hit->time) / hit->slider.duration;
-		struct oshu_point ball = oshu_path_at(&hit->slider.path, t);
-		struct oshu_point mouse = oshu_get_mouse(&game->display);
+		oshu_point ball = oshu_path_at(&hit->slider.path, t);
+		oshu_point mouse = oshu_get_mouse(&game->display);
 		if (oshu_distance(ball, mouse) > game->beatmap.difficulty.slider_tolerance) {
 			oshu_stop_loop(&game->audio);
 			game->osu.current_slider = NULL;
@@ -156,7 +156,7 @@ static int autoplay(struct oshu_game *game)
  */
 static int press(struct oshu_game *game, enum oshu_key key)
 {
-	struct oshu_point mouse = oshu_get_mouse(&game->display);
+	oshu_point mouse = oshu_get_mouse(&game->display);
 	struct oshu_hit *hit = find_hit(game, mouse);
 	if (!hit)
 		return 0;

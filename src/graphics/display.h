@@ -119,8 +119,7 @@
  */
 struct oshu_view {
 	double zoom;
-	double x;
-	double y;
+	oshu_point origin;
 	double width;
 	double height;
 };
@@ -236,7 +235,7 @@ void oshu_reset_view(struct oshu_display *display);
  *
  * \sa oshu_unproject
  */
-struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p);
+oshu_point oshu_project(struct oshu_display *display, oshu_point p);
 
 /**
  * Unproject a point from physical coordinates to logical coordinates.
@@ -246,7 +245,7 @@ struct oshu_point oshu_project(struct oshu_display *display, struct oshu_point p
  * From the definition of the view, `v(p) = z p + o`,
  * we deduce `p = (v(p) - o) / z`.
  */
-struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point p);
+oshu_point oshu_unproject(struct oshu_display *display, oshu_point p);
 
 /**
  * Get the mouse position.
@@ -256,6 +255,6 @@ struct oshu_point oshu_unproject(struct oshu_display *display, struct oshu_point
  *
  * \sa oshu_unproject
  */
-struct oshu_point oshu_get_mouse(struct oshu_display *display);
+oshu_point oshu_get_mouse(struct oshu_display *display);
 
 /** \} */
