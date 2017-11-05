@@ -95,10 +95,17 @@ static void dump_state(struct oshu_game *game)
 {
 	if (!isatty(fileno(stdout)))
 		return;
-	int minutes = (int) game->clock.now / 60.;
-	double seconds = game->clock.now - (minutes * 60.);
+	int minutes = game->clock.now / 60.;
+	double seconds = game->clock.now - minutes * 60.;
 	const char *state = game->paused ? " Paused" : "Playing";
-	printf("%s: %d:%06.3f\r", state, minutes, seconds);
+	double duration = game->audio.music.duration;
+	int duration_minutes = duration / 60.;
+	double duration_seconds = duration - duration_minutes * 60;
+	printf(
+		"%s: %d:%06.3f / %d:%06.3f\r",
+		state, minutes, seconds,
+		duration_minutes, duration_seconds
+	);
 	fflush(stdout);
 }
 
@@ -313,8 +320,39 @@ static void update_clock(struct oshu_game *game)
 		clock->now = clock->before;
 }
 
+static void welcome(struct oshu_game *game)
+{
+	struct oshu_beatmap *beatmap = &game->beatmap;
+	struct oshu_metadata *meta = &beatmap->metadata;
+	printf(
+		"\n"
+		"  \033[34m%s\033[0m (%s)\n"
+		"  \033[34m%s\033[0m (%s)\n"
+		"\n",
+		meta->title_unicode, meta->title,
+		meta->artist_unicode, meta->artist
+	);
+
+	printf("  \033[33m%s\033[0m\n", meta->version);
+	if (meta->creator)
+		printf("  By %s\n", meta->creator);
+	if (meta->source)
+		printf("  From %s\n", meta->source);
+
+	int stars = beatmap->difficulty.overall_difficulty;
+	double half_star = beatmap->difficulty.overall_difficulty - stars;
+	printf("  ");
+	for (int i = 0; i < stars; i++)
+		printf("★ ");
+	if (half_star >= .5)
+		printf("☆ ");
+
+	printf("\n\n");
+}
+
 int oshu_run_game(struct oshu_game *game)
 {
+	welcome(game);
 	SDL_Event event;
 	int missed_frames = 0;
 	if (!game->paused && game->clock.now >= 0)

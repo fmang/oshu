@@ -1196,11 +1196,8 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 
 static void dump_beatmap_info(struct oshu_beatmap *beatmap)
 {
-	oshu_log_info("audio filename: %s", beatmap->audio_filename);
+	oshu_log_debug("audio filename: %s", beatmap->audio_filename);
 	oshu_log_debug("slider multiplier: %.1f", beatmap->difficulty.slider_multiplier);
-	oshu_log_info("title: %s", beatmap->metadata.title);
-	oshu_log_info("artist: %s", beatmap->metadata.artist);
-	oshu_log_info("version: %s", beatmap->metadata.version);
 }
 
 /**
