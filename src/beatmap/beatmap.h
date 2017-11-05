@@ -19,7 +19,7 @@
  * https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)
  *
  * To find sample files, just download any beatmap you find on the official
- * Osu! website. The .osz files are just ZIP files. After you extract them,
+ * osu! website. The .osz files are just ZIP files. After you extract them,
  * you'll find the .osu files we're going to parse in this module.
  *
  * A \e .osu file is some kind of pseudo-INI, with sections written like

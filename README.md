@@ -3,18 +3,18 @@ oshu!
 
 Welcome to oshu!
 
-This project was born out of frustration from not being able to play Osu! on a
+This project was born out of frustration from not being able to play osu! on a
 little Linux box with no graphics card whatsoever.  It's aimed at minimalistic
 people and probably will never contain a hundredth of the official client's
 features.
 
-Osu! is that PC clone of the Osu! Tatakae! Ouendan DS rhythm game,
+osu! is that PC clone of the osu! Tatakae! Ouendan DS rhythm game,
 occidentalized as Elite Beat Agents.
 
-Osu! has got tons of cool beatmaps, and a more or less intuitive text file
+osu! has got tons of cool beatmaps, and a more or less intuitive text file
 format described at https://osu.ppy.sh/help/wiki/osu!_File_Formats
 
-The main problem with Osu! is that it required Windows and a graphics card.
+The main problem with osu! is that it required Windows and a graphics card.
 Even with that, it sometimes get slow unless the computer is a beast… Hell, the
 mania and taiko mode could be played in a terminal!
 

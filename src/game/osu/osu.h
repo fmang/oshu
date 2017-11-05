@@ -23,7 +23,7 @@ struct oshu_hit;
  */
 
 /**
- * Parts of the game state specific to the Osu! standard mode.
+ * Parts of the game state specific to osu!standard mode.
  */
 struct osu_state {
 	/**
