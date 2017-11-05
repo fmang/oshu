@@ -284,6 +284,7 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
 {
 	populate_default(library, OSHU_NORMAL_SAMPLE_SET);
 	populate_default(library, OSHU_SOFT_SAMPLE_SET);
+	populate_default(library, OSHU_DRUM_SAMPLE_SET);
 	for (struct oshu_hit *hit = beatmap->hits; hit; hit = hit->next) {
 		if (hit->type & OSHU_SLIDER_HIT) {
 			for (int i = 0; i <= hit->slider.repeat; ++i)
