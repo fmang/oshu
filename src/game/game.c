@@ -294,6 +294,7 @@ static void update_clock(struct oshu_game *game)
 int oshu_run_game(struct oshu_game *game)
 {
 	SDL_Event event;
+	int missed_frames = 0;
 	if (!game->paused && game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
 	while (!game->audio.music.finished && !game->stop) {
@@ -309,8 +310,13 @@ int oshu_run_game(struct oshu_game *game)
 		draw(game);
 		dump_state(game);
 		long int advance = frame_duration - (SDL_GetTicks() - game->clock.ticks);
-		if (advance > 0)
+		if (advance > 0) {
 			SDL_Delay(advance);
+		} else {
+			missed_frames++;
+			if (missed_frames == 1000)
+				oshu_log_warning("your computer is having a hard time keeping up 60 FPS");
+		}
 	}
 	end(game);
 	return 0;
