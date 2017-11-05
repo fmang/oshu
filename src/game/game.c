@@ -187,10 +187,10 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			case SDLK_ESCAPE:
 				unpause_game(game);
 				break;
-			case SDLK_LEFT:
+			case SDLK_PAGEUP:
 				rewind_music(game, 5.);
 				break;
-			case SDLK_RIGHT:
+			case SDLK_PAGEDOWN:
 				forward_music(game, 20.);
 				break;
 			}
