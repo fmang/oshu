@@ -769,10 +769,10 @@ static void fill_slider_additions(struct oshu_hit *hit)
 		struct oshu_hit_sound *s = &hit->slider.sounds[i];
 		if (!s->additions)
 			s->additions = OSHU_NORMAL_SOUND;
+		if (!s->additions_set)
+			s->additions_set = s->sample_set ? s->sample_set : hit->sound.additions_set;
 		if (!s->sample_set)
 			s->sample_set = hit->sound.sample_set;
-		if (!s->additions_set)
-			s->additions_set = hit->sound.additions_set;
 		s->index = hit->sound.index;
 		s->volume = hit->sound.volume;
 	}
@@ -1136,7 +1136,7 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 	/* 2. Additions set. */
 	if (parse_int_sep(parser, &value, ':') < 0)
 		return -1;
-	hit->sound.additions_set = value ? value : hit->timing_point->sample_set;
+	hit->sound.additions_set = value ? value : hit->sound.sample_set;
 	/* 3. Custom sample set index. */
 	if (parse_int_sep(parser, &value, ':') < 0)
 		return -1;
