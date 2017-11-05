@@ -217,7 +217,7 @@ struct oshu_bezier {
 	 * For any point such that i / n ≤ l ≤ (i + 1) / n, compute a weighted
 	 * average between anchors[i] and anchors[i+1].
 	 *
-	 * \sa oshu_normalize_bezier
+	 * \sa oshu_normalize
 	 */
 	double anchors[32];
 };
@@ -267,6 +267,12 @@ struct oshu_path {
  * The path described by its control points may not have the same length as the
  * wanted length specified as argument, in which case the path is shrinked or
  * expanded.
+ *
+ * In most case, this function will shrink the path, because the actual length
+ * is greater than the one specified in the beatmap.
+ *
+ * \todo
+ * Grow Bézier paths.
  */
 void oshu_normalize_path(struct oshu_path *path, double length);
 
