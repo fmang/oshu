@@ -161,6 +161,7 @@ enum oshu_key translate_key(SDL_Keysym *keysym)
 	case SDL_SCANCODE_S: return OSHU_LEFT_RING;
 	case SDL_SCANCODE_D: return OSHU_LEFT_MIDDLE;
 	case SDL_SCANCODE_F: return OSHU_LEFT_INDEX;
+	case SDL_SCANCODE_SPACE: return OSHU_THUMBS;
 	case SDL_SCANCODE_J: return OSHU_RIGHT_INDEX;
 	case SDL_SCANCODE_K: return OSHU_RIGHT_MIDDLE;
 	case SDL_SCANCODE_L: return OSHU_RIGHT_RING;
