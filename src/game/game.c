@@ -81,10 +81,32 @@ fail:
 	return -1;
 }
 
+/**
+ * Show the state of the game (paused/playing) and the current song position.
+ *
+ * Only do that for terminal outputs in order not to spam something if the
+ * output is redirected.
+ *
+ * The state length must not decrease over time, otherwise you end up with
+ * glitches. If you write `foo\rx`, you get `xoo`. This is the reason the
+ * Paused string literal has an extra space.
+ */
+static void dump_state(struct oshu_game *game)
+{
+	if (!isatty(fileno(stdout)))
+		return;
+	int minutes = (int) game->clock.now / 60.;
+	double seconds = game->clock.now - (minutes * 60.);
+	const char *state = game->paused ? " Paused" : "Playing";
+	printf("%s: %d:%06.3f\r", state, minutes, seconds);
+	fflush(stdout);
+}
+
 static void pause_game(struct oshu_game *game)
 {
 	oshu_pause_audio(&game->audio);
 	game->paused = 1;
+	dump_state(game);
 }
 
 static void unpause_game(struct oshu_game *game)
@@ -243,27 +265,6 @@ static void end(struct oshu_game *game)
 	);
 }
 
-/**
- * Show the state of the game (paused/playing) and the current song position.
- *
- * Only do that for terminal outputs in order not to spam something if the
- * output is redirected.
- *
- * The state length must not decrease over time, otherwise you end up with
- * glitches. If you write `foo\rx`, you get `xoo`. This is the reason the
- * Paused string literal has an extra space.
- */
-static void dump_state(struct oshu_game *game)
-{
-	if (!isatty(fileno(stdout)))
-		return;
-	int minutes = (int) game->clock.now / 60.;
-	double seconds = game->clock.now - (minutes * 60.);
-	const char *state = game->paused ? " Paused" : "Playing";
-	printf("%s: %d:%06.3f\r", state, minutes, seconds);
-	fflush(stdout);
-}
-
 static void draw(struct oshu_game *game)
 {
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
@@ -329,7 +330,8 @@ int oshu_run_game(struct oshu_game *game)
 		else if (!game->paused && game->autoplay)
 			game->mode->autoplay(game);
 		draw(game);
-		dump_state(game);
+		if (!game->paused)
+			dump_state(game);
 		long int advance = frame_duration - (SDL_GetTicks() - game->clock.ticks);
 		if (advance > 0) {
 			SDL_Delay(advance);
