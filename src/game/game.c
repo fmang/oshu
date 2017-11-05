@@ -251,8 +251,9 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
  */
 static void end(struct oshu_game *game)
 {
-	if (!game->audio.music.finished)
-		return;
+	/* Clear the status line. */
+	printf("\r                                        \r");
+	/* Compute the score. */
 	int good = 0;
 	int missed = 0;
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
@@ -261,14 +262,14 @@ static void end(struct oshu_game *game)
 		else if (hit->state == OSHU_GOOD_HIT)
 			good++;
 	}
+	double rate = (double) good / (good + missed);
 	printf(
-		"\n"
-		"*** Score ***\n"
-		"  Good: %d\n"
-		"  Miss: %d\n"
+		"  \033[1mScore:\033[0m\n"
+		"  \033[%dm%3d\033[0m good\n"
+		"  \033[%dm%3d\033[0m miss\n"
 		"\n",
-		good,
-		missed
+		rate >= 0.9 ? 32 : 0, good,
+		rate < 0.5  ? 31 : 0, missed
 	);
 }
 
@@ -326,14 +327,14 @@ static void welcome(struct oshu_game *game)
 	struct oshu_metadata *meta = &beatmap->metadata;
 	printf(
 		"\n"
-		"  \033[34m%s\033[0m (%s)\n"
-		"  \033[34m%s\033[0m (%s)\n"
+		"  \033[33m%s\033[0m // %s\n"
+		"  \033[33m%s\033[0m // %s\n"
 		"\n",
 		meta->title_unicode, meta->title,
 		meta->artist_unicode, meta->artist
 	);
 
-	printf("  \033[33m%s\033[0m\n", meta->version);
+	printf("  \033[34m%s\033[0m\n", meta->version);
 	if (meta->creator)
 		printf("  By %s\n", meta->creator);
 	if (meta->source)
