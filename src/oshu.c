@@ -12,6 +12,7 @@
 #include "log.h"
 #include "game/game.h"
 
+#include <libavutil/log.h>
 #include <SDL2/SDL.h>
 
 #include <errno.h>
@@ -96,7 +97,8 @@ int main(int argc, char **argv)
 			break;
 		switch (c) {
 		case OPT_VERBOSE:
-			verbosity = (verbosity == SDL_LOG_PRIORITY_INFO) ? SDL_LOG_PRIORITY_DEBUG : SDL_LOG_PRIORITY_VERBOSE;
+			if (verbosity > SDL_LOG_PRIORITY_VERBOSE)
+				verbosity--;
 			break;
 		case OPT_HELP:
 			puts("oshu! version " VERSION);
@@ -122,6 +124,7 @@ int main(int argc, char **argv)
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, verbosity);
+	av_log_set_level(verbosity <= SDL_LOG_PRIORITY_DEBUG ? AV_LOG_INFO : AV_LOG_ERROR);
 
 	char *beatmap_path = realpath(argv[optind], NULL);
 	if (beatmap_path == NULL) {
