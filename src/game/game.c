@@ -328,17 +328,16 @@ static void welcome(struct oshu_game *game)
 	printf(
 		"\n"
 		"  \033[33m%s\033[0m // %s\n"
-		"  \033[33m%s\033[0m // %s\n"
-		"\n",
+		"  \033[33m%s\033[0m // %s\n",
 		meta->title_unicode, meta->title,
 		meta->artist_unicode, meta->artist
 	);
-
-	printf("  \033[34m%s\033[0m\n", meta->version);
-	if (meta->creator)
-		printf("  By %s\n", meta->creator);
 	if (meta->source)
 		printf("  From %s\n", meta->source);
+
+	printf("\n  \033[34m%s\033[0m\n", meta->version);
+	if (meta->creator)
+		printf("  By %s\n", meta->creator);
 
 	int stars = beatmap->difficulty.overall_difficulty;
 	double half_star = beatmap->difficulty.overall_difficulty - stars;
