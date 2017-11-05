@@ -87,14 +87,10 @@ static void pause_game(struct oshu_game *game)
 	game->paused = 1;
 }
 
-static void toggle_pause(struct oshu_game *game)
+static void unpause_game(struct oshu_game *game)
 {
-	if (game->paused) {
-		oshu_play_audio(&game->audio);
-		game->paused = 0;
-	} else {
-		pause_game(game);
-	}
+	oshu_play_audio(&game->audio);
+	game->paused = 0;
 }
 
 static void rewind_music(struct oshu_game *game, double offset)
@@ -141,25 +137,38 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
 			break;
-		switch (event->key.keysym.sym) {
-		case SDLK_q:
-			game->stop = 1;
-			break;
-		case SDLK_ESCAPE:
-		case SDLK_SPACE:
-			toggle_pause(game);
-			break;
-		case SDLK_LEFT:
-			rewind_music(game, 5.);
-			break;
-		case SDLK_RIGHT:
-			forward_music(game, 20.);
-			break;
-		default:
-			if (!game->paused && !game->autoplay) {
-				enum oshu_key key = translate_key(&event->key.keysym);
-				if (key != OSHU_UNKNOWN_KEY)
-					game->mode->press(game, key);
+		if (game->paused) {
+			switch (event->key.keysym.sym) {
+			case SDLK_q:
+				game->stop = 1;
+				break;
+			case SDLK_ESCAPE:
+				unpause_game(game);
+				break;
+			case SDLK_LEFT:
+				rewind_music(game, 5.);
+				break;
+			case SDLK_RIGHT:
+				forward_music(game, 20.);
+				break;
+			}
+		} else {
+			switch (event->key.keysym.sym) {
+			case SDLK_ESCAPE:
+				pause_game(game);
+				break;
+			case SDLK_LEFT:
+				rewind_music(game, 5.);
+				break;
+			case SDLK_RIGHT:
+				forward_music(game, 20.);
+				break;
+			default:
+				if (!game->autoplay) {
+					enum oshu_key key = translate_key(&event->key.keysym);
+					if (key != OSHU_UNKNOWN_KEY)
+						game->mode->press(game, key);
+				}
 			}
 		}
 		break;
@@ -176,7 +185,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		break;
 	case SDL_MOUSEBUTTONUP:
 		if (!game->paused && !game->autoplay)
-			game->mode->release(game, OSHU_RIGHT_BUTTON);
+			game->mode->release(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
