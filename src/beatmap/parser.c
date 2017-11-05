@@ -606,7 +606,7 @@ static int parse_timing_point(struct parser_state *parser, struct oshu_timing_po
 	/* 5. Looks like this is the sample set index. */
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;
-	(*timing)->sample_index = value ? value : 1;
+	(*timing)->sample_index = value;
 	/* 6. Volume, from 0 to 100%. */
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;

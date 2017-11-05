@@ -41,14 +41,18 @@ struct SDL_AudioSpec;
  * }
  * \enddot
  *
- * The default index is 1. The beatmap may mention the special 0 value which
- * means it's the default index, or the inherited one.
- *
  * \{
  */
 
 enum oshu_sound_shelf_index {
-	OSHU_DEFAULT_SHELF = 1,
+	/**
+	 * Fallback shelf when a sample is missing from a custom shelf.
+	 *
+	 * The default shelf is built from the default resources, or ideally
+	 * the skin. It is different from shelf 1 which uses the sample files
+	 * in the beatmap directory.
+	 */
+	OSHU_DEFAULT_SHELF = 0,
 };
 
 /**

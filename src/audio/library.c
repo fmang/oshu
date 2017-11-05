@@ -182,10 +182,10 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, int
 	}
 	/* Combine everything. */
 	int rc;
-	if (index == 1) /* augh */
-		rc = snprintf(buffer, size, "%s-%s.wav", set_name, type_name);
-	else
+	if (index > 1)
 		rc = snprintf(buffer, size, "%s-%s%d.wav", set_name, type_name, index);
+	else
+		rc = snprintf(buffer, size, "%s-%s.wav", set_name, type_name);
 	if (rc < 0) {
 		oshu_log_error("sample file name formatting failed");
 		return -1;
@@ -201,23 +201,30 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, int
  *
  * Return a dynamically allocated buffer with the path to a WAV file on
  * success, NULL on failure.
+ *
+ * The special index 0 does not look into the beatmap directory but straight
+ * into the default set. Any non-0 index will only look in the beatmap
+ * directory.
  */
 static char* locate_sample(enum oshu_sample_set_family set, int index, int type)
 {
 	char filename[32];
 	if (make_sample_file_name(set, index, type, filename, sizeof(filename)) < 0)
 		return NULL;
-	/* 1. Check the current directory. */
-	if (access(filename, R_OK) == 0)
-		return strdup(filename);
-	/* 2. Check the installation's data directory. */
-	char *path;
-	int rc = asprintf(&path, "%s/samples/%s", PKGDATADIR, filename);
-	assert (rc >= 0);
-	if (access(path, R_OK) == 0)
-		return path;
-	free(path);
-	/* 3. Fail. */
+	if (index > 0) {
+		/* Check the current directory. */
+		if (access(filename, R_OK) == 0)
+			return strdup(filename);
+	} else {
+		/* Check the installation's data directory. */
+		char *path;
+		int rc = asprintf(&path, "%s/samples/%s", PKGDATADIR, filename);
+		assert (rc >= 0);
+		if (access(path, R_OK) == 0)
+			return path;
+		else
+			free(path);
+	}
 	return NULL;
 }
 
