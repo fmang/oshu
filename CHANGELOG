@@ -1,6 +1,19 @@
 Changelog
 =========
 
+1.4.0 - ETA 2017-11-11
+----------------------
+
+Introducing seeking ability, to let you replay specific parts of a beatmap.
+
+Overall, there are no revolutionary features, but the graphics and game modules
+have been reorganized and improved for more stability, and with the future
+modes in mind. Sliders and hit sounds have been tweaked to get closer to the
+official osu! client. The command-line output is nicer, with colors instead of
+crude log lines.
+
+The keyboard controls have changed a bit, check out the man page.
+
 1.3.0 - 2017-10-14
 ------------------
 
