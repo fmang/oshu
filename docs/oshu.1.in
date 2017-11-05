@@ -39,22 +39,34 @@ from a terminal as you won't be holding your mouse when the game starts.
 .SH CONTROLS
 .PP
 The game is controlled from the keyboard and mouse. The keys are based on
-osu!'s default settings.
+osu!'s default settings, and rely on the \fIphysical\fR position on a QWERTY
+keyboard. If you use a different keyboard layout, the keys are going to be at
+the same position, even if the letters are different.
+.SS Standard mode
+.PP
+Here are the official keys for the osu!standard mode:
 .TP
-\fBW, X, Z, mouse click\fR
+\fBZ, X, mouse click\fR
 Hit an object.
+.SS Common keys
+.PP
+The following keys are common to all modes:
 .TP
-\fBEscape, Space\fR
+\fBEscape\fR
 Toggle pause.
+.TP
+\fBPage up\fR
+Rewind the song by 5 seconds.
+.TP
+\fBPage down\fR
+Forward the song by 20 seconds.
+.SS Pause
+.PP
+When the game is paused, the key layout for your region is used. Their
+positions don't matter, but their letters do.
 .TP
 \fBQ\fR
 Quit the game.
-.TP
-\fBLeft arrow\fR
-Rewind the song by 5 seconds.
-.TP
-\fBRight arrow\fR
-Forward the song by 20 seconds.
 
 .SH AUTHOR
 Written by Frédéric Mangano-Tarumi <fmang+oshu at mg0 fr>.
