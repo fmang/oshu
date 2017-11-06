@@ -267,6 +267,9 @@ begin:
 		if (grow_bezier(bezier, target_length - length) >= 0)
 			goto begin;
 	}
+	if (length < target_length)
+		/* ignore the rounding errors */
+		target_length = length;
 
 	/* 3. Deduce the l-coordinates. */
 	assert (length > 0);
@@ -278,7 +281,7 @@ begin:
 	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
 	for (int j = 0; j < num_anchors; j++) {
 		double my_l = (double) j / (num_anchors - 1);
-		while (!(my_l <= l[i + 1]) && i < n)
+		while (!(my_l <= l[i + 1]) && i < n - 1)
 			i++;
 		assert (l[i] <= my_l);
 		double k = (my_l - l[i]) / (l[i+1] - l[i]);
