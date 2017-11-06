@@ -175,6 +175,46 @@ static oshu_vector bezier_derive(struct oshu_bezier *path, double t)
 }
 
 /**
+ * Grow a Bézier path.
+ *
+ * Concretely, this functions adds a new linear segment at the end. The dynamic
+ * arrays are grown to host that segment, then it is filled with the new
+ * segment.
+ *
+ * The start point of the segment is the same as the last point of the original
+ * path for continuity. The next point is computed by computing the derivative
+ * vector at the end of the path (t=1), then scaling it so that its length is
+ * equal to the *extension* argument, and finally adding that vector to the
+ * previous point.
+ *
+ * The memory reallocation implies the memory must have been dynamically
+ * allocated. You won't be able to grow a static path.
+ */
+static int grow_bezier(struct oshu_bezier *bezier, double extension)
+{
+	oshu_log_debug("expanding the bezier path by %f pixels", extension);
+	oshu_vector direction = oshu_normalize(bezier_derive(bezier, 1.));
+	if (direction == 0.) {
+		oshu_log_warning("cannot grow a bezier path whose end is stationary");
+		return -1;
+	}
+
+	assert (bezier->segment_count >= 1);
+	bezier->segment_count++;
+	bezier->indices = realloc(bezier->indices, (bezier->segment_count + 1) * sizeof(*bezier->indices));
+	assert (bezier->indices != NULL);
+	bezier->indices[bezier->segment_count] = bezier->indices[bezier->segment_count - 1] + 2;
+
+	size_t end = bezier->indices[bezier->segment_count];
+	assert (end >= 3);
+	bezier->control_points = realloc(bezier->control_points, end * sizeof(*bezier->control_points));
+	assert (bezier->control_points != NULL);
+	bezier->control_points[end - 2] = bezier->control_points[end - 3];
+	bezier->control_points[end - 1] = bezier->control_points[end - 2] + direction * extension;
+	return 0;
+}
+
+/**
  * Approximate the length of the segment and set-up the l-coordinate system.
  *
  * Receives a Bézier path whose #oshu_bezier::segment_count,
@@ -210,9 +250,11 @@ void normalize_bezier(struct oshu_bezier *bezier, double target_length)
 	/* 1. Prepare the field. */
 	int n = 32;  /* arbitrary */
 	double l[n + 1];
+	double length;
 
+begin:
 	/* 2. Compute the length of the path. */
-	double length = 0;
+	length = 0;
 	oshu_point prev = bezier->control_points[0];
 	for (int i = 0; i <= n; i++) {
 		double t = (double) i / n;
@@ -221,11 +263,9 @@ void normalize_bezier(struct oshu_bezier *bezier, double target_length)
 		l[i] = length;
 		prev = current;
 	}
-	if (length < target_length) {
-		double delta = target_length - length;
-		if (delta > 5.)
-			oshu_log_warning("bezier slider is %f pixels short", delta);
-		target_length = length;
+	if (length + 5. < target_length) {
+		if (grow_bezier(bezier, target_length - length) >= 0)
+			goto begin;
 	}
 
 	/* 3. Deduce the l-coordinates. */

@@ -188,6 +188,8 @@ struct oshu_bezier {
 	 *
 	 * The size of the indices array must be *segment_count + 1*.
 	 *
+	 * For the normalization process, it must be dynamically allocated.
+	 *
 	 * \sa segment_count
 	 * \sa control_points
 	 */
@@ -206,6 +208,10 @@ struct oshu_bezier {
 	 *
 	 * To identify the segments these points belong to, you need to use the
 	 * #indices array.
+	 *
+	 * Its length is specified in `indices[segment_count]`.
+	 *
+	 * For the normalization process, it must be dynamically allocated.
 	 */
 	oshu_point *control_points;
 	/**
@@ -270,9 +276,6 @@ struct oshu_path {
  *
  * In most case, this function will shrink the path, because the actual length
  * is greater than the one specified in the beatmap.
- *
- * \todo
- * Grow Bézier paths.
  */
 void oshu_normalize_path(struct oshu_path *path, double length);
 
