@@ -225,7 +225,7 @@ struct oshu_bezier {
 	 *
 	 * \sa oshu_normalize
 	 */
-	double anchors[32];
+	double anchors[64];
 };
 
 /**

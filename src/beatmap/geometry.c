@@ -248,7 +248,7 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
 void normalize_bezier(struct oshu_bezier *bezier, double target_length)
 {
 	/* 1. Prepare the field. */
-	int n = 32;  /* arbitrary */
+	int n = 64;  /* arbitrary */
 	double l[n + 1];
 	double length;
 
