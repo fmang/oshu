@@ -326,5 +326,8 @@ int oshu_seek_stream(struct oshu_stream *stream, double target)
 		return -1;
 	}
 	stream->current_timestamp = target;
+	/* Flush the buffers. */
+	next_page(stream);
+	next_frame(stream);
 	return 0;
 }
