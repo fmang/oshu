@@ -118,7 +118,8 @@ static void pause_game(struct oshu_game *game)
 
 static void unpause_game(struct oshu_game *game)
 {
-	oshu_play_audio(&game->audio);
+	if (game->clock.now >= 0)
+		oshu_play_audio(&game->audio);
 	game->paused = 0;
 }
 
@@ -325,7 +326,7 @@ static void update_clock(struct oshu_game *game)
 		clock->now = clock->before + diff;
 	else
 		clock->now = clock->audio;
-	/* force monoticity */
+	/* force monotonicity */
 	if (clock->now < clock->before)
 		clock->now = clock->before;
 }
