@@ -122,6 +122,12 @@ static void unpause_game(struct oshu_game *game)
 	game->paused = 0;
 }
 
+/**
+ * Rewind the song by the specified offset in seconds.
+ *
+ * Rewind the beatmap too but leaving a 1-second break so that we won't seek
+ * right before a note.
+ */
 static void rewind_music(struct oshu_game *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
@@ -130,7 +136,7 @@ static void rewind_music(struct oshu_game *game, double offset)
 	dump_state(game);
 
 	assert (game->hit_cursor != NULL);
-	while (game->hit_cursor->time > game->clock.now) {
+	while (game->hit_cursor->time > game->clock.now + 1.) {
 		game->hit_cursor->state = OSHU_INITIAL_HIT;
 		game->hit_cursor = game->hit_cursor->previous;
 	}
@@ -190,7 +196,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 				unpause_game(game);
 				break;
 			case SDLK_PAGEUP:
-				rewind_music(game, 5.);
+				rewind_music(game, 10.);
 				break;
 			case SDLK_PAGEDOWN:
 				forward_music(game, 20.);
@@ -202,7 +208,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 				pause_game(game);
 				break;
 			case SDLK_PAGEUP:
-				rewind_music(game, 5.);
+				rewind_music(game, 10.);
 				break;
 			case SDLK_PAGEDOWN:
 				forward_music(game, 20.);

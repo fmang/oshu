@@ -56,7 +56,7 @@ The following keys are common to all modes:
 Toggle pause.
 .TP
 \fBPage up\fR
-Rewind the song by 5 seconds.
+Rewind the song by 10 seconds, and leave a 1-second break.
 .TP
 \fBPage down\fR
 Forward the song by 20 seconds.
