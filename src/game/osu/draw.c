@@ -37,6 +37,15 @@ static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *b
 		oshu_vector d = radius / 3. + radius / 3. * I;
 		oshu_draw_line(display, p - d, p + d);
 		oshu_draw_line(display, p - d * I, p + d * I);
+	} else if (hit->state == OSHU_SKIPPED_HIT) {
+		SDL_SetRenderDrawColor(display->renderer, 64, 64, 255, 255);
+		oshu_point p = oshu_end_point(hit);
+		oshu_vector a = radius / 3.;
+		oshu_vector b = a * cexp(2. * M_PI / 3. * I);
+		oshu_vector c = b * cexp(2. * M_PI / 3. * I);
+		oshu_draw_line(display, p + a, p + b);
+		oshu_draw_line(display, p + b, p + c);
+		oshu_draw_line(display, p + c, p + a);
 	}
 }
 
