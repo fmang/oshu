@@ -150,7 +150,7 @@ static void forward_music(struct oshu_game *game, double offset)
 	dump_state(game);
 
 	assert (game->hit_cursor != NULL);
-	while (game->hit_cursor->time < game->clock.now) {
+	while (game->hit_cursor->time < game->clock.now + 1.) {
 		game->hit_cursor->state = OSHU_SKIPPED_HIT;
 		game->hit_cursor = game->hit_cursor->next;
 	}
