@@ -435,6 +435,8 @@ static int process_general(struct parser_state *parser)
 		/* No fear of epilepsy with oshu's current state. */
 	case SkinPreference:
 		/* Known values so far: `Default`. */
+	case StoryFireInFront:
+		/* What is this? */
 	case WidescreenStoryboard:
 		/* Storyboard are far from being supported. */
 		rc = consume_all(parser);
