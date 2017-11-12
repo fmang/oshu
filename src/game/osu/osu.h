@@ -42,9 +42,23 @@ struct osu_state {
 	 * irrelevant.
 	 */
 	enum oshu_key held_key;
-	/* XXX Toying around */
+	/**
+	 * The base picture representing a hit circle.
+	 */
 	struct oshu_texture circle_texture;
 };
+
+/**
+ * Paint all the required textures for the beatmap.
+ *
+ * Free everything with #osu_free_resources.
+ */
+int osu_paint_resources(struct oshu_game *game);
+
+/**
+ * Free the dynamic resources of the game mode.
+ */
+int osu_free_resources(struct oshu_game *game);
 
 /**
  * The main drawing callback of the mode.

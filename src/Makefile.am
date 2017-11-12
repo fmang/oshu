@@ -26,6 +26,7 @@ oshu_SOURCES = \
 	game/osu/draw.c \
 	game/osu/osu.c \
 	game/osu/osu.h \
+	game/osu/paint.c \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/draw.c \

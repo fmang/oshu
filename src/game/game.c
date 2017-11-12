@@ -296,6 +296,7 @@ static void draw(struct oshu_game *game)
 	SDL_RenderClear(game->display.renderer);
 	oshu_draw_background(&game->display, &game->background);
 	game->mode->draw(game);
+	SDL_RenderPresent(game->display.renderer);
 }
 
 /**

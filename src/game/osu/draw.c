@@ -96,30 +96,21 @@ static void connect_hits(struct oshu_display *display, struct oshu_beatmap *beat
 /**
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
- *
- * `now` is the current position in the playing song, in seconds.
  */
-static void draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *cursor, double now)
+int osu_draw(struct oshu_game *game)
 {
+	struct oshu_hit *cursor = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
 	struct oshu_hit *prev = NULL;
+	double now = game->clock.now;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->next) {
 		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
 			continue;
-		if (hit->time > now + beatmap->difficulty.approach_time)
+		if (hit->time > now + game->beatmap.difficulty.approach_time)
 			break;
 		if (prev && !(hit->type & OSHU_NEW_HIT_COMBO))
-			connect_hits(display, beatmap, prev, hit);
-		draw_hit(display, beatmap, hit, now);
+			connect_hits(&game->display, &game->beatmap, prev, hit);
+		draw_hit(&game->display, &game->beatmap, hit, now);
 		prev = hit;
 	}
-}
-
-int osu_draw(struct oshu_game *game)
-{
-	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
-	draw_beatmap(&game->display, &game->beatmap, start, game->clock.now);
-	/* XXX Toying around */
-	oshu_draw_texture(&game->display, 0, &game->osu.circle_texture);
-	SDL_RenderPresent(game->display.renderer);
 	return 0;
 }
