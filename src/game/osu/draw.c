@@ -10,7 +10,6 @@
 #include "game/game.h"
 #include "graphics/display.h"
 #include "graphics/draw.h"
-#include "graphics/texture.h"
 
 static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {

@@ -6,10 +6,9 @@
  */
 
 #include "game/game.h"
-#include "graphics/texture.h"
+#include "graphics/paint.h"
 
 #include <assert.h>
-#include <cairo/cairo.h>
 
 /**
  * Find the first clickable hit object that contains the given x/y coordinates.

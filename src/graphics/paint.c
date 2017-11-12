@@ -1,10 +1,10 @@
 /**
- * \file graphics/texture.c
- * \ingroup graphics_texture
+ * \file graphics/paint.c
+ * \ingroup graphics_paint
  */
 
 #include "graphics/display.h"
-#include "graphics/texture.h"
+#include "graphics/paint.h"
 
 #include <cairo/cairo.h>
 
