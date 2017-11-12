@@ -66,15 +66,13 @@ void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, 
 	SDL_RenderDrawLines(display->renderer, right, resolution);
 }
 
-void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic)
+void oshu_draw_background(struct oshu_display *display, struct oshu_texture *pic)
 {
 	SDL_Rect dest;
 	int ww, wh;
-	int tw, th;
 	SDL_GetWindowSize(display->window, &ww, &wh);
-	SDL_QueryTexture(pic, NULL, NULL, &tw, &th);
 	double window_ratio = (double) ww / wh;
-	double pic_ratio = (double) tw / th;
+	double pic_ratio = oshu_ratio(pic->size);
 
 	if (window_ratio > pic_ratio) {
 		/* the window is too wide */
@@ -89,7 +87,7 @@ void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic)
 		dest.y = 0;
 		dest.x = (ww - dest.w) / 2;
 	}
-	SDL_RenderCopy(display->renderer, pic, NULL, &dest);
+	SDL_RenderCopy(display->renderer, pic->texture, NULL, &dest);
 }
 
 /**

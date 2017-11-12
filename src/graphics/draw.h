@@ -59,7 +59,7 @@ void oshu_draw_line(struct oshu_display *display, oshu_point p1, oshu_point p2);
  * When the aspects don't match, crop the picture to ensure the window is
  * filled.
  */
-void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic);
+void oshu_draw_background(struct oshu_display *display, struct oshu_texture *pic);
 
 /**
  * Draw a texture at the specified position.

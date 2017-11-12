@@ -34,6 +34,11 @@ double oshu_distance(oshu_point p, oshu_point q)
 	return cabs(p - q);
 }
 
+double oshu_ratio(oshu_size size)
+{
+	return creal(size) / cimag(size);
+}
+
 /* Bézier *********************************************************************/
 
 /**

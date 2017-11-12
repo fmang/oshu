@@ -59,9 +59,8 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	}
 	game->mode->adjust(game);
 	if (game->beatmap.background_filename) {
-		game->background = IMG_LoadTexture(game->display.renderer, game->beatmap.background_filename);
-		if (game->background)
-			SDL_SetTextureColorMod(game->background, 64, 64, 64);
+		if (oshu_load_texture(&game->display, game->beatmap.background_filename, &game->background) >= 0)
+			SDL_SetTextureColorMod(game->background.texture, 64, 64, 64);
 	}
 
 	/* 4. Clock */
@@ -295,8 +294,7 @@ static void draw(struct oshu_game *game)
 {
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
-	if (game->background)
-		oshu_draw_background(&game->display, game->background);
+	oshu_draw_background(&game->display, &game->background);
 	game->mode->draw(game);
 }
 
@@ -409,10 +407,7 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);
-	if (game->background) {
-		SDL_DestroyTexture(game->background);
-		game->background = NULL;
-	}
+	oshu_destroy_texture(&game->background);
 	oshu_close_display(&game->display);
 }
 

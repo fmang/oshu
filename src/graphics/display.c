@@ -7,6 +7,7 @@
 #include "log.h"
 
 #include <assert.h>
+#include <SDL2/SDL_image.h>
 
 void oshu_scale_view(struct oshu_view *view, double factor)
 {
@@ -22,8 +23,8 @@ void oshu_resize_view(struct oshu_view *view, oshu_size size)
 
 void oshu_fit_view(struct oshu_view *view, oshu_size size)
 {
-	double wanted_ratio = creal(size) /cimag(size);
-	double current_ratio = creal(view->size) / cimag(view->size);
+	double wanted_ratio = oshu_ratio(size);
+	double current_ratio = oshu_ratio(view->size);
 	if (current_ratio > wanted_ratio) {
 		/* the window is too wide */
 		oshu_scale_view(view, cimag(view->size) / cimag(size));
@@ -106,6 +107,20 @@ oshu_point oshu_get_mouse(struct oshu_display *display)
 	int x, y;
 	SDL_GetMouseState(&x, &y);
 	return oshu_unproject(display, x + y * I);
+}
+
+int oshu_load_texture(struct oshu_display *display, const char *filename, struct oshu_texture *texture)
+{
+	texture->texture = IMG_LoadTexture(display->renderer, filename);
+	if (!texture->texture) {
+		oshu_log_error("error loading image: %s", IMG_GetError());
+		return -1;
+	}
+	texture->origin = 0;
+	int tw, th;
+	SDL_QueryTexture(texture->texture, NULL, NULL, &tw, &th);
+	texture->size = tw + th * I;
+	return 0;
 }
 
 void oshu_destroy_texture(struct oshu_texture *texture)

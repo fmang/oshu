@@ -94,7 +94,7 @@ struct oshu_game {
 	int autoplay;
 	int paused;
 	/** Background picture. */
-	SDL_Texture *background;
+	struct oshu_texture background;
 	/** Mode-specific data, defined inside each mode's header file. */
 	union {
 		struct osu_state osu;

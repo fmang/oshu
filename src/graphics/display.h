@@ -273,6 +273,13 @@ struct oshu_texture {
 };
 
 /**
+ * Load a texture using SDL2_image.
+ *
+ * Log an error and return -1 on failure.
+ */
+int oshu_load_texture(struct oshu_display *display, const char *filename, struct oshu_texture *texture);
+
+/**
  * Destroy the SDL texture with `SDL_DestroyTexture`.
  *
  * Note that textures are linked to the renderer they were created for, so make

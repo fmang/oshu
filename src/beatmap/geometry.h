@@ -59,6 +59,11 @@ double oshu_distance(oshu_point p, oshu_point q);
 double oshu_distance2(oshu_point p, oshu_point q);
 
 /**
+ * Return the width / height ratio of a size.
+ */
+double oshu_ratio(oshu_size size);
+
+/**
  * A simple line, with a start point and end point.
  *
  * Used by #OSHU_LINEAR_PATH segments.
