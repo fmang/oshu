@@ -69,6 +69,11 @@ struct oshu_clock {
 /**
  * The full game state, from the beatmap state to the audio and graphical
  * context.
+ *
+ * \todo
+ * Add a field for the current timing point, and update it from the main loop.
+ * It contains the kiai mode and milliseconds per beat, which is in theory
+ * needed by most modes.
  */
 struct oshu_game {
 	struct oshu_beatmap beatmap;

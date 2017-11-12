@@ -533,6 +533,14 @@ static int process_difficulty(struct parser_state *parser)
 	return 0;
 }
 
+/**
+ * The Events section contains most notably the background image, but also
+ * break points.
+ *
+ * \todo
+ * Parse break points. The structure is `2,start,end` where start and end are
+ * probably the offset in milliseconds from the beginning of the song.
+ */
 static int process_event(struct parser_state *parser)
 {
 	if (!strncmp(parser->input, "0,0,", 4)) {

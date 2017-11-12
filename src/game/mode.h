@@ -89,6 +89,9 @@ enum oshu_key {
  *
  * All the callbacks must be defined! It's okay if it doesn't do anything, but
  * the pointers must point somewhere.
+ *
+ * \todo
+ * Add an initialization method, and a destroy method.
  */
 struct oshu_game_mode {
 	/**
