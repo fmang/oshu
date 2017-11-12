@@ -12,17 +12,14 @@ static int paint_circle(struct oshu_game *game)
 	oshu_start_painting(256 + 256 * I, &p);
 	cairo_translate(p.cr, 128, 128);
 
-	cairo_set_source_rgba(p.cr, .1, .1, .1, 1);
+	cairo_set_source_rgba(p.cr, 1, 1, 1, .7);
 	cairo_arc(p.cr, 0, 0, 128, 0, 2. * M_PI);
 	cairo_fill(p.cr);
 
-	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
-	cairo_arc(p.cr, 0, 0, 118, 0, 2. * M_PI);
-	cairo_fill(p.cr);
-
 	cairo_set_source_rgba(p.cr, .1, .1, .1, 1);
-	cairo_arc(p.cr, 0, 0, 112, 0, 2. * M_PI);
-	cairo_fill(p.cr);
+	cairo_set_line_width(p.cr, 10);
+	cairo_arc(p.cr, 0, 0, 118, 0, 2. * M_PI);
+	cairo_stroke(p.cr);
 
 	int rc = oshu_finish_painting(&p, &game->display, &game->osu.circle_texture);
 	game->osu.circle_texture.size = (1. + I) * game->beatmap.difficulty.circle_radius * 2.;
