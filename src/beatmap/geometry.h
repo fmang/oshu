@@ -32,6 +32,11 @@ typedef double complex oshu_point;
 typedef double complex oshu_vector;
 
 /**
+ * A 2D size.
+ */
+typedef double complex oshu_size;
+
+/**
  * Normalize a vector, making its norm equal to 1.
  */
 oshu_vector oshu_normalize(oshu_vector p);
