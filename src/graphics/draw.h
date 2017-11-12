@@ -6,7 +6,9 @@
 #pragma once
 
 #include "beatmap/geometry.h"
-#include "graphics/display.h"
+
+struct oshu_display;
+struct oshu_texture;
 
 /**
  * \defgroup draw Draw

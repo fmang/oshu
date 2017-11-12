@@ -5,7 +5,10 @@
 
 #include "graphics/draw.h"
 
+#include "graphics/display.h"
+
 #include <assert.h>
+#include <SDL2/SDL.h>
 
 void oshu_draw_circle(struct oshu_display *display, oshu_point center, double radius)
 {

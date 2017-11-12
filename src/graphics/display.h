@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "beatmap/geometry.h"
 
-#include "beatmap/beatmap.h"
+struct SDL_Renderer;
+struct SDL_Window;
 
 /**
  * \defgroup graphics Graphics
@@ -188,8 +189,8 @@ void oshu_fit_view(struct oshu_view *view, oshu_size size);
  * \sa oshu_close_display
  */
 struct oshu_display {
-	SDL_Window *window;
-	SDL_Renderer *renderer;
+	struct SDL_Window *window;
+	struct SDL_Renderer *renderer;
 	/**
 	 * The current view, used to project coordinates when drawing.
 	 *

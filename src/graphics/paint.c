@@ -8,7 +8,7 @@
 #include "graphics/display.h"
 #include "log.h"
 
-#include <cairo/cairo.h>
+#include <SDL2/SDL.h>
 
 static void destroy_painter(struct oshu_painter *painter)
 {
