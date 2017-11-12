@@ -8,6 +8,7 @@
 #include "graphics/display.h"
 #include "log.h"
 
+#include <assert.h>
 #include <SDL2/SDL.h>
 
 static void destroy_painter(struct oshu_painter *painter)
@@ -69,9 +70,26 @@ fail:
 	return -1;
 }
 
+static void unpremultiply(SDL_Surface *surface)
+{
+	uint8_t *pixels = surface->pixels;
+	assert (surface->pitch % 4 == 0);
+	assert (surface->pitch == 4 * surface->w);
+	uint8_t *end = pixels + surface->h * surface->pitch;
+	for (uint8_t *c = pixels; c < end; c += 4) {
+		uint8_t alpha = c[3];
+		if (alpha == 0)
+			continue;
+		c[0] = c[0] * alpha / 256;
+		c[1] = c[1] * alpha / 256;
+		c[2] = c[2] * alpha / 256;
+	}
+}
+
 int oshu_finish_painting(struct oshu_painter *painter, struct oshu_display *display, struct oshu_texture *texture)
 {
 	int rc = 0;
+	unpremultiply(painter->destination);
 	SDL_UnlockSurface(painter->destination);
 	texture->size = painter->size;
 	texture->origin = 0;
