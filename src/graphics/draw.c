@@ -91,3 +91,17 @@ void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic)
 	}
 	SDL_RenderCopy(display->renderer, pic, NULL, &dest);
 }
+
+/**
+ * \todo
+ * Respect the view.
+ */
+void oshu_draw_texture(struct oshu_display *display, oshu_point p, struct oshu_texture *texture)
+{
+	oshu_point top_left = p - texture->origin;
+	SDL_Rect dest = {
+		.x = creal(top_left), .y = cimag(top_left),
+		.w = creal(texture->size), .h = cimag(texture->size),
+	};
+	SDL_RenderCopy(display->renderer, texture->texture, NULL, &dest);
+}

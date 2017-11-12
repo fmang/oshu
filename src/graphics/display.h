@@ -256,4 +256,28 @@ oshu_point oshu_unproject(struct oshu_display *display, oshu_point p);
  */
 oshu_point oshu_get_mouse(struct oshu_display *display);
 
+/**
+ * Define a texture loaded on the GPU.
+ *
+ * Store its size here for convenience.
+ *
+ * The origin defined the anchor of the texture, rather than always using the
+ * top left. Imagine you're representing a circle, you'd rather position it by
+ * its center rather than some imaginary top-left. When drawing a texture at
+ * (x, y), it will be drawn such that the *origin* is at (x, y).
+ */
+struct oshu_texture {
+	oshu_size size;
+	oshu_point origin;
+	struct SDL_Texture *texture;
+};
+
+/**
+ * Destroy the SDL texture with `SDL_DestroyTexture`.
+ *
+ * Note that textures are linked to the renderer they were created for, so make
+ * sure you delete the textures first.
+ */
+void oshu_destroy_texture(struct oshu_texture *texture);
+
 /** \} */

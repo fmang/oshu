@@ -107,3 +107,11 @@ oshu_point oshu_get_mouse(struct oshu_display *display)
 	SDL_GetMouseState(&x, &y);
 	return oshu_unproject(display, x + y * I);
 }
+
+void oshu_destroy_texture(struct oshu_texture *texture)
+{
+	if (texture->texture) {
+		SDL_DestroyTexture(texture->texture);
+		texture->texture = NULL;
+	}
+}

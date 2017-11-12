@@ -6,6 +6,7 @@
  */
 
 #include "game/game.h"
+#include "graphics/texture.h"
 
 #include <assert.h>
 #include <cairo/cairo.h>

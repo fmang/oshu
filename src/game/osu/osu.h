@@ -6,7 +6,7 @@
 #pragma once
 
 #include "game/mode.h"
-#include "graphics/texture.h"
+#include "graphics/display.h"
 
 struct oshu_beatmap;
 struct oshu_display;

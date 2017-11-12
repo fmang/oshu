@@ -12,6 +12,7 @@ struct SDL_Texture;
 struct _cairo_surface;
 struct _cairo;
 struct oshu_display;
+struct oshu_texture;
 
 /**
  * \defgroup graphics_texture Texture
@@ -19,16 +20,6 @@ struct oshu_display;
  *
  * \{
  */
-
-struct oshu_texture {
-	oshu_size size;
-	oshu_point origin;
-	struct SDL_Texture *texture;
-};
-
-void oshu_draw_texture(struct oshu_display *display, oshu_point p, struct oshu_texture *texture);
-
-void oshu_destroy_texture(struct oshu_texture *texture);
 
 struct oshu_painter {
 	oshu_size size;

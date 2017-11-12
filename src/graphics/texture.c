@@ -8,16 +8,6 @@
 
 #include <cairo/cairo.h>
 
-void oshu_draw_texture(struct oshu_display *display, oshu_point p, struct oshu_texture *texture)
-{
-	oshu_point top_left = p - texture->origin;
-	SDL_Rect dest = {
-		.x = creal(top_left), .y = cimag(top_left),
-		.w = creal(texture->size), .h = cimag(texture->size),
-	};
-	SDL_RenderCopy(display->renderer, texture->texture, NULL, &dest);
-}
-
 /**
  * \todo
  * Error handling.
@@ -51,12 +41,4 @@ int oshu_finish_painting(struct oshu_painter *painter, struct oshu_display *disp
 	texture->texture = SDL_CreateTextureFromSurface(display->renderer, painter->destination);
 	SDL_FreeSurface(painter->destination);
 	return 0;
-}
-
-void oshu_destroy_texture(struct oshu_texture *texture)
-{
-	if (texture->texture) {
-		SDL_DestroyTexture(texture->texture);
-		texture->texture = NULL;
-	}
 }

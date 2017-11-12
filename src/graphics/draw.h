@@ -61,4 +61,14 @@ void oshu_draw_line(struct oshu_display *display, oshu_point p1, oshu_point p2);
  */
 void oshu_draw_background(struct oshu_display *display, SDL_Texture *pic);
 
+/**
+ * Draw a texture at the specified position.
+ *
+ * *p* points at the position of the *origin* of the texture, not at the top
+ * left corner.
+ *
+ * The size of the texture is always preserved.
+ */
+void oshu_draw_texture(struct oshu_display *display, oshu_point p, struct oshu_texture *texture);
+
 /** \} */
