@@ -672,7 +672,7 @@ struct oshu_difficulty {
 	 *
 	 * Looks like most settings, 1 is easy, 5 is normal, and 9 is hard.
 	 *
-	 * Defaults to 1 second.
+	 * Defaults to 0.8 seconds.
 	 */
 	double approach_time;
 	/**

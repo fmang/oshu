@@ -524,6 +524,12 @@ static int process_difficulty(struct parser_state *parser)
 		difficulty->slider_tick_rate = value;
 		break;
 	case ApproachRate:
+		/* Hardest (10): 0.3s.
+		 * Medium  (5):  0.9s.
+		 * Easiest (0):  1.5s. */
+		difficulty->approach_time = - .12 * value + 1.5;
+		assert (difficulty->approach_time > 0.);
+		break;
 	case HPDrainRate:
 		break;
 	default:
