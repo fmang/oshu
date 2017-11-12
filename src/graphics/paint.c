@@ -80,9 +80,9 @@ static void unpremultiply(SDL_Surface *surface)
 		uint8_t alpha = c[3];
 		if (alpha == 0)
 			continue;
-		c[0] = c[0] * alpha / 256;
-		c[1] = c[1] * alpha / 256;
-		c[2] = c[2] * alpha / 256;
+		c[0] = (((unsigned int) c[0] << 8) - c[0]) / alpha;
+		c[1] = (((unsigned int) c[1] << 8) - c[0]) / alpha;
+		c[2] = (((unsigned int) c[2] << 8) - c[0]) / alpha;
 	}
 }
 
