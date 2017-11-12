@@ -26,11 +26,10 @@ static void destroy_painter(struct oshu_painter *painter)
 	}
 }
 
-int oshu_start_painting(oshu_size size, oshu_point origin, struct oshu_painter *painter)
+int oshu_start_painting(oshu_size size, struct oshu_painter *painter)
 {
 	memset(painter, 0, sizeof(*painter));
 	painter->size = size;
-	painter->origin = origin;
 
 	/* 1. SDL */
 	painter->destination = SDL_CreateRGBSurface(
@@ -63,7 +62,6 @@ int oshu_start_painting(oshu_size size, oshu_point origin, struct oshu_painter *
 		goto fail;
 	}
 
-	cairo_translate(painter->cr, creal(origin), cimag(origin));
 	return 0;
 
 fail:
@@ -76,7 +74,7 @@ int oshu_finish_painting(struct oshu_painter *painter, struct oshu_display *disp
 	int rc = 0;
 	SDL_UnlockSurface(painter->destination);
 	texture->size = painter->size;
-	texture->origin = painter->origin;
+	texture->origin = 0;
 	texture->texture = SDL_CreateTextureFromSurface(display->renderer, painter->destination);
 	if (!texture->texture) {
 		oshu_log_error("error uploading texture: %s", SDL_GetError());

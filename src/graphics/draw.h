@@ -71,6 +71,6 @@ void oshu_draw_background(struct oshu_display *display, struct oshu_texture *pic
  *
  * The size of the texture is always preserved.
  */
-void oshu_draw_texture(struct oshu_display *display, oshu_point p, struct oshu_texture *texture);
+void oshu_draw_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p);
 
 /** \} */

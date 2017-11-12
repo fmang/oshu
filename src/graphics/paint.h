@@ -33,7 +33,6 @@ struct oshu_texture;
 
 struct oshu_painter {
 	oshu_size size;
-	oshu_point origin;
 	struct SDL_Surface *destination;
 	cairo_surface_t *surface;
 	cairo_t *cr;
@@ -44,7 +43,7 @@ struct oshu_painter {
  *
  * When you're done drawing, call #oshu_finish_painting.
  */
-int oshu_start_painting(oshu_size size, oshu_point origin, struct oshu_painter *painter);
+int oshu_start_painting(oshu_size size, struct oshu_painter *painter);
 
 /**
  * Load the drawn texture onto the GPU as a texture, and free everything else.
