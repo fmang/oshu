@@ -259,16 +259,32 @@ oshu_point oshu_get_mouse(struct oshu_display *display);
 /**
  * Define a texture loaded on the GPU.
  *
- * Store its size here for convenience.
- *
- * The origin defined the anchor of the texture, rather than always using the
- * top left. Imagine you're representing a circle, you'd rather position it by
- * its center rather than some imaginary top-left. When drawing a texture at
- * (x, y), it will be drawn such that the *origin* is at (x, y).
+ * Load it with #oshu_load_texture or create it using #oshu_finish_painting,
+ * then destroy it with #oshu_destroy_texture.
  */
 struct oshu_texture {
+	/**
+	 * The final size of the texture, specified in logical units.
+	 *
+	 * Initially, it's the actual size of the texture in pixels, but
+	 * typically 1 logical pixel is bigger than a phyiscal pixel, so the
+	 * texture will be stretched.
+	 *
+	 * For example, you will create a 128×128 texture, and then force the
+	 * size to 64×64 osu!pixels, which could appear as 96×96 pixels on
+	 * screen. Better downscale than upscale, right?
+	 */
 	oshu_size size;
+	/**
+	 * The origin defines the anchor of the texture, rather than always using the
+	 * top left. Imagine you're representing a circle, you'd rather position it by
+	 * its center rather than some imaginary top-left. When drawing a texture at
+	 * (x, y), it will be drawn such that the *origin* is at (x, y).
+	 */
 	oshu_point origin;
+	/**
+	 * The underlying SDL texture.
+	 */
 	struct SDL_Texture *texture;
 };
 
