@@ -74,6 +74,9 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	}
 	game->clock.ticks = SDL_GetTicks();
 
+	/* 5. Post-initialization */
+	game->mode->initialize(game);
+
 	return 0;
 
 fail:
@@ -400,6 +403,8 @@ int oshu_run_game(struct oshu_game *game)
 void oshu_destroy_game(struct oshu_game *game)
 {
 	assert (game != NULL);
+	if (game->mode)
+		game->mode->destroy(game);
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);

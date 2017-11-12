@@ -95,6 +95,16 @@ enum oshu_key {
  */
 struct oshu_game_mode {
 	/**
+	 * Initialize all the required dynamic resources.
+	 *
+	 * \sa destroy
+	 */
+	int (*initialize)(struct oshu_game *game);
+	/**
+	 * Destroy any allocated dynamic memory.
+	 */
+	int (*destroy)(struct oshu_game *game);
+	/**
 	 * Called at every game iteration, unless the game is paused.
 	 *
 	 * The job of this function is to check the game clock and see if notes

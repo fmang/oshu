@@ -197,7 +197,19 @@ static int adjust(struct oshu_game *game)
 	return 0;
 }
 
+static int initialize(struct oshu_game *game)
+{
+	return 0;
+}
+
+static int destroy(struct oshu_game *game)
+{
+	return 0;
+}
+
 struct oshu_game_mode osu_mode = {
+	.initialize = initialize,
+	.destroy = destroy,
 	.check = check,
 	.autoplay = autoplay,
 	.adjust = adjust,
