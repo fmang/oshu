@@ -112,12 +112,19 @@ static void draw_beatmap(struct oshu_display *display, struct oshu_beatmap *beat
 		draw_hit(display, beatmap, hit, now);
 		prev = hit;
 	}
-	SDL_RenderPresent(display->renderer);
 }
 
 int osu_draw(struct oshu_game *game)
 {
 	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
 	draw_beatmap(&game->display, &game->beatmap, start, game->clock.now);
+	/* XXX Toying around */
+	SDL_Rect dest;
+	dest.x = 0;
+	dest.y = 0;
+	dest.w = 200;
+	dest.h = 200;
+	SDL_RenderCopy(game->display.renderer, game->osu.circle_texture, NULL, &dest);
+	SDL_RenderPresent(game->display.renderer);
 	return 0;
 }

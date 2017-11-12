@@ -12,6 +12,8 @@ struct oshu_display;
 struct oshu_game_mode;
 struct oshu_hit;
 
+struct SDL_Texture;
+
 /**
  * \defgroup osu Osu
  * \ingroup game
@@ -39,6 +41,8 @@ struct osu_state {
 	 * irrelevant.
 	 */
 	enum oshu_key held_key;
+	/* XXX Toying around */
+	SDL_Texture *circle_texture;
 };
 
 /**
