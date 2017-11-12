@@ -75,7 +75,8 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	game->clock.ticks = SDL_GetTicks();
 
 	/* 5. Post-initialization */
-	game->mode->initialize(game);
+	if (game->mode->initialize(game) < 0)
+		goto fail;
 
 	return 0;
 
