@@ -70,6 +70,14 @@ fail:
 	return -1;
 }
 
+/**
+ * Cairo uses pre-multiplied alpha channels.
+ *
+ * What this means is that a bright red (0xFF0000) at alpha 50% is stored as
+ * 0x800000. We need to divide by the alpha to restore the initial color.
+ *
+ * This is required for Cairo → SDL interoperability.
+ */
 static void unpremultiply(SDL_Surface *surface)
 {
 	uint8_t *pixels = surface->pixels;
