@@ -20,6 +20,7 @@ PKG_CHECK_MODULES([LAVF], [libavformat])
 PKG_CHECK_MODULES([LAVC], [libavcodec])
 PKG_CHECK_MODULES([LSWR], [libswresample])
 PKG_CHECK_MODULES([LAVU], [libavutil])
+PKG_CHECK_MODULES([CAIRO], [cairo])
 
 # Checks for header files.
 
