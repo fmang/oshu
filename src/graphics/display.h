@@ -120,8 +120,7 @@
 struct oshu_view {
 	double zoom;
 	oshu_point origin;
-	double width;
-	double height;
+	oshu_size size;
 };
 
 /**
@@ -143,7 +142,7 @@ struct oshu_view {
  * - `v(logical width / 2) = physical width / 2`
  *
  */
-void oshu_resize_view(struct oshu_view *view, double w, double h);
+void oshu_resize_view(struct oshu_view *view, oshu_size size);
 
 /**
  * Scale the coordinate system.
@@ -177,7 +176,7 @@ void oshu_scale_view(struct oshu_view *view, double factor);
  * - The view is not cut:
  *   `0 ≤ v(0) ≤ v(logical width) ≤ physical width`
  */
-void oshu_fit_view(struct oshu_view *view, double w, double h);
+void oshu_fit_view(struct oshu_view *view, oshu_size size);
 
 /**
  * Store everything related to the current display.
