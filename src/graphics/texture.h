@@ -28,6 +28,8 @@ struct oshu_texture {
 
 void oshu_draw_texture(struct oshu_display *display, oshu_point p, struct oshu_texture *texture);
 
+void oshu_destroy_texture(struct oshu_texture *texture);
+
 struct oshu_painter {
 	oshu_size size;
 	oshu_point origin;

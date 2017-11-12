@@ -201,17 +201,12 @@ static int adjust(struct oshu_game *game)
 static int initialize(struct oshu_game *game)
 {
 	/* XXX Toying around */
-	SDL_Surface *surface = SDL_CreateRGBSurface(
-		0, 400, 400, 32,
-		0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-	SDL_LockSurface(surface);
-	cairo_surface_t *pad = cairo_image_surface_create_for_data(
-		surface->pixels, CAIRO_FORMAT_ARGB32,
-		surface->w, surface->h, surface->pitch);
-	cairo_t *cr = cairo_create(pad);
-	/* Draw */
-	double xc = 128.0;
-	double yc = 128.0;
+	struct oshu_painter p;
+	oshu_start_painting(400 + 400 * I, 128 + 128 * I, &p);
+	cairo_t *cr = p.cr;
+
+	double xc = 0.0;
+	double yc = 0.0;
 	double radius = 100.0;
 	double angle1 = 45.0  * (M_PI/180.0);  /* angles are specified */
 	double angle2 = 180.0 * (M_PI/180.0);  /* in radians           */
@@ -232,16 +227,14 @@ static int initialize(struct oshu_game *game)
 	cairo_arc (cr, xc, yc, radius, angle2, angle2);
 	cairo_line_to (cr, xc, yc);
 	cairo_stroke (cr);
-	/* Finish */
-	SDL_UnlockSurface(surface);
-	game->osu.circle_texture = SDL_CreateTextureFromSurface(
-		game->display.renderer, surface);
-	SDL_FreeSurface(surface);
+
+	oshu_finish_painting(&p, &game->display, &game->osu.circle_texture);
 	return 0;
 }
 
 static int destroy(struct oshu_game *game)
 {
+	oshu_destroy_texture(&game->osu.circle_texture);
 	return 0;
 }
 

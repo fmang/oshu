@@ -6,6 +6,7 @@
 #pragma once
 
 #include "game/mode.h"
+#include "graphics/texture.h"
 
 struct oshu_beatmap;
 struct oshu_display;
@@ -42,7 +43,7 @@ struct osu_state {
 	 */
 	enum oshu_key held_key;
 	/* XXX Toying around */
-	SDL_Texture *circle_texture;
+	struct oshu_texture circle_texture;
 };
 
 /**

@@ -52,3 +52,11 @@ int oshu_finish_painting(struct oshu_painter *painter, struct oshu_display *disp
 	SDL_FreeSurface(painter->destination);
 	return 0;
 }
+
+void oshu_destroy_texture(struct oshu_texture *texture)
+{
+	if (texture->texture) {
+		SDL_DestroyTexture(texture->texture);
+		texture->texture = NULL;
+	}
+}

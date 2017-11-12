@@ -10,6 +10,7 @@
 #include "game/game.h"
 #include "graphics/display.h"
 #include "graphics/draw.h"
+#include "graphics/texture.h"
 
 static void draw_hit_circle(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_hit *hit, double now)
 {
@@ -119,12 +120,7 @@ int osu_draw(struct oshu_game *game)
 	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
 	draw_beatmap(&game->display, &game->beatmap, start, game->clock.now);
 	/* XXX Toying around */
-	SDL_Rect dest;
-	dest.x = 0;
-	dest.y = 0;
-	dest.w = 200;
-	dest.h = 200;
-	SDL_RenderCopy(game->display.renderer, game->osu.circle_texture, NULL, &dest);
+	oshu_draw_texture(&game->display, 0, &game->osu.circle_texture);
 	SDL_RenderPresent(game->display.renderer);
 	return 0;
 }
