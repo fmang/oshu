@@ -39,6 +39,21 @@ double oshu_ratio(oshu_size size)
 	return creal(size) / cimag(size);
 }
 
+/**
+ * Extend a box so that the point *p* fits in.
+ */
+static void extend_box(oshu_point p, oshu_point *top_left, oshu_point *bottom_right)
+{
+	if (creal(p) < creal(*top_left))
+		*top_left = creal(p) + I * cimag(*top_left);
+	if (cimag(p) < cimag(*top_left))
+		*top_left = creal(*top_left) + I * cimag(p);
+	if (creal(p) > creal(*bottom_right))
+		*bottom_right = creal(p) + I * cimag(*bottom_right);
+	if (cimag(p) > cimag(*bottom_right))
+		*bottom_right = creal(*bottom_right) + I * cimag(p);
+}
+
 /* Bézier *********************************************************************/
 
 /**
@@ -312,6 +327,19 @@ static double l_to_t(struct oshu_bezier *bezier, double l)
 	return (1. - l) * bezier->anchors[i] + l * bezier->anchors[i + 1];
 }
 
+/**
+ * Every point on a Bézier line is an average of all the control points, so
+ * it's safe to compute the bounding box of the polyline defined by them.
+ */
+void bezier_bounding_box(struct oshu_bezier *bezier, oshu_point *top_left, oshu_point *bottom_right)
+{
+	assert (bezier->segment_count > 0);
+	*top_left = *bottom_right = bezier->control_points[0];
+	int count = bezier->indices[bezier->segment_count];
+	for (int i = 0; i < count; ++i)
+		extend_box(bezier->control_points[i], top_left, bottom_right);
+}
+
 /* Lines **********************************************************************/
 
 /**
@@ -337,6 +365,13 @@ static void normalize_line(struct oshu_line *line, double target_length)
 	assert (actual_length > 0);
 	double factor = target_length / actual_length;
 	line->end = line->start + (line->end - line->start) * factor;
+}
+
+void line_bounding_box(struct oshu_line *line, oshu_point *top_left, oshu_point *bottom_right)
+{
+	*top_left = *bottom_right = line->start;
+	extend_box(line->start, top_left, bottom_right);
+	extend_box(line->end, top_left, bottom_right);
 }
 
 /* Perfect circle arcs ********************************************************/
@@ -405,6 +440,43 @@ static void normalize_arc(struct oshu_arc *arc, double target_length)
 	arc->end_angle = arc->start_angle + diff;
 }
 
+/**
+ * Compute the bounding box for an circle arc.
+ *
+ * First, normalize the edge angles, such that *min* is in the [0, 2π[
+ * interval. Adjust max accordingly.
+ *
+ * Then, add the two extremities of the arc, and, for any side of the circle
+ * reached, extend the box.
+ */
+void arc_bounding_box(struct oshu_arc *arc, oshu_point *top_left, oshu_point *bottom_right)
+{
+	double min = arc->start_angle < arc->end_angle ? arc->start_angle : arc->end_angle;
+	double max = arc->start_angle > arc->end_angle ? arc->start_angle : arc->end_angle;
+	while (min >= 2. * M_PI) {
+		min -= 2. * M_PI;
+		max -= 2. * M_PI;
+	}
+	while (min < 0) {
+		min += 2. * M_PI;
+		max += 2. * M_PI;
+	}
+	assert (min >= 0);
+	assert (min < 2. * M_PI);
+	assert (max >= min);
+
+	*top_left = *bottom_right = arc_at(arc, 0.);
+	extend_box(arc_at(arc, 1.), top_left, bottom_right);
+	if (min < M_PI / 2. && max > M_PI / 2.)
+		extend_box(arc->center - arc->radius * I, top_left, bottom_right);
+	if (min < M_PI && max > M_PI)
+		extend_box(arc->center - arc->radius, top_left, bottom_right);
+	if (min < 3. * M_PI / 2. && max > 3. * M_PI / 2.)
+		extend_box(arc->center + arc->radius * I, top_left, bottom_right);
+	if (max >= 2. * M_PI)
+		extend_box(arc->center + arc->radius, top_left, bottom_right);
+}
+
 /* Generic interface **********************************************************/
 
 void oshu_normalize_path(struct oshu_path *path, double length)
@@ -470,10 +542,21 @@ oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 	return revert ? -d : d;
 }
 
-/**
- * \todo
- * Implement it.
- */
 void oshu_path_bounding_box(struct oshu_path *path, oshu_point *top_left, oshu_point *bottom_right)
 {
+	switch (path->type) {
+	case OSHU_LINEAR_PATH:
+		line_bounding_box(&path->line, top_left, bottom_right);
+		break;
+	case OSHU_BEZIER_PATH:
+		bezier_bounding_box(&path->bezier, top_left, bottom_right);
+		break;
+	case OSHU_PERFECT_PATH:
+		arc_bounding_box(&path->arc, top_left, bottom_right);
+		break;
+	case OSHU_CATMULL_PATH:
+		assert (path->type != OSHU_CATMULL_PATH);
+	default:
+		assert (path->type != path->type);
+	}
 }
