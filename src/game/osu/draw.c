@@ -100,16 +100,16 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *prev, struct o
  */
 int osu_draw(struct oshu_game *game)
 {
-	struct oshu_hit *cursor = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
+	struct oshu_hit *cursor = oshu_look_hit_up(game, game->beatmap.difficulty.approach_time);
 	struct oshu_hit *prev = NULL;
 	double now = game->clock.now;
-	for (struct oshu_hit *hit = cursor; hit; hit = hit->next) {
+	for (struct oshu_hit *hit = cursor; hit; hit = hit->previous) {
 		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
 			continue;
-		if (hit->time > now + game->beatmap.difficulty.approach_time)
+		if (oshu_hit_end_time(hit) < now - game->beatmap.difficulty.approach_time)
 			break;
-		if (prev && !(hit->type & OSHU_NEW_HIT_COMBO))
-			connect_hits(game, prev, hit);
+		if (prev && !(prev->type & OSHU_NEW_HIT_COMBO))
+			connect_hits(game, hit, prev);
 		draw_hit(game, hit);
 		prev = hit;
 	}

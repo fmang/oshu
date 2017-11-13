@@ -152,7 +152,16 @@ int oshu_run_game(struct oshu_game *game);
  * position won't affect the results.
  *
  * For long notes like sliders, the end time is used, not the start time.
+ *
+ * \sa oshu_look_hit_up
  */
 struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset);
+
+/**
+ * Find the last hit object before *now + offset*.
+ *
+ * This is analogous to #oshu_look_hit_back.
+ */
+struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset);
 
 /** \} */
