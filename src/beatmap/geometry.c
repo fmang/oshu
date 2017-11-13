@@ -469,3 +469,11 @@ oshu_vector oshu_path_derive(struct oshu_path *path, double t)
 
 	return revert ? -d : d;
 }
+
+/**
+ * \todo
+ * Implement it.
+ */
+void oshu_path_bounding_box(struct oshu_path *path, oshu_point *top_left, oshu_point *bottom_right)
+{
+}

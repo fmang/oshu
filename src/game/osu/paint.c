@@ -6,7 +6,7 @@
 #include "game/game.h"
 #include "graphics/paint.h"
 
-#include "log.h"
+#include <assert.h>
 
 static int paint_circle(struct oshu_game *game)
 {
@@ -33,8 +33,22 @@ static int paint_circle(struct oshu_game *game)
 	return rc;
 }
 
+/**
+ * \todo
+ * Implement it.
+ */
+static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
+{
+	assert (hit->type & OSHU_SLIDER_HIT);
+	return -1;
+}
+
 int osu_paint_resources(struct oshu_game *game)
 {
+	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
+		if (hit->type & OSHU_SLIDER_HIT)
+			paint_slider(game, hit);
+	}
 	return paint_circle(game);
 }
 

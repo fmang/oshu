@@ -338,4 +338,18 @@ oshu_point oshu_path_at(struct oshu_path *path, double t);
  */
 oshu_vector oshu_path_derive(struct oshu_path *path, double t);
 
+/**
+ * Compute the smallest box such that the path fits in.
+ *
+ * It doesn't have a notion of path width, so you may need to push each edge
+ * with the radius of your objects.
+ *
+ * The returned pair of points is such that:
+ *
+ * 1. ∀t real(top_left) ≤ real(at(t)) ≤ real(bottom_right)
+ * 2. ∀t imag(top_left) ≤ imag(at(t)) ≤ imag(bottom_right)
+ *
+ */
+void oshu_path_bounding_box(struct oshu_path *path, oshu_point *top_left, oshu_point *bottom_right);
+
 /** \} */
