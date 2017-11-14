@@ -57,7 +57,7 @@ int create_window(struct oshu_display *display)
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		960, 720,
-		SDL_WINDOW_RESIZABLE
+		0
 	);
 	if (display->window == NULL)
 		goto fail;

@@ -13,7 +13,7 @@ static int paint_circle(struct oshu_game *game)
 {
 	double radius = game->beatmap.difficulty.circle_radius;
 	oshu_size size = (1. + I) *  radius * 2.;
-	double zoom = 3;
+	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
 	oshu_start_painting(size * zoom, &p);
@@ -21,12 +21,12 @@ static int paint_circle(struct oshu_game *game)
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_set_source_rgba(p.cr, 1, 1, 1, .7);
-	cairo_arc(p.cr, 0, 0, radius, 0, 2. * M_PI);
+	cairo_arc(p.cr, 0, 0, radius - 1, 0, 2. * M_PI);
 	cairo_fill(p.cr);
 
 	cairo_set_source_rgba(p.cr, .1, .1, .1, 1);
 	cairo_set_line_width(p.cr, 3);
-	cairo_arc(p.cr, 0, 0, radius - 4, 0, 2. * M_PI);
+	cairo_arc(p.cr, 0, 0, radius - 5, 0, 2. * M_PI);
 	cairo_stroke(p.cr);
 
 	int rc = oshu_finish_painting(&p, &game->display, &game->osu.circle_texture);
@@ -42,13 +42,13 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	oshu_point top_left, bottom_right;
 	oshu_path_bounding_box(&hit->slider.path, &top_left, &bottom_right);
 	oshu_size size = bottom_right - top_left + 2. * radius;
-	double zoom = 2;
+	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
 	oshu_start_painting(size * zoom, &p);
 
 	cairo_set_source_rgba(p.cr, 1, 0, 0, 1);
-	cairo_set_line_width(p.cr, 5);
+	cairo_set_line_width(p.cr, 3);
 	cairo_rectangle(p.cr, 0, 0, creal(size) * zoom, cimag(size) * zoom);
 	cairo_stroke(p.cr);
 
@@ -56,7 +56,7 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	cairo_translate(p.cr, - creal(top_left) + radius, - cimag(top_left) + radius);
 
 	cairo_set_source_rgba(p.cr, 1, 1, 1, .7);
-	cairo_set_line_width(p.cr, 2. * radius);
+	cairo_set_line_width(p.cr, 2. * radius - 1);
 	cairo_set_line_cap(p.cr, CAIRO_LINE_CAP_ROUND);
 	cairo_set_line_join(p.cr, CAIRO_LINE_JOIN_ROUND);
 	cairo_move_to(p.cr, creal(hit->p), cimag(hit->p));
@@ -75,7 +75,8 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	cairo_set_source_rgba(p.cr, .1, .1, .1, .5);
 	cairo_set_line_width(p.cr, 1);
 	for (int i = 1; i <= hit->slider.repeat; ++i) {
-		cairo_arc(p.cr, creal(end), cimag(end), (radius - 4.) / i, 0, 2. * M_PI);
+		double ratio = (double) i / hit->slider.repeat;
+		cairo_arc(p.cr, creal(end), cimag(end), (radius - 4.) * ratio, 0, 2. * M_PI);
 		cairo_stroke(p.cr);
 	}
 
