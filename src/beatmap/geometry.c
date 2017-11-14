@@ -468,11 +468,11 @@ void arc_bounding_box(struct oshu_arc *arc, oshu_point *top_left, oshu_point *bo
 	*top_left = *bottom_right = arc_at(arc, 0.);
 	extend_box(arc_at(arc, 1.), top_left, bottom_right);
 	if (min < M_PI / 2. && max > M_PI / 2.)
-		extend_box(arc->center - arc->radius * I, top_left, bottom_right);
+		extend_box(arc->center + arc->radius * I, top_left, bottom_right);
 	if (min < M_PI && max > M_PI)
 		extend_box(arc->center - arc->radius, top_left, bottom_right);
 	if (min < 3. * M_PI / 2. && max > 3. * M_PI / 2.)
-		extend_box(arc->center + arc->radius * I, top_left, bottom_right);
+		extend_box(arc->center - arc->radius * I, top_left, bottom_right);
 	if (max >= 2. * M_PI)
 		extend_box(arc->center + arc->radius, top_left, bottom_right);
 }

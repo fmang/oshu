@@ -7,6 +7,8 @@
 
 #include "geometry.h"
 
+struct oshu_texture;
+
 /** \defgroup beatmap Beatmap
  *
  * \brief
@@ -504,6 +506,13 @@ struct oshu_hit {
 	 * It should be left to 0 (#OSHU_INITIAL_HIT) by the parser.
 	 */
 	enum oshu_hit_state state;
+	/**
+	 * Graphical texture for the hit object.
+	 *
+	 * It is up to the game module to decide how to allocate it, draw it,
+	 * and free it.
+	 */
+	struct oshu_texture *texture;
 	/**
 	 * Pointer to the previous element of the linked list.
 	 *

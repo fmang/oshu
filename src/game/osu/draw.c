@@ -55,6 +55,8 @@ static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 	double radius = beatmap->difficulty.circle_radius;
 	draw_hit_circle(game, hit);
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
+		if (hit->texture)
+			oshu_draw_texture(&game->display, hit->texture, hit->p);
 		double t = (now - hit->time) / hit->slider.duration;
 		SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 		oshu_draw_thick_path(display, &hit->slider.path, 2 * radius);
