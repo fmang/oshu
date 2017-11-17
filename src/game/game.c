@@ -71,7 +71,6 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 		if (first_hit < 1.)
 			game->clock.now = first_hit - 1.;
 	}
-	game->clock.ticks = SDL_GetTicks();
 
 	/* 5. Post-initialization */
 	if (game->mode->initialize(game) < 0)
@@ -370,6 +369,8 @@ static void welcome(struct oshu_game *game)
 int oshu_run_game(struct oshu_game *game)
 {
 	welcome(game);
+	/* Reset the clock. */
+	game->clock.ticks = SDL_GetTicks();
 	SDL_Event event;
 	int missed_frames = 0;
 	if (!game->paused && game->clock.now >= 0)
