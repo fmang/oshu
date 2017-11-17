@@ -451,56 +451,31 @@ static void normalize_arc(struct oshu_arc *arc, double target_length)
  */
 void arc_bounding_box(struct oshu_arc *arc, oshu_point *top_left, oshu_point *bottom_right)
 {
-	double start = arc->start_angle;
-	double end = arc->end_angle;
-	while (start >= 2. * M_PI) {
-		start -= 2. * M_PI;
-		end -= 2. * M_PI;
+	double min = arc->start_angle < arc->end_angle ? arc->start_angle : arc->end_angle;
+	double max = arc->start_angle > arc->end_angle ? arc->start_angle : arc->end_angle;
+	while (min >= 2. * M_PI) {
+		min -= 2. * M_PI;
+		max -= 2. * M_PI;
 	}
-	while (start < 0) {
-		start += 2. * M_PI;
-		end += 2. * M_PI;
+	while (min < 0) {
+		min += 2. * M_PI;
+		max += 2. * M_PI;
 	}
-	assert (start >= 0);
-	assert (start < 2. * M_PI);
+	assert (min >= 0);
+	assert (min < 2. * M_PI);
+	assert (min <= max);
 
 	*top_left = *bottom_right = arc_at(arc, 0.);
 	extend_box(arc_at(arc, 1.), top_left, bottom_right);
 
-	if (start < end) {
-		/* Trigonometrical order */
-		if (start < M_PI / 2. && end > M_PI / 2.)
-			extend_box(arc->center - arc->radius * I, top_left, bottom_right);
-		if (start < M_PI && end > M_PI)
-			extend_box(arc->center - arc->radius, top_left, bottom_right);
-		if (start < 3. * M_PI / 2. && end > 3. * M_PI / 2.)
-			extend_box(arc->center + arc->radius * I, top_left, bottom_right);
-		if (end > 2. * M_PI)
-			extend_box(arc->center + arc->radius, top_left, bottom_right);
-		if (end > 5. / 2. * M_PI)
-			extend_box(arc->center - arc->radius * I, top_left, bottom_right);
-		if (end > 3. * M_PI)
-			extend_box(arc->center - arc->radius, top_left, bottom_right);
-		if (end > 7. / 2. * M_PI)
-			extend_box(arc->center + arc->radius * I, top_left, bottom_right);
-	} else {
-		/* Anti-trigonometrical order */
-		if (start > 3. * M_PI / 2. && end < 3. * M_PI / 2.)
-			extend_box(arc->center + arc->radius * I, top_left, bottom_right);
-		if (start > M_PI && end < M_PI)
-			extend_box(arc->center - arc->radius, top_left, bottom_right);
-		if (start > M_PI / 2. && end < M_PI / 2.)
-			extend_box(arc->center - arc->radius * I, top_left, bottom_right);
-		if (end < 0)
-			extend_box(arc->center + arc->radius, top_left, bottom_right);
-		if (end < - M_PI / 2.)
-			extend_box(arc->center + arc->radius * I, top_left, bottom_right);
-		if (end > - M_PI)
-			extend_box(arc->center - arc->radius, top_left, bottom_right);
-		if (end > - 3. * M_PI / 2.)
-			extend_box(arc->center - arc->radius * I, top_left, bottom_right);
+	double angle = 0;
+	oshu_vector radius = arc->radius;
+	for (int i = 1; i < 8; ++i) {
+		angle += M_PI / 2.;
+		radius *= I;
+		if (min < angle && angle < max)
+			extend_box(arc->center + radius, top_left, bottom_right);
 	}
-
 }
 
 /* Generic interface **********************************************************/
