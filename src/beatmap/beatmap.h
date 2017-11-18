@@ -136,6 +136,13 @@ enum oshu_sound_type {
  * over it.
  */
 struct oshu_color {
+	/**
+	 * The identifier of the combo.
+	 *
+	 * In a color sequence, indexes must start with 0 and increase by one
+	 * without any skip.
+	 */
+	int index;
 	int red;
 	int green;
 	int blue;
@@ -852,6 +859,10 @@ struct oshu_beatmap {
 	 * It's a circular linked list, as described in #oshu_color.
 	 */
 	struct oshu_color *colors;
+	/**
+	 * Number of colors in the #colors list.
+	 */
+	int color_count;
 	/**
 	 * \brief [HitObjects] section.
 	 *

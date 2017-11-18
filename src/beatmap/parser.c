@@ -646,27 +646,12 @@ fail:
 
 static int process_color(struct parser_state *parser)
 {
-	struct oshu_color *color;
-	int trash;
 	enum token token;
 	if (parse_token(parser, &token) < 0)
 		return -1;
 	switch (token) {
 	case Combo:
-		if (parse_int(parser, &trash) < 0)
-			return -1;
-		consume_spaces(parser);
-		if (consume_char(parser, ':') < 0)
-			return -1;
-		if (parse_color(parser, &color) < 0)
-			return -1;
-		if (parser->last_color)
-			parser->last_color->next = color;
-		parser->last_color = color;
-		if (!parser->beatmap->colors)
-			parser->beatmap->colors = color;
-		color->next = parser->beatmap->colors;
-		break;
+		return process_color_combo(parser);
 	case SliderBody:
 	case SliderTrackOverride:
 	case SliderBorder:
@@ -676,6 +661,47 @@ static int process_color(struct parser_state *parser)
 		parser_error(parser, "unknown color property");
 		return -1;
 	}
+	return 0;
+}
+
+static int process_color_combo(struct parser_state *parser)
+{
+	/* Check the combo index.
+	 * If it's wrong, force it anyway, we cannot affort a weird index space.
+	 * It's not even that important. */
+	int index;
+	if (parse_int(parser, &index) < 0)
+		return -1;
+	index--;
+	if (parser->last_color) {
+		if (index != parser->last_color->index + 1)
+			parser_error(parser, "suspicious color index");
+		else
+			index = parser->last_color->index + 1;
+	} else if (index != 0) {
+		parser_error(parser, "suspicious first color index");
+	} else {
+		index = 0;
+	}
+
+	/* Parse everything else. */
+	struct oshu_color *color;
+	consume_spaces(parser);
+	if (consume_char(parser, ':') < 0)
+		return -1;
+	if (parse_color(parser, &color) < 0)
+		return -1;
+	color->index = index;
+
+	/* Link it. */
+	if (parser->last_color)
+		parser->last_color->next = color;
+	parser->last_color = color;
+	if (!parser->beatmap->colors)
+		parser->beatmap->colors = color;
+	color->next = parser->beatmap->colors;
+	assert (parser->beatmap->color_count == index);
+	parser->beatmap->color_count = index + 1;
 	return 0;
 }
 
