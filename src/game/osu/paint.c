@@ -27,7 +27,7 @@ static int paint_approach_circle(struct oshu_game *game) {
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
-	cairo_set_source_rgba(p.cr, 1., 1., 1., .5);
+	cairo_set_source_rgba(p.cr, 1., 1., 1., .6);
 	cairo_set_line_width(p.cr, 4);
 	cairo_stroke(p.cr);
 
@@ -197,7 +197,7 @@ static int paint_good_mark(struct oshu_game *game)
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
-	cairo_set_source_rgba(p.cr, 0, .7, 0, .4);
+	cairo_set_source_rgba(p.cr, 0, .8, 0, .4);
 	cairo_set_line_width(p.cr, 2);
 	cairo_stroke(p.cr);
 
@@ -210,7 +210,7 @@ static int paint_good_mark(struct oshu_game *game)
 
 static int paint_bad_mark(struct oshu_game *game)
 {
-	double half = game->beatmap.difficulty.circle_radius / 4;
+	double half = game->beatmap.difficulty.circle_radius / 4.2;
 	oshu_size size = (1. + I) * (half + 4) * 2.;
 	double zoom = game->display.view.zoom;
 
