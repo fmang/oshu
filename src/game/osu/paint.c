@@ -20,13 +20,23 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, radius, radius);
 
-	cairo_set_source_rgb(p.cr, color->red, color->green, color->blue);
-	cairo_arc(p.cr, 0, 0, radius - 1, 0, 2. * M_PI);
-	cairo_fill(p.cr);
+	cairo_arc(p.cr, 0, 0, radius - 4, 0, 2. * M_PI);
+	cairo_set_source_rgb(p.cr, 1., 1., 1.);
+	cairo_set_line_width(p.cr, 6);
+	cairo_stroke_preserve(p.cr);
 
-	cairo_set_source_rgb(p.cr, .1, .1, .1);
+	cairo_pattern_t *pattern = cairo_pattern_create_radial(
+		-radius, -radius, 0.,
+		-radius, -radius, 2. * radius
+	);
+	cairo_pattern_add_color_stop_rgb(pattern, 0, 1., 1., 1.);
+	cairo_pattern_add_color_stop_rgb(pattern, 1, color->red, color->green, color->blue);
+	cairo_set_source(p.cr, pattern);
+	cairo_fill_preserve(p.cr);
+	cairo_pattern_destroy(pattern);
+
+	cairo_set_source_rgb(p.cr, 0., 0., 0.);
 	cairo_set_line_width(p.cr, 3);
-	cairo_arc(p.cr, 0, 0, radius - 5, 0, 2. * M_PI);
 	cairo_stroke(p.cr);
 
 	int rc = oshu_finish_painting(&p, &game->display, texture);
@@ -50,8 +60,6 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, - creal(top_left) + radius, - cimag(top_left) + radius);
 
-	cairo_set_source_rgb(p.cr, hit->color->red, hit->color->green, hit->color->blue);
-	cairo_set_line_width(p.cr, 2. * radius - 1);
 	cairo_set_line_cap(p.cr, CAIRO_LINE_CAP_ROUND);
 	cairo_set_line_join(p.cr, CAIRO_LINE_JOIN_ROUND);
 	cairo_move_to(p.cr, creal(hit->p), cimag(hit->p));
@@ -59,6 +67,17 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 		oshu_point pt = oshu_path_at(&hit->slider.path, (double) i / 128);
 		cairo_line_to(p.cr, creal(pt), cimag(pt));
 	}
+
+	cairo_set_source_rgb(p.cr, 1., 1., 1.);
+	cairo_set_line_width(p.cr, 2. * radius - 2);
+	cairo_stroke_preserve(p.cr);
+
+	cairo_set_source_rgb(p.cr, 0., 0., 0.);
+	cairo_set_line_width(p.cr, 2. * radius - 4);
+	cairo_stroke_preserve(p.cr);
+
+	cairo_set_source_rgb(p.cr, hit->color->red, hit->color->green, hit->color->blue);
+	cairo_set_line_width(p.cr, 2. * radius - 8);
 	cairo_stroke(p.cr);
 
 	cairo_set_source_rgb(p.cr, .1, .1, .1);
