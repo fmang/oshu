@@ -1,6 +1,17 @@
 Changelog
 =========
 
+1.5.0 - TBA
+-----------
+
+New fancy graphics!
+
+This marks a milestone in the oshu! project, as the graphics engine was the
+last remnant of the inital version. The new visuals uses accelerated 2D
+graphics to render antialiased shapes and tranculent objects. This looks nice
+but is a significant load compared to the previous wireframe graphics. All the
+objects are dynamically drawn using the cairo vector graphics library.
+
 1.4.0 - 2017-11-11
 ------------------
 
