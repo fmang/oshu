@@ -31,7 +31,6 @@ static void draw_hint(struct oshu_game *game, struct oshu_hit *hit)
 static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 {
 	struct oshu_display *display = &game->display;
-	struct oshu_beatmap *beatmap = &game->beatmap;
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
 		assert (hit->color != NULL);
 		oshu_draw_texture(display, &game->osu.circles[hit->color->index], hit->p);
@@ -76,20 +75,6 @@ static void draw_hit(struct oshu_game *game, struct oshu_hit *hit)
 		draw_hit_circle(game, hit);
 }
 
-static void connect_hits(struct oshu_game *game, struct oshu_hit *prev, struct oshu_hit *next)
-{
-	if (prev->state != OSHU_INITIAL_HIT && prev->state != OSHU_SLIDING_HIT)
-		return;
-	if (next->state != OSHU_INITIAL_HIT && next->state != OSHU_SLIDING_HIT)
-		return;
-	SDL_SetRenderDrawColor(game->display.renderer, 0, 128, 196, 255);
-	oshu_point end = oshu_end_point(prev);
-	oshu_vector diff = next->p - end;
-	oshu_vector d = oshu_normalize(diff);
-	d *= game->beatmap.difficulty.circle_radius;
-	oshu_draw_line(&game->display, end + d, next->p - d);
-}
-
 /**
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
@@ -97,17 +82,13 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *prev, struct o
 int osu_draw(struct oshu_game *game)
 {
 	struct oshu_hit *cursor = oshu_look_hit_up(game, game->beatmap.difficulty.approach_time);
-	struct oshu_hit *prev = NULL;
 	double now = game->clock.now;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->previous) {
 		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
 			continue;
 		if (oshu_hit_end_time(hit) < now - game->beatmap.difficulty.approach_time)
 			break;
-		if (prev && !(prev->type & OSHU_NEW_HIT_COMBO))
-			connect_hits(game, hit, prev);
 		draw_hit(game, hit);
-		prev = hit;
 	}
 	return 0;
 }
