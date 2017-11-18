@@ -54,6 +54,10 @@ struct osu_state {
 	 * Its size is the `radius + approach_size` from the beatmap.
 	 */
 	struct oshu_texture approach_circle;
+	/**
+	 * The slider ball and its tolerance circle.
+	 */
+	struct oshu_texture slider_ball;
 };
 
 /**

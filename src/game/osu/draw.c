@@ -72,10 +72,8 @@ static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 		/* ball */
 		double t = (now - hit->time) / hit->slider.duration;
 		if (hit->state == OSHU_SLIDING_HIT) {
-			SDL_SetRenderDrawColor(display->renderer, 196, 64, 0, 255);
 			oshu_point ball = oshu_path_at(&hit->slider.path, t < 0 ? 0 : t);
-			oshu_draw_circle(display, ball, radius / 2);
-			oshu_draw_circle(display, ball, beatmap->difficulty.slider_tolerance);
+			oshu_draw_texture(display, &game->osu.slider_ball, ball);
 		}
 		oshu_point end = oshu_path_at(&hit->slider.path, 1);
 		int rounds_left = hit->slider.repeat - (t <= 0 ? 0 : (int) t);
