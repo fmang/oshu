@@ -9,6 +9,12 @@
 
 #include <assert.h>
 
+static double brighter(double v)
+{
+	v += .3;
+	return v < 1. ? v : 1.;
+}
+
 static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct oshu_texture *texture)
 {
 	double radius = game->beatmap.difficulty.circle_radius;
@@ -29,7 +35,8 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 		-radius, -radius, 0.,
 		-radius, -radius, 2. * radius
 	);
-	cairo_pattern_add_color_stop_rgb(pattern, 0, 1., 1., 1.);
+	cairo_pattern_add_color_stop_rgb(pattern, 0,
+		brighter(color->red), brighter(color->green), brighter(color->blue));
 	cairo_pattern_add_color_stop_rgb(pattern, 1, color->red, color->green, color->blue);
 	cairo_set_source(p.cr, pattern);
 	cairo_fill_preserve(p.cr);
@@ -43,12 +50,6 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 	texture->size = size;
 	texture->origin = size / 2.;
 	return rc;
-}
-
-static double brighter(double v)
-{
-	v += .3;
-	return v < 1. ? v : 1.;
 }
 
 static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
