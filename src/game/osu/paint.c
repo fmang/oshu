@@ -48,9 +48,11 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 	oshu_start_painting(size * zoom, &p);
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, radius, radius);
+	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
+	double opacity = 0.6;
 
 	cairo_arc(p.cr, 0, 0, radius - 4, 0, 2. * M_PI);
-	cairo_set_source_rgb(p.cr, 1., 1., 1.);
+	cairo_set_source_rgba(p.cr, 1., 1., 1., opacity);
 	cairo_set_line_width(p.cr, 5);
 	cairo_stroke_preserve(p.cr);
 
@@ -58,14 +60,14 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 		-radius, -radius, 0.,
 		-radius, -radius, 2. * radius
 	);
-	cairo_pattern_add_color_stop_rgb(pattern, 0,
-		brighter(color->red), brighter(color->green), brighter(color->blue));
-	cairo_pattern_add_color_stop_rgb(pattern, 1, color->red, color->green, color->blue);
+	cairo_pattern_add_color_stop_rgba(pattern, 0,
+		brighter(color->red), brighter(color->green), brighter(color->blue), opacity);
+	cairo_pattern_add_color_stop_rgba(pattern, 1, color->red, color->green, color->blue, opacity);
 	cairo_set_source(p.cr, pattern);
 	cairo_fill_preserve(p.cr);
 	cairo_pattern_destroy(pattern);
 
-	cairo_set_source_rgb(p.cr, 0., 0., 0.);
+	cairo_set_source_rgba(p.cr, 0., 0., 0., opacity);
 	cairo_set_line_width(p.cr, 3);
 	cairo_stroke(p.cr);
 
@@ -89,6 +91,8 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, - creal(top_left) + radius, - cimag(top_left) + radius);
+	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
+	double opacity = 0.6;
 
 	/* Path. */
 	cairo_set_line_cap(p.cr, CAIRO_LINE_CAP_ROUND);
@@ -100,11 +104,11 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	}
 
 	/* Slider body. */
-	cairo_set_source_rgb(p.cr, 1., 1., 1.);
+	cairo_set_source_rgba(p.cr, 1., 1., 1., opacity);
 	cairo_set_line_width(p.cr, 2. * radius - 2);
 	cairo_stroke_preserve(p.cr);
 
-	cairo_set_source_rgb(p.cr, 0., 0., 0.);
+	cairo_set_source_rgba(p.cr, 0., 0., 0., opacity);
 	cairo_set_line_width(p.cr, 2. * radius - 4);
 	cairo_stroke_preserve(p.cr);
 
@@ -112,17 +116,16 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 		creal(top_left), cimag(top_left), 0.,
 		creal(top_left), cimag(top_left), cabs(size / 1.5)
 	);
-	cairo_pattern_add_color_stop_rgb(pattern, 0, 1., 1., 1.);
-	cairo_pattern_add_color_stop_rgb(pattern, 0,
-		brighter(hit->color->red), brighter(hit->color->green), brighter(hit->color->blue));
-	cairo_pattern_add_color_stop_rgb(pattern, 1, hit->color->red, hit->color->green, hit->color->blue);
+	cairo_pattern_add_color_stop_rgba(pattern, 0,
+		brighter(hit->color->red), brighter(hit->color->green), brighter(hit->color->blue), opacity);
+	cairo_pattern_add_color_stop_rgba(pattern, 1, hit->color->red, hit->color->green, hit->color->blue, opacity);
 	cairo_set_source(p.cr, pattern);
 	cairo_set_line_width(p.cr, 2. * radius - 8);
 	cairo_stroke(p.cr);
 
 	/* End point. */
 	oshu_point end = oshu_path_at(&hit->slider.path, 1.);
-	cairo_set_source_rgb(p.cr, 0., 0., 0.);
+	cairo_set_source_rgba(p.cr, 0., 0., 0., opacity);
 	cairo_set_line_width(p.cr, 1);
 	for (int i = 1; i <= hit->slider.repeat; ++i) {
 		double ratio = (double) i / hit->slider.repeat;
@@ -135,7 +138,7 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	cairo_set_source(p.cr, pattern);
 	cairo_fill_preserve(p.cr);
 
-	cairo_set_source_rgb(p.cr, 0., 0., 0.);
+	cairo_set_source_rgba(p.cr, 0., 0., 0., opacity);
 	cairo_set_line_width(p.cr, 2.5);
 	cairo_stroke(p.cr);
 
@@ -171,12 +174,12 @@ static int paint_slider_ball(struct oshu_game *game) {
 	cairo_stroke(p.cr);
 
 	/* ball */
-	cairo_arc(p.cr, 0, 0, game->beatmap.difficulty.circle_radius / 2, 0, 2. * M_PI);
-	cairo_set_source_rgba(p.cr, 1., 1., 1., .8);
-	cairo_fill_preserve(p.cr);
-	cairo_set_source_rgba(p.cr, 0., 0., 0., .5);
-	cairo_set_line_width(p.cr, 2);
-	cairo_stroke(p.cr);
+	cairo_arc(p.cr, 0, 0, game->beatmap.difficulty.circle_radius / 2.2, 0, 2. * M_PI);
+	cairo_set_source_rgba(p.cr, 1., 1., 1., .5);
+	cairo_fill(p.cr);
+	//cairo_set_source_rgba(p.cr, 0., 0., 0., .4);
+	//cairo_set_line_width(p.cr, 2);
+	//cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.slider_ball;
 	int rc = oshu_finish_painting(&p, &game->display, texture);
@@ -197,7 +200,7 @@ static int paint_good_mark(struct oshu_game *game)
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
-	cairo_set_source_rgba(p.cr, 0, .7, 0, .5);
+	cairo_set_source_rgba(p.cr, 0, .7, 0, .4);
 	cairo_set_line_width(p.cr, 2);
 	cairo_stroke(p.cr);
 
@@ -219,7 +222,7 @@ static int paint_bad_mark(struct oshu_game *game)
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, half + 2, half + 2);
 
-	cairo_set_source_rgba(p.cr, .8, 0, 0, .5);
+	cairo_set_source_rgba(p.cr, .9, 0, 0, .4);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 	cairo_set_line_width(p.cr, 2);
 
@@ -249,7 +252,7 @@ static int paint_skip_mark(struct oshu_game *game)
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, radius + 2, radius + 2);
 
-	cairo_set_source_rgba(p.cr, 0, 0, .9, .5);
+	cairo_set_source_rgba(p.cr, 0, 0, .9, .4);
 	cairo_set_line_width(p.cr, 1);
 
 	oshu_vector a = radius;
