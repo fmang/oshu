@@ -49,8 +49,11 @@ static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 	struct oshu_display *display = &game->display;
 	double now = game->clock.now;
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
-		if (hit->texture)
-			oshu_draw_texture(&game->display, hit->texture, hit->p);
+		if (!hit->texture) {
+			osu_paint_slider(game, hit);
+			assert (hit->texture != NULL);
+		}
+		oshu_draw_texture(&game->display, hit->texture, hit->p);
 		draw_hint(game, hit);
 		/* ball */
 		double t = (now - hit->time) / hit->slider.duration;

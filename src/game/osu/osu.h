@@ -88,6 +88,8 @@ struct osu_state {
  */
 int osu_paint_resources(struct oshu_game *game);
 
+int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit);
+
 /**
  * Free the dynamic resources of the game mode.
  */

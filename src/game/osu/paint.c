@@ -77,7 +77,7 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 	return rc;
 }
 
-static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
+int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 {
 	assert (hit->type & OSHU_SLIDER_HIT);
 	oshu_vector radius = game->beatmap.difficulty.circle_radius * (1. + I);
@@ -286,27 +286,15 @@ int osu_paint_resources(struct oshu_game *game)
 		paint_circle(game, color, &game->osu.circles[i]);
 		color = color->next;
 	}
-	int circles = SDL_GetTicks();
-
-	/* Sliders. */
-	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
-		if (hit->type & OSHU_SLIDER_HIT)
-			paint_slider(game, hit);
-	}
-	int sliders = SDL_GetTicks();
 
 	paint_approach_circle(game);
 	paint_slider_ball(game);
 	paint_good_mark(game);
 	paint_bad_mark(game);
 	paint_skip_mark(game);
-	int extras = SDL_GetTicks();
 
-	oshu_log_debug(
-		"done generating the textures in %.3f seconds: %.3fs circles, %.3fs sliders, %.3fs extras",
-		(extras - start) / 1000., (circles - start) / 1000.,
-		(sliders - circles) / 1000., (extras - sliders) / 1000.
-	);
+	int end = SDL_GetTicks();
+	oshu_log_debug("done generating the common textures in %.3f seconds", (end - start) / 1000.);
 	return 0;
 }
 
