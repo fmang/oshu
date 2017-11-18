@@ -101,6 +101,7 @@ static void build_path(cairo_t *cr, struct oshu_slider *slider)
 
 int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 {
+	int start = SDL_GetTicks();
 	assert (hit->type & OSHU_SLIDER_HIT);
 	oshu_vector radius = game->beatmap.difficulty.circle_radius * (1. + I);
 	oshu_point top_left, bottom_right;
@@ -172,6 +173,7 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 
 	hit->texture->size = size;
 	hit->texture->origin = hit->p - top_left + radius;
+	oshu_log_verbose("slider drawn in %.3f seconds", (SDL_GetTicks() - start) / 1000.);
 	return 0;
 }
 
