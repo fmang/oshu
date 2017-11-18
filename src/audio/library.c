@@ -296,7 +296,7 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
 		oshu_register_sound(library, &hit->sound);
 	}
 	int end = SDL_GetTicks();
-	oshu_log_debug("done loading the library in %f seconds", (end - start) / 1000.);
+	oshu_log_debug("done loading the library in %.3f seconds", (end - start) / 1000.);
 }
 
 /**

@@ -82,6 +82,9 @@ struct osu_state {
  * Paint all the required textures for the beatmap.
  *
  * Free everything with #osu_free_resources.
+ *
+ * \todo
+ * Paint textures lazily, or in a parallel thread for a faster start-up.
  */
 int osu_paint_resources(struct oshu_game *game);
 

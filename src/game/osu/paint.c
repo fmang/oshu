@@ -286,21 +286,27 @@ int osu_paint_resources(struct oshu_game *game)
 		paint_circle(game, color, &game->osu.circles[i]);
 		color = color->next;
 	}
+	int circles = SDL_GetTicks();
 
 	/* Sliders. */
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->type & OSHU_SLIDER_HIT)
 			paint_slider(game, hit);
 	}
+	int sliders = SDL_GetTicks();
 
 	paint_approach_circle(game);
 	paint_slider_ball(game);
 	paint_good_mark(game);
 	paint_bad_mark(game);
 	paint_skip_mark(game);
+	int extras = SDL_GetTicks();
 
-	int end = SDL_GetTicks();
-	oshu_log_debug("done generating the textures in %f seconds", (end - start) / 1000.);
+	oshu_log_debug(
+		"done generating the textures in %.3f seconds: %.3fs circles, %.3fs sliders, %.3fs extras",
+		(extras - start) / 1000., (circles - start) / 1000.,
+		(sliders - circles) / 1000., (extras - sliders) / 1000.
+	);
 	return 0;
 }
 
