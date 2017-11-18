@@ -946,11 +946,10 @@ static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 		return -1;
 	if (parse_int_sep(parser, &hit->slider.repeat, ',') < 0)
 		return -1;
-	double length;
-	if (parse_double(parser, &length) < 0)
+	if (parse_double(parser, &hit->slider.length) < 0)
 		return -1;
-	hit->slider.duration = length / (100. * parser->beatmap->difficulty.slider_multiplier) * hit->timing_point->beat_duration;
-	oshu_normalize_path(&hit->slider.path, length);
+	hit->slider.duration = hit->slider.length / (100. * parser->beatmap->difficulty.slider_multiplier) * hit->timing_point->beat_duration;
+	oshu_normalize_path(&hit->slider.path, hit->slider.length);
 	if (parse_slider_additions(parser, hit) < 0)
 		return -1;
 	return 0;

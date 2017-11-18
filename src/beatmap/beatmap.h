@@ -363,6 +363,10 @@ struct oshu_slider {
 	 */
 	int repeat;
 	/**
+	 * The length of the slider in osu!pixels.
+	 */
+	double length;
+	/**
 	 * Duration of the slider in seconds, one-way without repeat.
 	 *
 	 * The total duration of the slider is therefore #repeat multiplied by
