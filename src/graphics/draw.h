@@ -33,6 +33,8 @@ struct oshu_texture;
 
 /**
  * Draw a 1-pixel aliased stroke following the path.
+ *
+ * Usually not used, but preserved for debugging.
  */
 void oshu_draw_path(struct oshu_display *display, struct oshu_path *path);
 
@@ -41,16 +43,22 @@ void oshu_draw_path(struct oshu_display *display, struct oshu_path *path);
  *
  * Actually draws two more-or-less parallel lines. Follow the curve nicely but
  * might make ugly loops when the path is too... loopy.
+ *
+ * Usually not used, but preserved for debugging.
  */
 void oshu_draw_thick_path(struct oshu_display *display, struct oshu_path *path, double width);
 
 /**
  * Draw a regular polyline that should look like a circle.
+ *
+ * Usually not used, but preserved for debugging.
  */
 void oshu_draw_circle(struct oshu_display *display, oshu_point center, double radius);
 
 /**
  * Draw one line, plain and simple.
+ *
+ * Usually not used, but preserved for debugging.
  */
 void oshu_draw_line(struct oshu_display *display, oshu_point p1, oshu_point p2);
 
