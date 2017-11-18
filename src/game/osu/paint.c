@@ -77,6 +77,17 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 	return rc;
 }
 
+static void build_path(cairo_t *cr, struct oshu_slider *slider)
+{
+	oshu_point start = oshu_path_at(&slider->path, 0);
+	cairo_move_to(cr, creal(start), cimag(start));
+	int resolution = slider->length / 5. + 5;
+	for (int i = 1; i <= resolution; ++i) {
+		oshu_point pt = oshu_path_at(&slider->path, (double) i / resolution);
+		cairo_line_to(cr, creal(pt), cimag(pt));
+	}
+}
+
 int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 {
 	assert (hit->type & OSHU_SLIDER_HIT);
@@ -97,11 +108,7 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	/* Path. */
 	cairo_set_line_cap(p.cr, CAIRO_LINE_CAP_ROUND);
 	cairo_set_line_join(p.cr, CAIRO_LINE_JOIN_ROUND);
-	cairo_move_to(p.cr, creal(hit->p), cimag(hit->p));
-	for (int i = 1; i <= 128; ++i) {
-		oshu_point pt = oshu_path_at(&hit->slider.path, (double) i / 128);
-		cairo_line_to(p.cr, creal(pt), cimag(pt));
-	}
+	build_path(p.cr, &hit->slider);
 
 	/* Slider body. */
 	cairo_set_source_rgba(p.cr, 1., 1., 1., opacity);
