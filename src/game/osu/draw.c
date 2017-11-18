@@ -32,7 +32,6 @@ static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 {
 	struct oshu_display *display = &game->display;
 	struct oshu_beatmap *beatmap = &game->beatmap;
-	double radius = beatmap->difficulty.circle_radius;
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
 		assert (hit->color != NULL);
 		oshu_draw_texture(display, &game->osu.circles[hit->color->index], hit->p);
@@ -42,14 +41,7 @@ static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 	} else if (hit->state == OSHU_MISSED_HIT) {
 		oshu_draw_texture(display, &game->osu.bad_mark, oshu_end_point(hit));
 	} else if (hit->state == OSHU_SKIPPED_HIT) {
-		SDL_SetRenderDrawColor(display->renderer, 64, 64, 255, 255);
-		oshu_point p = oshu_end_point(hit);
-		oshu_vector a = radius / 3.;
-		oshu_vector b = a * cexp(2. * M_PI / 3. * I);
-		oshu_vector c = b * cexp(2. * M_PI / 3. * I);
-		oshu_draw_line(display, p + a, p + b);
-		oshu_draw_line(display, p + b, p + c);
-		oshu_draw_line(display, p + c, p + a);
+		oshu_draw_texture(display, &game->osu.skip_mark, oshu_end_point(hit));
 	}
 }
 
@@ -71,6 +63,8 @@ static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 		oshu_draw_texture(&game->display, &game->osu.good_mark, oshu_end_point(hit));
 	} else if (hit->state == OSHU_MISSED_HIT) {
 		oshu_draw_texture(&game->display, &game->osu.bad_mark, oshu_end_point(hit));
+	} else if (hit->state == OSHU_SKIPPED_HIT) {
+		oshu_draw_texture(display, &game->osu.skip_mark, oshu_end_point(hit));
 	}
 }
 

@@ -70,6 +70,12 @@ struct osu_state {
 	 * A red X.
 	 */
 	struct oshu_texture bad_mark;
+	/**
+	 * Symbol to indicate a note was skipped.
+	 *
+	 * A blue triangle pointing right.
+	 */
+	struct oshu_texture skip_mark;
 };
 
 /**

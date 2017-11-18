@@ -196,7 +196,7 @@ static int paint_good_mark(struct oshu_game *game)
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
-	cairo_set_source_rgba(p.cr, 0, .7, 0, 1.);
+	cairo_set_source_rgba(p.cr, 0, .7, 0, .5);
 	cairo_set_line_width(p.cr, 2);
 	cairo_stroke(p.cr);
 
@@ -218,7 +218,8 @@ static int paint_bad_mark(struct oshu_game *game)
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, half + 2, half + 2);
 
-	cairo_set_source_rgba(p.cr, .8, 0, 0, 1.);
+	cairo_set_source_rgba(p.cr, .8, 0, 0, .5);
+	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 	cairo_set_line_width(p.cr, 2);
 
 	cairo_move_to(p.cr, -half, -half);
@@ -230,6 +231,37 @@ static int paint_bad_mark(struct oshu_game *game)
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.bad_mark;
+	int rc = oshu_finish_painting(&p, &game->display, texture);
+	texture->size = size;
+	texture->origin = size / 2.;
+	return rc;
+}
+
+static int paint_skip_mark(struct oshu_game *game)
+{
+	double radius = game->beatmap.difficulty.circle_radius / 3.5;
+	oshu_size size = (1. + I) * (radius + 4) * 2.;
+	double zoom = game->display.view.zoom;
+
+	struct oshu_painter p;
+	oshu_start_painting(size * zoom, &p);
+	cairo_scale(p.cr, zoom, zoom);
+	cairo_translate(p.cr, radius + 2, radius + 2);
+
+	cairo_set_source_rgba(p.cr, 0, 0, .8, .5);
+	cairo_set_line_width(p.cr, 1);
+
+	oshu_vector a = radius;
+	oshu_vector b = a * cexp(2. * M_PI / 3. * I);
+	oshu_vector c = b * cexp(2. * M_PI / 3. * I);
+
+	cairo_move_to(p.cr, creal(a), cimag(a));
+	cairo_line_to(p.cr, creal(b), cimag(b));
+	cairo_line_to(p.cr, creal(c), cimag(c));
+	cairo_close_path(p.cr);
+	cairo_stroke(p.cr);
+
+	struct oshu_texture *texture = &game->osu.skip_mark;
 	int rc = oshu_finish_painting(&p, &game->display, texture);
 	texture->size = size;
 	texture->origin = size / 2.;
@@ -261,6 +293,7 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_slider_ball(game);
 	paint_good_mark(game);
 	paint_bad_mark(game);
+	paint_skip_mark(game);
 	return 0;
 }
 
@@ -279,5 +312,6 @@ int osu_free_resources(struct oshu_game *game)
 	oshu_destroy_texture(&game->osu.slider_ball);
 	oshu_destroy_texture(&game->osu.good_mark);
 	oshu_destroy_texture(&game->osu.bad_mark);
+	oshu_destroy_texture(&game->osu.skip_mark);
 	return 0;
 }
