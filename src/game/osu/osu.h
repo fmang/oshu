@@ -43,9 +43,11 @@ struct osu_state {
 	 */
 	enum oshu_key held_key;
 	/**
-	 * The base picture representing a hit circle.
+	 * Dynamic array of circle hit object textures.
+	 *
+	 * There are as many textures as there are colors in the beatmap.
 	 */
-	struct oshu_texture circle_texture;
+	struct oshu_texture *circles;
 };
 
 /**

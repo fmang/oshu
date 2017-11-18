@@ -779,7 +779,8 @@ static struct oshu_timing_point* seek_timing_point(double offset, struct parser_
  */
 static void compute_hit_combo(struct parser_state *parser, struct oshu_hit *hit)
 {
-	if (parser->last_hit == NULL) {
+	assert (parser->last_hit != NULL);
+	if (parser->last_hit->time < 0.) {
 		hit->combo = 0;
 		hit->combo_seq = 1;
 		hit->color = parser->beatmap->colors;
@@ -795,6 +796,7 @@ static void compute_hit_combo(struct parser_state *parser, struct oshu_hit *hit)
 		hit->combo_seq = parser->last_hit->combo_seq + 1;
 		hit->color = parser->last_hit->color;
 	}
+	assert (hit->color != NULL);
 }
 
 /**

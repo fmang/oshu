@@ -11,6 +11,8 @@
 #include "graphics/display.h"
 #include "graphics/draw.h"
 
+#include <assert.h>
+
 static void draw_hint(struct oshu_game *game, struct oshu_hit *hit)
 {
 	double now = game->clock.now;
@@ -31,7 +33,8 @@ static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 	struct oshu_beatmap *beatmap = &game->beatmap;
 	double radius = beatmap->difficulty.circle_radius;
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
-		oshu_draw_texture(display, &game->osu.circle_texture, hit->p);
+		assert (hit->color != NULL);
+		oshu_draw_texture(display, &game->osu.circles[hit->color->index], hit->p);
 		draw_hint(game, hit);
 	} else if (hit->state == OSHU_GOOD_HIT) {
 		oshu_point p = oshu_end_point(hit);

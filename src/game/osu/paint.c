@@ -9,7 +9,7 @@
 
 #include <assert.h>
 
-static int paint_circle(struct oshu_game *game)
+static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct oshu_texture *texture)
 {
 	double radius = game->beatmap.difficulty.circle_radius;
 	oshu_size size = (1. + I) *  radius * 2.;
@@ -29,9 +29,9 @@ static int paint_circle(struct oshu_game *game)
 	cairo_arc(p.cr, 0, 0, radius - 5, 0, 2. * M_PI);
 	cairo_stroke(p.cr);
 
-	int rc = oshu_finish_painting(&p, &game->display, &game->osu.circle_texture);
-	game->osu.circle_texture.size = size;
-	game->osu.circle_texture.origin = size / 2.;
+	int rc = oshu_finish_painting(&p, &game->display, texture);
+	texture->size = size;
+	texture->origin = size / 2.;
 	return rc;
 }
 
@@ -95,21 +95,37 @@ static int paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 
 int osu_paint_resources(struct oshu_game *game)
 {
+	/* Circle hits. */
+	assert (game->beatmap.color_count > 0);
+	assert (game->beatmap.colors != NULL);
+	game->osu.circles = calloc(game->beatmap.color_count, sizeof(*game->osu.circles));
+	assert (game->osu.circles != NULL);
+	struct oshu_color *color = game->beatmap.colors;
+	for (int i = 0; i < game->beatmap.color_count; ++i) {
+		oshu_log_verbose("painting circle for combo color #%d", i);
+		assert (color->index == i);
+		paint_circle(game, color, &game->osu.circles[i]);
+		color = color->next;
+	}
+
+	/* Sliders. */
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->type & OSHU_SLIDER_HIT)
 			paint_slider(game, hit);
 	}
-	return paint_circle(game);
+	return 0;
 }
 
 int osu_free_resources(struct oshu_game *game)
 {
+	for (int i = 0; i < game->beatmap.color_count; ++i)
+		oshu_destroy_texture(&game->osu.circles[i]);
+	free(game->osu.circles);
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->texture) {
 			oshu_destroy_texture(hit->texture);
 			free(hit->texture);
 		}
 	}
-	oshu_destroy_texture(&game->osu.circle_texture);
 	return 0;
 }
