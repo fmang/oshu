@@ -177,9 +177,6 @@ static int paint_slider_ball(struct oshu_game *game) {
 	cairo_arc(p.cr, 0, 0, game->beatmap.difficulty.circle_radius / 2.2, 0, 2. * M_PI);
 	cairo_set_source_rgba(p.cr, 1., 1., 1., .5);
 	cairo_fill(p.cr);
-	//cairo_set_source_rgba(p.cr, 0., 0., 0., .4);
-	//cairo_set_line_width(p.cr, 2);
-	//cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.slider_ball;
 	int rc = oshu_finish_painting(&p, &game->display, texture);
