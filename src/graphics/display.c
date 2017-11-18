@@ -53,11 +53,12 @@ oshu_point oshu_unproject(struct oshu_display *display, oshu_point p)
  */
 int create_window(struct oshu_display *display)
 {
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		960, 720,
-		0
+		SDL_WINDOW_RESIZABLE
 	);
 	if (display->window == NULL)
 		goto fail;
