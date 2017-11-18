@@ -184,6 +184,58 @@ static int paint_slider_ball(struct oshu_game *game) {
 	return rc;
 }
 
+static int paint_good_mark(struct oshu_game *game)
+{
+	double radius = game->beatmap.difficulty.circle_radius / 3;
+	oshu_size size = (1. + I) * radius * 2.;
+	double zoom = game->display.view.zoom;
+
+	struct oshu_painter p;
+	oshu_start_painting(size * zoom, &p);
+	cairo_scale(p.cr, zoom, zoom);
+	cairo_translate(p.cr, radius, radius);
+
+	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
+	cairo_set_source_rgba(p.cr, 0, .7, 0, 1.);
+	cairo_set_line_width(p.cr, 2);
+	cairo_stroke(p.cr);
+
+	struct oshu_texture *texture = &game->osu.good_mark;
+	int rc = oshu_finish_painting(&p, &game->display, texture);
+	texture->size = size;
+	texture->origin = size / 2.;
+	return rc;
+}
+
+static int paint_bad_mark(struct oshu_game *game)
+{
+	double half = game->beatmap.difficulty.circle_radius / 4;
+	oshu_size size = (1. + I) * (half + 4) * 2.;
+	double zoom = game->display.view.zoom;
+
+	struct oshu_painter p;
+	oshu_start_painting(size * zoom, &p);
+	cairo_scale(p.cr, zoom, zoom);
+	cairo_translate(p.cr, half + 2, half + 2);
+
+	cairo_set_source_rgba(p.cr, .8, 0, 0, 1.);
+	cairo_set_line_width(p.cr, 2);
+
+	cairo_move_to(p.cr, -half, -half);
+	cairo_line_to(p.cr, half, half);
+	cairo_stroke(p.cr);
+
+	cairo_move_to(p.cr, half, -half);
+	cairo_line_to(p.cr, -half, half);
+	cairo_stroke(p.cr);
+
+	struct oshu_texture *texture = &game->osu.bad_mark;
+	int rc = oshu_finish_painting(&p, &game->display, texture);
+	texture->size = size;
+	texture->origin = size / 2.;
+	return rc;
+}
+
 int osu_paint_resources(struct oshu_game *game)
 {
 	/* Circle hits. */
@@ -207,6 +259,8 @@ int osu_paint_resources(struct oshu_game *game)
 
 	paint_approach_circle(game);
 	paint_slider_ball(game);
+	paint_good_mark(game);
+	paint_bad_mark(game);
 	return 0;
 }
 
@@ -223,5 +277,7 @@ int osu_free_resources(struct oshu_game *game)
 	}
 	oshu_destroy_texture(&game->osu.approach_circle);
 	oshu_destroy_texture(&game->osu.slider_ball);
+	oshu_destroy_texture(&game->osu.good_mark);
+	oshu_destroy_texture(&game->osu.bad_mark);
 	return 0;
 }

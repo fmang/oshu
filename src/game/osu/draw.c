@@ -38,15 +38,9 @@ static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 		oshu_draw_texture(display, &game->osu.circles[hit->color->index], hit->p);
 		draw_hint(game, hit);
 	} else if (hit->state == OSHU_GOOD_HIT) {
-		oshu_point p = oshu_end_point(hit);
-		SDL_SetRenderDrawColor(display->renderer, 64, 255, 64, 255);
-		oshu_draw_circle(display, p, radius / 3);
+		oshu_draw_texture(display, &game->osu.good_mark, oshu_end_point(hit));
 	} else if (hit->state == OSHU_MISSED_HIT) {
-		SDL_SetRenderDrawColor(display->renderer, 255, 64, 64, 255);
-		oshu_point p = oshu_end_point(hit);
-		oshu_vector d = radius / 3. + radius / 3. * I;
-		oshu_draw_line(display, p - d, p + d);
-		oshu_draw_line(display, p - d * I, p + d * I);
+		oshu_draw_texture(display, &game->osu.bad_mark, oshu_end_point(hit));
 	} else if (hit->state == OSHU_SKIPPED_HIT) {
 		SDL_SetRenderDrawColor(display->renderer, 64, 64, 255, 255);
 		oshu_point p = oshu_end_point(hit);
@@ -62,9 +56,7 @@ static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 {
 	struct oshu_display *display = &game->display;
-	struct oshu_beatmap *beatmap = &game->beatmap;
 	double now = game->clock.now;
-	double radius = beatmap->difficulty.circle_radius;
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
 		if (hit->texture)
 			oshu_draw_texture(&game->display, hit->texture, hit->p);
@@ -75,8 +67,10 @@ static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 			oshu_point ball = oshu_path_at(&hit->slider.path, t < 0 ? 0 : t);
 			oshu_draw_texture(display, &game->osu.slider_ball, ball);
 		}
-		oshu_point end = oshu_path_at(&hit->slider.path, 1);
-		int rounds_left = hit->slider.repeat - (t <= 0 ? 0 : (int) t);
+	} else if (hit->state == OSHU_GOOD_HIT) {
+		oshu_draw_texture(&game->display, &game->osu.good_mark, oshu_end_point(hit));
+	} else if (hit->state == OSHU_MISSED_HIT) {
+		oshu_draw_texture(&game->display, &game->osu.bad_mark, oshu_end_point(hit));
 	}
 }
 

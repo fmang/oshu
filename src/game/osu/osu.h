@@ -58,6 +58,18 @@ struct osu_state {
 	 * The slider ball and its tolerance circle.
 	 */
 	struct oshu_texture slider_ball;
+	/**
+	 * Symbol to indicate a note was successfully hit.
+	 *
+	 * A green circle.
+	 */
+	struct oshu_texture good_mark;
+	/**
+	 * Symbol to indicate a note was missed.
+	 *
+	 * A red X.
+	 */
+	struct oshu_texture bad_mark;
 };
 
 /**
