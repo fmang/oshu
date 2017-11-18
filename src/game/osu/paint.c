@@ -79,12 +79,23 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 
 static void build_path(cairo_t *cr, struct oshu_slider *slider)
 {
-	oshu_point start = oshu_path_at(&slider->path, 0);
-	cairo_move_to(cr, creal(start), cimag(start));
-	int resolution = slider->length / 5. + 5;
-	for (int i = 1; i <= resolution; ++i) {
-		oshu_point pt = oshu_path_at(&slider->path, (double) i / resolution);
-		cairo_line_to(cr, creal(pt), cimag(pt));
+	if (slider->path.type == OSHU_LINEAR_PATH) {
+		cairo_move_to(cr, creal(slider->path.line.start), cimag(slider->path.line.start));
+		cairo_line_to(cr, creal(slider->path.line.end), cimag(slider->path.line.end));
+	} else if (slider->path.type == OSHU_PERFECT_PATH) {
+		struct oshu_arc *arc = &slider->path.arc;
+		if (arc->start_angle < arc->end_angle)
+			cairo_arc(cr, creal(arc->center), cimag(arc->center), arc->radius, arc->start_angle, arc->end_angle);
+		else
+			cairo_arc_negative(cr, creal(arc->center), cimag(arc->center), arc->radius, arc->start_angle, arc->end_angle);
+	} else {
+		oshu_point start = oshu_path_at(&slider->path, 0);
+		cairo_move_to(cr, creal(start), cimag(start));
+		int resolution = slider->length / 5. + 5;
+		for (int i = 1; i <= resolution; ++i) {
+			oshu_point pt = oshu_path_at(&slider->path, (double) i / resolution);
+			cairo_line_to(cr, creal(pt), cimag(pt));
+		}
 	}
 }
 
