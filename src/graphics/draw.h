@@ -73,4 +73,12 @@ void oshu_draw_background(struct oshu_display *display, struct oshu_texture *pic
  */
 void oshu_draw_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p);
 
+/**
+ * Draw a texture with a specific size.
+ *
+ * A ratio of 1 means no scaling is performed. More than 1 and the texture is
+ * grown, less than 1 and it is shrinked.
+ */
+void oshu_draw_scaled_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p, double ratio);
+
 /** \} */

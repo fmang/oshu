@@ -93,13 +93,18 @@ void oshu_draw_background(struct oshu_display *display, struct oshu_texture *pic
 	SDL_RenderCopy(display->renderer, pic->texture, NULL, &dest);
 }
 
-void oshu_draw_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p)
+void oshu_draw_scaled_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p, double ratio)
 {
-	oshu_point top_left = oshu_project(display, p - texture->origin);
-	oshu_size size = texture->size * display->view.zoom;
+	oshu_point top_left = oshu_project(display, p - texture->origin * ratio);
+	oshu_size size = texture->size * ratio * display->view.zoom;
 	SDL_Rect dest = {
 		.x = creal(top_left), .y = cimag(top_left),
 		.w = creal(size), .h = cimag(size),
 	};
 	SDL_RenderCopy(display->renderer, texture->texture, NULL, &dest);
+}
+
+void oshu_draw_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p)
+{
+	oshu_draw_scaled_texture(display, texture, p, 1.);
 }

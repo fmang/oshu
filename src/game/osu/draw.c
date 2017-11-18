@@ -19,10 +19,11 @@ static void draw_hint(struct oshu_game *game, struct oshu_hit *hit)
 	if (hit->time > now && hit->state == OSHU_INITIAL_HIT) {
 		SDL_SetRenderDrawColor(game->display.renderer, 255, 128, 64, 255);
 		double ratio = (double) (hit->time - now) / game->beatmap.difficulty.approach_time;
-		double radius = game->beatmap.difficulty.circle_radius;
-		oshu_draw_circle(
-			&game->display, hit->p,
-			radius + ratio * game->beatmap.difficulty.approach_size
+		double base_radius = game->beatmap.difficulty.circle_radius;
+		double radius = base_radius + ratio * game->beatmap.difficulty.approach_size;
+		oshu_draw_scaled_texture(
+			&game->display, &game->osu.approach_circle, hit->p,
+			2. * radius / creal(game->osu.approach_circle.size)
 		);
 	}
 }

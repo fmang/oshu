@@ -48,6 +48,12 @@ struct osu_state {
 	 * There are as many textures as there are colors in the beatmap.
 	 */
 	struct oshu_texture *circles;
+	/**
+	 * Full-size approach circle.
+	 *
+	 * Its size is the `radius + approach_size` from the beatmap.
+	 */
+	struct oshu_texture approach_circle;
 };
 
 /**
