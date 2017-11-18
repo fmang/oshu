@@ -118,13 +118,6 @@ static void pause_game(struct oshu_game *game)
 	dump_state(game);
 }
 
-static void unpause_game(struct oshu_game *game)
-{
-	if (game->clock.now >= 0)
-		oshu_play_audio(&game->audio);
-	game->paused = 0;
-}
-
 /**
  * Rewind the song by the specified offset in seconds.
  *
@@ -161,6 +154,24 @@ static void forward_music(struct oshu_game *game, double offset)
 		game->hit_cursor->state = OSHU_SKIPPED_HIT;
 		game->hit_cursor = game->hit_cursor->next;
 	}
+}
+
+/**
+ * Resume the game.
+ *
+ * If the music was playing, rewind it by 1 second to leave the player a little
+ * break after resuming. This probably makes cheating possible but I couldn't
+ * care less.
+ *
+ * Pausing on a slider will break it though.
+ */
+static void unpause_game(struct oshu_game *game)
+{
+	if (game->clock.now >= 0) {
+		rewind_music(game, 1.);
+		oshu_play_audio(&game->audio);
+	}
+	game->paused = 0;
 }
 
 enum oshu_key translate_key(SDL_Keysym *keysym)
