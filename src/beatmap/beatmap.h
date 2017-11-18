@@ -143,9 +143,9 @@ struct oshu_color {
 	 * without any skip.
 	 */
 	int index;
-	int red;
-	int green;
-	int blue;
+	double red;
+	double green;
+	double blue;
 	struct oshu_color *next;
 };
 

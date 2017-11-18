@@ -726,14 +726,16 @@ fail:
 	return -1;
 }
 
-static int parse_color_channel(struct parser_state *parser, int *c)
+static int parse_color_channel(struct parser_state *parser, double *ch)
 {
-	if (parse_int(parser, c) < 0)
+	int v;
+	if (parse_int(parser, &v) < 0)
 		return -1;
-	if (*c < 0 || *c > 255) {
+	if (v < 0 || v > 255) {
 		parser_error(parser, "color values must be comprised between 0 and 255, inclusive");
 		return -1;
 	}
+	*ch = (double) v / 255.;
 	return 0;
 }
 
