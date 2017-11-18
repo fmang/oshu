@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <SDL2/SDL_timer.h>
 
 void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format)
 {
@@ -282,6 +283,8 @@ static void populate_default(struct oshu_sound_library *library, enum oshu_sampl
 
 void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap)
 {
+	int start = SDL_GetTicks();
+	oshu_log_debug("loading the sample library");
 	populate_default(library, OSHU_NORMAL_SAMPLE_SET);
 	populate_default(library, OSHU_SOFT_SAMPLE_SET);
 	populate_default(library, OSHU_DRUM_SAMPLE_SET);
@@ -292,6 +295,8 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
 		}
 		oshu_register_sound(library, &hit->sound);
 	}
+	int end = SDL_GetTicks();
+	oshu_log_debug("done loading the library in %f seconds", (end - start) / 1000.);
 }
 
 /**

@@ -1,5 +1,5 @@
 /**
- * \file game/osu/paint.h
+ * \file game/osu/paint.c
  * \ingroup osu
  */
 
@@ -8,6 +8,7 @@
 #include "log.h"
 
 #include <assert.h>
+#include <SDL2/SDL_timer.h>
 
 static double brighter(double v)
 {
@@ -248,7 +249,7 @@ static int paint_skip_mark(struct oshu_game *game)
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, radius + 2, radius + 2);
 
-	cairo_set_source_rgba(p.cr, 0, 0, .8, .5);
+	cairo_set_source_rgba(p.cr, 0, 0, .9, .5);
 	cairo_set_line_width(p.cr, 1);
 
 	oshu_vector a = radius;
@@ -270,6 +271,9 @@ static int paint_skip_mark(struct oshu_game *game)
 
 int osu_paint_resources(struct oshu_game *game)
 {
+	int start = SDL_GetTicks();
+	oshu_log_debug("painting the textures");
+
 	/* Circle hits. */
 	assert (game->beatmap.color_count > 0);
 	assert (game->beatmap.colors != NULL);
@@ -294,6 +298,9 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_good_mark(game);
 	paint_bad_mark(game);
 	paint_skip_mark(game);
+
+	int end = SDL_GetTicks();
+	oshu_log_debug("done generating the textures in %f seconds", (end - start) / 1000.);
 	return 0;
 }
 
