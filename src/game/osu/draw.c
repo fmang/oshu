@@ -96,6 +96,31 @@ static void draw_cursor(struct oshu_game *game)
 	}
 }
 
+/**
+ * Connect two hits with a dotted line.
+ *
+ * ( ) · · · · ( )
+ *
+ * First, compute the visual distance between two hits, which is the distance
+ * between the center, minus the two radii. Then split this interval in steps
+ * of 15 pixels. Because we need an integral number of steps, floor it.
+ *
+ * The flooring would cause a extra padding after the last point, so we need to
+ * recalibrate the interval by dividing the distance by the number of steps.
+ *
+ * Now we have our steps:
+ *
+ * ( )   |   |   |   |   ( )
+ *
+  However, for some reason, this yields an excessive visual margin before the
+  first point and after the last point. To remedy this, the dots are put in the
+  middle of the steps, instead of between.
+ *
+ * ( ) · | · | · | · | · ( )
+ *
+ * Voilà!
+ *
+ */
 static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu_hit *b)
 {
 	if (a->state != OSHU_INITIAL_HIT && a->state != OSHU_SLIDING_HIT)
@@ -105,15 +130,16 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu
 	double interval = 15;
 	double center_distance = cabs(b->p - a_end);
 	double edge_distance = center_distance - 2 * radius;
-	if (edge_distance < 2 * interval)
+	if (edge_distance < interval)
 		return;
 	int steps = edge_distance / interval;
+	assert (steps >= 1);
 	interval = edge_distance / steps; /* recalibrate */
 	oshu_vector direction = (b->p - a_end) / center_distance;
 	oshu_point start = a_end + direction * radius;
 	oshu_vector step = direction * interval;
-	for (int i = 1; i < steps; ++i)
-		oshu_draw_texture(&game->display, &game->osu.connector, start + i * step);
+	for (int i = 0; i < steps; ++i)
+		oshu_draw_texture(&game->display, &game->osu.connector, start + (i + .5) * step);
 }
 
 /**
