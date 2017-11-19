@@ -52,7 +52,7 @@ struct osu_state {
 	 */
 	oshu_point mouse_history[4];
 	/**
-	 * See #previous_mouses.
+	 * Index of the most recent point in #mouse_history.
 	 */
 	int mouse_offset;
 	/**
