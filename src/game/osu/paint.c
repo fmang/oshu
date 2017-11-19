@@ -270,15 +270,14 @@ static int paint_bad_mark(struct oshu_game *game)
 	cairo_translate(p.cr, half + 2, half + 2);
 
 	cairo_set_source_rgba(p.cr, .9, 0, 0, .4);
-	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 	cairo_set_line_width(p.cr, 2);
 
 	cairo_move_to(p.cr, -half, -half);
 	cairo_line_to(p.cr, half, half);
-	cairo_stroke(p.cr);
 
 	cairo_move_to(p.cr, half, -half);
 	cairo_line_to(p.cr, -half, half);
+
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.bad_mark;
@@ -290,8 +289,8 @@ static int paint_bad_mark(struct oshu_game *game)
 
 static int paint_skip_mark(struct oshu_game *game)
 {
-	double radius = game->beatmap.difficulty.circle_radius / 3.5;
-	oshu_size size = (1. + I) * (radius + 4) * 2.;
+	double radius = game->beatmap.difficulty.circle_radius / 4;
+	oshu_size size = (1. + I) * (radius + 2) * 2.;
 	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
@@ -299,17 +298,17 @@ static int paint_skip_mark(struct oshu_game *game)
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, radius + 2, radius + 2);
 
-	cairo_set_source_rgba(p.cr, 0, 0, .9, .4);
+	cairo_set_source_rgba(p.cr, .3, .3, 1, .6);
 	cairo_set_line_width(p.cr, 1);
 
-	oshu_vector a = radius;
-	oshu_vector b = a * cexp(2. * M_PI / 3. * I);
-	oshu_vector c = b * cexp(2. * M_PI / 3. * I);
+	cairo_move_to(p.cr, 0, radius);
+	cairo_line_to(p.cr, radius, 0);
+	cairo_line_to(p.cr, 0, -radius);
 
-	cairo_move_to(p.cr, creal(a), cimag(a));
-	cairo_line_to(p.cr, creal(b), cimag(b));
-	cairo_line_to(p.cr, creal(c), cimag(c));
-	cairo_close_path(p.cr);
+	cairo_move_to(p.cr, -radius, radius);
+	cairo_line_to(p.cr, 0, 0);
+	cairo_line_to(p.cr, -radius, -radius);
+
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.skip_mark;
