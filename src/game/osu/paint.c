@@ -17,7 +17,7 @@ static double brighter(double v)
 }
 
 static int paint_cursor(struct oshu_game *game) {
-	double radius = 10;
+	double radius = 12;
 	oshu_size size = (1. + I) * radius * 2.;
 	double zoom = game->display.view.zoom;
 
@@ -25,11 +25,19 @@ static int paint_cursor(struct oshu_game *game) {
 	oshu_start_painting(size * zoom, &p);
 	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, radius, radius);
-	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 
+	cairo_pattern_t *pattern = cairo_pattern_create_radial(
+		0, 0, 0,
+		0, 0, radius - 1
+	);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.0, 1, 1, 1, .9);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.6, 1, 1, 1, .9);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.7, 1, 1, 1, .4);
+	cairo_pattern_add_color_stop_rgba(pattern, 1.0, 1, 1, 1, 0);
 	cairo_arc(p.cr, 0, 0, radius - 1, 0, 2. * M_PI);
-	cairo_set_source_rgba(p.cr, 1., 1., 1., .7);
+	cairo_set_source(p.cr, pattern);
 	cairo_fill(p.cr);
+	cairo_pattern_destroy(pattern);
 
 	struct oshu_texture *texture = &game->osu.cursor;
 	int rc = oshu_finish_painting(&p, &game->display, texture);
