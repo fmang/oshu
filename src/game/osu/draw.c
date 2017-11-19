@@ -93,5 +93,6 @@ int osu_draw(struct oshu_game *game)
 			break;
 		draw_hit(game, hit);
 	}
+	oshu_draw_texture(&game->display, &game->osu.cursor, oshu_get_mouse(&game->display));
 	return 0;
 }

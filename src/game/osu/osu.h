@@ -43,6 +43,10 @@ struct osu_state {
 	 */
 	enum oshu_key held_key;
 	/**
+	 * The software mouse cursor.
+	 */
+	struct oshu_texture cursor;
+	/**
 	 * Dynamic array of circle hit object textures.
 	 *
 	 * There are as many textures as there are colors in the beatmap.
@@ -83,17 +87,27 @@ struct osu_state {
  *
  * Free everything with #osu_free_resources.
  *
- * \todo
- * Paint textures lazily, or in a parallel thread for a faster start-up.
+ * Sliders are not painted. Instead, you must call #osu_paint_slider.
  */
 int osu_paint_resources(struct oshu_game *game);
 
+/**
+ * Paint a slider.
+ *
+ * This is externalized from #osu_paint_slider to let you paint them lazily,
+ * because painting all the sliders at once would increase the startup time by
+ * up to a few long seconds.
+ *
+ * The texture is stored in `hit->texture`.
+ *
+ * Slider textures are freed with #osu_free_resources.
+ */
 int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit);
 
 /**
  * Free the dynamic resources of the game mode.
  */
-int osu_free_resources(struct oshu_game *game);
+void osu_free_resources(struct oshu_game *game);
 
 /**
  * The main drawing callback of the mode.

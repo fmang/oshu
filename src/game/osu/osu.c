@@ -197,9 +197,23 @@ static int adjust(struct oshu_game *game)
 	return 0;
 }
 
+static int init(struct oshu_game *game)
+{
+	int rc = osu_paint_resources(game);
+	SDL_ShowCursor(SDL_DISABLE);
+	return rc;
+}
+
+static int destroy(struct oshu_game *game)
+{
+	SDL_ShowCursor(SDL_ENABLE);
+	osu_free_resources(game);
+	return 0;
+}
+
 struct oshu_game_mode osu_mode = {
-	.initialize = osu_paint_resources,
-	.destroy = osu_free_resources,
+	.initialize = init,
+	.destroy = destroy,
 	.check = check,
 	.autoplay = autoplay,
 	.adjust = adjust,
