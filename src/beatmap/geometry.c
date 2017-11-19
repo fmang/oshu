@@ -216,25 +216,28 @@ static oshu_vector bezier_derive(struct oshu_bezier *path, double t)
  */
 static int grow_bezier(struct oshu_bezier *bezier, double extension)
 {
+	assert (bezier->segment_count >= 1);
+	assert (bezier->indices != NULL);
+	assert (bezier->control_points != NULL);
+	size_t n = bezier->indices[bezier->segment_count];
+	assert (n >= 2);
+	oshu_point end = bezier->control_points[n - 1];
+	oshu_point before_end = bezier->control_points[n - 2];
+
 	oshu_log_debug("expanding the bezier path by %f pixels", extension);
-	oshu_vector direction = oshu_normalize(bezier_derive(bezier, 1.));
+	oshu_vector direction = oshu_normalize(end - before_end);
 	if (direction == 0.) {
 		oshu_log_warning("cannot grow a bezier path whose end is stationary");
 		return -1;
 	}
 
-	assert (bezier->segment_count >= 1);
 	bezier->segment_count++;
 	bezier->indices = realloc(bezier->indices, (bezier->segment_count + 1) * sizeof(*bezier->indices));
-	assert (bezier->indices != NULL);
-	bezier->indices[bezier->segment_count] = bezier->indices[bezier->segment_count - 1] + 2;
+	bezier->indices[bezier->segment_count] = n + 2;
 
-	size_t end = bezier->indices[bezier->segment_count];
-	assert (end >= 3);
-	bezier->control_points = realloc(bezier->control_points, end * sizeof(*bezier->control_points));
-	assert (bezier->control_points != NULL);
-	bezier->control_points[end - 2] = bezier->control_points[end - 3];
-	bezier->control_points[end - 1] = bezier->control_points[end - 2] + direction * extension;
+	bezier->control_points = realloc(bezier->control_points, (n + 2) * sizeof(*bezier->control_points));
+	bezier->control_points[n] = end;
+	bezier->control_points[n + 1] = end + direction * extension;
 	return 0;
 }
 
