@@ -93,6 +93,10 @@ struct osu_state {
 	 * A blue triangle pointing right.
 	 */
 	struct oshu_texture skip_mark;
+	/**
+	 * Little tick mark for the dotted line between two consecutive hits.
+	 */
+	struct oshu_texture connector;
 };
 
 /**

@@ -318,6 +318,28 @@ static int paint_skip_mark(struct oshu_game *game)
 	return rc;
 }
 
+static int paint_connector(struct oshu_game *game)
+{
+	double radius = 3;
+	oshu_size size = (1. + I) * radius * 2.;
+	double zoom = game->display.view.zoom;
+
+	struct oshu_painter p;
+	oshu_start_painting(size * zoom, &p);
+	cairo_scale(p.cr, zoom, zoom);
+	cairo_translate(p.cr, radius, radius);
+
+	cairo_set_source_rgba(p.cr, 1, 1, 1, .5);
+	cairo_arc(p.cr, 0, 0, radius - 1, 0, 2. * M_PI);
+	cairo_fill(p.cr);
+
+	struct oshu_texture *texture = &game->osu.connector;
+	int rc = oshu_finish_painting(&p, &game->display, texture);
+	texture->size = size;
+	texture->origin = size / 2.;
+	return rc;
+}
+
 /**
  * \todo
  * Handle errors.
@@ -346,6 +368,7 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_good_mark(game);
 	paint_bad_mark(game);
 	paint_skip_mark(game);
+	paint_connector(game);
 
 	int end = SDL_GetTicks();
 	oshu_log_debug("done generating the common textures in %.3f seconds", (end - start) / 1000.);
@@ -369,4 +392,5 @@ void osu_free_resources(struct oshu_game *game)
 	oshu_destroy_texture(&game->osu.good_mark);
 	oshu_destroy_texture(&game->osu.bad_mark);
 	oshu_destroy_texture(&game->osu.skip_mark);
+	oshu_destroy_texture(&game->osu.connector);
 }

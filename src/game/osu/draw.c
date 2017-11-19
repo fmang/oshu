@@ -96,6 +96,26 @@ static void draw_cursor(struct oshu_game *game)
 	}
 }
 
+static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu_hit *b)
+{
+	if (a->state != OSHU_INITIAL_HIT && a->state != OSHU_SLIDING_HIT)
+		return;
+	oshu_point a_end = oshu_end_point(a);
+	double radius = game->beatmap.difficulty.circle_radius;
+	double interval = 15;
+	double center_distance = cabs(b->p - a_end);
+	double edge_distance = center_distance - 2 * radius;
+	if (edge_distance < 2 * interval)
+		return;
+	int steps = edge_distance / interval;
+	interval = edge_distance / steps; /* recalibrate */
+	oshu_vector direction = (b->p - a_end) / center_distance;
+	oshu_point start = a_end + direction * radius;
+	oshu_vector step = direction * interval;
+	for (int i = 1; i < steps; ++i)
+		oshu_draw_texture(&game->display, &game->osu.connector, start + i * step);
+}
+
 /**
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
@@ -103,13 +123,17 @@ static void draw_cursor(struct oshu_game *game)
 int osu_draw(struct oshu_game *game)
 {
 	struct oshu_hit *cursor = oshu_look_hit_up(game, game->beatmap.difficulty.approach_time);
+	struct oshu_hit *next = NULL;
 	double now = game->clock.now;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->previous) {
 		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
 			continue;
 		if (oshu_hit_end_time(hit) < now - game->beatmap.difficulty.approach_time)
 			break;
+		if (next && next->combo == hit->combo)
+			connect_hits(game, hit, next);
 		draw_hit(game, hit);
+		next = hit;
 	}
 	draw_cursor(game);
 	return 0;
