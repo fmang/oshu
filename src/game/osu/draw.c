@@ -82,7 +82,6 @@ static void draw_cursor(struct oshu_game *game)
 {
 	oshu_point mouse = oshu_get_mouse(&game->display);
 	oshu_point prev = game->osu.previous_mouse;
-	prev += (prev - mouse) * 1.5; /* increase the trail */
 	int fireflies = 5;
 	for (int i = 0; i < fireflies; ++i) {
 		double ratio = (double) (fireflies - i) / fireflies;
@@ -93,7 +92,7 @@ static void draw_cursor(struct oshu_game *game)
 			ratio
 		);
 	}
-	game->osu.previous_mouse = mouse;
+	game->osu.previous_mouse = (prev + mouse) / 2.;
 }
 
 /**

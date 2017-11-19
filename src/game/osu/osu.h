@@ -45,6 +45,9 @@ struct osu_state {
 	/**
 	 * Keep track of the previous position of the mouse to display a
 	 * fancier cursor, with a trail.
+	 *
+	 * It's not necessarily the exact position, and an may be average of
+	 * the past few positions.
 	 */
 	oshu_point previous_mouse;
 	/**
