@@ -16,9 +16,7 @@ static double epsilon = 0.01;
 
 double oshu_distance2(oshu_point p, oshu_point q)
 {
-	double dx = creal(p - q);
-	double dy = cimag(p - q);
-	return dx * dx + dy * dy;
+	return (p - q) * conj(p - q);
 }
 
 double oshu_distance(oshu_point p, oshu_point q)
