@@ -43,13 +43,18 @@ struct osu_state {
 	 */
 	enum oshu_key held_key;
 	/**
-	 * Keep track of the previous position of the mouse to display a
+	 * Keep track of the previous positions of the mouse to display a
 	 * fancier cursor, with a trail.
 	 *
-	 * It's not necessarily the exact position, and an may be average of
-	 * the past few positions.
+	 * This is a circular array, starting at #mouse_offset. The previous is
+	 * at #mouse_offset - 1, and so on. When you reach the maximum index,
+	 * wrap at 0.
 	 */
-	oshu_point previous_mouse;
+	oshu_point mouse_history[4];
+	/**
+	 * See #previous_mouses.
+	 */
+	int mouse_offset;
 	/**
 	 * The software mouse cursor.
 	 */
