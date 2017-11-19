@@ -37,11 +37,6 @@ typedef double complex oshu_vector;
 typedef double complex oshu_size;
 
 /**
- * Normalize a vector, making its norm equal to 1.
- */
-oshu_vector oshu_normalize(oshu_vector p);
-
-/**
  * Compute the Euclidean distance between *p* and *q*.
  *
  * That's the usual sqrt(Δx² + Δy²) formula.
@@ -176,7 +171,7 @@ int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *ar
  * and 1, and represents how far the point is from the start. For example,
  * l=1/2 means that the point is at the middle of the curve, as opposed to
  * t=1/2 which means, for quadratic curves, that the point is closest to the
- * middle control point. See #oshu_normalize.
+ * middle control point. See #oshu_normalize_path.
  */
 struct oshu_bezier {
 	/**
@@ -233,7 +228,7 @@ struct oshu_bezier {
 	 * For any point such that i / n ≤ l ≤ (i + 1) / n, compute a weighted
 	 * average between anchors[i] and anchors[i+1].
 	 *
-	 * \sa oshu_normalize
+	 * \sa oshu_normalize_path
 	 */
 	double anchors[64];
 };

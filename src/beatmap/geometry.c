@@ -14,14 +14,6 @@
  */
 static double epsilon = 0.01;
 
-oshu_vector oshu_normalize(oshu_vector p)
-{
-	double norm = cabs(p);
-	if (norm < epsilon)
-		return 0;
-	return p / norm;
-}
-
 double oshu_distance2(oshu_point p, oshu_point q)
 {
 	double dx = creal(p - q);
@@ -188,8 +180,8 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
 	oshu_point before_end = bezier->control_points[n - 2];
 
 	oshu_log_debug("expanding the bezier path by %f pixels", extension);
-	oshu_vector direction = oshu_normalize(end - before_end);
-	if (direction == 0.) {
+	oshu_vector direction = end - before_end;
+	if (cabs(direction) < epsilon) {
 		oshu_log_warning("cannot grow a bezier path whose end is stationary");
 		return -1;
 	}
@@ -200,7 +192,7 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
 
 	bezier->control_points = realloc(bezier->control_points, (n + 2) * sizeof(*bezier->control_points));
 	bezier->control_points[n] = end;
-	bezier->control_points[n + 1] = end + direction * extension;
+	bezier->control_points[n + 1] = end + direction / cabs(direction) * extension;
 	return 0;
 }
 
@@ -288,7 +280,7 @@ begin:
  * Then, we get the approximate t by applying a similar relation:
  * `t = (1 - k) * anchors[i] + k * anchors[i + 1]`.
  *
- * \sa oshu_normalize_bezier
+ * \sa normalize_bezier
  */
 static double l_to_t(struct oshu_bezier *bezier, double l)
 {
