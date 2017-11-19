@@ -43,6 +43,11 @@ struct osu_state {
 	 */
 	enum oshu_key held_key;
 	/**
+	 * Keep track of the previous position of the mouse to display a
+	 * fancier cursor, with a trail.
+	 */
+	oshu_point previous_mouse;
+	/**
 	 * The software mouse cursor.
 	 */
 	struct oshu_texture cursor;

@@ -78,6 +78,24 @@ static void draw_hit(struct oshu_game *game, struct oshu_hit *hit)
 		draw_hit_circle(game, hit);
 }
 
+static void draw_cursor(struct oshu_game *game)
+{
+	oshu_point mouse = oshu_get_mouse(&game->display);
+	oshu_point prev = game->osu.previous_mouse;
+	prev += (prev - mouse) * 1.5; /* increase the trail */
+	int fireflies = 5;
+	for (int i = 0; i < fireflies; ++i) {
+		double ratio = (double) (fireflies - i) / fireflies;
+		SDL_SetTextureAlphaMod(game->osu.cursor.texture, ratio * 255);
+		oshu_draw_scaled_texture(
+			&game->display, &game->osu.cursor,
+			((fireflies - i) * mouse + i * prev) / fireflies,
+			ratio
+		);
+	}
+	game->osu.previous_mouse = mouse;
+}
+
 /**
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
@@ -93,6 +111,6 @@ int osu_draw(struct oshu_game *game)
 			break;
 		draw_hit(game, hit);
 	}
-	oshu_draw_texture(&game->display, &game->osu.cursor, oshu_get_mouse(&game->display));
+	draw_cursor(game);
 	return 0;
 }

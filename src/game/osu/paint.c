@@ -30,9 +30,9 @@ static int paint_cursor(struct oshu_game *game) {
 		0, 0, 0,
 		0, 0, radius - 1
 	);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.0, 1, 1, 1, .9);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.6, 1, 1, 1, .9);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.7, 1, 1, 1, .4);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.0, 1, 1, 1, .8);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.6, 1, 1, 1, .8);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.7, 1, 1, 1, .3);
 	cairo_pattern_add_color_stop_rgba(pattern, 1.0, 1, 1, 1, 0);
 	cairo_arc(p.cr, 0, 0, radius - 1, 0, 2. * M_PI);
 	cairo_set_source(p.cr, pattern);
