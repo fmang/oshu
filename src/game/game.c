@@ -409,6 +409,7 @@ int oshu_run_game(struct oshu_game *game)
 		}
 	}
 	end(game);
+	oshu_log_debug("%d missed frames", missed_frames);
 	return 0;
 }
 
