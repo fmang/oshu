@@ -196,7 +196,8 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
  * You should probably use #oshu_seek_music instead.
  *
  * \todo
- * What if the target position is past the end of stream?
+ * There's often some kind of audio distortion glitch right after seeking.
+ *
  */
 int oshu_seek_stream(struct oshu_stream *stream, double target);
 
