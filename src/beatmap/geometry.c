@@ -89,19 +89,6 @@ static int focus(double *t, int n)
 }
 
 /**
- * Pre-computed factorial values, for speed.
- * We're never going to see 8th-order Bezier curve, right?
- *
- * Don't add any more value here, it's going to cause numerical instabilities
- * because of overflows and float approximations.
- *
- * Use de Casteljau's algorithm is this is limiting.
- *
- * \sa bezier_at
- */
-static int fac[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800};
-
-/**
  * \brief Map global *t*-coordinates to segment-wise *t*-coordinates.
  *
  * \param path Read the Bézier path object.
@@ -143,7 +130,6 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, oshu_po
 {
 	int segment = focus(t, path->segment_count);
 	*degree = path->indices[segment+1] - path->indices[segment] - 1;
-	assert (*degree < sizeof(fac) / sizeof(*fac));
 	*control_points = path->control_points + path->indices[segment];
 }
 
@@ -153,9 +139,9 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, oshu_po
  * The coordinates are mapped with #bezier_map, and then we just apply the
  * standard explicit definition of Bézier curves.
  *
- * If the factorial gets too big and annoying, we'll switch to de Casteljau's
- * algorithm. However, since I'm not sure it would let us derive, maybe that's
- * gonna wait until we switch to a new Bézier drawing engine.
+ * Use de Casteljau's algorithm for numerical stability. I did come across
+ * super high-degree Bézier curves on some beatmaps, and the factorial was at
+ * its limits.
  */
 static oshu_point bezier_at(struct oshu_bezier *path, double t)
 {
@@ -173,29 +159,6 @@ static oshu_point bezier_at(struct oshu_bezier *path, double t)
 			pp[j] = (1. - t) * pp[j] + t * pp[j+1];
 	}
 	return pp[0];
-}
-
-/**
- * Compute the derivative of a Bézier curve in t-coordinates.
- *
- * In practice, it's going to be called with l-coordinates, so the result is
- * formally wrong. However, because both derivative vectors are collinear, and
- * because the resulting vector is normalized at the end anyway, it doesn't
- * matter.
- */
-static oshu_vector bezier_derive(struct oshu_bezier *path, double t)
-{
-	oshu_vector d = 0;
-	int degree;
-	oshu_point *points;
-	bezier_map(path, &t, &degree, &points);
-	for (int i = 0; i <= degree - 1; i++) {
-		double bin = fac[degree - 1] / (fac[i] * fac[degree - 1 - i]);
-		double factor = bin * pow(t, i) * pow(1 - t, degree - 1 - i);
-		d += factor * (points[i + 1] - points[i]);
-	}
-	d *= degree;
-	return d;
 }
 
 /**
@@ -357,14 +320,6 @@ static oshu_point line_at(struct oshu_line *line, double t)
 	return (1 - t) * line->start + t * line->end;
 }
 
-/**
- * Derive the equation in #line_at to get the derivative.
- */
-static oshu_vector line_derive(struct oshu_line *line, double t)
-{
-	return - line->start + line->end;
-}
-
 static void normalize_line(struct oshu_line *line, double target_length)
 {
 	double actual_length = oshu_distance(line->start, line->end);
@@ -387,16 +342,6 @@ static oshu_point arc_at(struct oshu_arc *arc, double t)
 {
 	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
 	return arc->center + arc->radius * cexp(angle * I);
-}
-
-/**
- * Naive derivative of #arc_at.
- */
-static oshu_vector arc_derive(struct oshu_arc *arc, double t)
-{
-	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
-	double deriv_angle = - arc->start_angle + arc->end_angle;
-	return arc->radius * deriv_angle * I * cexp(angle * I);
 }
 
 /**
@@ -520,34 +465,6 @@ oshu_point oshu_path_at(struct oshu_path *path, double t)
 		assert (path->type != path->type);
 	}
 	return 0;
-}
-
-oshu_vector oshu_path_derive(struct oshu_path *path, double t)
-{
-	oshu_vector d;
-	t = remainder(t, 2.);
-	int revert = t < 0;
-	t = fabs(t);
-	assert (-epsilon <= t && t <= 1 + epsilon);
-
-	switch (path->type) {
-	case OSHU_LINEAR_PATH:
-		d = line_derive(&path->line, t);
-		break;
-	case OSHU_BEZIER_PATH:
-		t = l_to_t(&path->bezier, t);
-		d = bezier_derive(&path->bezier, t);
-		break;
-	case OSHU_PERFECT_PATH:
-		d = arc_derive(&path->arc, t);
-		break;
-	case OSHU_CATMULL_PATH:
-		assert (path->type != OSHU_CATMULL_PATH);
-	default:
-		assert (path->type != path->type);
-	}
-
-	return revert ? -d : d;
 }
 
 void oshu_path_bounding_box(struct oshu_path *path, oshu_point *top_left, oshu_point *bottom_right)

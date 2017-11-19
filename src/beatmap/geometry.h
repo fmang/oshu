@@ -330,15 +330,6 @@ void oshu_normalize_path(struct oshu_path *path, double length);
 oshu_point oshu_path_at(struct oshu_path *path, double t);
 
 /**
- * Return the derivative vector of the path at point t in t-coordinates.
- *
- * t can be any point in ℝ, and will be mapped to [0, 1] according to the rules
- * defined in #oshu_path_at. When t is on a decreasing slope, the derivative
- * vector is reversed, as you'd expect if you like maths.
- */
-oshu_vector oshu_path_derive(struct oshu_path *path, double t);
-
-/**
  * Compute the smallest box such that the path fits in.
  *
  * It doesn't have a notion of path width, so you may need to push each edge
