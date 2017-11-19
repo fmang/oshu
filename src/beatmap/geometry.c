@@ -162,13 +162,17 @@ static oshu_point bezier_at(struct oshu_bezier *path, double t)
 	int degree;
 	oshu_point *points;
 	bezier_map(path, &t, &degree, &points);
-	oshu_point p = 0;
-	for (int i = 0; i <= degree; i++) {
-		double bin = fac[degree] / (fac[i] * fac[degree - i]);
-		double factor = bin * pow(t, i) * pow(1 - t, degree - i);
-		p += factor * points[i];
+	oshu_point pp[degree + 1];
+	memcpy(pp, points, (degree + 1) * sizeof(*pp));
+
+	/* l is the logical length of pp.
+	 * It begins with all the points, and drops one point at every
+	 * iteration. We stop when only 1 point is left */
+	for (int l = (degree + 1); l > 1; --l) {
+		for (int j = 0; j < (l - 1); ++j)
+			pp[j] = (1. - t) * pp[j] + t * pp[j+1];
 	}
-	return p;
+	return pp[0];
 }
 
 /**
