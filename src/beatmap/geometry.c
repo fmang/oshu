@@ -14,14 +14,12 @@
  */
 static double epsilon = 0.01;
 
-double oshu_distance2(oshu_point p, oshu_point q)
+/**
+ * Compute the squared Euclidean distance between *p* and *q*: Δx² + Δy².
+ */
+static double distance2(oshu_point p, oshu_point q)
 {
 	return (p - q) * conj(p - q);
-}
-
-double oshu_distance(oshu_point p, oshu_point q)
-{
-	return cabs(p - q);
 }
 
 double oshu_ratio(oshu_size size)
@@ -239,7 +237,7 @@ begin:
 	for (int i = 0; i <= n; i++) {
 		double t = (double) i / n;
 		oshu_point current = bezier_at(bezier, t);
-		length += oshu_distance(prev, current);
+		length += cabs(prev - current);
 		l[i] = length;
 		prev = current;
 	}
@@ -312,7 +310,7 @@ static oshu_point line_at(struct oshu_line *line, double t)
 
 static void normalize_line(struct oshu_line *line, double target_length)
 {
-	double actual_length = oshu_distance(line->start, line->end);
+	double actual_length = cabs(line->start - line->end);
 	assert (target_length > 0);
 	assert (actual_length > 0);
 	double factor = target_length / actual_length;
@@ -341,9 +339,9 @@ static oshu_point arc_at(struct oshu_arc *arc, double t)
  */
 int arc_center(oshu_point a, oshu_point b, oshu_point c, oshu_point *center)
 {
-	double a2 = oshu_distance2(b, c);
-	double b2 = oshu_distance2(a, c);
-	double c2 = oshu_distance2(a, b);
+	double a2 = distance2(b, c);
+	double b2 = distance2(a, c);
+	double c2 = distance2(a, b);
 	if (a2 < epsilon || b2 < epsilon || c2 < epsilon)
 		return -1;
 
@@ -363,7 +361,7 @@ int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *ar
 	if (arc_center(a, b, c, &arc->center))
 		return -1;
 
-	arc->radius = oshu_distance(a, arc->center);
+	arc->radius = cabs(a - arc->center);
 	arc->start_angle = carg(a - arc->center);
 	arc->end_angle = carg(c - arc->center);
 	double cross = cimag(conj(c - a) * (b - a));

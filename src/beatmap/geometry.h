@@ -37,23 +37,6 @@ typedef double complex oshu_vector;
 typedef double complex oshu_size;
 
 /**
- * Compute the Euclidean distance between *p* and *q*.
- *
- * That's the usual sqrt(Δx² + Δy²) formula.
- *
- * \sa oshu_distance2
- */
-double oshu_distance(oshu_point p, oshu_point q);
-
-/**
- * Compute the squared Euclidean distance between *p* and *q*: Δx² + Δy².
- *
- * This function is faster and more accurate that #oshu_distance, when only the
- * squared distances are needed.
- */
-double oshu_distance2(oshu_point p, oshu_point q);
-
-/**
  * Return the width / height ratio of a size.
  */
 double oshu_ratio(oshu_size size);
