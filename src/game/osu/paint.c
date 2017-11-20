@@ -237,7 +237,7 @@ static int paint_slider_ball(struct oshu_game *game) {
 
 static int paint_good_mark(struct oshu_game *game)
 {
-	double radius = game->beatmap.difficulty.circle_radius / 3;
+	double radius = game->beatmap.difficulty.circle_radius / 3.5;
 	oshu_size size = (1. + I) * radius * 2.;
 	double zoom = game->display.view.zoom;
 
@@ -260,8 +260,8 @@ static int paint_good_mark(struct oshu_game *game)
 
 static int paint_bad_mark(struct oshu_game *game)
 {
-	double half = game->beatmap.difficulty.circle_radius / 4.2;
-	oshu_size size = (1. + I) * (half + 4) * 2.;
+	double half = game->beatmap.difficulty.circle_radius / 4.7;
+	oshu_size size = (1. + I) * (half + 2) * 2.;
 	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
@@ -289,7 +289,7 @@ static int paint_bad_mark(struct oshu_game *game)
 
 static int paint_skip_mark(struct oshu_game *game)
 {
-	double radius = game->beatmap.difficulty.circle_radius / 4;
+	double radius = game->beatmap.difficulty.circle_radius / 4.7;
 	oshu_size size = (1. + I) * (radius + 2) * 2.;
 	double zoom = game->display.view.zoom;
 
