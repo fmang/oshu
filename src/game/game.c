@@ -168,7 +168,8 @@ static void forward_music(struct oshu_game *game, double offset)
 static void unpause_game(struct oshu_game *game)
 {
 	if (game->clock.now >= 0) {
-		rewind_music(game, 1.);
+		if (!game->autoplay)
+			rewind_music(game, 1.);
 		oshu_play_audio(&game->audio);
 	}
 	game->paused = 0;
