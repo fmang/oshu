@@ -17,7 +17,7 @@ static double brighter(double v)
 }
 
 static int paint_cursor(struct oshu_game *game) {
-	double radius = 12;
+	double radius = 14;
 	oshu_size size = (1. + I) * radius * 2.;
 	double zoom = game->display.view.zoom;
 
