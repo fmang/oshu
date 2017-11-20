@@ -224,13 +224,13 @@ static int paint_slider_ball(struct oshu_game *game) {
 	cairo_stroke(p.cr);
 
 	/* ball */
-	double ball_radius = game->beatmap.difficulty.circle_radius - 4;
+	double ball_radius = game->beatmap.difficulty.circle_radius / 1.2;
 	cairo_pattern_t *pattern = cairo_pattern_create_radial(
 		0, 0, 0,
 		0, 0, ball_radius
 	);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.0, 1, 1, 1, .6);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.3, 1, 1, 1, .5);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.0, 1, 1, 1, .7);
+	cairo_pattern_add_color_stop_rgba(pattern, 0.4, 1, 1, 1, .6);
 	cairo_pattern_add_color_stop_rgba(pattern, 0.6, 1, 1, 1, .2);
 	cairo_pattern_add_color_stop_rgba(pattern, 1.0, 1, 1, 1, 0);
 	cairo_arc(p.cr, 0, 0, ball_radius, 0, 2. * M_PI);
