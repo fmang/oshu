@@ -377,9 +377,11 @@ int osu_paint_resources(struct oshu_game *game)
 
 void osu_free_resources(struct oshu_game *game)
 {
-	for (int i = 0; i < game->beatmap.color_count; ++i)
-		oshu_destroy_texture(&game->osu.circles[i]);
-	free(game->osu.circles);
+	if (game->osu.circles) {
+		for (int i = 0; i < game->beatmap.color_count; ++i)
+			oshu_destroy_texture(&game->osu.circles[i]);
+		free(game->osu.circles);
+	}
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->texture) {
 			oshu_destroy_texture(hit->texture);
