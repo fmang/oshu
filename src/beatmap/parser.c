@@ -1008,7 +1008,7 @@ static int parse_perfect_slider(struct parser_state *parser, struct oshu_hit *hi
 
 	hit->slider.path.type = OSHU_PERFECT_PATH;
 	if (oshu_build_arc(a, b, c, &hit->slider.path.arc) < 0) {
-		/* tranform it into a linear path */
+		oshu_log_debug("degenerate perfect arc slider, turning it into a line");
 		hit->slider.path.type = OSHU_LINEAR_PATH;
 		hit->slider.path.line.start = a;
 		hit->slider.path.line.end = c;

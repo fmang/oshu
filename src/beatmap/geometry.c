@@ -358,7 +358,7 @@ int arc_center(oshu_point a, oshu_point b, oshu_point c, oshu_point *center)
 
 int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *arc)
 {
-	if (arc_center(a, b, c, &arc->center))
+	if (arc_center(a, b, c, &arc->center) < 0)
 		return -1;
 
 	arc->radius = cabs(a - arc->center);
