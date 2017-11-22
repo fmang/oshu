@@ -149,24 +149,7 @@ The user manual's man page is installed in the standard man directory, but you
 may view it directly from `docs/oshu.1` or straight from the template at
 `docs/oshu.1.in`.
 
-To generate the technical documentation of the game with Doxygen, you need to
-move to the `docs/` directory and run `make apidoc`. The documentation will be
-accessible from `docs/html/index.html`. By the way, if you didn't have Doxygen
-installed when you ran `./configure`, you'll need to call it again for it to
-detect Doxygen.
-
-
-Contributing
-------------
-
-Because the project is really young, please join the \#oshu IRC channel on
-[chat.freenode.net](https://freenode.net/kb/answer/chat) if you'd like to
-contribute. Someone is probably already working on your idea, and most likely
-myself :)
-
-You may also open issues on [GitHub][] or contact me directly by mail.
-
-[GitHub]: https://github.com/fmang/oshu/
+For the technical document, please look at `CONTRIBUTING.md`.
 
 
 Name
