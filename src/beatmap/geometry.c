@@ -12,7 +12,7 @@
  * When we get a value under this in our computation, we'll assume the value is
  * almost 0 and possibly trigger an error, depending on the context.
  */
-static double epsilon = 0.01;
+static double epsilon = 0.001;
 
 /**
  * Compute the squared Euclidean distance between *p* and *q*: Δx² + Δy².
@@ -438,7 +438,7 @@ oshu_point oshu_path_at(struct oshu_path *path, double t)
 {
 	/* map t from ℝ to [0,1] */
 	t = fabs(remainder(t, 2.));
-	assert (-epsilon <= t && t <= 1 + epsilon);
+	assert (0 <= t && t <= 1);
 	switch (path->type) {
 	case OSHU_LINEAR_PATH:
 		return line_at(&path->line, t);
