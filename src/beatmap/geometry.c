@@ -349,7 +349,7 @@ int arc_center(oshu_point a, oshu_point b, oshu_point c, oshu_point *center)
 	double t = b2 * (a2 + c2 - b2);
 	double u = c2 * (a2 + b2 - c2);
 	double sum = s + t + u;
-	if (abs(sum) < epsilon)
+	if (fabs(sum) < epsilon)
 		return -1;
 
 	*center = (s * a + t * b + u * c) / sum;
