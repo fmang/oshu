@@ -129,6 +129,16 @@ static void build_path(cairo_t *cr, struct oshu_slider *slider)
 	}
 }
 
+/**
+ * \todo
+ * Today, the number of repeat is shown by drawing concentric circles at the
+ * end of the slider. However, these circles are drawn statically, while we'd
+ * like them to disappear one after another as the slider repeats.
+ *
+ * \todo
+ * Paint the slider ticks. Preferably updating the ticks every time the slider
+ * repeats. Also, clear the ticks as the slider rolls over them.
+ */
 int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 {
 	int start = SDL_GetTicks();
