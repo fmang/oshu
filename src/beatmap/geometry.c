@@ -438,7 +438,7 @@ oshu_point oshu_path_at(struct oshu_path *path, double t)
 {
 	/* map t from ℝ to [0,1] */
 	t = fabs(remainder(t, 2.));
-	assert (0 <= t && t <= 1);
+	assert (-epsilon <= t && t <= 1 + epsilon);
 	switch (path->type) {
 	case OSHU_LINEAR_PATH:
 		return line_at(&path->line, t);
