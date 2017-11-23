@@ -682,6 +682,14 @@ struct oshu_difficulty {
 	 *     Miss = BeatmapDifficulty.DifficultyRange(difficulty, miss_max, miss_mid, miss_min);
 	 *
 	 * Defaults to 0.1 seconds.
+	 *
+	 * \todo
+	 * It's currently fixed to 0.1. This should depend on the difficulty settings.
+	 *
+	 * \todo
+	 * For a finer score, there should be several levels of leniency,
+	 * mapping to 50, 100 and 150 notes. Look for a video gameplay of Osu!
+	 * Tatakae! Ouendan! if you don't get it.
 	 */
 	double leniency;
 	/**
