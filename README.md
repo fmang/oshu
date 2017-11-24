@@ -17,16 +17,18 @@ people and probably will never contain a hundredth of the official client's
 features.
 
 osu! is that PC clone of the osu! Tatakae! Ouendan DS rhythm game,
-occidentalized as Elite Beat Agents.
-
-osu! has got tons of cool beatmaps, and a more or less intuitive text file
-format described at https://osu.ppy.sh/help/wiki/osu!_File_Formats
+occidentalized as Elite Beat Agents. osu! has got tons of cool beatmaps, and a
+more or less intuitive text file format described at
+https://osu.ppy.sh/help/wiki/osu!_File_Formats
 
 The main problem with osu! is that it required Windows and a graphics card.
 Even with that, it sometimes get slow unless the computer is a beast… Hell, the
 mania and taiko mode could be played in a terminal!
 
-Let's make a compatible fast version of the game!
+oshu! is currently mostly targeted at Linux users familiar with the console,
+but it doesn't have to be that way. All it needs are volunteers to build and
+test the project on the various operating systems and desktop environments out
+there.
 
 By the way, the name comes from osu! but with the s pronounced sh, because it's
 a mini-osu.
