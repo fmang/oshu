@@ -1,7 +1,7 @@
 oshu!
 =====
 
-<p float="right">
+<p>
 <img alt="Screenshot #1" src="https://www.mg0.fr/oshu/screenshots/1.5/96neko%20-%20Aimai%20Elegy.png" height="128px" />
 <img alt="Screenshot #2" src="https://www.mg0.fr/oshu/screenshots/1.5/Feint%20-%20We%20Won't%20Be%20Alone%20(feat.%20Laura%20Brehm).png" height="128px" />
 <img alt="Screenshot #3" src="https://www.mg0.fr/oshu/screenshots/1.5/Rita%20-%20Life%20goes%20on.png" height="128px" />
