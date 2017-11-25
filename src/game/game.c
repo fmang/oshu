@@ -261,7 +261,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
-			if (!game->autoplay)
+			if (!game->autoplay && game->hit_cursor->next)
 				pause_game(game);
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
