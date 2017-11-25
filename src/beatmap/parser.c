@@ -545,7 +545,10 @@ static int process_difficulty(struct parser_state *parser)
  *
  * \todo
  * Parse break points. The structure is `2,start,end` where start and end are
- * probably the offset in milliseconds from the beginning of the song.
+ * probably the offset in milliseconds from the beginning of the song. Note
+ * however that breaks are automatically detected with the space between two
+ * consecutive notes. It's probably not worth handling these until the game is
+ * much more mature.
  */
 static int process_event(struct parser_state *parser)
 {
