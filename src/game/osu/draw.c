@@ -196,8 +196,9 @@ static struct oshu_hit* previous_hit(struct oshu_game *game)
  *      S     S+2s         E-2s   E
  * ```
  *
- * A break must have a duration of at least 5 seconds, ensuring the animation
- * is never cut.
+ * A break must have a duration of at least 6 seconds, ensuring the animation
+ * is never cut in between, or that the background stays lit for less than 2
+ * seconds.
  *
  */
 static void draw_background(struct oshu_game *game)
@@ -209,7 +210,7 @@ static void draw_background(struct oshu_game *game)
 	double break_end = next_hit(game)->time;
 	double now = game->clock.now;
 	double ratio = 0.;
-	if (break_end - break_start > 5.) {
+	if (break_end - break_start > 6.) {
 		if (now < break_start + 1.)
 			ratio = 0.;
 		else if (now < break_start + 2.)
