@@ -1,14 +1,14 @@
 Changelog
 =========
 
-1.5.0 - TBA
------------
+1.5.0 - 2017-11-25
+------------------
 
 New fancy graphics!
 
 This marks a milestone in the oshu! project, as the graphics engine was the
-last remnant of the inital version. The new visuals uses accelerated 2D
-graphics to render antialiased shapes and tranculent objects. This looks nice
+last remnant of the initial version. The new visuals uses accelerated 2D
+graphics to render antialiased shapes and translucent objects. This looks nice
 but is a significant load compared to the previous wireframe graphics. All the
 objects are dynamically drawn using the cairo vector graphics library.
 
@@ -32,7 +32,7 @@ Hit sounds!
 
 While the hi-hat was a perfectly decent generic soft sound, exploiting the full
 audio sample range gives a completely different experience. Now you'll hear
-rythmic drums if you play well, and somethings other nice sound effects.
+rhythmic drums if you play well, and somethings other nice sound effects.
 
 With this release comes a new parser, much more accurate than the previous one.
 When a beatmap contains an error, the error is displayed and everyone is
