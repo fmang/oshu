@@ -2,11 +2,11 @@ oshu!
 =====
 
 <p>
-<img alt="Screenshot #1" src="https://www.mg0.fr/oshu/screenshots/1.5/96neko%20-%20Aimai%20Elegy.png" height="128px" />
-<img alt="Screenshot #2" src="https://www.mg0.fr/oshu/screenshots/1.5/Feint%20-%20We%20Won't%20Be%20Alone%20(feat.%20Laura%20Brehm).png" height="128px" />
-<img alt="Screenshot #3" src="https://www.mg0.fr/oshu/screenshots/1.5/Rita%20-%20Life%20goes%20on.png" height="128px" />
-<img alt="Screenshot #4" src="https://www.mg0.fr/oshu/screenshots/1.5/TeddyLoid%20feat.%20Bonjour%20Suzuki%20-%20Pipo%20Password.png" height="128px" />
-<img alt="Screenshot #5" src="https://www.mg0.fr/oshu/screenshots/1.5/Mastermind(xi+nora2r)%20-%20Dreadnought.png" height="128px" />
+<a href="https://www.mg0.fr/oshu/screenshots/1.5/96neko%20-%20Aimai%20Elegy.png"><img alt="Screenshot #1" src="https://www.mg0.fr/oshu/screenshots/1.5/96neko%20-%20Aimai%20Elegy.thumb.jpg" height="128px" /></a>
+<a href="https://www.mg0.fr/oshu/screenshots/1.5/Feint%20-%20We%20Won't%20Be%20Alone%20(feat.%20Laura%20Brehm).png"><img alt="Screenshot #2" src="https://www.mg0.fr/oshu/screenshots/1.5/Feint%20-%20We%20Won't%20Be%20Alone%20(feat.%20Laura%20Brehm).thumb.jpg" height="128px" /></a>
+<a href="https://www.mg0.fr/oshu/screenshots/1.5/Rita%20-%20Life%20goes%20on.png"><img alt="Screenshot #3" src="https://www.mg0.fr/oshu/screenshots/1.5/Rita%20-%20Life%20goes%20on.thumb.jpg" height="128px" /></a>
+<a href="https://www.mg0.fr/oshu/screenshots/1.5/TeddyLoid%20feat.%20Bonjour%20Suzuki%20-%20Pipo%20Password.png"><img alt="Screenshot #4" src="https://www.mg0.fr/oshu/screenshots/1.5/TeddyLoid%20feat.%20Bonjour%20Suzuki%20-%20Pipo%20Password.thumb.jpg" height="128px" /></a>
+<a href="https://www.mg0.fr/oshu/screenshots/1.5/Mastermind(xi+nora2r)%20-%20Dreadnought.png"><img alt="Screenshot #5" src="https://www.mg0.fr/oshu/screenshots/1.5/Mastermind(xi+nora2r)%20-%20Dreadnought.thumb.jpg" height="128px" /></a>
 </p>
 
 Welcome to oshu!
