@@ -211,6 +211,8 @@ static int relinquish(struct oshu_game *game)
 
 static int init(struct oshu_game *game)
 {
+	oshu_reset_view(&game->display);
+	oshu_fit_view(&game->display.view, 640 + 480 * I);
 	int rc = osu_paint_resources(game);
 	SDL_ShowCursor(SDL_DISABLE);
 	return rc;
