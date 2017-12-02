@@ -33,6 +33,21 @@ static struct oshu_hit* find_hit(struct oshu_game *game, oshu_point p)
 }
 
 /**
+ * Free the texture associated to a slider, when the slider gets old.
+ *
+ * It is unlikely that once a slider is marked as good or missed, it will ever
+ * be shown once again. The main exception is when the user seeks.
+ */
+static void jettison_hit(struct oshu_hit *hit)
+{
+	if (hit->texture) {
+		oshu_destroy_texture(hit->texture);
+		free(hit->texture);
+		hit->texture = NULL;
+	}
+}
+
+/**
  * Release the held slider, either because the held key is released, or because
  * a new slider is activated (somehow).
  */
@@ -48,6 +63,7 @@ static void release_slider(struct oshu_game *game)
 		hit->state = OSHU_GOOD_HIT;
 		oshu_play_sound(&game->library, &hit->slider.sounds[hit->slider.repeat], &game->audio);
 	}
+	jettison_hit(hit);
 	oshu_stop_loop(&game->audio);
 	game->osu.current_slider = NULL;
 }
@@ -95,16 +111,19 @@ static int check(struct oshu_game *game)
 			oshu_stop_loop(&game->audio);
 			game->osu.current_slider = NULL;
 			hit->state = OSHU_MISSED_HIT;
+			jettison_hit(hit);
 		}
 	}
 	/* Mark dead notes as missed. */
 	double left_wall = game->clock.now - game->beatmap.difficulty.leniency;
 	while (game->hit_cursor->time < left_wall) {
 		struct oshu_hit *hit = game->hit_cursor;
-		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
+		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT))) {
 			hit->state = OSHU_UNKNOWN_HIT;
-		else if (hit->state == OSHU_INITIAL_HIT)
+		} else if (hit->state == OSHU_INITIAL_HIT) {
 			hit->state = OSHU_MISSED_HIT;
+			jettison_hit(hit);
+		}
 		game->hit_cursor = hit->next;
 	}
 	return 0;
@@ -164,6 +183,7 @@ static int press(struct oshu_game *game, enum oshu_key key)
 		activate_hit(game, hit, key);
 	} else {
 		hit->state = OSHU_MISSED_HIT;
+		jettison_hit(hit);
 	}
 	return 0;
 }

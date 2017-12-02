@@ -406,6 +406,7 @@ void osu_free_resources(struct oshu_game *game)
 		if (hit->texture) {
 			oshu_destroy_texture(hit->texture);
 			free(hit->texture);
+			hit->texture = NULL;
 		}
 	}
 	oshu_destroy_texture(&game->osu.cursor);
