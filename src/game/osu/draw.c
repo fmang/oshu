@@ -232,17 +232,27 @@ static void draw_background(struct oshu_game *game)
 
 static void draw_metadata(struct oshu_game *game)
 {
+	double ratio;
+	if (game->clock.now < 3.)
+		ratio = 1.;
+	else if (game->clock.now < 4.)
+		ratio = 4. - game->clock.now;
+	else
+		return;
+
 	SDL_Rect frame = {
 		.x = 0,
 		.y = 0,
 		.w = creal(game->display.view.size),
 		.h = cimag(game->osu.metadata.size),
 	};
-	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 128);
+	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 128 * ratio);
 	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(game->display.renderer, &frame);
 
+	SDL_SetTextureAlphaMod(game->osu.metadata.texture, ratio * 255);
 	oshu_draw_texture(&game->display, &game->osu.metadata, 0);
+	SDL_SetTextureAlphaMod(game->osu.stars.texture, ratio * 255);
 	oshu_draw_texture(&game->display, &game->osu.stars, creal(game->display.view.size));
 }
 
