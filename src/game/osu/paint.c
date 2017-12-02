@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <SDL2/SDL_timer.h>
+#include <pango/pangocairo.h>
 
 static double brighter(double v)
 {
@@ -360,6 +361,40 @@ static int paint_connector(struct oshu_game *game)
 	return rc;
 }
 
+static int paint_metadata(struct oshu_game *game)
+{
+	oshu_size size = 300 + 200 * I;
+	double zoom = game->display.view.zoom;
+
+	struct oshu_painter p;
+	oshu_start_painting(size * zoom, &p);
+	cairo_scale(p.cr, zoom, zoom);
+
+	cairo_set_source_rgba(p.cr, 1, 1, 1, 0.5);
+	PangoLayout *layout = pango_cairo_create_layout(p.cr);
+	pango_layout_set_text(layout, "Hello\nWorld", -1);
+
+	PangoFontDescription *desc = pango_font_description_from_string("Sans Bold 18");
+	pango_layout_set_font_description(layout, desc);
+	pango_font_description_free(desc);
+
+	pango_cairo_update_layout(p.cr, layout);
+	cairo_move_to(p.cr, 0, 0);
+	pango_cairo_show_layout(p.cr, layout);
+	g_object_unref(layout);
+
+	cairo_move_to(p.cr, 0, 0);
+	cairo_line_to(p.cr, 300, 200);
+	cairo_set_line_width(p.cr, 2);
+	cairo_stroke(p.cr);
+
+	struct oshu_texture *texture = &game->osu.metadata;
+	int rc = oshu_finish_painting(&p, &game->display, texture);
+	texture->size = size;
+	texture->origin = 0;
+	return rc;
+}
+
 /**
  * \todo
  * Handle errors.
@@ -389,6 +424,7 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_bad_mark(game);
 	paint_skip_mark(game);
 	paint_connector(game);
+	paint_metadata(game);
 
 	int end = SDL_GetTicks();
 	oshu_log_debug("done generating the common textures in %.3f seconds", (end - start) / 1000.);
