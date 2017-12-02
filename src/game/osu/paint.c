@@ -363,14 +363,20 @@ static int paint_connector(struct oshu_game *game)
 
 static int paint_metadata(struct oshu_game *game)
 {
-	oshu_size size = 300 + 200 * I;
+	oshu_size size = 200 + 100 * I;
 	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
 	oshu_start_painting(size * zoom, &p);
 	cairo_scale(p.cr, zoom, zoom);
+	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 
-	cairo_set_source_rgba(p.cr, 1, 1, 1, 0.5);
+	cairo_set_source_rgba(p.cr, 0, 0, 0, 1);
+	cairo_set_line_width(p.cr, 3);
+	cairo_rectangle(p.cr, 0, 0, 200, 100);
+	cairo_stroke(p.cr);
+
+	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
 	PangoLayout *layout = pango_cairo_create_layout(p.cr);
 	pango_layout_set_text(layout, "Hello\nWorld", -1);
 
@@ -382,11 +388,6 @@ static int paint_metadata(struct oshu_game *game)
 	cairo_move_to(p.cr, 0, 0);
 	pango_cairo_show_layout(p.cr, layout);
 	g_object_unref(layout);
-
-	cairo_move_to(p.cr, 0, 0);
-	cairo_line_to(p.cr, 300, 200);
-	cairo_set_line_width(p.cr, 2);
-	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.metadata;
 	int rc = oshu_finish_painting(&p, &game->display, texture);
