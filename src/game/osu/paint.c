@@ -339,16 +339,12 @@ static int paint_connector(struct oshu_game *game)
 
 static int paint_metadata(struct oshu_game *game)
 {
-	oshu_size size = creal(game->display.view.size) + 60 * I;
+	oshu_size size = 640 + 60 * I;
 	double padding = 10;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
-
-	cairo_set_source_rgba(p.cr, 0, 0, 0, 0.5);
-	cairo_rectangle(p.cr, 0, 0, creal(size), cimag(size));
-	cairo_fill(p.cr);
 
 	PangoLayout *layout = pango_cairo_create_layout(p.cr);
 	pango_layout_set_width(layout, PANGO_SCALE * (creal(size) - 2. * padding));

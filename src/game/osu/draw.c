@@ -230,6 +230,20 @@ static void draw_background(struct oshu_game *game)
 	oshu_draw_background(&game->display, &game->background);
 }
 
+static void draw_metadata(struct oshu_game *game)
+{
+	SDL_Rect frame = {
+		.x = 0,
+		.y = 0,
+		.w = creal(game->display.view.size),
+		.h = cimag(game->osu.metadata.size),
+	};
+	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 128);
+	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
+	SDL_RenderFillRect(game->display.renderer, &frame);
+	oshu_draw_texture(&game->display, &game->osu.metadata, 0);
+}
+
 /**
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
@@ -238,7 +252,7 @@ int osu_draw(struct oshu_game *game)
 {
 	oshu_reset_view(&game->display);
 	draw_background(game);
-	oshu_draw_texture(&game->display, &game->osu.metadata, 0);
+	draw_metadata(game);
 
 	oshu_fit_view(&game->display.view, 640 + 480 * I);
 	oshu_resize_view(&game->display.view, 512 + 384 * I);
