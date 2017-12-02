@@ -233,7 +233,9 @@ static void draw_background(struct oshu_game *game)
 static void draw_metadata(struct oshu_game *game)
 {
 	double ratio;
-	if (game->clock.now < 3.)
+	if (game->paused)
+		ratio = 1.;
+	else if (game->clock.now < 3.)
 		ratio = 1.;
 	else if (game->clock.now < 4.)
 		ratio = 4. - game->clock.now;
