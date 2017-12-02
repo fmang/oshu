@@ -3,6 +3,8 @@
  * \ingroup osu
  */
 
+#include "../config.h"
+
 #include "game/game.h"
 #include "graphics/paint.h"
 #include "log.h"
@@ -337,7 +339,7 @@ static int paint_connector(struct oshu_game *game)
 
 static int paint_metadata(struct oshu_game *game)
 {
-	oshu_size size = 200 + 100 * I;
+	oshu_size size = creal(game->display.view.size) + 100 * I;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -345,21 +347,32 @@ static int paint_metadata(struct oshu_game *game)
 
 	cairo_set_source_rgba(p.cr, 0, 0, 0, 1);
 	cairo_set_line_width(p.cr, 3);
-	cairo_rectangle(p.cr, 0, 0, 200, 100);
+	cairo_rectangle(p.cr, 0, 0, creal(size), cimag(size));
 	cairo_stroke(p.cr);
 
-	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
 	PangoLayout *layout = pango_cairo_create_layout(p.cr);
-	pango_layout_set_text(layout, "Hello\nWorld", -1);
+	pango_layout_set_width(layout, PANGO_SCALE * creal(size));
+	pango_layout_set_ellipsize(layout, PANGO_ELLIPSIZE_END);
 
 	PangoFontDescription *desc = pango_font_description_from_string("Sans Bold 18");
 	pango_layout_set_font_description(layout, desc);
 	pango_font_description_free(desc);
 
-	pango_cairo_update_layout(p.cr, layout);
-	cairo_move_to(p.cr, 0, 0);
+	struct oshu_metadata *meta = &game->beatmap.metadata;
+	const char *title = meta->title_unicode;
+	const char *artist = meta->artist_unicode;
+	char *text;
+	asprintf(&text, "%s\n%s", title, artist);
+	assert (text != NULL);
+
+	int width, height;
+	pango_layout_set_text(layout, text, -1);
+	pango_layout_get_size(layout, &width, &height);
+	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
+	cairo_move_to(p.cr, 0, cimag(size) - height / PANGO_SCALE);
 	pango_cairo_show_layout(p.cr, layout);
 	g_object_unref(layout);
+	free(text);
 
 	struct oshu_texture *texture = &game->osu.metadata;
 	int rc = oshu_finish_painting(&p, texture);
