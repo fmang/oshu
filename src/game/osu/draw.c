@@ -236,8 +236,12 @@ static void draw_background(struct oshu_game *game)
  */
 int osu_draw(struct oshu_game *game)
 {
+	oshu_reset_view(&game->display);
 	draw_background(game);
 	oshu_draw_texture(&game->display, &game->osu.metadata, 0);
+
+	oshu_fit_view(&game->display.view, 640 + 480 * I);
+	oshu_resize_view(&game->display.view, 512 + 384 * I);
 	struct oshu_hit *cursor = oshu_look_hit_up(game, game->beatmap.difficulty.approach_time);
 	struct oshu_hit *next = NULL;
 	double now = game->clock.now;

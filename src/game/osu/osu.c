@@ -211,9 +211,6 @@ static int relinquish(struct oshu_game *game)
 
 static int adjust(struct oshu_game *game)
 {
-	oshu_reset_view(&game->display);
-	oshu_fit_view(&game->display.view, 640 + 480 * I);
-	oshu_resize_view(&game->display.view, 512 + 384 * I);
 	return 0;
 }
 
