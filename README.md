@@ -72,6 +72,7 @@ repositories.
 - SDL2 and SDL2_image,
 - ffmpeg or libav,
 - cairo,
+- pango,
 - a C99 compiler,
 - pkg-config,
 - autoconf, automake (when building from the git repository).

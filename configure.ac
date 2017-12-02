@@ -21,6 +21,7 @@ PKG_CHECK_MODULES([LAVC], [libavcodec])
 PKG_CHECK_MODULES([LSWR], [libswresample])
 PKG_CHECK_MODULES([LAVU], [libavutil])
 PKG_CHECK_MODULES([CAIRO], [cairo])
+PKG_CHECK_MODULES([PANGO], [pango])
 
 # Checks for header files.
 
