@@ -101,6 +101,10 @@ struct osu_state {
 	 * The frame with the title of the song, the artist and everything.
 	 */
 	struct oshu_texture metadata;
+	/**
+	 * The frame with the title of the difficulty, and the number of stars;
+	 */
+	struct oshu_texture stars;
 };
 
 /**

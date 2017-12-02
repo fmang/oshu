@@ -241,7 +241,9 @@ static void draw_metadata(struct oshu_game *game)
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 128);
 	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(game->display.renderer, &frame);
+
 	oshu_draw_texture(&game->display, &game->osu.metadata, 0);
+	oshu_draw_texture(&game->display, &game->osu.stars, creal(game->display.view.size));
 }
 
 /**

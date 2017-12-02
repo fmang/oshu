@@ -337,23 +337,30 @@ static int paint_connector(struct oshu_game *game)
 	return rc;
 }
 
-static int paint_metadata(struct oshu_game *game)
+static const double padding = 10;
+
+static PangoLayout* setup_layout(struct oshu_painter *p)
 {
-	oshu_size size = 640 + 60 * I;
-	double padding = 10;
+	cairo_set_operator(p->cr, CAIRO_OPERATOR_SOURCE);
 
-	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
-	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
-
-	PangoLayout *layout = pango_cairo_create_layout(p.cr);
-	pango_layout_set_width(layout, PANGO_SCALE * (creal(size) - 2. * padding));
+	PangoLayout *layout = pango_cairo_create_layout(p->cr);
+	pango_layout_set_width(layout, PANGO_SCALE * (creal(p->size) - 2. * padding));
 	pango_layout_set_ellipsize(layout, PANGO_ELLIPSIZE_END);
 	pango_layout_set_spacing(layout, 5 * PANGO_SCALE);
 
 	PangoFontDescription *desc = pango_font_description_from_string("Sans Bold 12");
 	pango_layout_set_font_description(layout, desc);
 	pango_font_description_free(desc);
+
+	return layout;
+}
+
+static int paint_metadata(struct oshu_game *game)
+{
+	oshu_size size = 640 + 60 * I;
+	struct oshu_painter p;
+	oshu_start_painting(&game->display, size, &p);
+	PangoLayout *layout = setup_layout(&p);
 
 	struct oshu_metadata *meta = &game->beatmap.metadata;
 	const char *title = meta->title_unicode;
@@ -374,6 +381,42 @@ static int paint_metadata(struct oshu_game *game)
 	struct oshu_texture *texture = &game->osu.metadata;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = 0;
+	return rc;
+}
+
+static int paint_stars(struct oshu_game *game)
+{
+	oshu_size size = 360 + 60 * I;
+	struct oshu_painter p;
+	oshu_start_painting(&game->display, size, &p);
+	PangoLayout *layout = setup_layout(&p);
+
+	char *sky = strdup(" ★ ★ ★ ★ ★ ★ ★ ★ ★ ★");
+	int stars = game->beatmap.difficulty.overall_difficulty;
+	assert (stars >= 0);
+	assert (stars <= 10);
+	int star_length = strlen(sky) / 10;
+	char *difficulty = sky + (10 - stars) * star_length;
+
+	struct oshu_metadata *meta = &game->beatmap.metadata;
+	const char *version = meta->version;
+	assert (version != NULL);
+	char *text;
+	asprintf(&text, "%s\n%s", version, difficulty);
+	assert (text != NULL);
+
+	int width, height;
+	pango_layout_set_text(layout, text, -1);
+	pango_layout_set_alignment(layout, PANGO_ALIGN_RIGHT);
+	pango_layout_get_size(layout, &width, &height);
+	cairo_set_source_rgba(p.cr, 1, 1, 1, .5);
+	cairo_move_to(p.cr, padding, (cimag(size) - height / PANGO_SCALE) / 2.);
+	pango_cairo_show_layout(p.cr, layout);
+	g_object_unref(layout);
+
+	struct oshu_texture *texture = &game->osu.stars;
+	int rc = oshu_finish_painting(&p, texture);
+	texture->origin = creal(size);
 	return rc;
 }
 
@@ -407,6 +450,7 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_skip_mark(game);
 	paint_connector(game);
 	paint_metadata(game);
+	paint_stars(game);
 
 	int end = SDL_GetTicks();
 	oshu_log_debug("done generating the common textures in %.3f seconds", (end - start) / 1000.);
@@ -434,4 +478,6 @@ void osu_free_resources(struct oshu_game *game)
 	oshu_destroy_texture(&game->osu.bad_mark);
 	oshu_destroy_texture(&game->osu.skip_mark);
 	oshu_destroy_texture(&game->osu.connector);
+	oshu_destroy_texture(&game->osu.metadata);
+	oshu_destroy_texture(&game->osu.stars);
 }
