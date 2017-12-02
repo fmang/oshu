@@ -32,6 +32,7 @@ struct oshu_texture;
  */
 
 struct oshu_painter {
+	struct oshu_display *display;
 	oshu_size size;
 	struct SDL_Surface *destination;
 	cairo_surface_t *surface;
@@ -42,8 +43,12 @@ struct oshu_painter {
  * Create an SDL surface and bind a Cairo context.
  *
  * When you're done drawing, call #oshu_finish_painting.
+ *
+ * The actual size of the texture depends on the display's current zoom, but
+ * this is made transparent with a call to `cairo_scale`. This is what vector
+ * graphics are for, right?
  */
-int oshu_start_painting(oshu_size size, struct oshu_painter *painter);
+int oshu_start_painting(struct oshu_display *display, oshu_size size, struct oshu_painter *painter);
 
 /**
  * Load the drawn texture onto the GPU as a texture, and free everything else.
@@ -54,6 +59,6 @@ int oshu_start_painting(oshu_size size, struct oshu_painter *painter);
  *
  * You should destroy the texture later with #oshu_destroy_texture.
  */
-int oshu_finish_painting(struct oshu_painter *painter, struct oshu_display *display, struct oshu_texture *texture);
+int oshu_finish_painting(struct oshu_painter *painter, struct oshu_texture *texture);
 
 /** \} */

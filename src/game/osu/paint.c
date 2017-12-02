@@ -20,11 +20,9 @@ static double brighter(double v)
 static int paint_cursor(struct oshu_game *game) {
 	double radius = 14;
 	oshu_size size = (1. + I) * radius * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_pattern_t *pattern = cairo_pattern_create_radial(
@@ -41,20 +39,18 @@ static int paint_cursor(struct oshu_game *game) {
 	cairo_pattern_destroy(pattern);
 
 	struct oshu_texture *texture = &game->osu.cursor;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
 
-static int paint_approach_circle(struct oshu_game *game) {
+static int paint_approach_circle(struct oshu_game *game)
+{
 	double radius = game->beatmap.difficulty.circle_radius + game->beatmap.difficulty.approach_size;
 	oshu_size size = (1. + I) * radius * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
@@ -63,8 +59,7 @@ static int paint_approach_circle(struct oshu_game *game) {
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.approach_circle;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
@@ -73,11 +68,9 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 {
 	double radius = game->beatmap.difficulty.circle_radius;
 	oshu_size size = (1. + I) * radius * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 	double opacity = 0.7;
@@ -102,8 +95,7 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 	cairo_set_line_width(p.cr, 3);
 	cairo_stroke(p.cr);
 
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
@@ -148,12 +140,10 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	oshu_point top_left, bottom_right;
 	oshu_path_bounding_box(&hit->slider.path, &top_left, &bottom_right);
 	oshu_size size = bottom_right - top_left + 2. * radius;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
+	oshu_start_painting(&game->display, size, &p);
 
-	cairo_scale(p.cr, zoom, zoom);
 	cairo_translate(p.cr, - creal(top_left) + radius, - cimag(top_left) + radius);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 	double opacity = 0.7;
@@ -206,13 +196,12 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 
 	hit->texture = calloc(1, sizeof(*hit->texture));
 	assert (hit->texture != NULL);
-	if (oshu_finish_painting(&p, &game->display, hit->texture) < 0) {
+	if (oshu_finish_painting(&p, hit->texture) < 0) {
 		free(hit->texture);
 		hit->texture = NULL;
 		return -1;
 	}
 
-	hit->texture->size = size;
 	hit->texture->origin = hit->p - top_left + radius;
 	oshu_log_verbose("slider drawn in %.3f seconds", (SDL_GetTicks() - start) / 1000.);
 	return 0;
@@ -221,11 +210,9 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 static int paint_slider_ball(struct oshu_game *game) {
 	double radius = game->beatmap.difficulty.slider_tolerance;
 	oshu_size size = (1. + I) * radius * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	/* tolerance */
@@ -250,8 +237,7 @@ static int paint_slider_ball(struct oshu_game *game) {
 	cairo_pattern_destroy(pattern);
 
 	struct oshu_texture *texture = &game->osu.slider_ball;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
@@ -260,11 +246,9 @@ static int paint_good_mark(struct oshu_game *game)
 {
 	double radius = game->beatmap.difficulty.circle_radius / 3.5;
 	oshu_size size = (1. + I) * radius * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
@@ -273,8 +257,7 @@ static int paint_good_mark(struct oshu_game *game)
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.good_mark;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
@@ -283,11 +266,9 @@ static int paint_bad_mark(struct oshu_game *game)
 {
 	double half = game->beatmap.difficulty.circle_radius / 4.7;
 	oshu_size size = (1. + I) * (half + 2) * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, half + 2, half + 2);
 
 	cairo_set_source_rgba(p.cr, .9, 0, 0, .4);
@@ -302,8 +283,7 @@ static int paint_bad_mark(struct oshu_game *game)
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.bad_mark;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
@@ -312,11 +292,9 @@ static int paint_skip_mark(struct oshu_game *game)
 {
 	double radius = game->beatmap.difficulty.circle_radius / 4.7;
 	oshu_size size = (1. + I) * (radius + 2) * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius + 2, radius + 2);
 
 	cairo_set_source_rgba(p.cr, .3, .3, 1, .6);
@@ -333,8 +311,7 @@ static int paint_skip_mark(struct oshu_game *game)
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->osu.skip_mark;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
@@ -343,11 +320,9 @@ static int paint_connector(struct oshu_game *game)
 {
 	double radius = 3;
 	oshu_size size = (1. + I) * radius * 2.;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_set_source_rgba(p.cr, 1, 1, 1, .5);
@@ -355,8 +330,7 @@ static int paint_connector(struct oshu_game *game)
 	cairo_fill(p.cr);
 
 	struct oshu_texture *texture = &game->osu.connector;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
@@ -364,11 +338,9 @@ static int paint_connector(struct oshu_game *game)
 static int paint_metadata(struct oshu_game *game)
 {
 	oshu_size size = 200 + 100 * I;
-	double zoom = game->display.view.zoom;
 
 	struct oshu_painter p;
-	oshu_start_painting(size * zoom, &p);
-	cairo_scale(p.cr, zoom, zoom);
+	oshu_start_painting(&game->display, size, &p);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 
 	cairo_set_source_rgba(p.cr, 0, 0, 0, 1);
@@ -390,8 +362,7 @@ static int paint_metadata(struct oshu_game *game)
 	g_object_unref(layout);
 
 	struct oshu_texture *texture = &game->osu.metadata;
-	int rc = oshu_finish_painting(&p, &game->display, texture);
-	texture->size = size;
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = 0;
 	return rc;
 }
