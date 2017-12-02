@@ -339,22 +339,23 @@ static int paint_connector(struct oshu_game *game)
 
 static int paint_metadata(struct oshu_game *game)
 {
-	oshu_size size = creal(game->display.view.size) + 100 * I;
+	oshu_size size = creal(game->display.view.size) + 60 * I;
+	double padding = 10;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 
-	cairo_set_source_rgba(p.cr, 0, 0, 0, 1);
-	cairo_set_line_width(p.cr, 3);
+	cairo_set_source_rgba(p.cr, 0, 0, 0, 0.5);
 	cairo_rectangle(p.cr, 0, 0, creal(size), cimag(size));
-	cairo_stroke(p.cr);
+	cairo_fill(p.cr);
 
 	PangoLayout *layout = pango_cairo_create_layout(p.cr);
-	pango_layout_set_width(layout, PANGO_SCALE * creal(size));
+	pango_layout_set_width(layout, PANGO_SCALE * (creal(size) - 2. * padding));
 	pango_layout_set_ellipsize(layout, PANGO_ELLIPSIZE_END);
+	pango_layout_set_spacing(layout, 5 * PANGO_SCALE);
 
-	PangoFontDescription *desc = pango_font_description_from_string("Sans Bold 18");
+	PangoFontDescription *desc = pango_font_description_from_string("Sans Bold 12");
 	pango_layout_set_font_description(layout, desc);
 	pango_font_description_free(desc);
 
@@ -369,7 +370,7 @@ static int paint_metadata(struct oshu_game *game)
 	pango_layout_set_text(layout, text, -1);
 	pango_layout_get_size(layout, &width, &height);
 	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
-	cairo_move_to(p.cr, 0, cimag(size) - height / PANGO_SCALE);
+	cairo_move_to(p.cr, padding, (cimag(size) - height / PANGO_SCALE) / 2.);
 	pango_cairo_show_layout(p.cr, layout);
 	g_object_unref(layout);
 	free(text);
