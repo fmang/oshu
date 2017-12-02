@@ -57,7 +57,6 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 		SDL_SetWindowTitle(game->display.window, title);
 		free(title);
 	}
-	game->mode->adjust(game);
 	if (game->beatmap.background_filename)
 		oshu_load_texture(&game->display, game->beatmap.background_filename, &game->background);
 
@@ -256,9 +255,6 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
-		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			game->mode->adjust(game);
-			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 			if (!game->autoplay && game->hit_cursor->next)

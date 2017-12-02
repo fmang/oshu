@@ -209,11 +209,6 @@ static int relinquish(struct oshu_game *game)
 	return 0;
 }
 
-static int adjust(struct oshu_game *game)
-{
-	return 0;
-}
-
 static int init(struct oshu_game *game)
 {
 	int rc = osu_paint_resources(game);
@@ -233,7 +228,6 @@ struct oshu_game_mode osu_mode = {
 	.destroy = destroy,
 	.check = check,
 	.autoplay = autoplay,
-	.adjust = adjust,
 	.draw = osu_draw,
 	.press = press,
 	.release = release,
