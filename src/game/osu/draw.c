@@ -252,8 +252,10 @@ static void draw_metadata(struct oshu_game *game)
 	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(game->display.renderer, &frame);
 
-	SDL_SetTextureAlphaMod(game->osu.metadata.texture, ratio * 255);
-	oshu_draw_texture(&game->display, &game->osu.metadata, 0);
+	int unicode = game->clock.now < 2;
+	struct oshu_texture *meta = unicode ? &game->osu.metadata_unicode : &game->osu.metadata;
+	SDL_SetTextureAlphaMod(meta->texture, ratio * 255);
+	oshu_draw_texture(&game->display, meta, 0);
 	SDL_SetTextureAlphaMod(game->osu.stars.texture, ratio * 255);
 	oshu_draw_texture(&game->display, &game->osu.stars, creal(game->display.view.size));
 }

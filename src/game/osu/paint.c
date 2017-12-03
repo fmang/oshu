@@ -355,7 +355,7 @@ static PangoLayout* setup_layout(struct oshu_painter *p)
 	return layout;
 }
 
-static int paint_metadata(struct oshu_game *game)
+static int paint_metadata(struct oshu_game *game, int unicode)
 {
 	oshu_size size = 640 + 60 * I;
 	struct oshu_painter p;
@@ -363,8 +363,8 @@ static int paint_metadata(struct oshu_game *game)
 	PangoLayout *layout = setup_layout(&p);
 
 	struct oshu_metadata *meta = &game->beatmap.metadata;
-	const char *title = meta->title_unicode;
-	const char *artist = meta->artist_unicode;
+	const char *title = unicode ? meta->title_unicode : meta->title;
+	const char *artist = unicode ? meta->artist_unicode : meta->artist;
 	char *text;
 	asprintf(&text, "%s\n%s", title, artist);
 	assert (text != NULL);
@@ -375,10 +375,11 @@ static int paint_metadata(struct oshu_game *game)
 	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
 	cairo_move_to(p.cr, padding, (cimag(size) - height / PANGO_SCALE) / 2.);
 	pango_cairo_show_layout(p.cr, layout);
+
 	g_object_unref(layout);
 	free(text);
 
-	struct oshu_texture *texture = &game->osu.metadata;
+	struct oshu_texture *texture = unicode ? &game->osu.metadata_unicode : &game->osu.metadata;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = 0;
 	return rc;
@@ -391,12 +392,12 @@ static int paint_stars(struct oshu_game *game)
 	oshu_start_painting(&game->display, size, &p);
 	PangoLayout *layout = setup_layout(&p);
 
-	char *sky = strdup(" ★ ★ ★ ★ ★ ★ ★ ★ ★ ★");
+	char *sky = " ★ ★ ★ ★ ★ ★ ★ ★ ★ ★";
 	int stars = game->beatmap.difficulty.overall_difficulty;
 	assert (stars >= 0);
 	assert (stars <= 10);
 	int star_length = strlen(sky) / 10;
-	char *difficulty = sky + (10 - stars) * star_length;
+	char *difficulty = strndup(sky, star_length * stars);
 
 	struct oshu_metadata *meta = &game->beatmap.metadata;
 	const char *version = meta->version;
@@ -412,7 +413,10 @@ static int paint_stars(struct oshu_game *game)
 	cairo_set_source_rgba(p.cr, 1, 1, 1, .5);
 	cairo_move_to(p.cr, padding, (cimag(size) - height / PANGO_SCALE) / 2.);
 	pango_cairo_show_layout(p.cr, layout);
+
 	g_object_unref(layout);
+	free(text);
+	free(difficulty);
 
 	struct oshu_texture *texture = &game->osu.stars;
 	int rc = oshu_finish_painting(&p, texture);
@@ -449,7 +453,8 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_bad_mark(game);
 	paint_skip_mark(game);
 	paint_connector(game);
-	paint_metadata(game);
+	paint_metadata(game, 0);
+	paint_metadata(game, 1);
 	paint_stars(game);
 
 	int end = SDL_GetTicks();
@@ -479,5 +484,6 @@ void osu_free_resources(struct oshu_game *game)
 	oshu_destroy_texture(&game->osu.skip_mark);
 	oshu_destroy_texture(&game->osu.connector);
 	oshu_destroy_texture(&game->osu.metadata);
+	oshu_destroy_texture(&game->osu.metadata_unicode);
 	oshu_destroy_texture(&game->osu.stars);
 }
