@@ -18,9 +18,9 @@
 #include <SDL2/SDL_image.h>
 
 /**
- * How long a frame should last in milleseconds. 17 is about 60 FPS.
+ * How long a frame should last in seconds. 17 is about 60 FPS.
  */
-static const double frame_duration = 17;
+static const double frame_duration = .016666666;
 
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 {
@@ -323,12 +323,12 @@ static void draw(struct oshu_game *game)
 static void update_clock(struct oshu_game *game)
 {
 	struct oshu_clock *clock = &game->clock;
-	long int ticks = SDL_GetTicks();
-	double diff = (double) (ticks - clock->ticks) / 1000.;
+	double system = SDL_GetTicks() / 1000.;
+	double diff = system - clock->system;
 	double prev_audio = clock->audio;
 	clock->audio = game->audio.music.current_timestamp;
 	clock->before = clock->now;
-	clock->ticks = ticks;
+	clock->system = system;
 	if (game->paused)
 		; /* don't update the clock */
 	else if (clock->before < 0) /* leading in */
@@ -374,8 +374,9 @@ static void welcome(struct oshu_game *game)
 int oshu_run_game(struct oshu_game *game)
 {
 	welcome(game);
-	/* Reset the clock. */
-	game->clock.ticks = SDL_GetTicks();
+	/* Reset the clock.
+	 * Otherwise, when the startup is slow, the clock would jump. */
+	game->clock.system = SDL_GetTicks() / 1000.;
 	SDL_Event event;
 	int missed_frames = 0;
 	if (!game->paused && game->clock.now >= 0)
@@ -393,9 +394,9 @@ int oshu_run_game(struct oshu_game *game)
 		draw(game);
 		if (!game->paused)
 			dump_state(game);
-		long int advance = frame_duration - (SDL_GetTicks() - game->clock.ticks);
+		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
-			SDL_Delay(advance);
+			SDL_Delay(advance * 1000);
 		} else {
 			missed_frames++;
 			if (missed_frames == 1000)

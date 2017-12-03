@@ -54,16 +54,16 @@ struct oshu_clock {
 	 */
 	double audio;
 	/**
-	 * The process time in ticks.
+	 * The process time, computed from SDL's ticks.
 	 *
-	 * This is what `SDL_GetTicks` returns, and is the reference time when
-	 * the audio hasn't started.
+	 * This is the reference time when the audio hasn't started, or when it
+	 * has stopped.
 	 *
 	 * It may also be used to increase the accuracy of the game clock,
 	 * because sometimes the audio timestamp won't change as no new frame
 	 * was decoded.
 	 */
-	long int ticks;
+	double system;
 };
 
 /**
