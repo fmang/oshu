@@ -230,6 +230,19 @@ static void draw_background(struct oshu_game *game)
 	oshu_draw_background(&game->display, &game->background);
 }
 
+/**
+ * Display the metadata on top of the gaming screen.
+ *
+ * Metadata are drawn in white text and a translucent black background for
+ * readability.
+ *
+ * The display is shown when the game in paused, and in the 6 first seconds of
+ * the game. It fades out from the 5th second to the 6th, where it becomes
+ * completely invisible.
+ *
+ * Every 3.5 second, the display is switched between Unicode and ASCII, with a
+ * 0.2-second fade transititon.
+ */
 static void draw_metadata(struct oshu_game *game)
 {
 	double ratio;
