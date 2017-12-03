@@ -456,6 +456,12 @@ struct oshu_hit {
 	 */
 	double time;
 	/**
+	 * When the hit was clicked by the user, relative to the #time.
+	 *
+	 * 0 is a perfect hit, -0.5 means the note was hit half a second early.
+	 */
+	double offset;
+	/**
 	 * Type of the hit object, like circle, slider, spinner, and a few
 	 * extra information.
 	 *

@@ -181,6 +181,7 @@ static int press(struct oshu_game *game, enum oshu_key key)
 		return 0;
 	if (fabs(hit->time - game->clock.now) < game->beatmap.difficulty.leniency) {
 		activate_hit(game, hit, key);
+		hit->offset = game->clock.now - hit->time;
 	} else {
 		hit->state = OSHU_MISSED_HIT;
 		jettison_hit(hit);

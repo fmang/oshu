@@ -28,19 +28,32 @@ static void draw_hint(struct oshu_game *game, struct oshu_hit *hit)
 	}
 }
 
+static void draw_hit_mark(struct oshu_game *game, struct oshu_hit *hit)
+{
+	if (hit->state == OSHU_GOOD_HIT) {
+		double leniency = game->beatmap.difficulty.leniency;
+		struct oshu_texture *mark = &game->osu.good_mark;
+		if (hit->offset < - leniency / 2)
+			mark = &game->osu.early_mark;
+		else if (hit->offset > leniency / 2)
+			mark = &game->osu.late_mark;
+		oshu_draw_texture(&game->display, mark, oshu_end_point(hit));
+	} else if (hit->state == OSHU_MISSED_HIT) {
+		oshu_draw_texture(&game->display, &game->osu.bad_mark, oshu_end_point(hit));
+	} else if (hit->state == OSHU_SKIPPED_HIT) {
+		oshu_draw_texture(&game->display, &game->osu.skip_mark, oshu_end_point(hit));
+	}
+}
+
 static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 {
 	struct oshu_display *display = &game->display;
-	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
+	if (hit->state == OSHU_INITIAL_HIT) {
 		assert (hit->color != NULL);
 		oshu_draw_texture(display, &game->osu.circles[hit->color->index], hit->p);
 		draw_hint(game, hit);
-	} else if (hit->state == OSHU_GOOD_HIT) {
-		oshu_draw_texture(display, &game->osu.good_mark, oshu_end_point(hit));
-	} else if (hit->state == OSHU_MISSED_HIT) {
-		oshu_draw_texture(display, &game->osu.bad_mark, oshu_end_point(hit));
-	} else if (hit->state == OSHU_SKIPPED_HIT) {
-		oshu_draw_texture(display, &game->osu.skip_mark, oshu_end_point(hit));
+	} else {
+		draw_hit_mark(game, hit);
 	}
 }
 
@@ -61,12 +74,8 @@ static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 			oshu_point ball = oshu_path_at(&hit->slider.path, t < 0 ? 0 : t);
 			oshu_draw_texture(display, &game->osu.slider_ball, ball);
 		}
-	} else if (hit->state == OSHU_GOOD_HIT) {
-		oshu_draw_texture(&game->display, &game->osu.good_mark, oshu_end_point(hit));
-	} else if (hit->state == OSHU_MISSED_HIT) {
-		oshu_draw_texture(&game->display, &game->osu.bad_mark, oshu_end_point(hit));
-	} else if (hit->state == OSHU_SKIPPED_HIT) {
-		oshu_draw_texture(display, &game->osu.skip_mark, oshu_end_point(hit));
+	} else {
+		draw_hit_mark(game, hit);
 	}
 }
 
