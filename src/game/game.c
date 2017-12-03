@@ -386,8 +386,10 @@ static void check_end(struct oshu_game *game)
 		return;
 	if (game->hit_cursor->next)
 		return;
-	game->state = OSHU_FINISHED;
-	end(game);
+	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + game->beatmap.difficulty.leniency) {
+		game->state = OSHU_FINISHED | OSHU_PLAYING;
+		end(game);
+	}
 }
 
 int oshu_run_game(struct oshu_game *game)
@@ -412,7 +414,7 @@ int oshu_run_game(struct oshu_game *game)
 			game->mode->autoplay(game);
 		check_end(game);
 		draw(game);
-		if (game->state & OSHU_PLAYING)
+		if ((game->state & OSHU_PLAYING) && !(game->state & OSHU_FINISHED))
 			dump_state(game);
 		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
