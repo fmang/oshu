@@ -453,8 +453,14 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_bad_mark(game);
 	paint_skip_mark(game);
 	paint_connector(game);
+
+	struct oshu_metadata *meta = &game->beatmap.metadata;
+	int title_difference = meta->title && meta->title_unicode && strcmp(meta->title, meta->title_unicode);
+	int artist_difference = meta->artist && meta->artist_unicode && strcmp(meta->artist, meta->artist_unicode);
 	paint_metadata(game, 0);
-	paint_metadata(game, 1);
+	if (title_difference || artist_difference)
+		paint_metadata(game, 1);
+
 	paint_stars(game);
 
 	int end = SDL_GetTicks();

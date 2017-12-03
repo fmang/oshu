@@ -235,10 +235,10 @@ static void draw_metadata(struct oshu_game *game)
 	double ratio;
 	if (game->paused)
 		ratio = 1.;
-	else if (game->clock.now < 3.)
-		ratio = 1.;
 	else if (game->clock.now < 4.)
-		ratio = 4. - game->clock.now;
+		ratio = 1.;
+	else if (game->clock.now < 5.)
+		ratio = 5. - game->clock.now;
 	else
 		return;
 
@@ -254,11 +254,12 @@ static void draw_metadata(struct oshu_game *game)
 
 	double phase = game->clock.system / 3.;
 	double progression = fabs(((phase - (int) phase) - 0.5) * 2.);
+	int has_unicode = game->osu.metadata_unicode.texture != NULL;
+	int unicode = has_unicode ? (int) phase % 2 == 0 : 0;
 	double transition = 1.;
-	if (progression > .9)
+	if (progression > .9 && has_unicode)
 		transition = 1. - (progression - .9) * 10.;
 
-	int unicode = (int) phase % 2 == 0;
 	struct oshu_texture *meta = unicode ? &game->osu.metadata_unicode : &game->osu.metadata;
 	SDL_SetTextureAlphaMod(meta->texture, ratio * transition * 255);
 	oshu_draw_texture(&game->display, meta, 0);
