@@ -23,16 +23,16 @@ oshu_SOURCES = \
 	game/game.c \
 	game/game.h \
 	game/mode.h \
-	game/osu/draw.c \
-	game/osu/osu.c \
-	game/osu/osu.h \
-	game/osu/paint.c \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/draw.c \
 	graphics/draw.h \
 	graphics/paint.c \
-	graphics/paint.h
+	graphics/paint.h \
+	osu/draw.c \
+	osu/osu.c \
+	osu/osu.h \
+	osu/paint.c
 
 oshu_CFLAGS = -iquote . -DPKGDATADIR='"$(pkgdatadir)"' $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LSWR_CFLAGS) $(LAVU_CFLAGS) $(PANGOCAIRO_CFLAGS) $(CAIRO_CFLAGS)
 oshu_LDADD = -lm $(SDL2_LIBS) $(SDL2_image_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LSWR_LIBS) $(LAVU_LIBS) $(PANGOCAIRO_LIBS) $(CAIRO_LIBS)

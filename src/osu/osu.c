@@ -1,5 +1,5 @@
 /**
- * \file game/osu/osu.c
+ * \file osu/osu.c
  * \ingroup osu
  *
  * Implement the osu! standard mode.

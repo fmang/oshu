@@ -40,6 +40,8 @@ digraph modules {
 	Game -> Audio;
 	Game -> Beatmap;
 	Game -> Graphics;
+	Game -> Osu;
+	Osu -> Game;
 	Main -> Game;
 }
 \enddot

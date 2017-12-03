@@ -1,5 +1,5 @@
 /**
- * \file game/osu/paint.c
+ * \file osu/paint.c
  * \ingroup osu
  */
 

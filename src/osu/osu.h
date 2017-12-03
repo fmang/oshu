@@ -1,5 +1,5 @@
 /**
- * \file game/osu/osu.h
+ * \file osu/osu.h
  * \ingroup osu
  */
 
@@ -17,7 +17,6 @@ struct SDL_Texture;
 
 /**
  * \defgroup osu Osu
- * \ingroup game
  *
  * \brief
  * Osu standard game mode.

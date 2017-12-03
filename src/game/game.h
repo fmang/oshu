@@ -11,8 +11,8 @@
 #include "audio/library.h"
 #include "beatmap/beatmap.h"
 #include "game/mode.h"
-#include "game/osu/osu.h"
 #include "graphics/display.h"
+#include "osu/osu.h"
 
 /**
  * \defgroup game Game
@@ -83,7 +83,7 @@ enum oshu_game_state {
 	 *
 	 * Paused autoplay and playing autoplay are both possible.
 	 *
-	 * It cannot be combined with #OSHU_USER_PLAYING.
+	 * It cannot be combined with #OSHU_USERPLAY.
 	 */
 	OSHU_AUTOPLAY = 0x02,
 	/**

@@ -1,5 +1,5 @@
 /**
- * \file game/osu/draw.c
+ * \file osu/draw.c
  * \ingroup osu
  *
  * \brief
