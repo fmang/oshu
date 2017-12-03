@@ -67,6 +67,45 @@ struct oshu_clock {
 };
 
 /**
+ * Enumerate the game states.
+ *
+ * These are flags and can be OR'd.
+ */
+enum oshu_game_state {
+	/**
+	 * The user is playing.
+	 *
+	 * This is exclusive with most other flags.
+	 */
+	OSHU_USER_PLAYING = 0x01,
+	/**
+	 * Autoplay is similar to playing in that the music is playing, but
+	 * most interactions are pretty the same as when the game is paused.
+	 */
+	OSHU_AUTOPLAY = 0x02,
+	/**
+	 * The song is playing, whether it is on autoplay or not.
+	 * You must not OR this flag, but you can AND it for testing.
+	 */
+	OSHU_PLAYING = OSHU_USER_PLAYING | OSHU_AUTOPLAY,
+	/**
+	 * The game is paused.
+	 *
+	 * This is contradictory to OSHU_PLAYING.
+	 */
+	OSHU_PAUSED = 0x04,
+	/**
+	 * After the final note has been playing, the game enters some
+	 * pseudo-pause mode to display the score.
+	 */
+	OSHU_FINISHED = 0x08,
+	/**
+	 * Will stop a the next iteration if this is true.
+	 */
+	OSHU_STOPPING = 0x10,
+};
+
+/**
  * The full game state, from the beatmap state to the audio and graphical
  * context.
  *
@@ -87,12 +126,9 @@ struct oshu_game {
 	 * It is always allocated statically, so you must not free it.
 	 */
 	struct oshu_game_mode *mode;
-	/** Will stop a the next iteration if this is true. */
-	int stop;
-	/** On autoplay mode, the user interactions are ignored and every
-	 *  object will be perfectly hit. */
+	/** Combination of flags from #oshu_game_state. */
+	int state;
 	int autoplay;
-	int paused;
 	/** Background picture. */
 	struct oshu_texture background;
 	/** Mode-specific data, defined inside each mode's header file. */

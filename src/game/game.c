@@ -96,7 +96,7 @@ static void dump_state(struct oshu_game *game)
 		return;
 	int minutes = game->clock.now / 60.;
 	double seconds = game->clock.now - minutes * 60.;
-	const char *state = game->paused ? " Paused" : "Playing";
+	const char *state = game->state & OSHU_PAUSED ? " Paused" : "Playing";
 	double duration = game->audio.music.duration;
 	int duration_minutes = duration / 60.;
 	double duration_seconds = duration - duration_minutes * 60;
@@ -111,7 +111,8 @@ static void dump_state(struct oshu_game *game)
 static void pause_game(struct oshu_game *game)
 {
 	oshu_pause_audio(&game->audio);
-	game->paused = 1;
+	game->state |= OSHU_PAUSED;
+	game->state &= ~OSHU_PLAYING;
 	dump_state(game);
 }
 
@@ -141,7 +142,7 @@ static void forward_music(struct oshu_game *game, double offset)
 	game->clock.now = game->audio.music.current_timestamp;
 	game->mode->relinquish(game);
 
-	if (!game->paused)
+	if (!(game->state & OSHU_PAUSED))
 		oshu_play_audio(&game->audio);
 
 	dump_state(game);
@@ -169,7 +170,8 @@ static void unpause_game(struct oshu_game *game)
 			rewind_music(game, 1.);
 		oshu_play_audio(&game->audio);
 	}
-	game->paused = 0;
+	game->state &= ~OSHU_PAUSED;
+	game->state |= game->autoplay ? OSHU_AUTOPLAY : OSHU_USER_PLAYING;
 }
 
 enum oshu_key translate_key(SDL_Keysym *keysym)
@@ -203,10 +205,10 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
 			break;
-		if (game->paused) {
+		if (game->state & (OSHU_AUTOPLAY | OSHU_PAUSED)) {
 			switch (event->key.keysym.sym) {
 			case SDLK_q:
-				game->stop = 1;
+				game->state |= OSHU_STOPPING;
 				break;
 			case SDLK_ESCAPE:
 				unpause_game(game);
@@ -218,7 +220,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 				forward_music(game, 20.);
 				break;
 			}
-		} else {
+		} else if (game->state & OSHU_USER_PLAYING) {
 			switch (event->key.keysym.sym) {
 			case SDLK_ESCAPE:
 				pause_game(game);
@@ -230,38 +232,45 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 				forward_music(game, 20.);
 				break;
 			default:
-				if (!game->autoplay) {
+				{
 					enum oshu_key key = translate_key(&event->key.keysym);
 					if (key != OSHU_UNKNOWN_KEY)
 						game->mode->press(game, key);
 				}
 			}
+		} else {
+			/* probably the end screen, OSHU_FINISHED */
+			switch (event->key.keysym.sym) {
+			case SDLK_q:
+				game->state |= OSHU_STOPPING;
+				break;
+			}
 		}
 		break;
 	case SDL_KEYUP:
-		if (!game->paused && !game->autoplay) {
+		if (game->state & OSHU_USER_PLAYING) {
 			enum oshu_key key = translate_key(&event->key.keysym);
 			if (key != OSHU_UNKNOWN_KEY)
 				game->mode->release(game, key);
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		if (!game->paused && !game->autoplay)
+		if (game->state & OSHU_USER_PLAYING)
 			game->mode->press(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_MOUSEBUTTONUP:
-		if (!game->paused && !game->autoplay)
+		if (game->state & OSHU_USER_PLAYING)
 			game->mode->release(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
-			if (!game->autoplay && game->hit_cursor->next)
+			if ((game->state & OSHU_USER_PLAYING) && game->hit_cursor->next)
 				pause_game(game);
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
-			game->stop = 1;
+			game->state |= OSHU_STOPPING;
 			break;
 		}
 		break;
@@ -329,7 +338,7 @@ static void update_clock(struct oshu_game *game)
 	clock->audio = game->audio.music.current_timestamp;
 	clock->before = clock->now;
 	clock->system = system;
-	if (game->paused)
+	if (!(game->state & OSHU_PLAYING))
 		; /* don't update the clock */
 	else if (clock->before < 0) /* leading in */
 		clock->now = clock->before + diff;
@@ -379,20 +388,20 @@ int oshu_run_game(struct oshu_game *game)
 	game->clock.system = SDL_GetTicks() / 1000.;
 	SDL_Event event;
 	int missed_frames = 0;
-	if (!game->paused && game->clock.now >= 0)
+	if ((game->state & OSHU_PLAYING) && game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
-	while (!game->audio.music.finished && !game->stop) {
+	while (!game->audio.music.finished && !(game->state & OSHU_STOPPING)) {
 		update_clock(game);
 		if (game->clock.before < 0 && game->clock.now >= 0)
 			oshu_play_audio(&game->audio);
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
-		if (!game->paused && !game->autoplay)
+		if (game->state & OSHU_USER_PLAYING)
 			game->mode->check(game);
-		else if (!game->paused && game->autoplay)
+		else if (game->state & OSHU_AUTOPLAY)
 			game->mode->autoplay(game);
 		draw(game);
-		if (!game->paused)
+		if (game->state & OSHU_PLAYING)
 			dump_state(game);
 		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {

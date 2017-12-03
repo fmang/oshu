@@ -57,7 +57,7 @@ static struct oshu_game current_game;
 
 static void signal_handler(int signum)
 {
-	current_game.stop = 1;
+	current_game.state |= OSHU_STOPPING;
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -74,8 +74,16 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		return -1;
 	}
 
-	current_game.autoplay = autoplay;
-	current_game.paused = pause;
+	if (autoplay) {
+		current_game.autoplay = autoplay;
+		current_game.state |= OSHU_AUTOPLAY;
+	} else {
+		current_game.state |= OSHU_USER_PLAYING;
+	}
+	if (pause) {
+		current_game.state |= OSHU_PAUSED;
+		current_game.state &= ~OSHU_PLAYING;
+	}
 
 	if ((rc = oshu_run_game(&current_game)) < 0)
 		oshu_log_error("error while running the game, aborting");
