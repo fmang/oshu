@@ -235,10 +235,10 @@ static void draw_metadata(struct oshu_game *game)
 	double ratio;
 	if (game->paused)
 		ratio = 1.;
-	else if (game->clock.now < 4.)
+	else if (game->clock.system < 5.)
 		ratio = 1.;
-	else if (game->clock.now < 5.)
-		ratio = 5. - game->clock.now;
+	else if (game->clock.system < 6.)
+		ratio = 6. - game->clock.system;
 	else
 		return;
 
@@ -252,7 +252,7 @@ static void draw_metadata(struct oshu_game *game)
 	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(game->display.renderer, &frame);
 
-	double phase = game->clock.system / 3.;
+	double phase = game->clock.system / 3.5;
 	double progression = fabs(((phase - (int) phase) - 0.5) * 2.);
 	int has_unicode = game->osu.metadata_unicode.texture != NULL;
 	int unicode = has_unicode ? (int) phase % 2 == 0 : 0;
