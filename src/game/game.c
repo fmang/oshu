@@ -380,6 +380,16 @@ static void welcome(struct oshu_game *game)
 	printf("\n\n");
 }
 
+static void check_end(struct oshu_game *game)
+{
+	if (game->state & OSHU_FINISHED)
+		return;
+	if (game->hit_cursor->next)
+		return;
+	game->state = OSHU_FINISHED;
+	end(game);
+}
+
 int oshu_run_game(struct oshu_game *game)
 {
 	welcome(game);
@@ -390,7 +400,7 @@ int oshu_run_game(struct oshu_game *game)
 	int missed_frames = 0;
 	if ((game->state & OSHU_PLAYING) && game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
-	while (!game->audio.music.finished && !(game->state & OSHU_STOPPING)) {
+	while (!(game->state & OSHU_STOPPING)) {
 		update_clock(game);
 		if (game->clock.before < 0 && game->clock.now >= 0)
 			oshu_play_audio(&game->audio);
@@ -400,6 +410,7 @@ int oshu_run_game(struct oshu_game *game)
 			game->mode->check(game);
 		else if (game->state & OSHU_AUTOPLAY)
 			game->mode->autoplay(game);
+		check_end(game);
 		draw(game);
 		if (game->state & OSHU_PLAYING)
 			dump_state(game);
@@ -412,7 +423,6 @@ int oshu_run_game(struct oshu_game *game)
 				oshu_log_warning("your computer is having a hard time keeping up 60 FPS");
 		}
 	}
-	end(game);
 	oshu_log_debug("%d missed frames", missed_frames);
 	return 0;
 }
