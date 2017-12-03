@@ -82,6 +82,18 @@ struct osu_state {
 	 */
 	struct oshu_texture good_mark;
 	/**
+	 * Symbol for early hits.
+	 *
+	 * A yellow half-circle, on the left.
+	 */
+	struct oshu_texture early_mark;
+	/**
+	 * Symbol for early hits.
+	 *
+	 * A yellow half-circle, on the right.
+	 */
+	struct oshu_texture late_mark;
+	/**
 	 * Symbol to indicate a note was missed.
 	 *
 	 * A red X.

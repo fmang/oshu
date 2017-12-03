@@ -244,7 +244,7 @@ static int paint_slider_ball(struct oshu_game *game) {
 	return rc;
 }
 
-static int paint_good_mark(struct oshu_game *game)
+static int paint_good_mark(struct oshu_game *game, int offset, struct oshu_texture *texture)
 {
 	double radius = game->beatmap.difficulty.circle_radius / 3.5;
 	oshu_size size = (1. + I) * radius * 2.;
@@ -253,12 +253,22 @@ static int paint_good_mark(struct oshu_game *game)
 	oshu_start_painting(&game->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
-	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
-	cairo_set_source_rgba(p.cr, 0, .8, 0, .4);
+	if (offset == 0) {
+		/* good */
+		cairo_set_source_rgba(p.cr, 0, .8, 0, .4);
+		cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
+	} else if (offset < 0) {
+		/* early */
+		cairo_set_source_rgba(p.cr, .8, .8, 0, .4);
+		cairo_arc(p.cr, 0, 0, radius - 3, M_PI / 2 , 3 * M_PI / 2);
+	} else if (offset > 0) {
+		/* late */
+		cairo_set_source_rgba(p.cr, .8, .8, 0, .4);
+		cairo_arc(p.cr, 0, 0, radius - 3, - M_PI / 2 , M_PI / 2);
+	}
 	cairo_set_line_width(p.cr, 2);
 	cairo_stroke(p.cr);
 
-	struct oshu_texture *texture = &game->osu.good_mark;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
@@ -449,7 +459,9 @@ int osu_paint_resources(struct oshu_game *game)
 	paint_cursor(game);
 	paint_approach_circle(game);
 	paint_slider_ball(game);
-	paint_good_mark(game);
+	paint_good_mark(game, -1, &game->osu.early_mark);
+	paint_good_mark(game, 0, &game->osu.good_mark);
+	paint_good_mark(game, 1, &game->osu.late_mark);
 	paint_bad_mark(game);
 	paint_skip_mark(game);
 	paint_connector(game);
@@ -486,6 +498,8 @@ void osu_free_resources(struct oshu_game *game)
 	oshu_destroy_texture(&game->osu.approach_circle);
 	oshu_destroy_texture(&game->osu.slider_ball);
 	oshu_destroy_texture(&game->osu.good_mark);
+	oshu_destroy_texture(&game->osu.early_mark);
+	oshu_destroy_texture(&game->osu.late_mark);
 	oshu_destroy_texture(&game->osu.bad_mark);
 	oshu_destroy_texture(&game->osu.skip_mark);
 	oshu_destroy_texture(&game->osu.connector);
