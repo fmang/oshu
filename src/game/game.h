@@ -73,36 +73,38 @@ struct oshu_clock {
  */
 enum oshu_game_state {
 	/**
-	 * The user is playing.
+	 * The user plays.
 	 *
-	 * This is exclusive with most other flags.
+	 * It can be combined with OSHU_PLAYING or OSHU_PAUSED, but not paused.
 	 */
-	OSHU_USER_PLAYING = 0x01,
+	OSHU_USERPLAY = 0x01,
 	/**
-	 * Autoplay is similar to playing in that the music is playing, but
-	 * most interactions are pretty the same as when the game is paused.
+	 * Tells whether the game is in autoplay mode or not.
+	 *
+	 * Paused autoplay and playing autoplay are both possible.
+	 *
+	 * It cannot be combined with #OSHU_USER_PLAYING.
 	 */
 	OSHU_AUTOPLAY = 0x02,
 	/**
 	 * The song is playing, whether it is on autoplay or not.
-	 * You must not OR this flag, but you can AND it for testing.
 	 */
-	OSHU_PLAYING = OSHU_USER_PLAYING | OSHU_AUTOPLAY,
+	OSHU_PLAYING = 0x04,
 	/**
 	 * The game is paused.
 	 *
 	 * This is contradictory to OSHU_PLAYING.
 	 */
-	OSHU_PAUSED = 0x04,
+	OSHU_PAUSED = 0x08,
 	/**
 	 * After the final note has been playing, the game enters some
 	 * pseudo-pause mode to display the score.
 	 */
-	OSHU_FINISHED = 0x08,
+	OSHU_FINISHED = 0x10,
 	/**
 	 * Will stop a the next iteration if this is true.
 	 */
-	OSHU_STOPPING = 0x10,
+	OSHU_STOPPING = 0x20,
 };
 
 /**
@@ -128,7 +130,6 @@ struct oshu_game {
 	struct oshu_game_mode *mode;
 	/** Combination of flags from #oshu_game_state. */
 	int state;
-	int autoplay;
 	/** Background picture. */
 	struct oshu_texture background;
 	/** Mode-specific data, defined inside each mode's header file. */

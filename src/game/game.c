@@ -166,12 +166,12 @@ static void forward_music(struct oshu_game *game, double offset)
 static void unpause_game(struct oshu_game *game)
 {
 	if (game->clock.now >= 0) {
-		if (!game->autoplay)
+		if (!(game->state & OSHU_AUTOPLAY))
 			rewind_music(game, 1.);
 		oshu_play_audio(&game->audio);
 	}
 	game->state &= ~OSHU_PAUSED;
-	game->state |= game->autoplay ? OSHU_AUTOPLAY : OSHU_USER_PLAYING;
+	game->state |= OSHU_PLAYING;
 }
 
 enum oshu_key translate_key(SDL_Keysym *keysym)
@@ -220,7 +220,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 				forward_music(game, 20.);
 				break;
 			}
-		} else if (game->state & OSHU_USER_PLAYING) {
+		} else if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING)) {
 			switch (event->key.keysym.sym) {
 			case SDLK_ESCAPE:
 				pause_game(game);
@@ -248,25 +248,25 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		}
 		break;
 	case SDL_KEYUP:
-		if (game->state & OSHU_USER_PLAYING) {
+		if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING)) {
 			enum oshu_key key = translate_key(&event->key.keysym);
 			if (key != OSHU_UNKNOWN_KEY)
 				game->mode->release(game, key);
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		if (game->state & OSHU_USER_PLAYING)
+		if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING))
 			game->mode->press(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_MOUSEBUTTONUP:
-		if (game->state & OSHU_USER_PLAYING)
+		if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING))
 			game->mode->release(game, OSHU_LEFT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
-			if ((game->state & OSHU_USER_PLAYING) && game->hit_cursor->next)
+			if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING) && game->hit_cursor->next)
 				pause_game(game);
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
@@ -396,7 +396,7 @@ int oshu_run_game(struct oshu_game *game)
 			oshu_play_audio(&game->audio);
 		while (SDL_PollEvent(&event))
 			handle_event(game, &event);
-		if (game->state & OSHU_USER_PLAYING)
+		if (game->state & OSHU_USERPLAY)
 			game->mode->check(game);
 		else if (game->state & OSHU_AUTOPLAY)
 			game->mode->autoplay(game);
