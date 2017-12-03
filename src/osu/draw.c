@@ -309,7 +309,7 @@ static void draw_progression(struct oshu_game *game)
 		.w = progression * creal(game->display.view.size),
 		.h = height,
 	};
-	SDL_SetRenderDrawColor(game->display.renderer, 255, 255, 255, 64);
+	SDL_SetRenderDrawColor(game->display.renderer, 255, 255, 255, 48);
 	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(game->display.renderer, &bar);
 }
