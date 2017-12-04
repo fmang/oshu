@@ -138,7 +138,7 @@ static int check(struct oshu_game *game)
  * The key is the held key, relevant only for sliders. In autoplay mode, it's
  * value doesn't matter.
  */
-static void activate_hit(struct oshu_game *game, struct oshu_hit *hit, enum oshu_key key)
+static void activate_hit(struct oshu_game *game, struct oshu_hit *hit, enum oshu_finger key)
 {
 	if (hit->type & OSHU_SLIDER_HIT) {
 		release_slider(game);
@@ -173,7 +173,7 @@ static int autoplay(struct oshu_game *game)
  *
  * Play a sample depending on what was clicked, and when.
  */
-static int press(struct oshu_game *game, enum oshu_key key)
+static int press(struct oshu_game *game, enum oshu_finger key)
 {
 	oshu_point mouse = oshu_get_mouse(&game->display);
 	struct oshu_hit *hit = find_hit(game, mouse);
@@ -193,7 +193,7 @@ static int press(struct oshu_game *game, enum oshu_key key)
  * When the user is holding a slider or a hold note in mania mode, release the
  * thing.
  */
-static int release(struct oshu_game *game, enum oshu_key key)
+static int release(struct oshu_game *game, enum oshu_finger key)
 {
 	if (game->osu.held_key == key)
 		release_slider(game);

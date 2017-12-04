@@ -174,7 +174,7 @@ static void unpause_game(struct oshu_game *game)
 	game->state |= OSHU_PLAYING;
 }
 
-enum oshu_key oshu_translate_key(SDL_Keysym *keysym)
+enum oshu_finger oshu_translate_key(SDL_Keysym *keysym)
 {
 	switch (keysym->scancode) {
 	/* Bottom row, for standard and taiko modes. */
@@ -233,7 +233,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 				break;
 			default:
 				{
-					enum oshu_key key = oshu_translate_key(&event->key.keysym);
+					enum oshu_finger key = oshu_translate_key(&event->key.keysym);
 					if (key != OSHU_UNKNOWN_KEY)
 						game->mode->press(game, key);
 				}
@@ -249,7 +249,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		break;
 	case SDL_KEYUP:
 		if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING)) {
-			enum oshu_key key = oshu_translate_key(&event->key.keysym);
+			enum oshu_finger key = oshu_translate_key(&event->key.keysym);
 			if (key != OSHU_UNKNOWN_KEY)
 				game->mode->release(game, key);
 		}

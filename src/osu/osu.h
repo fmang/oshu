@@ -40,7 +40,7 @@ struct osu_state {
 	 * When the #current_slider is NULL, the value of this field is
 	 * irrelevant.
 	 */
-	enum oshu_key held_key;
+	enum oshu_finger held_key;
 	/**
 	 * Keep track of the previous positions of the mouse to display a
 	 * fancier cursor, with a trail.

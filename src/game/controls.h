@@ -44,7 +44,7 @@ struct SDL_Keysym;
  * Keys on the left hand are negative, while keys on the right hand are
  * positive, making it easy to test which hand a constant belongs to.
  */
-enum oshu_key {
+enum oshu_finger {
 	OSHU_LEFT_PINKY = -4,
 	OSHU_LEFT_RING = -3,
 	OSHU_LEFT_MIDDLE = -2,
@@ -85,13 +85,13 @@ enum oshu_key {
 };
 
 /**
- * Translate an SDL keysym to its finger in #oshu_key.
+ * Translate an SDL keysym to its finger in #oshu_finger.
  *
  * The physical key code is used for the translation, to guarantee layout agnosticity.
  *
  * If the key doesn't match a finger, return #OSHU_UNKNOWN_KEY.
  */
-enum oshu_key oshu_translate_key(struct SDL_Keysym *keysym);
+enum oshu_finger oshu_translate_key(struct SDL_Keysym *keysym);
 
 /**
  * Map functions to SDL keycodes.

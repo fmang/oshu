@@ -74,11 +74,11 @@ struct oshu_game_mode {
 	 *
 	 * \sa release
 	 */
-	int (*press)(struct oshu_game *game, enum oshu_key key);
+	int (*press)(struct oshu_game *game, enum oshu_finger key);
 	/**
 	 * See #press.
 	 */
-	int (*release)(struct oshu_game *game, enum oshu_key key);
+	int (*release)(struct oshu_game *game, enum oshu_finger key);
 	/**
 	 * Release any held object, like sliders or hold notes.
 	 *
