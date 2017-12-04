@@ -207,28 +207,28 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 			break;
 		if (game->state & (OSHU_AUTOPLAY | OSHU_PAUSED)) {
 			switch (event->key.keysym.sym) {
-			case SDLK_q:
+			case OSHU_QUIT_KEY:
 				game->state |= OSHU_STOPPING;
 				break;
-			case SDLK_ESCAPE:
+			case OSHU_PAUSE_KEY:
 				unpause_game(game);
 				break;
-			case SDLK_PAGEUP:
+			case OSHU_REWIND_KEY:
 				rewind_music(game, 10.);
 				break;
-			case SDLK_PAGEDOWN:
+			case OSHU_FORWARD_KEY:
 				forward_music(game, 20.);
 				break;
 			}
 		} else if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING)) {
 			switch (event->key.keysym.sym) {
-			case SDLK_ESCAPE:
+			case OSHU_PAUSE_KEY:
 				pause_game(game);
 				break;
-			case SDLK_PAGEUP:
+			case OSHU_REWIND_KEY:
 				rewind_music(game, 10.);
 				break;
-			case SDLK_PAGEDOWN:
+			case OSHU_FORWARD_KEY:
 				forward_music(game, 20.);
 				break;
 			default:
@@ -241,7 +241,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		} else {
 			/* probably the end screen, OSHU_FINISHED */
 			switch (event->key.keysym.sym) {
-			case SDLK_q:
+			case OSHU_QUIT_KEY:
 				game->state |= OSHU_STOPPING;
 				break;
 			}

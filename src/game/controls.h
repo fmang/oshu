@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <SDL2/SDL_keycode.h>
+
 struct SDL_Keysym;
 
 /**
@@ -90,5 +92,20 @@ enum oshu_key {
  * If the key doesn't match a finger, return #OSHU_UNKNOWN_KEY.
  */
 enum oshu_key oshu_translate_key(struct SDL_Keysym *keysym);
+
+/**
+ * Map functions to SDL keycodes.
+ *
+ * This is meant to ensure consistency across the various game screens. With
+ * this, no two screens would use different keys for the same function.
+ *
+ * Compare the keys with `SDL_Event.key.keysym.sym`.
+ */
+enum oshu_control_key {
+	OSHU_QUIT_KEY = SDLK_q,
+	OSHU_PAUSE_KEY = SDLK_ESCAPE,
+	OSHU_REWIND_KEY = SDLK_PAGEUP,
+	OSHU_FORWARD_KEY = SDLK_PAGEDOWN,
+};
 
 /** \} */
