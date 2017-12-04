@@ -1,6 +1,6 @@
 /**
  * \file game/screen.h
- * \ingroup game
+ * \ingroup game_screen
  */
 
 #pragma once

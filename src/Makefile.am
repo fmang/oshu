@@ -20,8 +20,10 @@ oshu_SOURCES = \
 	beatmap/parser.c \
 	beatmap/parser.h \
 	beatmap/tokens.h \
+	game/controls.h \
 	game/game.c \
 	game/game.h \
+	game/screen.h \
 	game/mode.h \
 	graphics/display.c \
 	graphics/display.h \
