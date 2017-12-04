@@ -5,6 +5,8 @@
 
 #pragma once
 
+struct SDL_Keysym;
+
 /**
  * \defgroup game_controls Controls
  * \ingroup game
@@ -79,5 +81,14 @@ enum oshu_key {
 	 */
         OSHU_UNKNOWN_KEY = -100,
 };
+
+/**
+ * Translate an SDL keysym to its finger in #oshu_key.
+ *
+ * The physical key code is used for the translation, to guarantee layout agnosticity.
+ *
+ * If the key doesn't match a finger, return #OSHU_UNKNOWN_KEY.
+ */
+enum oshu_key oshu_translate_key(struct SDL_Keysym *keysym);
 
 /** \} */
