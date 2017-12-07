@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
   <mime-type type="text/x-osu">
-    <comment>Osu! game file</comment>
-    <comment lang="fr">Fichier du jeu osu!</comment>
+    <comment>osu! beatmap file</comment>
+    <comment lang="fr">Fichier de beatmap osu!</comment>
     <magic priority="50">
       <match type="string" offset="0" value="osu file format"/>
     </magic>

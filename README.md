@@ -89,6 +89,7 @@ BEATMAP.osu`. Otherwise you may use the default `/usr/local`.
 
 If you want to have oshu integrated in your desktop:
 
+	$ cd share
 	$ desktop-file-install --dir $PREFIX/share/applications oshu.desktop
 	$ xdg-mime install x-osu.xml
 	$ xdg-mime default oshu.desktop text/x-osu
