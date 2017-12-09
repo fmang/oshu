@@ -1,3 +1,5 @@
+#include "game/game.h"
+
 struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset)
 {
 	struct oshu_hit *hit = game->hit_cursor;

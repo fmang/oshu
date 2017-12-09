@@ -74,7 +74,7 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		return -1;
 	}
 
-	current_game.autoplay = 1;
+	current_game.autoplay = autoplay;
 	if (pause)
 		oshu_pause_game(&current_game);
 

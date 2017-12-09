@@ -1,4 +1,8 @@
 #include "game/game.h"
+#include "game/screen.h"
+#include "game/tty.h"
+
+#include <assert.h>
 
 void oshu_rewind_game(struct oshu_game *game, double offset)
 {
