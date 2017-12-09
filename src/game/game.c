@@ -108,7 +108,7 @@ static void dump_state(struct oshu_game *game)
 	fflush(stdout);
 }
 
-static void pause_game(struct oshu_game *game)
+void oshu_pause_game(struct oshu_game *game)
 {
 	oshu_pause_audio(&game->audio);
 	game->state |= OSHU_PAUSED;
@@ -116,13 +116,7 @@ static void pause_game(struct oshu_game *game)
 	dump_state(game);
 }
 
-/**
- * Rewind the song by the specified offset in seconds.
- *
- * Rewind the beatmap too but leaving a 1-second break so that we won't seek
- * right before a note.
- */
-static void rewind_music(struct oshu_game *game, double offset)
+void oshu_rewind_game(struct oshu_game *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
 	game->clock.now = game->audio.music.current_timestamp;
@@ -136,7 +130,7 @@ static void rewind_music(struct oshu_game *game, double offset)
 	}
 }
 
-static void forward_music(struct oshu_game *game, double offset)
+void oshu_forward_game(struct oshu_game *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp + offset);
 	game->clock.now = game->audio.music.current_timestamp;
@@ -154,20 +148,11 @@ static void forward_music(struct oshu_game *game, double offset)
 	}
 }
 
-/**
- * Resume the game.
- *
- * If the music was playing, rewind it by 1 second to leave the player a little
- * break after resuming. This probably makes cheating possible but I couldn't
- * care less.
- *
- * Pausing on a slider will break it though.
- */
-static void unpause_game(struct oshu_game *game)
+void oshu_unpause_game(struct oshu_game *game)
 {
 	if (game->clock.now >= 0) {
 		if (!(game->state & OSHU_AUTOPLAY))
-			rewind_music(game, 1.);
+			oshu_rewind_game(game, 1.);
 		oshu_play_audio(&game->audio);
 	}
 	game->state &= ~OSHU_PAUSED;
@@ -211,25 +196,25 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 				game->state |= OSHU_STOPPING;
 				break;
 			case OSHU_PAUSE_KEY:
-				unpause_game(game);
+				oshu_unpause_game(game);
 				break;
 			case OSHU_REWIND_KEY:
-				rewind_music(game, 10.);
+				oshu_rewind_game(game, 10.);
 				break;
 			case OSHU_FORWARD_KEY:
-				forward_music(game, 20.);
+				oshu_forward_game(game, 20.);
 				break;
 			}
 		} else if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING)) {
 			switch (event->key.keysym.sym) {
 			case OSHU_PAUSE_KEY:
-				pause_game(game);
+				oshu_pause_game(game);
 				break;
 			case OSHU_REWIND_KEY:
-				rewind_music(game, 10.);
+				oshu_rewind_game(game, 10.);
 				break;
 			case OSHU_FORWARD_KEY:
-				forward_music(game, 20.);
+				oshu_forward_game(game, 20.);
 				break;
 			default:
 				{
@@ -267,7 +252,7 @@ static void handle_event(struct oshu_game *game, SDL_Event *event)
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 			if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING) && game->hit_cursor->next)
-				pause_game(game);
+				oshu_pause_game(game);
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
 			game->state |= OSHU_STOPPING;

@@ -23,8 +23,11 @@ oshu_SOURCES = \
 	game/controls.h \
 	game/game.c \
 	game/game.h \
-	game/screen.h \
 	game/mode.h \
+	game/pause.c \
+	game/play.c \
+	game/score.c \
+	game/screen.h \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/draw.c \

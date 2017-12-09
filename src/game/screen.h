@@ -41,7 +41,7 @@ struct oshu_game_screen {
 	 * The main game module may preprocess the event, or even filter it.
 	 * For instance, when the window is closed.
 	 */
-	int (*handle_event)(struct oshu_game *game, union SDL_Event *event);
+	int (*on_event)(struct oshu_game *game, union SDL_Event *event);
 	/**
 	 * The update function is run at every iteration of the main loop.
 	 */

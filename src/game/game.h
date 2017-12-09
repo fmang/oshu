@@ -14,6 +14,8 @@
 #include "graphics/display.h"
 #include "osu/osu.h"
 
+struct oshu_game_screen;
+
 /**
  * \defgroup game Game
  *
@@ -130,6 +132,8 @@ struct oshu_game {
 	struct oshu_game_mode *mode;
 	/** Combination of flags from #oshu_game_state. */
 	int state;
+	int autoplay;
+	struct oshu_game_screen *screen;
 	/** Background picture. */
 	struct oshu_texture background;
 	/** Mode-specific data, defined inside each mode's header file. */
@@ -200,5 +204,31 @@ struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset);
  * This is analogous to #oshu_look_hit_back.
  */
 struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset);
+
+/**
+ * Resume the game.
+ *
+ * If the music was playing, rewind it by 1 second to leave the player a little
+ * break after resuming. This probably makes cheating possible but I couldn't
+ * care less.
+ *
+ * Pausing on a slider will break it though.
+ */
+void oshu_unpause_game(struct oshu_game *game);
+
+void oshu_pause_game(struct oshu_game *game);
+
+/**
+ * Rewind the song by the specified offset in seconds.
+ *
+ * Rewind the beatmap too but leaving a 1-second break so that we won't seek
+ * right before a note.
+ */
+void oshu_rewind_game(struct oshu_game *game, double offset);
+
+/**
+ * See #oshu_rewind_game.
+ */
+void oshu_forward_game(struct oshu_game *game, double offset);
 
 /** \} */
