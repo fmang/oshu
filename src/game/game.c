@@ -8,6 +8,7 @@
 #include "../config.h"
 
 #include "game/game.h"
+#include "game/screen.h"
 #include "graphics/draw.h"
 #include "log.h"
 
@@ -70,6 +71,7 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	}
 
 	/* 5. Post-initialization */
+	game->screen = &oshu_play_screen;
 	if (game->mode->initialize(game) < 0)
 		goto fail;
 
@@ -113,6 +115,7 @@ void oshu_pause_game(struct oshu_game *game)
 	oshu_pause_audio(&game->audio);
 	game->state |= OSHU_PAUSED;
 	game->state &= ~OSHU_PLAYING;
+	game->screen = &oshu_pause_screen;
 	dump_state(game);
 }
 
@@ -157,6 +160,7 @@ void oshu_unpause_game(struct oshu_game *game)
 	}
 	game->state &= ~OSHU_PAUSED;
 	game->state |= OSHU_PLAYING;
+	game->screen = &oshu_play_screen;
 }
 
 enum oshu_finger oshu_translate_key(SDL_Keysym *keysym)
@@ -178,87 +182,6 @@ enum oshu_finger oshu_translate_key(SDL_Keysym *keysym)
 	case SDL_SCANCODE_L: return OSHU_RIGHT_RING;
 	case SDL_SCANCODE_SEMICOLON: return OSHU_RIGHT_PINKY;
 	default:             return OSHU_UNKNOWN_KEY;
-	}
-}
-
-/**
- * React to an event got from SDL.
- */
-static void handle_event(struct oshu_game *game, SDL_Event *event)
-{
-	switch (event->type) {
-	case SDL_KEYDOWN:
-		if (event->key.repeat)
-			break;
-		if (game->state & (OSHU_AUTOPLAY | OSHU_PAUSED)) {
-			switch (event->key.keysym.sym) {
-			case OSHU_QUIT_KEY:
-				game->state |= OSHU_STOPPING;
-				break;
-			case OSHU_PAUSE_KEY:
-				oshu_unpause_game(game);
-				break;
-			case OSHU_REWIND_KEY:
-				oshu_rewind_game(game, 10.);
-				break;
-			case OSHU_FORWARD_KEY:
-				oshu_forward_game(game, 20.);
-				break;
-			}
-		} else if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING)) {
-			switch (event->key.keysym.sym) {
-			case OSHU_PAUSE_KEY:
-				oshu_pause_game(game);
-				break;
-			case OSHU_REWIND_KEY:
-				oshu_rewind_game(game, 10.);
-				break;
-			case OSHU_FORWARD_KEY:
-				oshu_forward_game(game, 20.);
-				break;
-			default:
-				{
-					enum oshu_finger key = oshu_translate_key(&event->key.keysym);
-					if (key != OSHU_UNKNOWN_KEY)
-						game->mode->press(game, key);
-				}
-			}
-		} else {
-			/* probably the end screen, OSHU_FINISHED */
-			switch (event->key.keysym.sym) {
-			case OSHU_QUIT_KEY:
-				game->state |= OSHU_STOPPING;
-				break;
-			}
-		}
-		break;
-	case SDL_KEYUP:
-		if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING)) {
-			enum oshu_finger key = oshu_translate_key(&event->key.keysym);
-			if (key != OSHU_UNKNOWN_KEY)
-				game->mode->release(game, key);
-		}
-		break;
-	case SDL_MOUSEBUTTONDOWN:
-		if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING))
-			game->mode->press(game, OSHU_LEFT_BUTTON);
-		break;
-	case SDL_MOUSEBUTTONUP:
-		if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING))
-			game->mode->release(game, OSHU_LEFT_BUTTON);
-		break;
-	case SDL_WINDOWEVENT:
-		switch (event->window.event) {
-		case SDL_WINDOWEVENT_MINIMIZED:
-		case SDL_WINDOWEVENT_FOCUS_LOST:
-			if ((game->state & OSHU_USERPLAY) && (game->state & OSHU_PLAYING) && game->hit_cursor->next)
-				oshu_pause_game(game);
-			break;
-		case SDL_WINDOWEVENT_CLOSE:
-			game->state |= OSHU_STOPPING;
-			break;
-		}
-		break;
 	}
 }
 
@@ -373,6 +296,7 @@ static void check_end(struct oshu_game *game)
 		return;
 	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + game->beatmap.difficulty.leniency) {
 		game->state = OSHU_FINISHED | OSHU_PLAYING;
+		game->screen = &oshu_score_screen;
 		end(game);
 	}
 }
@@ -392,7 +316,7 @@ int oshu_run_game(struct oshu_game *game)
 		if (game->clock.before < 0 && game->clock.now >= 0)
 			oshu_play_audio(&game->audio);
 		while (SDL_PollEvent(&event))
-			handle_event(game, &event);
+			game->screen->on_event(game, &event);
 		if (game->state & OSHU_USERPLAY)
 			game->mode->check(game);
 		else if (game->state & OSHU_AUTOPLAY)
