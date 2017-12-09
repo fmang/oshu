@@ -1,3 +1,8 @@
+/**
+ * \file game/actions.c
+ * \ingroup game_actions
+ */
+
 #include "game/game.h"
 #include "game/screen.h"
 #include "game/tty.h"

@@ -1,5 +1,5 @@
 /**
- * \file audio.h
+ * \file audio/audio.h
  * \ingroup audio
  *
  * \brief

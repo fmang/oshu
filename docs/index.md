@@ -38,7 +38,6 @@ digraph modules {
 	Audio -> Beatmap;
 	Graphics -> Beatmap;
 	Game -> Audio;
-	Game -> Beatmap;
 	Game -> Graphics;
 	Game -> Osu;
 	Osu -> Game;
@@ -65,6 +64,9 @@ the screen.
 The \ref game module joins every module together and runs the main event loop
 of the game. It watches the audio and the user's keyboard and mouse events to
 manipulate the beatmap state, then schedules the drawing of the window.
+
+The \ref osu module implements the osu!standard game mode. It extends the game
+module, while the game module only briefly refers to it.
 
 The *main* module is the entry-point of oshu! and provides a command-line
 interface to briefly configure the game, and then yields control to the game

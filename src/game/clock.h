@@ -1,4 +1,16 @@
+/**
+ * \file game/clock.h
+ * \ingroup game_clock
+ */
+
 #pragma once
+
+/**
+ * \defgroup game_clock Clock
+ * \ingroup game
+ *
+ * \{
+ */
 
 struct oshu_game;
 
@@ -65,3 +77,5 @@ void oshu_initialize_clock(struct oshu_game *game);
  * positive, while the audio clock will be null at that moment.
  */
 void oshu_update_clock(struct oshu_game *game);
+
+/** \} */

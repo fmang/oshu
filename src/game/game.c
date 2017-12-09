@@ -2,7 +2,7 @@
  * \file game/game.c
  * \ingroup game
  *
- * Game module implementation.
+ * Implemention game initialization, destruction and the main loop.
  */
 
 #include "../config.h"

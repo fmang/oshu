@@ -10,9 +10,10 @@ union SDL_Event;
 struct oshu_game;
 
 /**
- * \defgroup game_screen Screens
+ * \defgroup game_screen Screen
+ * \ingroup game
  *
- * A game screen is the state the game is in.
+ * A game screen defines the state the game is in.
  *
  * The main idea is that there is the main loop iterating at a constant 60 FPS
  * rate, and handling the common events, like window closing.

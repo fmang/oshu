@@ -1,3 +1,8 @@
+/**
+ * \file game/helpers.c
+ * \ingroup game_helpers
+ */
+
 #include "game/game.h"
 
 struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset)

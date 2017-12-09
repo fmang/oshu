@@ -1,3 +1,11 @@
+/**
+ * \file game/score.c
+ * \ingroup game_screen
+ *
+ * \brief
+ * Implement the score screen, when the game is finished.
+ */
+
 #include "game/game.h"
 #include "game/screen.h"
 

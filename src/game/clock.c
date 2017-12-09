@@ -1,3 +1,8 @@
+/**
+ * \file game/clock.c
+ * \ingroup game_clock
+ */
+
 #include "game/game.h"
 #include "game/screen.h"
 

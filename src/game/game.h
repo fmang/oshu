@@ -99,15 +99,16 @@ void oshu_destroy_game(struct oshu_game *game);
 
 /**
  * Start the main event loop.
+ *
+ * You can stop it with #oshu_stop_game.
  */
 int oshu_run_game(struct oshu_game *game);
 
 /**
- * Make the game stop at the next iteration.
+ * \defgroup game_helpers Helpers
  *
- * It can be called from a signal handler.
+ * \{
  */
-void oshu_stop_game(struct oshu_game *game);
 
 /**
  * Find the first hit object after *now - offset*.
@@ -127,6 +128,14 @@ struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset);
  * This is analogous to #oshu_look_hit_back.
  */
 struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset);
+
+/** \} */
+
+/**
+ * \defgroup game_actions Actions
+ *
+ * \{
+ */
 
 /**
  * Resume the game.
@@ -153,5 +162,14 @@ void oshu_rewind_game(struct oshu_game *game, double offset);
  * See #oshu_rewind_game.
  */
 void oshu_forward_game(struct oshu_game *game, double offset);
+
+/**
+ * Make the game stop at the next iteration.
+ *
+ * It can be called from a signal handler.
+ */
+void oshu_stop_game(struct oshu_game *game);
+
+/** \} */
 
 /** \} */

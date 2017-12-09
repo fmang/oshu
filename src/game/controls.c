@@ -1,3 +1,8 @@
+/**
+ * \file game/controls.c
+ * \ingroup game_controls
+ */
+
 #include "game/controls.h"
 
 #include <SDL2/SDL.h>

@@ -1,3 +1,11 @@
+/**
+ * \file game/play.c
+ * \ingroup game_screen
+ *
+ * \brief
+ * Implement the main game screen.
+ */
+
 #include "game/game.h"
 #include "game/screen.h"
 #include "game/tty.h"

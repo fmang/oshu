@@ -1,3 +1,11 @@
+/**
+ * \file game/pause.c
+ * \ingroup game_screen
+ *
+ * \brief
+ * Implement the pause screen.
+ */
+
 #include "game/game.h"
 #include "game/screen.h"
 

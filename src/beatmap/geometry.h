@@ -1,5 +1,5 @@
 /**
- * \file geometry.h
+ * \file beatmap/geometry.h
  * \ingroup geometry
  */
 

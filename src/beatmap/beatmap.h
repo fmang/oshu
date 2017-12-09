@@ -1,5 +1,5 @@
 /**
- * \file beatmap.h
+ * \file beatmap/beatmap.h
  * \ingroup beatmap
  */
 
