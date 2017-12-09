@@ -10,6 +10,7 @@
 #include "audio/audio.h"
 #include "audio/library.h"
 #include "beatmap/beatmap.h"
+#include "game/clock.h"
 #include "game/mode.h"
 #include "graphics/display.h"
 #include "osu/osu.h"
@@ -24,49 +25,6 @@ struct oshu_game_screen;
  *
  * \{
  */
-
-/**
- * Keep track of various aspects of the elapsing time.
- */
-struct oshu_clock {
-	/**
-	 * The current time in seconds.
-	 *
-	 * This is the main clock of the game. Use it unless you have a reason
-	 * not to.
-	 *
-	 * 0 is the beginning of the song. It is totally okay for this clock to
-	 * be negative when the beatmap has a lead in time.
-	 */
-	double now;
-	/**
-	 * Previous time in seconds.
-	 *
-	 * This is the time at the previous game loop iteration. It is
-	 * occasionaly useful to detect when a specific point in time has just
-	 * passed.
-	 */
-	double before;
-	/**
-	 * The audio clock.
-	 *
-	 * It may also be accessed directly using the audio module.
-	 *
-	 * When the audio hasn't started, it sticks at 0.
-	 */
-	double audio;
-	/**
-	 * The process time, computed from SDL's ticks.
-	 *
-	 * This is the reference time when the audio hasn't started, or when it
-	 * has stopped.
-	 *
-	 * It may also be used to increase the accuracy of the game clock,
-	 * because sometimes the audio timestamp won't change as no new frame
-	 * was decoded.
-	 */
-	double system;
-};
 
 /**
  * The full game state, from the beatmap state to the audio and graphical

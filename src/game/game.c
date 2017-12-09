@@ -61,18 +61,7 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	if (game->beatmap.background_filename)
 		oshu_load_texture(&game->display, game->beatmap.background_filename, &game->background);
 
-	/* 4. Clock */
-	if (game->beatmap.audio_lead_in > 0.) {
-		game->clock.now = - game->beatmap.audio_lead_in;
-	} else {
-		double first_hit = game->beatmap.hits->next->time;
-		if (first_hit < 1.)
-			game->clock.now = first_hit - 1.;
-	}
-
-	/* 5. Post-initialization */
-	game->autoplay = 0;
-	game->stop = 0;
+	/* 4. Post-initialization */
 	game->screen = &oshu_play_screen;
 	if (game->mode->initialize(game) < 0)
 		goto fail;
@@ -160,55 +149,14 @@ static void draw(struct oshu_game *game)
 	SDL_RenderPresent(game->display.renderer);
 }
 
-/**
- * Update the game clock.
- *
- * It as roughly 2 modes:
- *
- * 1. When the audio has a lead-in time, rely on SDL's ticks to increase the
- *    clock.
- * 2. When the lead-in phase is over, use the audio clock. However, if we
- *    detect it hasn't change, probably because the codec frame is too big, then
- *    we make it progress with the SDL clock anyway.
- *
- * In both cases, we wanna ensure the *now* clock is always monotonous. If we
- * detect the new time is before the previous time, then we stop the time until
- * now catches up with before. That case does happen at least right after the
- * lead-in phase, because the audio starts when the *now* clock becomes
- * positive, while the audio clock will be null at that moment.
- */
-static void update_clock(struct oshu_game *game)
-{
-	struct oshu_clock *clock = &game->clock;
-	double system = SDL_GetTicks() / 1000.;
-	double diff = system - clock->system;
-	double prev_audio = clock->audio;
-	clock->audio = game->audio.music.current_timestamp;
-	clock->before = clock->now;
-	clock->system = system;
-	if (game->screen == &oshu_pause_screen)
-		; /* don't update the clock */
-	else if (clock->before < 0) /* leading in */
-		clock->now = clock->before + diff;
-	else if (clock->audio == prev_audio) /* audio clock stuck */
-		clock->now = clock->before + diff;
-	else
-		clock->now = clock->audio;
-	/* force monotonicity */
-	if (clock->now < clock->before)
-		clock->now = clock->before;
-}
-
 int oshu_run_game(struct oshu_game *game)
 {
 	oshu_welcome(game);
-	/* Reset the clock.
-	 * Otherwise, when the startup is slow, the clock would jump. */
-	game->clock.system = SDL_GetTicks() / 1000.;
+	oshu_initialize_clock(game);
 	SDL_Event event;
 	int missed_frames = 0;
 	while (!game->stop) {
-		update_clock(game);
+		oshu_update_clock(game);
 		while (SDL_PollEvent(&event))
 			game->screen->on_event(game, &event);
 		game->screen->update(game);
