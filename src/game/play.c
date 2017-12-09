@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "game/screen.h"
+#include "game/tty.h"
 
 #include <SDL2/SDL.h>
 
@@ -58,33 +59,6 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 	return 0;
 }
 
-/**
- * Print the score if the song was finished, then exit.
- */
-static void end(struct oshu_game *game)
-{
-	/* Clear the status line. */
-	printf("\r                                        \r");
-	/* Compute the score. */
-	int good = 0;
-	int missed = 0;
-	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
-		if (hit->state == OSHU_MISSED_HIT)
-			missed++;
-		else if (hit->state == OSHU_GOOD_HIT)
-			good++;
-	}
-	double rate = (double) good / (good + missed);
-	printf(
-		"  \033[1mScore:\033[0m\n"
-		"  \033[%dm%3d\033[0m good\n"
-		"  \033[%dm%3d\033[0m miss\n"
-		"\n",
-		rate >= 0.9 ? 32 : 0, good,
-		rate < 0.5  ? 31 : 0, missed
-	);
-}
-
 static void check_end(struct oshu_game *game)
 {
 	if (game->hit_cursor->next)
@@ -92,7 +66,7 @@ static void check_end(struct oshu_game *game)
 	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + game->beatmap.difficulty.leniency) {
 		game->state = OSHU_FINISHED | OSHU_PLAYING;
 		game->screen = &oshu_score_screen;
-		end(game);
+		oshu_congratulate(game);
 	}
 }
 

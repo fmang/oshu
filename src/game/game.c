@@ -9,12 +9,12 @@
 
 #include "game/game.h"
 #include "game/screen.h"
+#include "game/tty.h"
 #include "graphics/draw.h"
 #include "log.h"
 
 #include <assert.h>
 #include <stdio.h>
-#include <unistd.h>
 
 #include <SDL2/SDL_image.h>
 
@@ -80,24 +80,6 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 fail:
 	oshu_destroy_game(game);
 	return -1;
-}
-
-void oshu_print_state(struct oshu_game *game)
-{
-	if (!isatty(fileno(stdout)))
-		return;
-	int minutes = game->clock.now / 60.;
-	double seconds = game->clock.now - minutes * 60.;
-	const char *state = game->state & OSHU_PAUSED ? " Paused" : "Playing";
-	double duration = game->audio.music.duration;
-	int duration_minutes = duration / 60.;
-	double duration_seconds = duration - duration_minutes * 60;
-	printf(
-		"%s: %d:%06.3f / %d:%06.3f\r",
-		state, minutes, seconds,
-		duration_minutes, duration_seconds
-	);
-	fflush(stdout);
 }
 
 void oshu_pause_game(struct oshu_game *game)
@@ -222,38 +204,9 @@ static void update_clock(struct oshu_game *game)
 		clock->now = clock->before;
 }
 
-static void welcome(struct oshu_game *game)
-{
-	struct oshu_beatmap *beatmap = &game->beatmap;
-	struct oshu_metadata *meta = &beatmap->metadata;
-	printf(
-		"\n"
-		"  \033[33m%s\033[0m // %s\n"
-		"  \033[33m%s\033[0m // %s\n",
-		meta->title_unicode, meta->title,
-		meta->artist_unicode, meta->artist
-	);
-	if (meta->source)
-		printf("  From %s\n", meta->source);
-
-	printf("\n  \033[34m%s\033[0m\n", meta->version);
-	if (meta->creator)
-		printf("  By %s\n", meta->creator);
-
-	int stars = beatmap->difficulty.overall_difficulty;
-	double half_star = beatmap->difficulty.overall_difficulty - stars;
-	printf("  ");
-	for (int i = 0; i < stars; i++)
-		printf("★ ");
-	if (half_star >= .5)
-		printf("☆ ");
-
-	printf("\n\n");
-}
-
 int oshu_run_game(struct oshu_game *game)
 {
-	welcome(game);
+	oshu_welcome(game);
 	/* Reset the clock.
 	 * Otherwise, when the startup is slow, the clock would jump. */
 	game->clock.system = SDL_GetTicks() / 1000.;

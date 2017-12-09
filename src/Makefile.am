@@ -28,6 +28,8 @@ oshu_SOURCES = \
 	game/play.c \
 	game/score.c \
 	game/screen.h \
+	game/tty.c \
+	game/tty.h \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/draw.c \
