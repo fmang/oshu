@@ -111,6 +111,10 @@ static int update(struct oshu_game *game)
 
 static int draw(struct oshu_game *game)
 {
+	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
+	SDL_RenderClear(game->display.renderer);
+	game->mode->draw(game);
+	SDL_RenderPresent(game->display.renderer);
 	return 0;
 }
 
