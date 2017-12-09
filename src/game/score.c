@@ -11,14 +11,14 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 			break;
 		switch (event->key.keysym.sym) {
 		case OSHU_QUIT_KEY:
-			game->state |= OSHU_STOPPING;
+			oshu_stop_game(game);
 			break;
 		}
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_CLOSE:
-			game->state |= OSHU_STOPPING;
+			oshu_stop_game(game);
 			break;
 		}
 		break;
@@ -38,6 +38,7 @@ static int draw(struct oshu_game *game)
 }
 
 struct oshu_game_screen oshu_score_screen = {
+	.name = "Finished",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,

@@ -71,6 +71,8 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	}
 
 	/* 5. Post-initialization */
+	game->autoplay = 0;
+	game->stop = 0;
 	game->screen = &oshu_play_screen;
 	if (game->mode->initialize(game) < 0)
 		goto fail;
@@ -85,8 +87,6 @@ fail:
 void oshu_pause_game(struct oshu_game *game)
 {
 	oshu_pause_audio(&game->audio);
-	game->state |= OSHU_PAUSED;
-	game->state &= ~OSHU_PLAYING;
 	game->screen = &oshu_pause_screen;
 	oshu_print_state(game);
 }
@@ -111,9 +111,6 @@ void oshu_forward_game(struct oshu_game *game, double offset)
 	game->clock.now = game->audio.music.current_timestamp;
 	game->mode->relinquish(game);
 
-	if (!(game->state & OSHU_PAUSED))
-		oshu_play_audio(&game->audio);
-
 	oshu_print_state(game);
 
 	assert (game->hit_cursor != NULL);
@@ -126,12 +123,10 @@ void oshu_forward_game(struct oshu_game *game, double offset)
 void oshu_unpause_game(struct oshu_game *game)
 {
 	if (game->clock.now >= 0) {
-		if (!(game->state & OSHU_AUTOPLAY))
+		if (!game->autoplay)
 			oshu_rewind_game(game, 1.);
 		oshu_play_audio(&game->audio);
 	}
-	game->state &= ~OSHU_PAUSED;
-	game->state |= OSHU_PLAYING;
 	game->screen = &oshu_play_screen;
 }
 
@@ -191,7 +186,7 @@ static void update_clock(struct oshu_game *game)
 	clock->audio = game->audio.music.current_timestamp;
 	clock->before = clock->now;
 	clock->system = system;
-	if (!(game->state & OSHU_PLAYING))
+	if (game->screen == &oshu_pause_screen)
 		; /* don't update the clock */
 	else if (clock->before < 0) /* leading in */
 		clock->now = clock->before + diff;
@@ -212,7 +207,7 @@ int oshu_run_game(struct oshu_game *game)
 	game->clock.system = SDL_GetTicks() / 1000.;
 	SDL_Event event;
 	int missed_frames = 0;
-	while (!(game->state & OSHU_STOPPING)) {
+	while (!game->stop) {
 		update_clock(game);
 		while (SDL_PollEvent(&event))
 			game->screen->on_event(game, &event);
@@ -269,4 +264,9 @@ struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset)
 		hit = hit->previous;
 	/* here we have the guarantee that hit->time <= target */
 	return hit;
+}
+
+void oshu_stop_game(struct oshu_game *game)
+{
+	game->stop = 1;
 }

@@ -35,6 +35,7 @@ struct oshu_game;
  * Define a game screen by its behavior.
  */
 struct oshu_game_screen {
+	const char *name;
 	/**
 	 * Called every time an event happens.
 	 *

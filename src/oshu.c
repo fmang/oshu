@@ -57,10 +57,10 @@ static struct oshu_game current_game;
 
 static void signal_handler(int signum)
 {
-	current_game.state |= OSHU_STOPPING;
+	oshu_stop_game(&current_game);
 }
 
-int run(const char *beatmap_path, int state)
+int run(const char *beatmap_path, int autoplay, int pause)
 {
 	int rc = 0;
 
@@ -74,7 +74,9 @@ int run(const char *beatmap_path, int state)
 		return -1;
 	}
 
-	current_game.state = state;
+	current_game.autoplay = 1;
+	if (pause)
+		oshu_pause_game(&current_game);
 
 	if ((rc = oshu_run_game(&current_game)) < 0)
 		oshu_log_error("error while running the game, aborting");
@@ -86,7 +88,8 @@ int run(const char *beatmap_path, int state)
 
 int main(int argc, char **argv)
 {
-	int state = OSHU_USERPLAY | OSHU_PLAYING;
+	int autoplay = 0;
+	int pause = 0;
 	int verbosity = SDL_LOG_PRIORITY_INFO;
 
 	for (;;) {
@@ -104,11 +107,10 @@ int main(int argc, char **argv)
 			fputs(help, stdout);
 			return 0;
 		case OPT_AUTOPLAY:
-			state |= OSHU_AUTOPLAY;
-			state &= ~OSHU_USERPLAY;
+			autoplay = 1;
 			break;
 		case OPT_PAUSE:
-			state |= OSHU_PAUSED;
+			pause = 1;
 			break;
 		default:
 			fputs(usage, stderr);
@@ -146,7 +148,7 @@ int main(int argc, char **argv)
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
-	if (run(beatmap_file, state) < 0)
+	if (run(beatmap_file, autoplay, pause) < 0)
 		return 1;
 
 	free(beatmap_path);

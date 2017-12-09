@@ -69,47 +69,6 @@ struct oshu_clock {
 };
 
 /**
- * Enumerate the game states.
- *
- * These are flags and can be OR'd.
- */
-enum oshu_game_state {
-	/**
-	 * The user plays.
-	 *
-	 * It can be combined with OSHU_PLAYING or OSHU_PAUSED, but not paused.
-	 */
-	OSHU_USERPLAY = 0x01,
-	/**
-	 * Tells whether the game is in autoplay mode or not.
-	 *
-	 * Paused autoplay and playing autoplay are both possible.
-	 *
-	 * It cannot be combined with #OSHU_USERPLAY.
-	 */
-	OSHU_AUTOPLAY = 0x02,
-	/**
-	 * The song is playing, whether it is on autoplay or not.
-	 */
-	OSHU_PLAYING = 0x04,
-	/**
-	 * The game is paused.
-	 *
-	 * This is contradictory to OSHU_PLAYING.
-	 */
-	OSHU_PAUSED = 0x08,
-	/**
-	 * After the final note has been playing, the game enters some
-	 * pseudo-pause mode to display the score.
-	 */
-	OSHU_FINISHED = 0x10,
-	/**
-	 * Will stop a the next iteration if this is true.
-	 */
-	OSHU_STOPPING = 0x20,
-};
-
-/**
  * The full game state, from the beatmap state to the audio and graphical
  * context.
  *
@@ -130,8 +89,7 @@ struct oshu_game {
 	 * It is always allocated statically, so you must not free it.
 	 */
 	struct oshu_game_mode *mode;
-	/** Combination of flags from #oshu_game_state. */
-	int state;
+	int stop;
 	int autoplay;
 	struct oshu_game_screen *screen;
 	/** Background picture. */
@@ -185,6 +143,13 @@ void oshu_destroy_game(struct oshu_game *game);
  * Start the main event loop.
  */
 int oshu_run_game(struct oshu_game *game);
+
+/**
+ * Make the game stop at the next iteration.
+ *
+ * It can be called from a signal handler.
+ */
+void oshu_stop_game(struct oshu_game *game);
 
 /**
  * Find the first hit object after *now - offset*.

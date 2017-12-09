@@ -51,7 +51,7 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 				oshu_pause_game(game);
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
-			game->state |= OSHU_STOPPING;
+			oshu_stop_game(game);
 			break;
 		}
 		break;
@@ -64,7 +64,6 @@ static void check_end(struct oshu_game *game)
 	if (game->hit_cursor->next)
 		return;
 	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + game->beatmap.difficulty.leniency) {
-		game->state = OSHU_FINISHED | OSHU_PLAYING;
 		game->screen = &oshu_score_screen;
 		oshu_congratulate(game);
 	}
@@ -90,6 +89,7 @@ static int draw(struct oshu_game *game)
 }
 
 struct oshu_game_screen oshu_play_screen = {
+	.name = "Playing",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,

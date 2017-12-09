@@ -8,6 +8,7 @@
 
 #include "beatmap/beatmap.h"
 #include "game/game.h"
+#include "game/screen.h"
 #include "graphics/display.h"
 #include "graphics/draw.h"
 
@@ -255,7 +256,7 @@ static void draw_background(struct oshu_game *game)
 static void draw_metadata(struct oshu_game *game)
 {
 	double ratio;
-	if (game->state & OSHU_PAUSED)
+	if (game->screen == &oshu_pause_screen)
 		ratio = 1.;
 	else if (game->clock.system < 5.)
 		ratio = 1.;

@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "game/screen.h"
 #include "game/tty.h"
 
 #include <unistd.h>
@@ -38,13 +39,12 @@ void oshu_print_state(struct oshu_game *game)
 		return;
 	int minutes = game->clock.now / 60.;
 	double seconds = game->clock.now - minutes * 60.;
-	const char *state = game->state & OSHU_PAUSED ? " Paused" : "Playing";
 	double duration = game->audio.music.duration;
 	int duration_minutes = duration / 60.;
 	double duration_seconds = duration - duration_minutes * 60;
 	printf(
 		"%s: %d:%06.3f / %d:%06.3f\r",
-		state, minutes, seconds,
+		game->screen->name, minutes, seconds,
 		duration_minutes, duration_seconds
 	);
 	fflush(stdout);
