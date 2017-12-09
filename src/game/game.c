@@ -175,6 +175,14 @@ enum oshu_finger oshu_translate_key(SDL_Keysym *keysym)
 	}
 }
 
+static void draw(struct oshu_game *game)
+{
+	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
+	SDL_RenderClear(game->display.renderer);
+	game->screen->draw(game);
+	SDL_RenderPresent(game->display.renderer);
+}
+
 /**
  * Update the game clock.
  *
@@ -256,7 +264,7 @@ int oshu_run_game(struct oshu_game *game)
 		while (SDL_PollEvent(&event))
 			game->screen->on_event(game, &event);
 		game->screen->update(game);
-		game->screen->draw(game);
+		draw(game);
 		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
 			SDL_Delay(advance * 1000);
