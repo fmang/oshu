@@ -73,52 +73,6 @@ fail:
 	return -1;
 }
 
-void oshu_pause_game(struct oshu_game *game)
-{
-	oshu_pause_audio(&game->audio);
-	game->screen = &oshu_pause_screen;
-	oshu_print_state(game);
-}
-
-void oshu_rewind_game(struct oshu_game *game, double offset)
-{
-	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
-	game->clock.now = game->audio.music.current_timestamp;
-	game->mode->relinquish(game);
-	oshu_print_state(game);
-
-	assert (game->hit_cursor != NULL);
-	while (game->hit_cursor->time > game->clock.now + 1.) {
-		game->hit_cursor->state = OSHU_INITIAL_HIT;
-		game->hit_cursor = game->hit_cursor->previous;
-	}
-}
-
-void oshu_forward_game(struct oshu_game *game, double offset)
-{
-	oshu_seek_music(&game->audio, game->audio.music.current_timestamp + offset);
-	game->clock.now = game->audio.music.current_timestamp;
-	game->mode->relinquish(game);
-
-	oshu_print_state(game);
-
-	assert (game->hit_cursor != NULL);
-	while (game->hit_cursor->time < game->clock.now + 1.) {
-		game->hit_cursor->state = OSHU_SKIPPED_HIT;
-		game->hit_cursor = game->hit_cursor->next;
-	}
-}
-
-void oshu_unpause_game(struct oshu_game *game)
-{
-	if (game->clock.now >= 0) {
-		if (!game->autoplay)
-			oshu_rewind_game(game, 1.);
-		oshu_play_audio(&game->audio);
-	}
-	game->screen = &oshu_play_screen;
-}
-
 static void draw(struct oshu_game *game)
 {
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
@@ -133,12 +87,14 @@ int oshu_run_game(struct oshu_game *game)
 	oshu_initialize_clock(game);
 	SDL_Event event;
 	int missed_frames = 0;
+
 	while (!game->stop) {
 		oshu_update_clock(game);
 		while (SDL_PollEvent(&event))
 			game->screen->on_event(game, &event);
 		game->screen->update(game);
 		draw(game);
+
 		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
 			SDL_Delay(advance * 1000);
@@ -148,6 +104,7 @@ int oshu_run_game(struct oshu_game *game)
 				oshu_log_warning("your computer is having a hard time keeping up 60 FPS");
 		}
 	}
+
 	oshu_log_debug("%d missed frames", missed_frames);
 	return 0;
 }
@@ -162,37 +119,4 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_close_sound_library(&game->library);
 	oshu_destroy_texture(&game->background);
 	oshu_close_display(&game->display);
-}
-
-struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset)
-{
-	struct oshu_hit *hit = game->hit_cursor;
-	double target = game->clock.now - offset;
-	/* seek backward */
-	while (oshu_hit_end_time(hit) > target)
-		hit = hit->previous;
-	/* seek forward */
-	while (oshu_hit_end_time(hit) < target)
-		hit = hit->next;
-	/* here we have the guarantee that hit->time >= target */
-	return hit;
-}
-
-struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset)
-{
-	struct oshu_hit *hit = game->hit_cursor;
-	double target = game->clock.now + offset;
-	/* seek forward */
-	while (hit->time < target)
-		hit = hit->next;
-	/* seek backward */
-	while (hit->time > target)
-		hit = hit->previous;
-	/* here we have the guarantee that hit->time <= target */
-	return hit;
-}
-
-void oshu_stop_game(struct oshu_game *game)
-{
-	game->stop = 1;
 }

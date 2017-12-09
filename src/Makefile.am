@@ -2,7 +2,6 @@ bin_PROGRAMS = oshu
 
 oshu_SOURCES = \
 	oshu.c \
-	log.h \
 	audio/audio.c \
 	audio/audio.h \
 	audio/library.c \
@@ -20,12 +19,14 @@ oshu_SOURCES = \
 	beatmap/parser.c \
 	beatmap/parser.h \
 	beatmap/tokens.h \
+	game/actions.c \
 	game/clock.c \
 	game/clock.h \
 	game/controls.c \
 	game/controls.h \
 	game/game.c \
 	game/game.h \
+	game/helpers.c \
 	game/mode.h \
 	game/pause.c \
 	game/play.c \
@@ -39,6 +40,7 @@ oshu_SOURCES = \
 	graphics/draw.h \
 	graphics/paint.c \
 	graphics/paint.h \
+	log.h \
 	osu/draw.c \
 	osu/osu.c \
 	osu/osu.h \
