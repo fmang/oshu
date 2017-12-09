@@ -22,6 +22,7 @@ oshu_SOURCES = \
 	beatmap/tokens.h \
 	game/clock.c \
 	game/clock.h \
+	game/controls.c \
 	game/controls.h \
 	game/game.c \
 	game/game.h \
