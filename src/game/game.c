@@ -82,17 +82,7 @@ fail:
 	return -1;
 }
 
-/**
- * Show the state of the game (paused/playing) and the current song position.
- *
- * Only do that for terminal outputs in order not to spam something if the
- * output is redirected.
- *
- * The state length must not decrease over time, otherwise you end up with
- * glitches. If you write `foo\rx`, you get `xoo`. This is the reason the
- * Paused string literal has an extra space.
- */
-static void dump_state(struct oshu_game *game)
+void oshu_print_state(struct oshu_game *game)
 {
 	if (!isatty(fileno(stdout)))
 		return;
@@ -116,7 +106,7 @@ void oshu_pause_game(struct oshu_game *game)
 	game->state |= OSHU_PAUSED;
 	game->state &= ~OSHU_PLAYING;
 	game->screen = &oshu_pause_screen;
-	dump_state(game);
+	oshu_print_state(game);
 }
 
 void oshu_rewind_game(struct oshu_game *game, double offset)
@@ -124,7 +114,7 @@ void oshu_rewind_game(struct oshu_game *game, double offset)
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
 	game->clock.now = game->audio.music.current_timestamp;
 	game->mode->relinquish(game);
-	dump_state(game);
+	oshu_print_state(game);
 
 	assert (game->hit_cursor != NULL);
 	while (game->hit_cursor->time > game->clock.now + 1.) {
@@ -142,7 +132,7 @@ void oshu_forward_game(struct oshu_game *game, double offset)
 	if (!(game->state & OSHU_PAUSED))
 		oshu_play_audio(&game->audio);
 
-	dump_state(game);
+	oshu_print_state(game);
 
 	assert (game->hit_cursor != NULL);
 	while (game->hit_cursor->time < game->clock.now + 1.) {
@@ -183,33 +173,6 @@ enum oshu_finger oshu_translate_key(SDL_Keysym *keysym)
 	case SDL_SCANCODE_SEMICOLON: return OSHU_RIGHT_PINKY;
 	default:             return OSHU_UNKNOWN_KEY;
 	}
-}
-
-/**
- * Print the score if the song was finished, then exit.
- */
-static void end(struct oshu_game *game)
-{
-	/* Clear the status line. */
-	printf("\r                                        \r");
-	/* Compute the score. */
-	int good = 0;
-	int missed = 0;
-	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
-		if (hit->state == OSHU_MISSED_HIT)
-			missed++;
-		else if (hit->state == OSHU_GOOD_HIT)
-			good++;
-	}
-	double rate = (double) good / (good + missed);
-	printf(
-		"  \033[1mScore:\033[0m\n"
-		"  \033[%dm%3d\033[0m good\n"
-		"  \033[%dm%3d\033[0m miss\n"
-		"\n",
-		rate >= 0.9 ? 32 : 0, good,
-		rate < 0.5  ? 31 : 0, missed
-	);
 }
 
 static void draw(struct oshu_game *game)
@@ -288,19 +251,6 @@ static void welcome(struct oshu_game *game)
 	printf("\n\n");
 }
 
-static void check_end(struct oshu_game *game)
-{
-	if (game->state & OSHU_FINISHED)
-		return;
-	if (game->hit_cursor->next)
-		return;
-	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + game->beatmap.difficulty.leniency) {
-		game->state = OSHU_FINISHED | OSHU_PLAYING;
-		game->screen = &oshu_score_screen;
-		end(game);
-	}
-}
-
 int oshu_run_game(struct oshu_game *game)
 {
 	welcome(game);
@@ -309,22 +259,12 @@ int oshu_run_game(struct oshu_game *game)
 	game->clock.system = SDL_GetTicks() / 1000.;
 	SDL_Event event;
 	int missed_frames = 0;
-	if ((game->state & OSHU_PLAYING) && game->clock.now >= 0)
-		oshu_play_audio(&game->audio);
 	while (!(game->state & OSHU_STOPPING)) {
 		update_clock(game);
-		if (game->clock.before < 0 && game->clock.now >= 0)
-			oshu_play_audio(&game->audio);
 		while (SDL_PollEvent(&event))
 			game->screen->on_event(game, &event);
-		if (game->state & OSHU_USERPLAY)
-			game->mode->check(game);
-		else if (game->state & OSHU_AUTOPLAY)
-			game->mode->autoplay(game);
-		check_end(game);
+		game->screen->update(game);
 		draw(game);
-		if ((game->state & OSHU_PLAYING) && !(game->state & OSHU_FINISHED))
-			dump_state(game);
 		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
 			SDL_Delay(advance * 1000);
