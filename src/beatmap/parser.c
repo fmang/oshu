@@ -1258,6 +1258,17 @@ void initialize(struct oshu_beatmap *beatmap)
 	beatmap->hits->time = -INFINITY;
 }
 
+static int validate_metadata(struct oshu_metadata *meta)
+{
+	if (!meta->title)
+		return -1;
+	if (!meta->artist)
+		return -1;
+	if (!meta->version)
+		return -1;
+	return 0;
+}
+
 /**
  * Perform a variety of checks on a beatmap file to ensure it was parsed well
  * enough to be played.
@@ -1266,6 +1277,10 @@ static int validate(struct oshu_beatmap *beatmap)
 {
 	if (!beatmap->audio_filename) {
 		oshu_log_error("no audio file mentionned");
+		return -1;
+	}
+	if (validate_metadata(&beatmap->metadata) < 0) {
+		oshu_log_error("incomplete metadata");
 		return -1;
 	}
 	return 0;

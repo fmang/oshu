@@ -23,51 +23,64 @@
  */
 static const double frame_duration = .016666666;
 
-int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
+static int open_beatmap(const char *beatmap_path, struct oshu_game *game)
 {
-	/* 1. Beatmap */
 	if (oshu_load_beatmap(beatmap_path, &game->beatmap) < 0) {
 		oshu_log_error("no beatmap, aborting");
-		goto fail;
+		return -1;
 	}
 	if (game->beatmap.mode == OSHU_OSU_MODE) {
 		game->mode = &osu_mode;
 	} else {
 		oshu_log_error("unsupported game mode");
-		goto fail;
+		return -1;
 	}
 	assert (game->beatmap.hits != NULL);
 	game->hit_cursor = game->beatmap.hits;
+	return 0;
+}
 
-	/* 2. Audio */
+static int open_audio(struct oshu_game *game)
+{
 	assert (game->beatmap.audio_filename != NULL);
 	if (oshu_open_audio(game->beatmap.audio_filename, &game->audio) < 0) {
 		oshu_log_error("no audio, aborting");
-		goto fail;
+		return -1;
 	}
 	oshu_open_sound_library(&game->library, &game->audio.device_spec);
 	oshu_populate_library(&game->library, &game->beatmap);
+	return 0;
+}
 
-	/* 3. Display */
+static int open_display(struct oshu_game *game)
+{
 	if (oshu_open_display(&game->display) < 0) {
 		oshu_log_error("no display, aborting");
-		goto fail;
+		return -1;
 	}
+	struct oshu_metadata *meta = &game->beatmap.metadata;
 	char *title;
-	if (asprintf(&title, "%s - oshu!", beatmap_path) >= 0) {
+	if (asprintf(&title, "%s - %s ♯ %s 𝄞 oshu!", meta->artist, meta->title, meta->version) >= 0) {
 		SDL_SetWindowTitle(game->display.window, title);
 		free(title);
 	}
 	if (game->beatmap.background_filename)
 		oshu_load_texture(&game->display, game->beatmap.background_filename, &game->background);
+	return 0;
+}
 
-	/* 4. Post-initialization */
+int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
+{
 	game->screen = &oshu_play_screen;
+	if (open_beatmap(beatmap_path, game) < 0)
+		goto fail;
+	if (open_audio(game) < 0)
+		goto fail;
+	if (open_display(game) < 0)
+		goto fail;
 	if (game->mode->initialize(game) < 0)
 		goto fail;
-
 	return 0;
-
 fail:
 	oshu_destroy_game(game);
 	return -1;
@@ -85,6 +98,7 @@ int oshu_run_game(struct oshu_game *game)
 {
 	oshu_welcome(game);
 	oshu_initialize_clock(game);
+
 	SDL_Event event;
 	int missed_frames = 0;
 
