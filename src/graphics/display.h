@@ -13,6 +13,11 @@ struct SDL_Window;
 
 /**
  * \defgroup graphics Graphics
+ *
+ * \todo
+ * Describe the overall module structure, and their relations with a nice dot
+ * graph. Paint → Texture → Display → View. Texture → SDL_Texture →
+ * SDL_Renderer ← Display. Paint → Cairo.
  */
 
 /**

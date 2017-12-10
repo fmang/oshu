@@ -101,6 +101,9 @@ void oshu_fit_view(struct oshu_view *view, oshu_size size);
  * the game to regenerate textures.
  *
  * Call this function when you receive a `SDL_WINDOWEVENT_SIZE_CHANGED`.
+ *
+ * \todo
+ * Move in display.h.
  */
 void oshu_reset_view(struct oshu_display *display);
 
