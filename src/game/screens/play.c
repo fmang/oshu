@@ -71,7 +71,8 @@ static void check_end(struct oshu_game *game)
 {
 	if (game->hit_cursor->next)
 		return;
-	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + game->beatmap.difficulty.leniency) {
+	const double delay = game->beatmap.difficulty.leniency + game->beatmap.difficulty.approach_time;
+	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + delay) {
 		game->screen = &oshu_score_screen;
 		oshu_congratulate(game);
 	}
