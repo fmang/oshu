@@ -51,6 +51,7 @@ int oshu_paint_score(struct oshu_game *game)
 			cairo_line_to(p.cr, x, y);
 		}
 	}
+	cairo_line_to(p.cr, 0, cimag(size));
 	cairo_stroke(p.cr);
 
 	cairo_set_source_rgba(p.cr, 1, 0, 1, .6);
@@ -63,6 +64,7 @@ int oshu_paint_score(struct oshu_game *game)
 			cairo_line_to(p.cr, x, y);
 		}
 	}
+	cairo_line_to(p.cr, 0, cimag(size));
 	cairo_stroke(p.cr);
 
 	struct oshu_texture *texture = &game->ui.score.offset_graph;
