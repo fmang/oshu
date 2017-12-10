@@ -40,10 +40,12 @@ oshu_SOURCES = \
 	game/ui/ui.h \
 	graphics/display.c \
 	graphics/display.h \
-	graphics/draw.c \
-	graphics/draw.h \
 	graphics/paint.c \
 	graphics/paint.h \
+	graphics/texture.c \
+	graphics/texture.h \
+	graphics/view.c \
+	graphics/view.h \
 	log.h \
 	osu/draw.c \
 	osu/osu.c \

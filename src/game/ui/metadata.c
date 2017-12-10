@@ -7,8 +7,8 @@
 
 #include "game/game.h"
 #include "game/screens/screens.h"
-#include "graphics/draw.h"
 #include "graphics/paint.h"
+#include "graphics/texture.h"
 
 #include <assert.h>
 #include <pango/pangocairo.h>

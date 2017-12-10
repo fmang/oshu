@@ -9,7 +9,7 @@
 #include "beatmap/beatmap.h"
 #include "game/game.h"
 #include "graphics/display.h"
-#include "graphics/draw.h"
+#include "graphics/texture.h"
 
 #include <assert.h>
 

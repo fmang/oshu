@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "graphics/display.h"
+#include "graphics/texture.h"
 
 struct oshu_game;
 

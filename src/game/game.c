@@ -10,7 +10,7 @@
 #include "game/game.h"
 #include "game/screens/screens.h"
 #include "game/tty.h"
-#include "graphics/draw.h"
+#include "graphics/texture.h"
 #include "log.h"
 
 #include <assert.h>

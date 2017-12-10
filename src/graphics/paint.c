@@ -6,6 +6,7 @@
 #include "graphics/paint.h"
 
 #include "graphics/display.h"
+#include "graphics/texture.h"
 #include "log.h"
 
 #include <assert.h>
