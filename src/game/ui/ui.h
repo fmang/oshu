@@ -45,9 +45,18 @@ void oshu_free_metadata(struct oshu_game *game);
 
 void oshu_show_progression_bar(struct oshu_game *game);
 
+struct oshu_score_widget {
+	struct oshu_texture offset_graph;
+};
+
+int oshu_paint_score(struct oshu_game *game);
+void oshu_show_score(struct oshu_game *game);
+void oshu_free_score(struct oshu_game *game);
+
 struct oshu_ui {
 	struct oshu_background_widget background;
 	struct oshu_metadata_widget metadata;
+	struct oshu_score_widget score;
 };
 
 /** \} */
