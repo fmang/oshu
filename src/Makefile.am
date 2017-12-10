@@ -32,6 +32,7 @@ oshu_SOURCES = \
 	game/mode.h \
 	game/pause.c \
 	game/play.c \
+	game/progression.c \
 	game/score.c \
 	game/screen.h \
 	game/tty.c \

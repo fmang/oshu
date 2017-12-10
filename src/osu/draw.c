@@ -153,37 +153,11 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu
 }
 
 /**
- * Draw at the bottom of the screen a progress bar showing how far in the song
- * we are.
- */
-static void draw_progression(struct oshu_game *game)
-{
-	double progression = game->clock.now / game->audio.music.duration;
-	if (progression < 0)
-		progression = 0;
-	else if (progression > 1)
-		progression = 1;
-
-	double height = 4;
-	SDL_Rect bar = {
-		.x = 0,
-		.y = cimag(game->display.view.size) - height,
-		.w = progression * creal(game->display.view.size),
-		.h = height,
-	};
-	SDL_SetRenderDrawColor(game->display.renderer, 255, 255, 255, 48);
-	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
-	SDL_RenderFillRect(game->display.renderer, &bar);
-}
-
-/**
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
  */
 int osu_draw(struct oshu_game *game)
 {
-	draw_progression(game);
-
 	oshu_fit_view(&game->display.view, 640 + 480 * I);
 	oshu_resize_view(&game->display.view, 512 + 384 * I);
 	struct oshu_hit *cursor = oshu_look_hit_up(game, game->beatmap.difficulty.approach_time);

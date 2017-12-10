@@ -98,6 +98,7 @@ static void draw(struct oshu_game *game)
 	SDL_RenderClear(game->display.renderer);
 	oshu_show_background(game);
 	oshu_show_metadata(game);
+	oshu_show_progression_bar(game);
 	game->screen->draw(game);
 	SDL_RenderPresent(game->display.renderer);
 }
