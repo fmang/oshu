@@ -18,33 +18,6 @@ static double brighter(double v)
 	return v < 1. ? v : 1.;
 }
 
-static int paint_cursor(struct oshu_game *game) {
-	double radius = 14;
-	oshu_size size = (1. + I) * radius * 2.;
-
-	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
-	cairo_translate(p.cr, radius, radius);
-
-	cairo_pattern_t *pattern = cairo_pattern_create_radial(
-		0, 0, 0,
-		0, 0, radius - 1
-	);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.0, 1, 1, 1, .8);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.6, 1, 1, 1, .8);
-	cairo_pattern_add_color_stop_rgba(pattern, 0.7, 1, 1, 1, .3);
-	cairo_pattern_add_color_stop_rgba(pattern, 1.0, 1, 1, 1, 0);
-	cairo_arc(p.cr, 0, 0, radius - 1, 0, 2. * M_PI);
-	cairo_set_source(p.cr, pattern);
-	cairo_fill(p.cr);
-	cairo_pattern_destroy(pattern);
-
-	struct oshu_texture *texture = &game->osu.cursor;
-	int rc = oshu_finish_painting(&p, texture);
-	texture->origin = size / 2.;
-	return rc;
-}
-
 static int paint_approach_circle(struct oshu_game *game)
 {
 	double radius = game->beatmap.difficulty.circle_radius + game->beatmap.difficulty.approach_size;
@@ -368,7 +341,6 @@ int osu_paint_resources(struct oshu_game *game)
 		color = color->next;
 	}
 
-	paint_cursor(game);
 	paint_approach_circle(game);
 	paint_slider_ball(game);
 	paint_good_mark(game, -1, &game->osu.early_mark);
@@ -397,7 +369,6 @@ void osu_free_resources(struct oshu_game *game)
 			hit->texture = NULL;
 		}
 	}
-	oshu_destroy_texture(&game->osu.cursor);
 	oshu_destroy_texture(&game->osu.approach_circle);
 	oshu_destroy_texture(&game->osu.slider_ball);
 	oshu_destroy_texture(&game->osu.good_mark);

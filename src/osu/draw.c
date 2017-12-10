@@ -87,24 +87,6 @@ static void draw_hit(struct oshu_game *game, struct oshu_hit *hit)
 		draw_hit_circle(game, hit);
 }
 
-static void draw_cursor(struct oshu_game *game)
-{
-	int fireflies = sizeof(game->osu.mouse_history) / sizeof(*game->osu.mouse_history);
-	game->osu.mouse_offset = (game->osu.mouse_offset + 1) % fireflies;
-	game->osu.mouse_history[game->osu.mouse_offset] = oshu_get_mouse(&game->display);
-
-	for (int i = 1; i <= fireflies; ++i) {
-		int offset = (game->osu.mouse_offset + i) % fireflies;
-		double ratio = (double) (i + 1) / (fireflies + 1);
-		SDL_SetTextureAlphaMod(game->osu.cursor.texture, ratio * 255);
-		oshu_draw_scaled_texture(
-			&game->display, &game->osu.cursor,
-			game->osu.mouse_history[offset],
-			ratio
-		);
-	}
-}
-
 /**
  * Connect two hits with a dotted line.
  *
@@ -172,6 +154,5 @@ int osu_draw(struct oshu_game *game)
 		draw_hit(game, hit);
 		next = hit;
 	}
-	draw_cursor(game);
 	return 0;
 }

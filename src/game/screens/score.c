@@ -45,6 +45,7 @@ static int draw(struct oshu_game *game)
 	oshu_show_metadata(game);
 	oshu_show_progression_bar(game);
 	oshu_show_score(game);
+	game->mode->draw(game);
 	return 0;
 }
 

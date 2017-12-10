@@ -35,6 +35,7 @@ oshu_SOURCES = \
 	game/tty.c \
 	game/tty.h \
 	game/ui/background.c \
+	game/ui/cursor.c \
 	game/ui/metadata.c \
 	game/ui/progression.c \
 	game/ui/score.c \

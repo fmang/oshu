@@ -67,6 +67,7 @@ static int open_display(struct oshu_game *game)
 	oshu_reset_view(&game->display);
 	oshu_load_background(game);
 	oshu_paint_metadata(game);
+	oshu_paint_cursor(game);
 	return 0;
 }
 
@@ -97,6 +98,7 @@ static void draw(struct oshu_game *game)
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
 	game->screen->draw(game);
+	oshu_show_cursor(game);
 	SDL_RenderPresent(game->display.renderer);
 }
 
@@ -138,5 +140,8 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);
 	oshu_free_background(game);
+	oshu_free_metadata(game);
+	oshu_free_score(game);
+	oshu_free_cursor(game);
 	oshu_close_display(&game->display);
 }

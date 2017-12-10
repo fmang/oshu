@@ -42,23 +42,6 @@ struct osu_state {
 	 */
 	enum oshu_finger held_key;
 	/**
-	 * Keep track of the previous positions of the mouse to display a
-	 * fancier cursor, with a trail.
-	 *
-	 * This is a circular array, starting at #mouse_offset. The previous is
-	 * at #mouse_offset - 1, and so on. When you reach the maximum index,
-	 * wrap at 0.
-	 */
-	oshu_point mouse_history[4];
-	/**
-	 * Index of the most recent point in #mouse_history.
-	 */
-	int mouse_offset;
-	/**
-	 * The software mouse cursor.
-	 */
-	struct oshu_texture cursor;
-	/**
 	 * Dynamic array of circle hit object textures.
 	 *
 	 * There are as many textures as there are colors in the beatmap.
