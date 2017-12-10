@@ -139,8 +139,7 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu
  */
 int osu_draw(struct oshu_game *game)
 {
-	oshu_fit_view(&game->display.view, 640 + 480 * I);
-	oshu_resize_view(&game->display.view, 512 + 384 * I);
+	osu_view(game);
 	struct oshu_hit *cursor = oshu_look_hit_up(game, game->beatmap.difficulty.approach_time);
 	struct oshu_hit *next = NULL;
 	double now = game->clock.now;
@@ -154,5 +153,6 @@ int osu_draw(struct oshu_game *game)
 		draw_hit(game, hit);
 		next = hit;
 	}
+	oshu_reset_view(&game->display);
 	return 0;
 }

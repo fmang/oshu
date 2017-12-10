@@ -8,7 +8,7 @@
 
 int oshu_paint_cursor(struct oshu_game *game)
 {
-	double radius = 14;
+	double radius = 20;
 	oshu_size size = (1. + I) * radius * 2.;
 
 	struct oshu_painter p;

@@ -127,6 +127,8 @@ void osu_free_resources(struct oshu_game *game);
  */
 int osu_draw(struct oshu_game *game);
 
+void osu_view(struct oshu_game *game);
+
 /**
  * Implementation of the standard osu! game mode.
  */

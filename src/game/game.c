@@ -94,7 +94,6 @@ fail:
  */
 static void draw(struct oshu_game *game)
 {
-	oshu_reset_view(&game->display);
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
 	game->screen->draw(game);

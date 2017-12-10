@@ -100,6 +100,7 @@ static void sonorize_slider(struct oshu_game *game)
  */
 static int check(struct oshu_game *game)
 {
+	osu_view(game);
 	/* Ensure the mouse follows the slider. */
 	sonorize_slider(game); /* < may release the slider! */
 	if (game->osu.current_slider) {
@@ -126,6 +127,7 @@ static int check(struct oshu_game *game)
 		}
 		game->hit_cursor = hit->next;
 	}
+	oshu_reset_view(&game->display);
 	return 0;
 }
 
@@ -175,7 +177,9 @@ static int autoplay(struct oshu_game *game)
  */
 static int press(struct oshu_game *game, enum oshu_finger key)
 {
+	osu_view(game);
 	oshu_point mouse = oshu_get_mouse(&game->display);
+	oshu_reset_view(&game->display);
 	struct oshu_hit *hit = find_hit(game, mouse);
 	if (!hit)
 		return 0;
@@ -224,6 +228,12 @@ static int destroy(struct oshu_game *game)
 	SDL_ShowCursor(SDL_ENABLE);
 	osu_free_resources(game);
 	return 0;
+}
+
+void osu_view(struct oshu_game *game)
+{
+	oshu_fit_view(&game->display.view, 640 + 480 * I);
+	oshu_resize_view(&game->display.view, 512 + 384 * I);
 }
 
 struct oshu_game_mode osu_mode = {
