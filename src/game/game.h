@@ -29,6 +29,7 @@ struct oshu_game_screen;
 
 struct oshu_ui {
 	struct oshu_background_widget background;
+	struct oshu_metadata_widget metadata;
 };
 
 /**

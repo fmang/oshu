@@ -64,7 +64,9 @@ static int open_display(struct oshu_game *game)
 		SDL_SetWindowTitle(game->display.window, title);
 		free(title);
 	}
+	oshu_reset_view(&game->display);
 	oshu_load_background(game);
+	oshu_paint_metadata(game);
 	return 0;
 }
 
@@ -85,12 +87,17 @@ fail:
 	return -1;
 }
 
+/**
+ * \todo
+ * Move the background and metadata in their game screens.
+ */
 static void draw(struct oshu_game *game)
 {
 	oshu_reset_view(&game->display);
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
 	oshu_show_background(game);
+	oshu_show_metadata(game);
 	game->screen->draw(game);
 	SDL_RenderPresent(game->display.renderer);
 }

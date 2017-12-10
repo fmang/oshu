@@ -108,15 +108,6 @@ struct osu_state {
 	 * Little tick mark for the dotted line between two consecutive hits.
 	 */
 	struct oshu_texture connector;
-	/**
-	 * The frame with the title of the song, the artist and everything.
-	 */
-	struct oshu_texture metadata;
-	struct oshu_texture metadata_unicode;
-	/**
-	 * The frame with the title of the difficulty, and the number of stars;
-	 */
-	struct oshu_texture stars;
 };
 
 /**

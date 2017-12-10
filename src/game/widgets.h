@@ -1,6 +1,12 @@
 /**
  * \file game/widgets.h
  * \ingroup game_widgets
+ *
+ * \todo
+ * Rename this file ui.h
+ *
+ * \todo
+ * Define the oshu_ui structure here.
  */
 
 #pragma once
@@ -33,7 +39,7 @@ struct oshu_metadata_widget {
 	struct oshu_texture stars;
 };
 
-int oshu_load_metadata(struct oshu_game *game);
+int oshu_paint_metadata(struct oshu_game *game);
 void oshu_show_metadata(struct oshu_game *game);
 void oshu_free_metadata(struct oshu_game *game);
 

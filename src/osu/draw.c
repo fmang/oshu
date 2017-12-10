@@ -153,57 +153,6 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu
 }
 
 /**
- * Display the metadata on top of the gaming screen.
- *
- * Metadata are drawn in white text and a translucent black background for
- * readability.
- *
- * The display is shown when the game in paused, and in the 6 first seconds of
- * the game. It fades out from the 5th second to the 6th, where it becomes
- * completely invisible.
- *
- * Every 3.5 second, the display is switched between Unicode and ASCII, with a
- * 0.2-second fade transititon.
- */
-static void draw_metadata(struct oshu_game *game)
-{
-	double ratio;
-	if (game->screen == &oshu_pause_screen)
-		ratio = 1.;
-	else if (game->clock.system < 5.)
-		ratio = 1.;
-	else if (game->clock.system < 6.)
-		ratio = 6. - game->clock.system;
-	else
-		return;
-
-	SDL_Rect frame = {
-		.x = 0,
-		.y = 0,
-		.w = creal(game->display.view.size),
-		.h = cimag(game->osu.metadata.size),
-	};
-	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 128 * ratio);
-	SDL_SetRenderDrawBlendMode(game->display.renderer, SDL_BLENDMODE_BLEND);
-	SDL_RenderFillRect(game->display.renderer, &frame);
-
-	double phase = game->clock.system / 3.5;
-	double progression = fabs(((phase - (int) phase) - 0.5) * 2.);
-	int has_unicode = game->osu.metadata_unicode.texture != NULL;
-	int unicode = has_unicode ? (int) phase % 2 == 0 : 0;
-	double transition = 1.;
-	if (progression > .9 && has_unicode)
-		transition = 1. - (progression - .9) * 10.;
-
-	struct oshu_texture *meta = unicode ? &game->osu.metadata_unicode : &game->osu.metadata;
-	SDL_SetTextureAlphaMod(meta->texture, ratio * transition * 255);
-	oshu_draw_texture(&game->display, meta, 0);
-
-	SDL_SetTextureAlphaMod(game->osu.stars.texture, ratio * 255);
-	oshu_draw_texture(&game->display, &game->osu.stars, creal(game->display.view.size));
-}
-
-/**
  * Draw at the bottom of the screen a progress bar showing how far in the song
  * we are.
  */
@@ -234,7 +183,6 @@ static void draw_progression(struct oshu_game *game)
 int osu_draw(struct oshu_game *game)
 {
 	draw_progression(game);
-	draw_metadata(game);
 
 	oshu_fit_view(&game->display.view, 640 + 480 * I);
 	oshu_resize_view(&game->display.view, 512 + 384 * I);

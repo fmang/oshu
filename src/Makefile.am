@@ -28,6 +28,7 @@ oshu_SOURCES = \
 	game/game.c \
 	game/game.h \
 	game/helpers.c \
+	game/metadata.c \
 	game/mode.h \
 	game/pause.c \
 	game/play.c \
