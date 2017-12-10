@@ -1,6 +1,6 @@
 /**
- * \file game/widgets.h
- * \ingroup game_widgets
+ * \file game/ui/ui.h
+ * \ingroup game_ui
  *
  * \todo
  * Rename this file ui.h
@@ -16,7 +16,7 @@
 struct oshu_game;
 
 /**
- * \defgroup game_widgets Widgets
+ * \defgroup game_ui Widgets
  * \ingroup game
  *
  * \brief
@@ -44,5 +44,10 @@ void oshu_show_metadata(struct oshu_game *game);
 void oshu_free_metadata(struct oshu_game *game);
 
 void oshu_show_progression_bar(struct oshu_game *game);
+
+struct oshu_ui {
+	struct oshu_background_widget background;
+	struct oshu_metadata_widget metadata;
+};
 
 /** \} */

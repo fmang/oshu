@@ -20,7 +20,6 @@ oshu_SOURCES = \
 	beatmap/parser.h \
 	beatmap/tokens.h \
 	game/actions.c \
-	game/background.c \
 	game/clock.c \
 	game/clock.h \
 	game/controls.c \
@@ -28,16 +27,17 @@ oshu_SOURCES = \
 	game/game.c \
 	game/game.h \
 	game/helpers.c \
-	game/metadata.c \
 	game/mode.h \
-	game/progression.c \
 	game/screens/pause.c \
 	game/screens/play.c \
 	game/screens/score.c \
 	game/screens/screens.h \
 	game/tty.c \
 	game/tty.h \
-	game/widgets.h \
+	game/ui/background.c \
+	game/ui/metadata.c \
+	game/ui/progression.c \
+	game/ui/ui.h \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/draw.c \

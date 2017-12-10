@@ -12,7 +12,7 @@
 #include "beatmap/beatmap.h"
 #include "game/clock.h"
 #include "game/mode.h"
-#include "game/widgets.h"
+#include "game/ui/ui.h"
 #include "graphics/display.h"
 #include "osu/osu.h"
 
@@ -26,11 +26,6 @@ struct oshu_game_screen;
  *
  * \{
  */
-
-struct oshu_ui {
-	struct oshu_background_widget background;
-	struct oshu_metadata_widget metadata;
-};
 
 /**
  * The full game state, from the beatmap state to the audio and graphical
