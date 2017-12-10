@@ -48,9 +48,30 @@ static int update(struct oshu_game *game)
 	return 0;
 }
 
+static void draw_pause(struct oshu_display *display)
+{
+	const double size = 100;
+	const double thickness = 40;
+	const oshu_size screen = display->view.size;
+	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 128);
+	SDL_SetRenderDrawBlendMode(display->renderer, SDL_BLENDMODE_BLEND);
+	SDL_Rect bar = {
+		.x = creal(screen) / 2. - size / 2.,
+		.y = cimag(screen) / 2. - size / 2.,
+		.w = thickness,
+		.h = size,
+	};
+	SDL_RenderFillRect(display->renderer, &bar);
+	bar.x += size - thickness;
+	SDL_RenderFillRect(display->renderer, &bar);
+}
+
 static int draw(struct oshu_game *game)
 {
-	game->mode->draw(game);
+	oshu_show_background(game);
+	oshu_show_metadata(game);
+	oshu_show_progression_bar(game);
+	draw_pause(&game->display);
 	return 0;
 }
 

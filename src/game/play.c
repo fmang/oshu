@@ -92,6 +92,9 @@ static int update(struct oshu_game *game)
 
 static int draw(struct oshu_game *game)
 {
+	oshu_show_background(game);
+	oshu_show_metadata(game);
+	oshu_show_progression_bar(game);
 	game->mode->draw(game);
 	return 0;
 }
