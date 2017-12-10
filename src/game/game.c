@@ -8,7 +8,7 @@
 #include "../config.h"
 
 #include "game/game.h"
-#include "game/screen.h"
+#include "game/screens.h"
 #include "game/tty.h"
 #include "graphics/draw.h"
 #include "log.h"

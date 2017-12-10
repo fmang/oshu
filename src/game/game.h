@@ -144,7 +144,7 @@ struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset);
 struct oshu_hit* oshu_next_hit(struct oshu_game *game);
 
 /**
- * Like #next_hit, but in the other direction.
+ * Like #oshu_next_hit, but in the other direction.
  */
 struct oshu_hit* oshu_previous_hit(struct oshu_game *game);
 

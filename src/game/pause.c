@@ -1,13 +1,13 @@
 /**
  * \file game/pause.c
- * \ingroup game_screen
+ * \ingroup game_screens
  *
  * \brief
  * Implement the pause screen.
  */
 
 #include "game/game.h"
-#include "game/screen.h"
+#include "game/screens.h"
 
 #include <SDL2/SDL.h>
 

@@ -1,13 +1,13 @@
 /**
  * \file game/play.c
- * \ingroup game_screen
+ * \ingroup game_screens
  *
  * \brief
  * Implement the main game screen.
  */
 
 #include "game/game.h"
-#include "game/screen.h"
+#include "game/screens.h"
 #include "game/tty.h"
 
 #include <SDL2/SDL.h>

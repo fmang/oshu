@@ -8,7 +8,7 @@
 
 #include "beatmap/beatmap.h"
 #include "game/game.h"
-#include "game/screen.h"
+#include "game/screens.h"
 #include "graphics/display.h"
 #include "graphics/draw.h"
 

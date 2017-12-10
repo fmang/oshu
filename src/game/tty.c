@@ -1,5 +1,5 @@
 #include "game/game.h"
-#include "game/screen.h"
+#include "game/screens.h"
 #include "game/tty.h"
 
 #include <unistd.h>

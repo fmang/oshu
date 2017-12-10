@@ -1,6 +1,6 @@
 /**
- * \file game/screen.h
- * \ingroup game_screen
+ * \file game/screens.h
+ * \ingroup oshu_game_screen
  */
 
 #pragma once
@@ -10,7 +10,7 @@ union SDL_Event;
 struct oshu_game;
 
 /**
- * \defgroup game_screen Screen
+ * \defgroup oshu_game_screen Screens
  * \ingroup game
  *
  * A game screen defines the state the game is in.

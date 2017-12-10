@@ -1,13 +1,13 @@
 /**
  * \file game/score.c
- * \ingroup game_screen
+ * \ingroup game_screens
  *
  * \brief
  * Implement the score screen, when the game is finished.
  */
 
 #include "game/game.h"
-#include "game/screen.h"
+#include "game/screens.h"
 
 #include <SDL2/SDL.h>
 
