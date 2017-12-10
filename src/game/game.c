@@ -64,8 +64,7 @@ static int open_display(struct oshu_game *game)
 		SDL_SetWindowTitle(game->display.window, title);
 		free(title);
 	}
-	if (game->beatmap.background_filename)
-		oshu_load_texture(&game->display, game->beatmap.background_filename, &game->background);
+	oshu_load_background(game);
 	return 0;
 }
 
@@ -88,8 +87,10 @@ fail:
 
 static void draw(struct oshu_game *game)
 {
+	oshu_reset_view(&game->display);
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
+	oshu_show_background(game);
 	game->screen->draw(game);
 	SDL_RenderPresent(game->display.renderer);
 }
@@ -131,6 +132,6 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);
-	oshu_destroy_texture(&game->background);
+	oshu_free_background(game);
 	oshu_close_display(&game->display);
 }

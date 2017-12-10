@@ -20,6 +20,7 @@ oshu_SOURCES = \
 	beatmap/parser.h \
 	beatmap/tokens.h \
 	game/actions.c \
+	game/background.c \
 	game/clock.c \
 	game/clock.h \
 	game/controls.c \
@@ -34,6 +35,7 @@ oshu_SOURCES = \
 	game/screen.h \
 	game/tty.c \
 	game/tty.h \
+	game/widgets.h \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/draw.c \

@@ -42,30 +42,6 @@ void oshu_draw_path(struct oshu_display *display, struct oshu_path *path)
 	SDL_RenderDrawLines(display->renderer, points, resolution);
 }
 
-void oshu_draw_background(struct oshu_display *display, struct oshu_texture *pic)
-{
-	SDL_Rect dest;
-	int ww, wh;
-	SDL_GetWindowSize(display->window, &ww, &wh);
-	double window_ratio = (double) ww / wh;
-	double pic_ratio = oshu_ratio(pic->size);
-
-	if (window_ratio > pic_ratio) {
-		/* the window is too wide */
-		dest.w = ww;
-		dest.h = dest.w / pic_ratio;
-		dest.x = 0;
-		dest.y = (wh - dest.h) / 2;
-	} else {
-		/* the window is too high */
-		dest.h = wh;
-		dest.w = dest.h * pic_ratio;
-		dest.y = 0;
-		dest.x = (ww - dest.w) / 2;
-	}
-	SDL_RenderCopy(display->renderer, pic->texture, NULL, &dest);
-}
-
 void oshu_draw_scaled_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p, double ratio)
 {
 	oshu_point top_left = oshu_project(display, p - texture->origin * ratio);

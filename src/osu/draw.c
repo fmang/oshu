@@ -153,94 +153,6 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu
 }
 
 /**
- * Return the next relevant hit.
- *
- * A hit is irrelevant when it's not supported by the mode, like sliders.
- *
- * The final null hit is considered relevant in order to ensure this function
- * always return something.
- */
-static struct oshu_hit* next_hit(struct oshu_game *game)
-{
-	struct oshu_hit *hit = game->hit_cursor;
-	for (; hit->next; hit = hit->next) {
-		if (hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT))
-			break;
-	}
-	return hit;
-}
-
-/**
- * Like #next_hit, but in the other direction.
- */
-static struct oshu_hit* previous_hit(struct oshu_game *game)
-{
-	struct oshu_hit *hit = game->hit_cursor;
-	if (!hit->previous)
-		return hit;
-	for (hit = hit->previous; hit->previous; hit = hit->previous) {
-		if (hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT))
-			break;
-	}
-	return hit;
-}
-
-/**
- * Draw the background, adjusting the brightness.
- *
- * Most of the time, the background will be displayed at 25% of its luminosity,
- * so that hit objects are clear.
- *
- * During breaks, the background is shown at full luminosity. The variation
- * show in the following graph, where *S* is the end time of the previous note
- * and the start of the break, and E the time of the next note and the end of
- * the break.
- *
- * ```
- * 100% ┼      ______________
- *      │     /              \
- *      │    /                \
- *      │___/                  \___
- *  25% │
- *      └──────┼────────────┼─────┼─> t
- *      S     S+2s         E-2s   E
- * ```
- *
- * A break must have a duration of at least 6 seconds, ensuring the animation
- * is never cut in between, or that the background stays lit for less than 2
- * seconds.
- *
- */
-static void draw_background(struct oshu_game *game)
-{
-	if (!game->background.texture)
-		return;
-	assert (game->hit_cursor->previous != NULL);
-	double break_start = oshu_hit_end_time(previous_hit(game));
-	double break_end = next_hit(game)->time;
-	double now = game->clock.now;
-	double ratio = 0.;
-	if (break_end - break_start > 6.) {
-		if (now < break_start + 1.)
-			ratio = 0.;
-		else if (now < break_start + 2.)
-			ratio = now - (break_start + 1.);
-		else if (now < break_end - 2.)
-			ratio = 1.;
-		else if (now < break_end - 1.)
-			ratio = 1. - (now - (break_end - 2.));
-		else
-			ratio = 0.;
-
-	}
-	int mod = 64 + ratio * 191;
-	assert (mod >= 0);
-	assert (mod <= 255);
-	SDL_SetTextureColorMod(game->background.texture, mod, mod, mod);
-	oshu_draw_background(&game->display, &game->background);
-}
-
-/**
  * Display the metadata on top of the gaming screen.
  *
  * Metadata are drawn in white text and a translucent black background for
@@ -321,8 +233,6 @@ static void draw_progression(struct oshu_game *game)
  */
 int osu_draw(struct oshu_game *game)
 {
-	oshu_reset_view(&game->display);
-	draw_background(game);
 	draw_progression(game);
 	draw_metadata(game);
 

@@ -53,15 +53,6 @@ void oshu_draw_circle(struct oshu_display *display, oshu_point center, double ra
 void oshu_draw_line(struct oshu_display *display, oshu_point p1, oshu_point p2);
 
 /**
- * Draw a background image.
- *
- * Scale the texture to the window's size, while preserving the aspect ratio.
- * When the aspects don't match, crop the picture to ensure the window is
- * filled.
- */
-void oshu_draw_background(struct oshu_display *display, struct oshu_texture *pic);
-
-/**
  * Draw a texture at the specified position.
  *
  * *p* points at the position of the *origin* of the texture, not at the top

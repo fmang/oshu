@@ -12,6 +12,7 @@
 #include "beatmap/beatmap.h"
 #include "game/clock.h"
 #include "game/mode.h"
+#include "game/widgets.h"
 #include "graphics/display.h"
 #include "osu/osu.h"
 
@@ -25,6 +26,10 @@ struct oshu_game_screen;
  *
  * \{
  */
+
+struct oshu_ui {
+	struct oshu_background_widget background;
+};
 
 /**
  * The full game state, from the beatmap state to the audio and graphical
@@ -41,6 +46,7 @@ struct oshu_game {
 	struct oshu_sound_library library;
 	struct oshu_display display;
 	struct oshu_clock clock;
+	struct oshu_ui ui;
 	/**
 	 * The game mode configuration.
 	 *
@@ -50,8 +56,6 @@ struct oshu_game {
 	int stop;
 	int autoplay;
 	struct oshu_game_screen *screen;
-	/** Background picture. */
-	struct oshu_texture background;
 	/** Mode-specific data, defined inside each mode's header file. */
 	union {
 		struct osu_state osu;
@@ -128,6 +132,21 @@ struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset);
  * This is analogous to #oshu_look_hit_back.
  */
 struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset);
+
+/**
+ * Return the next relevant hit.
+ *
+ * A hit is irrelevant when it's not supported by the mode, like sliders.
+ *
+ * The final null hit is considered relevant in order to ensure this function
+ * always return something.
+ */
+struct oshu_hit* oshu_next_hit(struct oshu_game *game);
+
+/**
+ * Like #next_hit, but in the other direction.
+ */
+struct oshu_hit* oshu_previous_hit(struct oshu_game *game);
 
 /** \} */
 
