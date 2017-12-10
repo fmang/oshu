@@ -30,11 +30,11 @@ oshu_SOURCES = \
 	game/helpers.c \
 	game/metadata.c \
 	game/mode.h \
-	game/pause.c \
-	game/play.c \
 	game/progression.c \
-	game/score.c \
-	game/screen.h \
+	game/screens/pause.c \
+	game/screens/play.c \
+	game/screens/score.c \
+	game/screens/screens.h \
 	game/tty.c \
 	game/tty.h \
 	game/widgets.h \

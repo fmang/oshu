@@ -1,5 +1,5 @@
 /**
- * \file game/pause.c
+ * \file game/screens/pause.c
  * \ingroup game_screens
  *
  * \brief
@@ -7,7 +7,7 @@
  */
 
 #include "game/game.h"
-#include "game/screens.h"
+#include "game/screens/screens.h"
 
 #include <SDL2/SDL.h>
 
