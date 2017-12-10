@@ -31,7 +31,7 @@ int oshu_paint_score(struct oshu_game *game)
 	assert (duration > 0);
 
 	cairo_set_source_rgba(p.cr, 1, 0, 0, .6);
-	cairo_set_line_width(p.cr, 2);
+	cairo_set_line_width(p.cr, 1);
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->state == OSHU_MISSED_HIT) {
 			double y = hit->time / duration * cimag(size);
@@ -42,7 +42,7 @@ int oshu_paint_score(struct oshu_game *game)
 	}
 
 	cairo_set_source_rgba(p.cr, 1, 1, 0, .6);
-	cairo_set_line_width(p.cr, 2);
+	cairo_set_line_width(p.cr, 1);
 	cairo_move_to(p.cr, 0, 0);
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->offset < 0) {
@@ -54,7 +54,7 @@ int oshu_paint_score(struct oshu_game *game)
 	cairo_stroke(p.cr);
 
 	cairo_set_source_rgba(p.cr, 1, 0, 1, .6);
-	cairo_set_line_width(p.cr, 2);
+	cairo_set_line_width(p.cr, 1);
 	cairo_move_to(p.cr, 0, 0);
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->offset > 0) {
