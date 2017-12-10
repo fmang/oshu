@@ -93,6 +93,7 @@ fail:
  */
 static void draw(struct oshu_game *game)
 {
+	oshu_reset_view(&game->display);
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
 	game->screen->draw(game);
@@ -108,7 +109,6 @@ int oshu_run_game(struct oshu_game *game)
 	int missed_frames = 0;
 
 	while (!game->stop) {
-		oshu_reset_view(&game->display);
 		oshu_update_clock(game);
 		while (SDL_PollEvent(&event))
 			game->screen->on_event(game, &event);
