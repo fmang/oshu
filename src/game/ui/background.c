@@ -1,5 +1,5 @@
 /**
- * \file game/background.c
+ * \file game/ui/background.c
  * \ingroup game_ui
  */
 

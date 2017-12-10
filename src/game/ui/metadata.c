@@ -1,5 +1,5 @@
 /**
- * \file game/metadata.c
+ * \file game/ui/metadata.c
  * \ingroup game_ui
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file game/progression.c
+ * \file game/ui/progression.c
  * \ingroup game_ui
  */
 
