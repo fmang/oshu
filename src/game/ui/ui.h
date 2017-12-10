@@ -1,12 +1,6 @@
 /**
  * \file game/ui/ui.h
  * \ingroup game_ui
- *
- * \todo
- * Rename this file ui.h
- *
- * \todo
- * Define the oshu_ui structure here.
  */
 
 #pragma once
@@ -21,6 +15,10 @@ struct oshu_game;
  *
  * \brief
  * Collection of GUI elements.
+ *
+ * \todo
+ * Make the elements more generic. Take specific arguments instead of the full
+ * game every time. Then it out of the game module.
  *
  * \{
  */
