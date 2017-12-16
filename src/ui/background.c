@@ -76,7 +76,6 @@ void oshu_show_background(struct oshu_game *game)
 {
 	if (!game->ui.background.picture.texture)
 		return;
-	assert (game->hit_cursor->previous != NULL);
 	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
 	double break_end = oshu_next_hit(game)->time;
 	double now = game->clock.now;
