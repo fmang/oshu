@@ -35,14 +35,14 @@ void oshu_fit_view(struct oshu_view *view, oshu_size size)
 	oshu_resize_view(view, size);
 }
 
-oshu_point oshu_project(struct oshu_display *display, oshu_point p)
+oshu_point oshu_project(struct oshu_view *view, oshu_point p)
 {
-	return p * display->view.zoom + display->view.origin;
+	return p * view->zoom + view->origin;
 }
 
-oshu_point oshu_unproject(struct oshu_display *display, oshu_point p)
+oshu_point oshu_unproject(struct oshu_view *view, oshu_point p)
 {
-	return (p - display->view.origin) / display->view.zoom;
+	return (p - view->origin) / view->zoom;
 }
 
 void oshu_reset_view(struct oshu_display *display)

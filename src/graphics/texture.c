@@ -34,7 +34,7 @@ void oshu_destroy_texture(struct oshu_texture *texture)
 
 void oshu_draw_scaled_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p, double ratio)
 {
-	oshu_point top_left = oshu_project(display, p - texture->origin * ratio);
+	oshu_point top_left = oshu_project(&display->view, p - texture->origin * ratio);
 	oshu_size size = texture->size * ratio * display->view.zoom;
 	SDL_Rect dest = {
 		.x = creal(top_left), .y = cimag(top_left),

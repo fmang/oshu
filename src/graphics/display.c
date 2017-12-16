@@ -62,5 +62,5 @@ oshu_point oshu_get_mouse(struct oshu_display *display)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	return oshu_unproject(display, x + y * I);
+	return oshu_unproject(&display->view, x + y * I);
 }
