@@ -3,12 +3,10 @@
  * \ingroup osu
  *
  * \brief
- * Drawing routines specific to the Osu game mode.
+ * Drawing routines specific to the osu!standard game mode.
  */
 
-#include "beatmap/beatmap.h"
 #include "game/game.h"
-#include "graphics/display.h"
 #include "graphics/texture.h"
 
 #include <assert.h>

@@ -5,6 +5,8 @@
  * Implement the osu! standard mode.
  */
 
+#include "osu/osu.h"
+
 #include "game/game.h"
 
 #include <assert.h>
@@ -100,14 +102,15 @@ static void sonorize_slider(struct oshu_game *game)
  */
 static int check(struct oshu_game *game)
 {
-	osu_view(game);
 	/* Ensure the mouse follows the slider. */
 	sonorize_slider(game); /* < may release the slider! */
 	if (game->osu.current_slider) {
 		struct oshu_hit *hit = game->osu.current_slider;
 		double t = (game->clock.now - hit->time) / hit->slider.duration;
 		oshu_point ball = oshu_path_at(&hit->slider.path, t);
+		osu_view(game);
 		oshu_point mouse = oshu_get_mouse(&game->display);
+		oshu_reset_view(&game->display);
 		if (cabs(ball - mouse) > game->beatmap.difficulty.slider_tolerance) {
 			oshu_stop_loop(&game->audio);
 			game->osu.current_slider = NULL;
@@ -127,7 +130,6 @@ static int check(struct oshu_game *game)
 		}
 		game->hit_cursor = hit->next;
 	}
-	oshu_reset_view(&game->display);
 	return 0;
 }
 
@@ -216,9 +218,9 @@ static int relinquish(struct oshu_game *game)
 
 static int init(struct oshu_game *game)
 {
-	oshu_reset_view(&game->display);
-	oshu_fit_view(&game->display.view, 640 + 480 * I);
+	osu_view(game);
 	int rc = osu_paint_resources(game);
+	oshu_reset_view(&game->display);
 	SDL_ShowCursor(SDL_DISABLE);
 	return rc;
 }

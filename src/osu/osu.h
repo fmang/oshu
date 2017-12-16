@@ -5,21 +5,23 @@
 
 #pragma once
 
-#include "game/mode.h"
-#include "graphics/display.h"
+#include "game/controls.h"
+#include "graphics/texture.h"
 
-struct oshu_beatmap;
-struct oshu_display;
+struct oshu_game;
 struct oshu_game_mode;
 struct oshu_hit;
-
-struct SDL_Texture;
 
 /**
  * \defgroup osu Osu
  *
  * \brief
- * Osu standard game mode.
+ * osu!standard game mode.
+ *
+ * Most of the functions defined in this module are internal.
+ *
+ * It is connected to the game module by its #osu_state structure and #osu_mode
+ * object.
  *
  * \{
  */
@@ -123,10 +125,19 @@ void osu_free_resources(struct oshu_game *game);
 /**
  * The main drawing callback of the mode.
  *
- * Exported in its own sub-module.
+ * Exported in its own sub-module because it is relatively complex.
  */
 int osu_draw(struct oshu_game *game);
 
+/**
+ * Set-up the coordinate system for the osu!standard mode.
+ *
+ * The window is mapped to a 640×480 screen with a few margins, yielding a
+ * 512×384 logical screen.
+ *
+ * It is the caller's responsibility to reset the view, preferably such that
+ * the #osu_view/#oshu_reset_view pairing looks obvious.
+ */
 void osu_view(struct oshu_game *game);
 
 /**

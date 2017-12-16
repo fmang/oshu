@@ -3,8 +3,6 @@
  * \ingroup osu
  */
 
-#include "../config.h"
-
 #include "game/game.h"
 #include "graphics/paint.h"
 #include "log.h"
