@@ -1,6 +1,6 @@
 /**
  * \file graphics/display.h
- * \ingroup display
+ * \ingroup graphics_display
  */
 
 #pragma once
@@ -65,20 +65,41 @@ struct SDL_Window;
  * \brief
  * Abstract an SDL2 window.
  *
+ * To avoid reinventing the wheel, this module provides only the most basic
+ * functions for initializing the window and its renderer together, with the
+ * appropriate settings.
+ *
+ * The main drawing operation on a display is #oshu_draw_texture. The other
+ * drawing primitives must be called straight from SDL using the display's
+ * underlying renderer. Note that while wrapped operations transform the
+ * coordinates using the display's view, you would need to project the
+ * coordinates yourself with #oshu_project to get a consistent behavior with
+ * the equivalent SDL routines.
+ *
  * \{
  */
 
 /**
  * Store everything related to the current display.
  *
- * A display is an SDL window, a renderer, possibly some textures, and also a
- * state for the drawing functions.
+ * A display is an SDL window, a renderer, and a coordinate system.
+ *
+ * Any textures allocated for a display are specific to that display, and
+ * should be freed first.
  *
  * \sa oshu_open_display
  * \sa oshu_close_display
  */
 struct oshu_display {
+	/**
+	 * The one and only SDL game window.
+	 */
 	struct SDL_Window *window;
+	/**
+	 * The renderer for displaying accelerated graphics.
+	 *
+	 * It must be freed after the textures, but before the window.
+	 */
 	struct SDL_Renderer *renderer;
 	/**
 	 * The current view, used to project coordinates when drawing.
@@ -101,7 +122,10 @@ int oshu_open_display(struct oshu_display *display);
 /**
  * Free the display structure and everything associated to it.
  *
- * *display* is left in an unspecified state.
+ * *display* is left in an unspecified state, but it is okay to call this
+ * function multiple times.
+ *
+ * Calling it on a null-initialized structure is also valid.
  */
 void oshu_close_display(struct oshu_display *display);
 
