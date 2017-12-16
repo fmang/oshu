@@ -88,7 +88,6 @@ static int update(struct oshu_game *game)
 		game->mode->autoplay(game);
 	else
 		game->mode->check(game);
-	oshu_print_state(game);
 	check_end(game);
 	return 0;
 }

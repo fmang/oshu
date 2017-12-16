@@ -116,6 +116,11 @@ int oshu_run_game(struct oshu_game *game)
 		game->screen->update(game);
 		draw(game);
 
+		/* Calling oshu_print_state before draw causes some flickering
+		 * on the tty, for some reason. */
+		if (game->screen == &oshu_play_screen)
+			oshu_print_state(game);
+
 		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
 			SDL_Delay(advance * 1000);
