@@ -1,6 +1,6 @@
 /**
  * \file graphics/display.c
- * \ingroup display
+ * \ingroup graphics_display
  */
 
 #include "graphics/display.h"

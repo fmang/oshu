@@ -39,8 +39,12 @@ digraph modules {
 	Graphics -> Beatmap;
 	Game -> Audio;
 	Game -> Graphics;
-	Game -> Osu;
-	Osu -> Game;
+	Game -> Beatmap;
+	subgraph {
+		rank=same;
+		Osu -> Game;
+		Game -> Osu;
+	}
 	Main -> Game;
 }
 \enddot
