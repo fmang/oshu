@@ -15,16 +15,11 @@ For maximum compatibility, the audio engine relies heavily on ffmpeg's
 libavformat and libavcodec which play about everything. The audio device is
 handled by SDL's standard audio module.
 
-The current graphics engine is a prototype complete enough to draw the
-essential elements of the game. It is based on SDL's rendering engine and
-limited to circles and 1-pixel lines. This is extremely fast but really crude.
-In the future, oshu! will most likely use the Cairo vector graphics library to
-render all the objects that are going to be required. If it's fast enough, it
-could be done dynamically, but at first everything would be generated and
-loaded onto the GPU as textures when the beatmap is loaded, and in particular
-the sliders. Using that kind of trick, we'll probably reach top performance and
-pleasing graphics. To load the background, the simplest option is the
-SDL2_image library, which is really lightweight and fits our needs.
+The graphics engine is based on SDL2's accelerated rendering API. The game's
+visual assets are dynamically generated using the cairo vector graphics
+library, and depending on the beatmap's configuration. To optimize the start-up
+time, some textures are drawn on-the-fly when required, sometimes causing a
+frame to be dropped. The frame rate is fixed at 60 FPS.
 
 
 Code structure
@@ -35,11 +30,18 @@ digraph modules {
 	rankdir=BT;
 	node [shape=rect];
 	Beatmap;
+	subgraph {
+		rank=same;
+		Audio;
+		UI -> Graphics;
+	}
 	Audio -> Beatmap;
 	Graphics -> Beatmap;
+	UI -> Beatmap;
 	Game -> Audio;
 	Game -> Graphics;
 	Game -> Beatmap;
+	Game -> UI;
 	subgraph {
 		rank=same;
 		Osu -> Game;
@@ -53,28 +55,32 @@ The \ref log module provides a wrapper around SDL's logging facility and is
 used about everywhere in the code. It's an implicit dependency of all the
 modules.
 
-The \ref audio module handles everything audio-related from audio file loading
-down to the actual output to the sound device. It is self-contained. In
-particular, it has no relation to the beatmap whatsoever.
-
 The \ref beatmap module handles the complete loading and parsing of the beatmap
 files. It is self-contained. In particular, it is not going to load anything
-audio or graphical
+audio or graphical. Since the beatmap is central to the game, most modules
+depend on it for one of the structure it defines.
 
-The \ref graphics module handles the window creation and the drawing of the
-game elements. It is able to browse a beatmap object to draw its elements on
-the screen.
+The \ref audio module handles everything audio-related from audio file loading
+down to the actual output to the sound device.
+
+The \ref graphics module handles the window creation and provides accelerated
+drawing primitives. It is not directly related to the game, but uses the
+geometric types defined by the beatmap module.
+
+The \ref ui module provides user interface elements as widgets. Widgets are the
+basic block for a composable user interface.
 
 The \ref game module joins every module together and runs the main event loop
 of the game. It watches the audio and the user's keyboard and mouse events to
-manipulate the beatmap state, then schedules the drawing of the window.
+manipulate the beatmap state, then schedules the drawing of the window. It is
+agnostic to the game mode.
 
 The \ref osu module implements the osu!standard game mode. It extends the game
-module, while the game module only briefly refers to it.
+module, while the game module only briefly refers to it to dispatch events.
 
-The *main* module is the entry-point of oshu! and provides a command-line
-interface to briefly configure the game, and then yields control to the game
-module.
+The *main* module \ref oshu.c is the entry-point of oshu! and provides a
+command-line interface to briefly configure the game, and then yields control
+to the game module.
 
 
 Error handling
