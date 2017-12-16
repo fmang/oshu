@@ -1,6 +1,6 @@
 /**
- * \file game/ui/ui.h
- * \ingroup game_ui
+ * \file ui/ui.h
+ * \ingroup ui
  */
 
 #pragma once
@@ -10,8 +10,8 @@
 struct oshu_game;
 
 /**
- * \defgroup game_ui Widgets
- * \ingroup game
+ * \defgroup ui UI
+ * \ingroup ui
  *
  * \brief
  * Collection of GUI elements.

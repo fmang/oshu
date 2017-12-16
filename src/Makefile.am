@@ -34,12 +34,6 @@ oshu_SOURCES = \
 	game/screens/screens.h \
 	game/tty.c \
 	game/tty.h \
-	game/ui/background.c \
-	game/ui/cursor.c \
-	game/ui/metadata.c \
-	game/ui/progression.c \
-	game/ui/score.c \
-	game/ui/ui.h \
 	graphics/display.c \
 	graphics/display.h \
 	graphics/paint.c \
@@ -52,7 +46,13 @@ oshu_SOURCES = \
 	osu/draw.c \
 	osu/osu.c \
 	osu/osu.h \
-	osu/paint.c
+	osu/paint.c \
+	ui/background.c \
+	ui/cursor.c \
+	ui/metadata.c \
+	ui/progression.c \
+	ui/score.c \
+	ui/ui.h
 
 oshu_CFLAGS = -iquote . -DPKGDATADIR='"$(pkgdatadir)"' $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LSWR_CFLAGS) $(LAVU_CFLAGS) $(PANGOCAIRO_CFLAGS) $(CAIRO_CFLAGS)
 oshu_LDADD = -lm $(SDL2_LIBS) $(SDL2_image_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LSWR_LIBS) $(LAVU_LIBS) $(PANGOCAIRO_LIBS) $(CAIRO_LIBS)

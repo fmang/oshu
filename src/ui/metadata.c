@@ -1,6 +1,6 @@
 /**
- * \file game/ui/metadata.c
- * \ingroup game_ui
+ * \file ui/metadata.c
+ * \ingroup ui
  */
 
 #include "../config.h"

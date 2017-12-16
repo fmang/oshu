@@ -1,6 +1,6 @@
 /**
- * \file game/ui/score.c
- * \ingroup game_ui
+ * \file ui/score.c
+ * \ingroup ui
  */
 
 #include "../config.h"

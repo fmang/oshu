@@ -1,6 +1,6 @@
 /**
- * \file game/ui/cursor.c
- * \ingroup game_ui
+ * \file ui/cursor.c
+ * \ingroup ui
  */
 
 #include "game/game.h"

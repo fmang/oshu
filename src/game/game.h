@@ -12,7 +12,7 @@
 #include "beatmap/beatmap.h"
 #include "game/clock.h"
 #include "game/mode.h"
-#include "game/ui/ui.h"
+#include "ui/ui.h"
 #include "graphics/display.h"
 #include "osu/osu.h"
 
