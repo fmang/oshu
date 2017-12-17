@@ -74,11 +74,4 @@ int oshu_paint_cursor(struct oshu_game *game);
 void oshu_show_cursor(struct oshu_game *game);
 void oshu_free_cursor(struct oshu_game *game);
 
-struct oshu_ui {
-	struct oshu_background_widget background;
-	struct oshu_metadata_widget metadata;
-	struct oshu_score_widget score;
-	struct oshu_cursor_widget cursor;
-};
-
 /** \} */

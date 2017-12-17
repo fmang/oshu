@@ -28,6 +28,16 @@ struct oshu_game_screen;
  */
 
 /**
+ * The game user inteface, composed with widgets from the \ref ui module.
+ */
+struct oshu_game_ui {
+	struct oshu_background_widget background;
+	struct oshu_metadata_widget metadata;
+	struct oshu_score_widget score;
+	struct oshu_cursor_widget cursor;
+};
+
+/**
  * The full game state, from the beatmap state to the audio and graphical
  * context.
  *
@@ -42,7 +52,7 @@ struct oshu_game {
 	struct oshu_sound_library library;
 	struct oshu_display display;
 	struct oshu_clock clock;
-	struct oshu_ui ui;
+	struct oshu_game_ui ui;
 	/**
 	 * The game mode configuration.
 	 *
