@@ -51,27 +51,6 @@ int oshu_paint_score(struct oshu_game *game);
 void oshu_show_score(struct oshu_game *game);
 void oshu_free_score(struct oshu_game *game);
 
-struct oshu_cursor_widget {
-	/**
-	 * Keep track of the previous positions of the mouse to display a
-	 * fancier cursor, with a trail.
-	 *
-	 * This is a circular array, starting at #offset. The previous is at
-	 * #offset - 1, and so on. When you reach the maximum index, wrap at 0.
-	 */
-	oshu_point history[4];
-	/**
-	 * Index of the most recent point in #history.
-	 */
-	int offset;
-	/**
-	 * The software mouse cursor.
-	 */
-	struct oshu_texture mouse;
-};
-
-int oshu_paint_cursor(struct oshu_game *game);
-void oshu_show_cursor(struct oshu_game *game);
-void oshu_free_cursor(struct oshu_game *game);
-
 /** \} */
+
+#include "ui/cursor.h"

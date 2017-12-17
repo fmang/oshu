@@ -65,9 +65,15 @@ static int open_display(struct oshu_game *game)
 		free(title);
 	}
 	oshu_reset_view(&game->display);
+	return 0;
+}
+
+static int create_ui(struct oshu_game *game)
+{
 	oshu_load_background(game);
 	oshu_paint_metadata(game);
-	oshu_paint_cursor(game);
+	if (oshu_create_cursor(&game->display, &game->ui.cursor) < 0)
+		return -1;
 	return 0;
 }
 
@@ -79,6 +85,8 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	if (open_audio(game) < 0)
 		goto fail;
 	if (open_display(game) < 0)
+		goto fail;
+	if (create_ui(game) < 0)
 		goto fail;
 	if (game->mode->initialize(game) < 0)
 		goto fail;
@@ -97,7 +105,7 @@ static void draw(struct oshu_game *game)
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
 	game->screen->draw(game);
-	oshu_show_cursor(game);
+	oshu_show_cursor(&game->ui.cursor);
 	SDL_RenderPresent(game->display.renderer);
 }
 
@@ -135,6 +143,14 @@ int oshu_run_game(struct oshu_game *game)
 	return 0;
 }
 
+static void destroy_ui(struct oshu_game *game)
+{
+	oshu_free_background(game);
+	oshu_free_metadata(game);
+	oshu_free_score(game);
+	oshu_destroy_cursor(&game->ui.cursor);
+}
+
 void oshu_destroy_game(struct oshu_game *game)
 {
 	assert (game != NULL);
@@ -143,9 +159,6 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);
-	oshu_free_background(game);
-	oshu_free_metadata(game);
-	oshu_free_score(game);
-	oshu_free_cursor(game);
+	destroy_ui(game);
 	oshu_close_display(&game->display);
 }

@@ -49,6 +49,7 @@ oshu_SOURCES = \
 	osu/paint.c \
 	ui/background.c \
 	ui/cursor.c \
+	ui/cursor.h \
 	ui/metadata.c \
 	ui/progression.c \
 	ui/score.c \
