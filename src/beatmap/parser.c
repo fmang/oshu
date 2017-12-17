@@ -926,6 +926,9 @@ static int parse_common_hit(struct parser_state *parser, struct oshu_hit *hit)
  * - `P|396:140|448:80,1,140,0|8,1:0|0:0`
  * - `L|168:88,1,70,8|0,0:0|0:0`
  * - `B|460:188|408:240|408:240|416:280,1,140,4|2,1:2|0:3`
+ *
+ * Some sliders are shorter and omit the slider additions, like that:
+ * `160,76,142685,6,0,B|156:120|116:152,1,70,8|0`
  */
 static int parse_slider(struct parser_state *parser, struct oshu_hit *hit)
 {
@@ -1104,9 +1107,12 @@ static int parse_slider_additions(struct parser_state *parser, struct oshu_hit *
 		if (parse_int(parser, &hit->slider.sounds[i].additions) < 0)
 			goto fail;
 	}
-	if (consume_char(parser, ',') < 0)
-		goto fail;
 	/* Second field: the sample sets, for the normal sound and the additions. */
+	/* It is optional too, beware! */
+	if (*parser->input == '\0')
+		return 0;
+	else if (consume_char(parser, ',') < 0)
+		goto fail;
 	for (int i = 0; i <= hit->slider.repeat; ++i) {
 		if (i > 0 && consume_char(parser, '|') < 0)
 			goto fail;
