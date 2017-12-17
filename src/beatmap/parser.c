@@ -509,7 +509,7 @@ static int process_difficulty(struct parser_state *parser)
 		return -1;
 	switch (key) {
 	case CircleSize:
-		difficulty->circle_radius = 32. * (1. - .7 * (value - 5.) / 5.);
+		difficulty->circle_radius = 54.4 - 4.48 * value;
 		assert (difficulty->circle_radius > 0.);
 		difficulty->approach_size = 3. * difficulty->circle_radius;
 		difficulty->slider_tolerance = 2. * difficulty->circle_radius;
