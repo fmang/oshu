@@ -96,7 +96,7 @@ static int draw(struct oshu_game *game)
 {
 	oshu_show_background(game);
 	oshu_show_metadata(game);
-	oshu_show_progression_bar(game);
+	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
 	game->mode->draw(game);
 	return 0;
 }

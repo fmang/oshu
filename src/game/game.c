@@ -72,6 +72,8 @@ static int create_ui(struct oshu_game *game)
 {
 	oshu_load_background(game);
 	oshu_paint_metadata(game);
+	if (oshu_create_audio_progress_bar(&game->display, &game->audio.music, &game->ui.audio_progress_bar) < 0)
+		return -1;
 	if (oshu_create_cursor(&game->display, &game->ui.cursor) < 0)
 		return -1;
 	return 0;
@@ -149,6 +151,7 @@ static void destroy_ui(struct oshu_game *game)
 	oshu_free_metadata(game);
 	oshu_free_score(game);
 	oshu_destroy_cursor(&game->ui.cursor);
+	oshu_destroy_audio_progress_bar(&game->ui.audio_progress_bar);
 }
 
 void oshu_destroy_game(struct oshu_game *game)
