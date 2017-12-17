@@ -4,17 +4,25 @@
 
 #include <unistd.h>
 
+void print_dual(const char *ascii, const char *unicode)
+{
+	if (ascii && unicode && strcmp(ascii, unicode))
+		printf("  \033[33m%s\033[0m // %s\n", ascii, unicode);
+	else if (unicode)
+		printf("  \033[33m%s\033[0m\n", unicode);
+	else if (ascii)
+		printf("  \033[33m%s\033[0m\n", ascii);
+	else
+		printf("  Unknown\n");
+}
+
 void oshu_welcome(struct oshu_game *game)
 {
 	struct oshu_beatmap *beatmap = &game->beatmap;
 	struct oshu_metadata *meta = &beatmap->metadata;
-	printf(
-		"\n"
-		"  \033[33m%s\033[0m // %s\n"
-		"  \033[33m%s\033[0m // %s\n",
-		meta->title_unicode, meta->title,
-		meta->artist_unicode, meta->artist
-	);
+	printf("\n");
+	print_dual(meta->title, meta->title_unicode);
+	print_dual(meta->artist, meta->artist_unicode);
 	if (meta->source)
 		printf("  From %s\n", meta->source);
 
