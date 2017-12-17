@@ -7,7 +7,7 @@
 void print_dual(const char *ascii, const char *unicode)
 {
 	if (ascii && unicode && strcmp(ascii, unicode))
-		printf("  \033[33m%s\033[0m // %s\n", ascii, unicode);
+		printf("  \033[33m%s\033[0m // %s\n", unicode, ascii);
 	else if (unicode)
 		printf("  \033[33m%s\033[0m\n", unicode);
 	else if (ascii)
