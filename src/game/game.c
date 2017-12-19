@@ -121,6 +121,7 @@ int oshu_run_game(struct oshu_game *game)
 
 	while (!game->stop) {
 		oshu_update_clock(game);
+		oshu_reset_view(&game->display);
 		while (SDL_PollEvent(&event))
 			game->screen->on_event(game, &event);
 		game->screen->update(game);
