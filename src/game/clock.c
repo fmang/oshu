@@ -5,6 +5,7 @@
 
 #include "game/game.h"
 #include "game/screens/screens.h"
+#include "log.h"
 
 void oshu_initialize_clock(struct oshu_game *game)
 {
@@ -27,15 +28,22 @@ void oshu_update_clock(struct oshu_game *game)
 	clock->audio = game->audio.music.current_timestamp;
 	clock->before = clock->now;
 	clock->system = system;
-	if (game->screen == &oshu_pause_screen)
-		; /* don't update the clock */
-	else if (clock->before < 0) /* leading in */
+
+	if (game->screen == &oshu_pause_screen) {
+		/* Don't update the clock when the game is paused. */
+	} else if (clock->before < 0) {
+		/* Leading in. */
 		clock->now = clock->before + diff;
-	else if (clock->audio == prev_audio) /* audio clock stuck */
+	} else if (clock->audio == prev_audio) {
+		/* The audio clock is stuck. */
+		/* It happens as the audio buffer is worth several frames. */
 		clock->now = clock->before + diff;
-	else
+	} else {
+		/* If the audio clock changed, synchronize the game clock. */
 		clock->now = clock->audio;
-	/* force monotonicity */
+	}
+
+	/* Force monotonicity. */
 	if (clock->now < clock->before)
 		clock->now = clock->before;
 }
