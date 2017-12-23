@@ -13,7 +13,7 @@
 
 static int paint_cursor(struct oshu_cursor_widget *cursor)
 {
-	double radius = 20;
+	double radius = 14;
 	oshu_size size = (1. + I) * radius * 2.;
 
 	struct oshu_painter p;

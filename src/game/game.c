@@ -74,10 +74,6 @@ static int create_ui(struct oshu_game *game)
 	oshu_paint_metadata(game);
 	if (oshu_create_audio_progress_bar(&game->display, &game->audio.music, &game->ui.audio_progress_bar) < 0)
 		return -1;
-	if (oshu_create_cursor(&game->display, &game->ui.cursor) < 0)
-		return -1;
-	else
-		SDL_ShowCursor(SDL_DISABLE);
 	return 0;
 }
 
@@ -109,7 +105,6 @@ static void draw(struct oshu_game *game)
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
 	game->screen->draw(game);
-	oshu_show_cursor(&game->ui.cursor);
 	SDL_RenderPresent(game->display.renderer);
 }
 
@@ -153,7 +148,6 @@ static void destroy_ui(struct oshu_game *game)
 	oshu_free_background(game);
 	oshu_free_metadata(game);
 	oshu_free_score(game);
-	oshu_destroy_cursor(&game->ui.cursor);
 	oshu_destroy_audio_progress_bar(&game->ui.audio_progress_bar);
 }
 

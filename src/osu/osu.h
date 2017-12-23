@@ -7,6 +7,7 @@
 
 #include "game/controls.h"
 #include "graphics/texture.h"
+#include "ui/cursor.h"
 
 struct oshu_game;
 struct oshu_game_mode;
@@ -93,6 +94,11 @@ struct osu_state {
 	 * Little tick mark for the dotted line between two consecutive hits.
 	 */
 	struct oshu_texture connector;
+	/**
+	 * Use a fancy software cursor for the osu!standard mode, because the
+	 * mouse is a central part of the gameplay.
+	 */
+	struct oshu_cursor_widget cursor;
 };
 
 /**

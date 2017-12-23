@@ -151,6 +151,7 @@ int osu_draw(struct oshu_game *game)
 		draw_hit(game, hit);
 		next = hit;
 	}
+	oshu_show_cursor(&game->osu.cursor);
 	oshu_reset_view(&game->display);
 	return 0;
 }

@@ -41,6 +41,7 @@ static int update(struct oshu_game *game)
 
 static int draw(struct oshu_game *game)
 {
+	SDL_ShowCursor(SDL_ENABLE);
 	oshu_show_background(game);
 	oshu_show_metadata(game);
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);

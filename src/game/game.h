@@ -34,7 +34,6 @@ struct oshu_game_ui {
 	struct oshu_background_widget background;
 	struct oshu_metadata_widget metadata;
 	struct oshu_score_widget score;
-	struct oshu_cursor_widget cursor;
 	struct oshu_audio_progress_bar_widget audio_progress_bar;
 };
 
