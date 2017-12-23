@@ -133,7 +133,7 @@ static int draw(struct oshu_game *game)
 {
 	SDL_ShowCursor(SDL_DISABLE);
 	draw_background(game);
-	oshu_show_metadata(game);
+	oshu_show_metadata_frame(&game->ui.metadata, oshu_fade_out(5, 6, game->clock.system));
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
 	game->mode->draw(game);
 	return 0;

@@ -38,16 +38,6 @@ struct oshu_game;
  * \{
  */
 
-struct oshu_metadata_frame {
-	struct oshu_texture ascii;
-	struct oshu_texture unicode;
-	struct oshu_texture stars;
-};
-
-int oshu_paint_metadata(struct oshu_game *game);
-void oshu_show_metadata(struct oshu_game *game);
-void oshu_free_metadata(struct oshu_game *game);
-
 struct oshu_score_widget {
 	struct oshu_texture offset_graph;
 };
@@ -61,3 +51,4 @@ void oshu_free_score(struct oshu_game *game);
 #include "ui/audio.h"
 #include "ui/background.h"
 #include "ui/cursor.h"
+#include "ui/metadata.h"

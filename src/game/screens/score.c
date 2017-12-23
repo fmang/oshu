@@ -43,7 +43,7 @@ static int draw(struct oshu_game *game)
 {
 	SDL_ShowCursor(SDL_ENABLE);
 	oshu_show_background(&game->ui.background, 1);
-	oshu_show_metadata(game);
+	oshu_show_metadata_frame(&game->ui.metadata, 1);
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
 	oshu_show_score(game);
 	return 0;

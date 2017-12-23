@@ -54,6 +54,7 @@ oshu_SOURCES = \
 	ui/cursor.c \
 	ui/cursor.h \
 	ui/metadata.c \
+	ui/metadata.h \
 	ui/score.c \
 	ui/ui.h
 

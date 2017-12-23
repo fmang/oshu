@@ -72,7 +72,7 @@ static int create_ui(struct oshu_game *game)
 {
 	if (game->beatmap.background_filename)
 		oshu_load_background(&game->display, game->beatmap.background_filename, &game->ui.background);
-	oshu_paint_metadata(game);
+	oshu_create_metadata_frame(&game->display, &game->beatmap, &game->clock.system, &game->ui.metadata);
 	if (oshu_create_audio_progress_bar(&game->display, &game->audio.music, &game->ui.audio_progress_bar) < 0)
 		return -1;
 	return 0;
@@ -147,7 +147,7 @@ int oshu_run_game(struct oshu_game *game)
 static void destroy_ui(struct oshu_game *game)
 {
 	oshu_destroy_background(&game->ui.background);
-	oshu_free_metadata(game);
+	oshu_destroy_metadata_frame(&game->ui.metadata);
 	oshu_free_score(game);
 	oshu_destroy_audio_progress_bar(&game->ui.audio_progress_bar);
 }
