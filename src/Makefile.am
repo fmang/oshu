@@ -50,6 +50,7 @@ oshu_SOURCES = \
 	ui/audio.c \
 	ui/audio.h \
 	ui/background.c \
+	ui/background.h \
 	ui/cursor.c \
 	ui/cursor.h \
 	ui/metadata.c \

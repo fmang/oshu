@@ -38,14 +38,6 @@ struct oshu_game;
  * \{
  */
 
-struct oshu_background {
-	struct oshu_texture picture;
-};
-
-int oshu_load_background(struct oshu_game *game);
-void oshu_show_background(struct oshu_game *game);
-void oshu_free_background(struct oshu_game *game);
-
 struct oshu_metadata_frame {
 	struct oshu_texture ascii;
 	struct oshu_texture unicode;
@@ -67,4 +59,5 @@ void oshu_free_score(struct oshu_game *game);
 /** \} */
 
 #include "ui/audio.h"
+#include "ui/background.h"
 #include "ui/cursor.h"

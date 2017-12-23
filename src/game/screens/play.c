@@ -92,10 +92,47 @@ static int update(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * Draw the background, adjusting the brightness.
+ *
+ * Most of the time, the background will be displayed at 25% of its luminosity,
+ * so that hit objects are clear.
+ *
+ * During breaks, the background is shown at full luminosity. The variation
+ * show in the following graph, where *S* is the end time of the previous note
+ * and the start of the break, and E the time of the next note and the end of
+ * the break.
+ *
+ * ```
+ * 100% ┼      ______________
+ *      │     /              \
+ *      │    /                \
+ *      │___/                  \___
+ *  25% │
+ *      └──────┼────────────┼─────┼─> t
+ *      S     S+2s         E-2s   E
+ * ```
+ *
+ * A break must have a duration of at least 6 seconds, ensuring the animation
+ * is never cut in between, or that the background stays lit for less than 2
+ * seconds.
+ *
+ */
+static void draw_background(struct oshu_game *game)
+{
+	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
+	double break_end = oshu_next_hit(game)->time;
+	double now = game->clock.now;
+	double ratio = 0.;
+	if (break_end - break_start > 6.)
+		ratio = oshu_trapezium(break_start + 1, break_end - 1, 1, now);
+	oshu_show_background(&game->ui.background, ratio);
+}
+
 static int draw(struct oshu_game *game)
 {
 	SDL_ShowCursor(SDL_DISABLE);
-	oshu_show_background(game);
+	draw_background(game);
 	oshu_show_metadata(game);
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
 	game->mode->draw(game);
