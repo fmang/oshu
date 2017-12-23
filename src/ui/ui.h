@@ -18,8 +18,7 @@ struct oshu_game;
  *
  * All the widgets share a common interface:
  *
- * - The widget's state is defined with a structure whose name ends with
- *   `_widget`.
+ * - The widget's state is defined with a structure.
  *
  * - The widget is initialized and configured with a `create` function,
  *   returning an int. The first argument is an #oshu_display, and the last one
@@ -39,7 +38,7 @@ struct oshu_game;
  * \{
  */
 
-struct oshu_background_widget {
+struct oshu_background {
 	struct oshu_texture picture;
 };
 
@@ -47,7 +46,7 @@ int oshu_load_background(struct oshu_game *game);
 void oshu_show_background(struct oshu_game *game);
 void oshu_free_background(struct oshu_game *game);
 
-struct oshu_metadata_widget {
+struct oshu_metadata_frame {
 	struct oshu_texture ascii;
 	struct oshu_texture unicode;
 	struct oshu_texture stars;

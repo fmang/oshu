@@ -11,14 +11,14 @@
 #include <assert.h>
 #include <SDL2/SDL.h>
 
-int oshu_create_audio_progress_bar(struct oshu_display *display, struct oshu_stream *stream, struct oshu_audio_progress_bar_widget *bar)
+int oshu_create_audio_progress_bar(struct oshu_display *display, struct oshu_stream *stream, struct oshu_audio_progress_bar *bar)
 {
 	bar->display = display;
 	bar->stream = stream;
 	return 0;
 }
 
-void oshu_show_audio_progress_bar(struct oshu_audio_progress_bar_widget *bar)
+void oshu_show_audio_progress_bar(struct oshu_audio_progress_bar *bar)
 {
 	assert (bar->stream->duration != 0);
 	double progression = bar->stream->current_timestamp / bar->stream->duration;
@@ -39,6 +39,6 @@ void oshu_show_audio_progress_bar(struct oshu_audio_progress_bar_widget *bar)
 	SDL_RenderFillRect(bar->display->renderer, &shape);
 }
 
-void oshu_destroy_audio_progress_bar(struct oshu_audio_progress_bar_widget *bar)
+void oshu_destroy_audio_progress_bar(struct oshu_audio_progress_bar *bar)
 {
 }
