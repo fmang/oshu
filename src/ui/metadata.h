@@ -75,6 +75,8 @@ struct oshu_metadata_frame {
  * Refer to #oshu_metadata_frame for documentation on the parameters.
  *
  * `frame` needs not be initialized.
+ *
+ * When done, please destroy the frame with #oshu_destroy_metadata_frame.
  */
 int oshu_create_metadata_frame(struct oshu_display *display, struct oshu_beatmap *beatmap, double *clock, struct oshu_metadata_frame *frame);
 
@@ -115,7 +117,9 @@ void oshu_show_metadata_frame(struct oshu_metadata_frame *frame, double opacity)
  */
 double oshu_fade_out(double start, double end, double t);
 
+/**
+ * Free the allocated textures.
+ */
 void oshu_destroy_metadata_frame(struct oshu_metadata_frame *frame);
-
 
 /** \} */

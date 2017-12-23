@@ -148,7 +148,7 @@ static void destroy_ui(struct oshu_game *game)
 {
 	oshu_destroy_background(&game->ui.background);
 	oshu_destroy_metadata_frame(&game->ui.metadata);
-	oshu_free_score(game);
+	oshu_destroy_score_widget(&game->ui.score);
 	oshu_destroy_audio_progress_bar(&game->ui.audio_progress_bar);
 }
 

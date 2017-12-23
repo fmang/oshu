@@ -45,7 +45,7 @@ static int draw(struct oshu_game *game)
 	oshu_show_background(&game->ui.background, 1);
 	oshu_show_metadata_frame(&game->ui.metadata, 1);
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
-	oshu_show_score(game);
+	oshu_show_score_widget(&game->ui.score);
 	return 0;
 }
 

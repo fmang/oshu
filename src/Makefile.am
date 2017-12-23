@@ -56,6 +56,7 @@ oshu_SOURCES = \
 	ui/metadata.c \
 	ui/metadata.h \
 	ui/score.c \
+	ui/score.h \
 	ui/ui.h
 
 oshu_CFLAGS = -iquote . -DPKGDATADIR='"$(pkgdatadir)"' $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LSWR_CFLAGS) $(LAVU_CFLAGS) $(PANGOCAIRO_CFLAGS) $(CAIRO_CFLAGS)
