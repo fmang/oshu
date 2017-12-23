@@ -221,13 +221,11 @@ static int init(struct oshu_game *game)
 	osu_view(game);
 	int rc = osu_paint_resources(game);
 	oshu_reset_view(&game->display);
-	SDL_ShowCursor(SDL_DISABLE);
 	return rc;
 }
 
 static int destroy(struct oshu_game *game)
 {
-	SDL_ShowCursor(SDL_ENABLE);
 	osu_free_resources(game);
 	return 0;
 }

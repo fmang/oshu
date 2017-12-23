@@ -76,6 +76,8 @@ static int create_ui(struct oshu_game *game)
 		return -1;
 	if (oshu_create_cursor(&game->display, &game->ui.cursor) < 0)
 		return -1;
+	else
+		SDL_ShowCursor(SDL_DISABLE);
 	return 0;
 }
 
