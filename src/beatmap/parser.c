@@ -377,7 +377,7 @@ static int process_section(struct parser_state *parser)
 	case TimingPoints:
 	case Colours:
 	case HitObjects:
-		parser->section = token;
+		parser->section = (enum beatmap_section) token;
 		return 0;
 	default:
 		parser_error(parser, "unknown section");
