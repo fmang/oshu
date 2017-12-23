@@ -97,10 +97,6 @@ fail:
 	return -1;
 }
 
-/**
- * \todo
- * Move the background and metadata in their game screens.
- */
 static void draw(struct oshu_game *game)
 {
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);

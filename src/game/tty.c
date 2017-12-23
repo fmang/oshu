@@ -1,6 +1,12 @@
+/**
+ * \file game/tty.c
+ * \ingroup game_tty
+ */
+
+#include "game/tty.h"
+
 #include "game/game.h"
 #include "game/screens/screens.h"
-#include "game/tty.h"
 
 #include <unistd.h>
 
