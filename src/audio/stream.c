@@ -146,6 +146,7 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
 			return -1;
 		left -= rc;
 		stream->sample_index += rc;
+		stream->current_timestamp += (double) rc / stream->decoder->sample_rate;
 		samples += rc * channels;
 	}
 	return nb_samples - left;
