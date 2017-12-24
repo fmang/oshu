@@ -22,7 +22,7 @@ struct oshu_game_screen;
  * \defgroup game Game
  *
  * \brief
- * Coordinate all the modules and implement the game mechanics.
+ * Coordinate all the modules.
  *
  * \{
  */
@@ -117,6 +117,9 @@ int oshu_run_game(struct oshu_game *game);
 /**
  * \defgroup game_helpers Helpers
  *
+ * \brief
+ * Read-only game accessors.
+ *
  * \{
  */
 
@@ -159,20 +162,22 @@ struct oshu_hit* oshu_previous_hit(struct oshu_game *game);
 /**
  * \defgroup game_actions Actions
  *
+ * \brief
+ * Change the game state.
+ *
  * \{
  */
 
 /**
  * Resume the game.
- *
- * If the music was playing, rewind it by 1 second to leave the player a little
- * break after resuming. This probably makes cheating possible but I couldn't
- * care less.
- *
- * Pausing on a slider will break it though.
  */
 void oshu_unpause_game(struct oshu_game *game);
 
+/**
+ * Pause the game.
+ *
+ * Enter the #oshu_pause_screen screen.
+ */
 void oshu_pause_game(struct oshu_game *game);
 
 /**

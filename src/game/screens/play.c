@@ -67,6 +67,13 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 	return 0;
 }
 
+/**
+ * Once the last note of the beatmap is past the game cursor, end the game.
+ *
+ * This is where the score is computed, and displayed on the console.
+ *
+ * The game switches to the score screen, from which the only exit is *death*.
+ */
 static void check_end(struct oshu_game *game)
 {
 	if (game->hit_cursor->next)
@@ -139,6 +146,15 @@ static int draw(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * The standard in-play game screen.
+ *
+ * This is the main screen of the game. The beatmap is displayed and the user
+ * interacts with it by clicking and stroking keys.
+ *
+ * This screen relies heavily on the game mode.
+ *
+ */
 struct oshu_game_screen oshu_play_screen = {
 	.name = "Playing",
 	.on_event = on_event,

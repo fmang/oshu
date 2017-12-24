@@ -49,6 +49,12 @@ static int draw(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * Game complete screen.
+ *
+ * Once this screen is reached, the only command left is *exit*.
+ *
+ */
 struct oshu_game_screen oshu_score_screen = {
 	.name = "Finished",
 	.on_event = on_event,

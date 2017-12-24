@@ -9,6 +9,9 @@
  * \defgroup game_clock Clock
  * \ingroup game
  *
+ * \brief
+ * Compute the game clock from the audio time and process time.
+ *
  * \{
  */
 

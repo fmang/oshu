@@ -47,11 +47,8 @@ void oshu_pause_game(struct oshu_game *game)
 
 void oshu_unpause_game(struct oshu_game *game)
 {
-	if (game->clock.now >= 0) {
-		if (!game->autoplay)
-			oshu_rewind_game(game, 1.);
+	if (game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
-	}
 	game->screen = &oshu_play_screen;
 }
 

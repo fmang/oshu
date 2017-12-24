@@ -13,7 +13,8 @@ struct oshu_game;
  * \defgroup game_screens Screens
  * \ingroup game
  *
- * A game screen defines the state the game is in.
+ * \brief
+ * Game states.
  *
  * The main idea is that there is the main loop iterating at a constant 60 FPS
  * rate, and handling the common events, like window closing.
@@ -28,6 +29,24 @@ struct oshu_game;
  * common structure, and would share code when appropriate. The main point is
  * that event handlers should never cascade the if-else conditionals depending
  * on the state.
+ *
+ * \dot
+ * digraph modules {
+ * 	rankdir=LR;
+ * 	node [shape=rect];
+ * 	subgraph {
+ * 		rank=same;
+ * 		Pause -> Play;
+ * 		Play -> Pause;
+ * 	}
+ * 	Start -> Play;
+ * 	Play -> Finish;
+ * 	Finish -> Exit;
+ * 	Pause -> Exit;
+ * 	Start [shape=none];
+ * 	Exit [shape=none];
+ * }
+ * \enddot
  *
  * \{
  */
@@ -59,8 +78,13 @@ struct oshu_game_screen {
 	int (*draw)(struct oshu_game *game);
 };
 
+/* Defined in play.c */
 extern struct oshu_game_screen oshu_play_screen;
+
+/* Defined in pause.c */
 extern struct oshu_game_screen oshu_pause_screen;
+
+/* Defined in score.c */
 extern struct oshu_game_screen oshu_score_screen;
 
 /** \} */

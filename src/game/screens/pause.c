@@ -22,6 +22,8 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 			oshu_stop_game(game);
 			break;
 		case OSHU_PAUSE_KEY:
+			if (game->clock.now > 0 && !game->autoplay)
+				oshu_rewind_game(game, 1.);
 			oshu_unpause_game(game);
 			break;
 		case OSHU_REWIND_KEY:
@@ -76,6 +78,19 @@ static int draw(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * Pause screen: the music stops.
+ *
+ * In the pause screen, the user cannot interact with the game itself, but may
+ * control the audio position by seeking.
+ *
+ * The beatmap isn't drawn, but instead a pause symbol and the beatmap's
+ * metadata are shown.
+ *
+ * When resuming, the audio is rewinded by 1 second to leave the user some time
+ * to re-focus.
+ *
+ */
 struct oshu_game_screen oshu_pause_screen = {
 	.name = "Paused",
 	.on_event = on_event,

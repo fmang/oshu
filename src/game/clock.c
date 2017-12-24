@@ -19,6 +19,11 @@ void oshu_initialize_clock(struct oshu_game *game)
 	game->clock.system = SDL_GetTicks() / 1000.;
 }
 
+/**
+ * \todo
+ * Find a better way to determine if the music is playing. The clock shouldn't
+ * take the game screen into consideration.
+ */
 void oshu_update_clock(struct oshu_game *game)
 {
 	struct oshu_clock *clock = &game->clock;
