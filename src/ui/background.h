@@ -64,9 +64,12 @@ struct oshu_background {
  * with #oshu_show_background and #oshu_destroy_background. It is therefore
  * safe to ignore errors here.
  *
- * \todo
- * Pre-scale the background at load time instead of forcing the GPU to scale a
- * huge texture everytime the game is painted.
+ * The background is pre-scaled to avoid keeping a huge texture in video
+ * memory, and that makes the background rendering much faster as no scaling is
+ * necessary anymore. Moreover, even if the SDL scaling algorithm is set to
+ * *nearest* for better performance, the background will still appear smooth
+ * because the pre-scale algorithm is fancier than that, thanks to cairo.
+ *
  */
 int oshu_load_background(struct oshu_display *display, const char *filename, struct oshu_background *background);
 

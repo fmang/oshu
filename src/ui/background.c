@@ -9,6 +9,7 @@
 #include "log.h"
 
 #include <assert.h>
+#include <cairo/cairo.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -45,8 +46,29 @@ static void fit(struct oshu_display *display, oshu_size size, SDL_Rect *dest)
  * When scaling is performed, the input surface is freed and the pointer made
  * point to the new scaled surface.
  *
+ * First, the resulting image size is computing using the same function as
+ * #oshu_show_background. If the resulting size is smaller than the original
+ * size, do nothing.
+ *
+ * Then, the image is converted to unpacked RGB: each pixel is made of 4-bytes,
+ * one of which is unused. This format is called SDL_PIXELFORMAT_RGB888, or
+ * CAIRO_FORMAT_RGB24, but *not* SDL_PIXELFORMAT_RGB24. Cairo doesn't seem to
+ * support packed 3-byte RGB.
+ *
+ * The destination SDL surface is created with the wanted size. Both surfaces
+ * are then converted to cairo surfaces, without memory duplication because
+ * that's how cairo integrates with SDL best. The source is painted on the
+ * destination.
+ *
+ * Finally, everything is unlocked and freed except the destination surface,
+ * which is stored in `*pic`. Voilà!
+ *
+ * It might sound a bit overkill to use cairo for that, but oshu! already
+ * depends on it anyway, and the best SDL provides is SDL_BlitScaled, which
+ * albeit fast, ruins the quality.
+ *
  * \todo
- * Handle blit errors.
+ * Handle cairo errors.
  */
 static int scale_background(struct oshu_display *display, SDL_Surface **pic)
 {
@@ -54,9 +76,39 @@ static int scale_background(struct oshu_display *display, SDL_Surface **pic)
 	fit(display, (*pic)->w + I * (*pic)->h, &target_rect);
 	if (target_rect.w >= (*pic)->w)
 		return 0; /* don't upscale */
+	double zoom = (double) target_rect.w / (*pic)->w;
+	oshu_log_debug("scaling the background to %dx%d (%.1f%%)", target_rect.w, target_rect.h, zoom * 100);
 
+	if ((*pic)->format->format != SDL_PIXELFORMAT_RGB888) {
+		oshu_log_debug("converting the background picture to unpacked RGB");
+		SDL_Surface *converted = SDL_ConvertSurfaceFormat(*pic, SDL_PIXELFORMAT_RGB888, 0);
+		assert (converted != NULL);
+		SDL_FreeSurface(*pic);
+		*pic = converted;
+	}
 	SDL_Surface *target = SDL_CreateRGBSurfaceWithFormat(0, target_rect.w, target_rect.h, 24, SDL_PIXELFORMAT_RGB888);
-	SDL_BlitScaled(*pic, NULL, target, NULL);
+	assert ((*pic)->format->format == SDL_PIXELFORMAT_RGB888);
+	assert (target->format->format == SDL_PIXELFORMAT_RGB888);
+
+	SDL_LockSurface(target);
+	SDL_LockSurface(*pic);
+	cairo_surface_t *source = cairo_image_surface_create_for_data(
+		(*pic)->pixels, CAIRO_FORMAT_RGB24,
+		(*pic)->w, (*pic)->h, (*pic)->pitch);
+	cairo_surface_t *dest = cairo_image_surface_create_for_data(
+		target->pixels, CAIRO_FORMAT_RGB24,
+		target->w, target->h, target->pitch);
+
+	cairo_t *cr = cairo_create(dest);
+	cairo_scale(cr, zoom, zoom);
+	cairo_set_source_surface(cr, source, 0, 0);
+	cairo_paint(cr);
+	cairo_destroy(cr);
+
+	cairo_surface_destroy(dest);
+	cairo_surface_destroy(source);
+	SDL_UnlockSurface(*pic);
+	SDL_UnlockSurface(target);
 	SDL_FreeSurface(*pic);
 	*pic = target;
 	return 0;
