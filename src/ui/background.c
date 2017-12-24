@@ -64,19 +64,3 @@ void oshu_destroy_background(struct oshu_background *background)
 {
 	oshu_destroy_texture(&background->picture);
 }
-
-double oshu_trapezium(double start, double end, double transition, double t)
-{
-	double ratio = 0.;
-	if (t <= start)
-		ratio = 0.;
-	else if (t < start + transition)
-		ratio = (t - start) / transition;
-	else if (t <= end - transition)
-		ratio = 1.;
-	else if (t < end)
-		ratio = (end - t) / transition;
-	else
-		ratio = 0.;
-	return ratio;
-}

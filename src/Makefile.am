@@ -40,6 +40,8 @@ oshu_SOURCES = \
 	graphics/paint.h \
 	graphics/texture.c \
 	graphics/texture.h \
+	graphics/transitions.c \
+	graphics/transitions.h \
 	graphics/view.c \
 	graphics/view.h \
 	log.h \

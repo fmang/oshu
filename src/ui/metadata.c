@@ -160,17 +160,6 @@ void oshu_show_metadata_frame(struct oshu_metadata_frame *frame, double opacity)
 	oshu_draw_texture(frame->display, &frame->stars, creal(frame->display->view.size));
 }
 
-double oshu_fade_out(double start, double end, double t)
-{
-	assert (end > start);
-	if (t < start)
-		return 1;
-	else if (t < end)
-		return (end - t) / (end - start);
-	else
-		return 0;
-}
-
 void oshu_destroy_metadata_frame(struct oshu_metadata_frame *frame)
 {
 	oshu_destroy_texture(&frame->ascii);

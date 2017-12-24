@@ -95,29 +95,6 @@ int oshu_create_metadata_frame(struct oshu_display *display, struct oshu_beatmap
 void oshu_show_metadata_frame(struct oshu_metadata_frame *frame, double opacity);
 
 /**
- * Fading out function.
- *
- * *start* defines when the fade-out transition starts, and *end* when it ends.
- * *t* is the current time.
- *
- * The return value of this function is 1 when *start < t*, then decreases
- * linearily when *start < t < end*, and finally becomes 0 when *t > end*.
- * It is continous.
- *
- * Assumes *start < end*.
- *
- * ```
- * 1 ┼____
- *   │    \
- *   │     \
- *   │      \____
- * 0 └───┼───┼────> t
- *       S   E
- * ```
- */
-double oshu_fade_out(double start, double end, double t);
-
-/**
  * Free the allocated textures.
  */
 void oshu_destroy_metadata_frame(struct oshu_metadata_frame *frame);

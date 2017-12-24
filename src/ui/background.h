@@ -92,47 +92,6 @@ int oshu_load_background(struct oshu_display *display, const char *filename, str
 void oshu_show_background(struct oshu_background *background, double brightness);
 
 /**
- * Convex isosceles trapezoid function.
- *
- * This function draws a trapezoid from an arbitrary x-axis and a fixed [0, 1]
- * y-axis. This is meant to handle symmetrical transition effects.
- *
- * This trapezium function is defined such that:
- *
- * - It is continuous.
- * - Before *start*, its image is a constant 0.
- * - It increases linearily in [start, start+transition] from 0 to 1.
- * - Between [start+transition, end-transition], its image is a constant 1.
- * - It decreases linearily in [end, end-transition] from 1 to 0.
- * - After *end*, its image is a constant 0.
- *
- * It assumes that:
- *
- * 1. transition > 0
- * 2. start + transition < end - transition
- *
- *
- * ```
- * 1 ┼      __________
- *   │     /          \
- *   │    /            \
- *   │___/              \___
- * 0 └──┼───┼────────┼───┼───> t
- *      S  S+T      E-T  E
- * ```
- *
- * Because a transition with a very short stable 1 has little meaning, you
- * should check if the difference between start and end is big enough to
- * require a transition effect. Otherwise, you might as well skip the
- * transition.
- *
- * You are discouraged to use this function like a triangle with
- * `transition = (end - start) / 2`, because that won't reflect your intention.
- *
- */
-double oshu_trapezium(double start, double end, double transition, double t);
-
-/**
  * Free the background picture.
  */
 void oshu_destroy_background(struct oshu_background *background);

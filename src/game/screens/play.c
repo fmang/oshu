@@ -6,9 +6,11 @@
  * Implement the main game screen.
  */
 
-#include "game/game.h"
 #include "game/screens/screens.h"
+
+#include "game/game.h"
 #include "game/tty.h"
+#include "graphics/transitions.h"
 
 #include <SDL2/SDL.h>
 
