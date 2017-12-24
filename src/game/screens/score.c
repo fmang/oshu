@@ -6,8 +6,10 @@
  * Implement the score screen, when the game is finished.
  */
 
-#include "game/game.h"
 #include "game/screens/screens.h"
+
+#include "game/game.h"
+#include "graphics/transitions.h"
 
 #include <SDL2/SDL.h>
 
@@ -42,8 +44,10 @@ static int update(struct oshu_game *game)
 static int draw(struct oshu_game *game)
 {
 	SDL_ShowCursor(SDL_ENABLE);
-	oshu_show_background(&game->ui.background, 1);
-	oshu_show_metadata_frame(&game->ui.metadata, 1);
+	double end = oshu_hit_end_time(oshu_previous_hit(game));
+	double r = oshu_fade_in(end + 1, end + 2, game->clock.now);
+	oshu_show_background(&game->ui.background, r);
+	oshu_show_metadata_frame(&game->ui.metadata, r);
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
 	oshu_show_score_widget(&game->ui.score);
 	return 0;
