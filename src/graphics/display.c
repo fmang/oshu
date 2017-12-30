@@ -98,7 +98,7 @@ int create_window(struct oshu_display *display)
 		goto fail;
 	display->renderer = SDL_CreateRenderer(
 		display->window, -1,
-		display->features & OSHU_HARDWARE_ACCELERATION ? 0 : SDL_RENDERER_SOFTWARE
+		(display->features & OSHU_HARDWARE_ACCELERATION) ? 0 : SDL_RENDERER_SOFTWARE
 	);
 	if (display->renderer == NULL)
 		goto fail;
