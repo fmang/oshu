@@ -10,6 +10,50 @@
 #include <SDL2/SDL.h>
 
 /**
+ * Define the window size when the game starts.
+ *
+ * It reads the OSHU_WINDOW_SIZE environment if defined, and falls back on the
+ * default 960×720 resolution if the variable is invalid or absent.
+ *
+ * The value of the variable follows the format `WxH` where W is the width in
+ * pixels, and H the height in pixels. The lowest resolution is 320x240.
+ *
+ * Usually, the format should be 4:3 to match the game, but it's perfectly fine
+ * to have a wider window. It's just that the extra width will be nothing but
+ * margin. It may fit the background better though.
+ */
+static oshu_size get_default_window_size()
+{
+	char *value = getenv("OSHU_WINDOW_SIZE");
+	if (!value || !*value) /* null or empty */
+		goto def;
+	/* Width */
+	char *x;
+	int width = strtol(value, &x, 10);
+	if (*x != 'x')
+		goto invalid;
+	/* Height */
+	char *end;
+	int height = strtol(x + 1, &end, 10);
+	if (*end != '\0')
+		goto invalid;
+	/* Putting it together */
+	if (width < 320 || height < 240) {
+		oshu_log_warning("the minimal default window size is 320x240");
+		goto invalid;
+	} else if (width > 3480 || height > 2160) {
+		oshu_log_warning("it's unlikely you have a screen bigger than 4K");
+		goto invalid;
+	} else {
+		return width + height * I;
+	}
+invalid:
+	oshu_log_warning("rejected OSHU_WINDOW_SIZE value %s, defaulting to 960x720", value);
+def:
+	return 960 + 720 * I;
+}
+
+/**
  * Open the window and create the rendered.
  *
  * The default window size, 960x720 is arbitrary but proportional the the game
@@ -17,11 +61,12 @@
  */
 int create_window(struct oshu_display *display)
 {
+	oshu_size window_size = get_default_window_size();
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		960, 720,
+		creal(window_size), cimag(window_size),
 		SDL_WINDOW_RESIZABLE
 	);
 	if (display->window == NULL)
@@ -35,6 +80,10 @@ fail:
 	return -1;
 }
 
+/**
+ * The default window size is read from the OSHU_WINDOW_SIZE environment
+ * variable. More details at #get_default_window_size.
+ */
 int oshu_open_display(struct oshu_display *display)
 {
 	if (create_window(display) < 0)

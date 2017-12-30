@@ -68,6 +68,20 @@ positions don't matter, but their letters do.
 \fBQ\fR
 Quit the game.
 
+.SH CONFIGURATION
+.PP
+oshu! currently doesn't read a configuration file, but reads the environment.
+You may therefore easily configure oshu! from your .bashrc, or by creating a
+wrapper script.
+.PP
+Here's the list of supported environment variables:
+.TP
+\fBOSHU_WINDOW_SIZE\fR
+This variable specifies the default window size when the game start. Its value
+must conform to the format \fI960x720\fR, where 960 is the width in pixels, and
+720 the height in pixels. When omitted or invalid, the game starts with a
+fallback default size of 960x720.
+
 .SH AUTHOR
 Written by Frédéric Mangano-Tarumi <fmang+oshu at mg0 fr>.
 
