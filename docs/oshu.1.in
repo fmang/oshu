@@ -81,6 +81,11 @@ This variable specifies the default window size when the game start. Its value
 must conform to the format \fI960x720\fR, where 960 is the width in pixels, and
 720 the height in pixels. When omitted or invalid, the game starts with a
 fallback default size of 960x720.
+.TP
+\fBOSHU_QUALITY\fR
+This variables controls the visual effects and other rendering quality
+settings. It may take one of \fIlow\fR, \fImedium\fR, and \fIhigh\fR. The
+default is \fIhigh\fR.
 
 .SH AUTHOR
 Written by Frédéric Mangano-Tarumi <fmang+oshu at mg0 fr>.

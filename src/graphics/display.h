@@ -92,25 +92,22 @@ enum oshu_visual_feature {
 	 * By default, it is set to *nearest*, which is fast but breaks
 	 * antialising when textures are scaled. *linear* gives much nicer
 	 * results, but is much more expensive.
-	 *
-	 * \todo
-	 * Implement this flag.
 	 */
-	OSHU_LINEAR_SCALING,
+	OSHU_LINEAR_SCALING = 0x1,
 	/**
 	 * Display a background picture rather than a pitch black screen.
 	 *
 	 * \todo
 	 * Implement this flag.
 	 */
-	OSHU_SHOW_BACKGROUND,
+	OSHU_SHOW_BACKGROUND = 0x2,
 	/**
 	 * Show a fancy software mouse cursor instead of the default one.
 	 *
 	 * \todo
 	 * Implement this flag.
 	 */
-	OSHU_FANCY_CURSOR,
+	OSHU_FANCY_CURSOR = 0x4,
 	/**
 	 * Prefer hardware rendering over software rendering.
 	 *
@@ -121,10 +118,10 @@ enum oshu_visual_feature {
 	 * One notable example is the Raspberry Pi which runs much smoother
 	 * without acceleration.
 	 *
-	 * \todo
-	 * Implement this flag.
+	 * Note that enabling this flag doesn't force it on the SDL display,
+	 * but disabling it forces software rendering.
 	 */
-	OSHU_HARDWARE_ACCELERATION,
+	OSHU_HARDWARE_ACCELERATION = 0x8,
 };
 
 /**
@@ -168,6 +165,12 @@ enum oshu_quality_level {
 	 * whatever the window size is.
 	 */
 	OSHU_HIGH_QUALITY = OSHU_MEDIUM_QUALITY|OSHU_LINEAR_SCALING|OSHU_HARDWARE_ACCELERATION,
+	/**
+	 * Default quality level.
+	 *
+	 * Used when the user didn't specify anything.
+	 */
+	OSHU_DEFAULT_QUALITY = OSHU_HIGH_QUALITY,
 };
 
 /**
@@ -210,8 +213,6 @@ struct oshu_display {
 
 /**
  * Create a display structure, open the SDL window and create the renderer.
- *
- * *display* must be null-initialized.
  *
  * \sa oshu_close_display
  */

@@ -54,6 +54,28 @@ def:
 }
 
 /**
+ * Return the enabled visual features reading the OSHU_QUALITY environment
+ * variable.
+ */
+int get_features()
+{
+	char *value = getenv("OSHU_QUALITY");
+	if (!value || !*value) { /* null or empty */
+		return OSHU_DEFAULT_QUALITY;
+	} else if (!strcmp(value, "high")) {
+		return OSHU_HIGH_QUALITY;
+	} else if (!strcmp(value, "medium")) {
+		return OSHU_MEDIUM_QUALITY;
+	} else if (!strcmp(value, "low")) {
+		return OSHU_LOW_QUALITY;
+	} else {
+		oshu_log_warning("invalid OSHU_QUALITY value: %s", value);
+		oshu_log_warning("supported quality levels are: low, medium, high");
+		return OSHU_DEFAULT_QUALITY;
+	}
+}
+
+/**
  * Open the window and create the rendered.
  *
  * The default window size, 960x720 is arbitrary but proportional the the game
@@ -61,8 +83,11 @@ def:
  */
 int create_window(struct oshu_display *display)
 {
+	memset(display, 0, sizeof(*display));
+	display->features = get_features();
 	oshu_size window_size = get_default_window_size();
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	if (display->features & OSHU_LINEAR_SCALING)
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -71,7 +96,10 @@ int create_window(struct oshu_display *display)
 	);
 	if (display->window == NULL)
 		goto fail;
-	display->renderer = SDL_CreateRenderer(display->window, -1, 0);
+	display->renderer = SDL_CreateRenderer(
+		display->window, -1,
+		display->features & OSHU_HARDWARE_ACCELERATION ? 0 : SDL_RENDERER_SOFTWARE
+	);
 	if (display->renderer == NULL)
 		goto fail;
 	return 0;
