@@ -131,8 +131,11 @@ int oshu_run_game(struct oshu_game *game)
 			SDL_Delay(advance * 1000);
 		} else {
 			missed_frames++;
-			if (missed_frames == 1000)
+			if (missed_frames == 1000) {
 				oshu_log_warning("your computer is having a hard time keeping up 60 FPS");
+				if (game->display.features)
+					oshu_log_warning("try running oshu! with OSHU_QUALITY=low (see the man page)");
+			}
 		}
 	}
 
