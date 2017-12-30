@@ -97,13 +97,13 @@ enum oshu_visual_feature {
 	/**
 	 * Display a background picture rather than a pitch black screen.
 	 *
-	 * Implemented by the #ui_background module.
+	 * Implemented by the \ref ui_background module.
 	 */
 	OSHU_SHOW_BACKGROUND = 0x2,
 	/**
 	 * Show a fancy software mouse cursor instead of the default one.
 	 *
-	 * This flag is implemented by the #ui_cursor module.
+	 * This flag is implemented by the \ref ui_cursor module.
 	 */
 	OSHU_FANCY_CURSOR = 0x4,
 	/**
