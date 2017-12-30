@@ -111,6 +111,20 @@ enum oshu_visual_feature {
 	 * Implement this flag.
 	 */
 	OSHU_FANCY_CURSOR,
+	/**
+	 * Prefer hardware rendering over software rendering.
+	 *
+	 * Since the graphics are quite simple, unless fancy scaling is enabled
+	 * with #OSHU_LINEAR_SCALING, hardware graphics provide little
+	 * advantage, and may even worsen the performance.
+	 *
+	 * One notable example is the Raspberry Pi which runs much smoother
+	 * without acceleration.
+	 *
+	 * \todo
+	 * Implement this flag.
+	 */
+	OSHU_HARDWARE_ACCELERATION,
 };
 
 /**
@@ -118,12 +132,17 @@ enum oshu_visual_feature {
  *
  * This is controllable through the `OSHU_QUALITY` environment variable:
  *
- * - `-` suffix for #OSHU_LOW_QUALITY,
- * - no suffix for #OSHU_MEDIUM_QUALITY,
- * - `+` suffix for #OSHU_HIGH_QUALITY.
+ * - `low` for #OSHU_LOW_QUALITY,
+ * - `medium` for #OSHU_MEDIUM_QUALITY,
+ * - `high` for #OSHU_HIGH_QUALITY.
  *
  * A quality level is actually a combination of visual features from
  * #oshu_visual_feature.
+ *
+ * In the future, the OSHU_QUALITY variable may be expanded to support finer
+ * settings and allow enabling individual features instead of picking a level
+ * from a limited set of values. For example, you could imagine
+ * `medium-background`, or `low+acceleration`.
  */
 enum oshu_quality_level {
 	/**
@@ -148,7 +167,7 @@ enum oshu_quality_level {
 	 * Use linear scaling, and make textures fit the window size exactly,
 	 * whatever the window size is.
 	 */
-	OSHU_HIGH_QUALITY = OSHU_MEDIUM_QUALITY|OSHU_LINEAR_SCALING,
+	OSHU_HIGH_QUALITY = OSHU_MEDIUM_QUALITY|OSHU_LINEAR_SCALING|OSHU_HARDWARE_ACCELERATION,
 };
 
 /**
@@ -185,37 +204,8 @@ struct oshu_display {
 	 *
 	 * It is by default loaded from the `OSHU_QUALITY` environment
 	 * variable, using the values defined by #oshu_quality_level.
-	 *
-	 * \todo
-	 * Load it from the OSHU_QUALITY environment variable on display
-	 * initialization. OSHU_QUALITY will contain values like `1.5+`, `1.5`
-	 * or `1.5-`, mapping respectively to high, medium and low quality. By
-	 * default, high quality is selected.
 	 */
 	int features;
-	/**
-	 * The quality factor defines the texture size, and the default window
-	 * size.
-	 *
-	 * A quality factor of 1 represents a standard 640×480 osu! screen. A
-	 * factor of 1.5 maps to oshu!'s default 960×640 screen.
-	 *
-	 * When the quality factor is 0, texture builders fall back on the
-	 * current #view's #oshu_view::zoom. This is usually the best choice,
-	 * as textures are generated to fit the screen perfectly.
-	 *
-	 * You'll get nothing but worse graphics from increasing this value
-	 * more than necessary. However, you may want to decrease it when you
-	 * want a big window but cannot afford full-resolution textures.
-	 *
-	 * \todo
-	 * Load it from the OSHU_QUALITY environment variable on display
-	 * initialization.
-	 *
-	 * \todo
-	 * Use it from the paint submodule when building textures.
-	 */
-	double quality_factor;
 };
 
 /**
