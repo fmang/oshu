@@ -104,8 +104,7 @@ enum oshu_visual_feature {
 	/**
 	 * Show a fancy software mouse cursor instead of the default one.
 	 *
-	 * \todo
-	 * Implement this flag.
+	 * This flag is implemented by the #ui_cursor module.
 	 */
 	OSHU_FANCY_CURSOR = 0x4,
 	/**

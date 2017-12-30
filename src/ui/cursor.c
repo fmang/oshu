@@ -41,18 +41,24 @@ static int paint_cursor(struct oshu_cursor_widget *cursor)
 int oshu_create_cursor(struct oshu_display *display, struct oshu_cursor_widget *cursor)
 {
 	memset(cursor, 0, sizeof(*cursor));
+	cursor->display = display;
+
+	if (!(display->features & OSHU_FANCY_CURSOR))
+		return 0;
 
 	int fireflies = sizeof(cursor->history) / sizeof(*cursor->history);
 	oshu_point mouse = oshu_get_mouse(display);
 	for (int i = 0; i < fireflies; ++i)
 		cursor->history[i] = mouse;
 
-	cursor->display = display;
 	return paint_cursor(cursor);
 }
 
 void oshu_show_cursor(struct oshu_cursor_widget *cursor)
 {
+	if (!(cursor->display->features & OSHU_FANCY_CURSOR))
+		return;
+
 	int fireflies = sizeof(cursor->history) / sizeof(*cursor->history);
 	cursor->offset = (cursor->offset + 1) % fireflies;
 	cursor->history[cursor->offset] = oshu_get_mouse(cursor->display);
@@ -71,5 +77,8 @@ void oshu_show_cursor(struct oshu_cursor_widget *cursor)
 
 void oshu_destroy_cursor(struct oshu_cursor_widget *cursor)
 {
+	if (!(cursor->display->features & OSHU_FANCY_CURSOR))
+		return;
+
 	oshu_destroy_texture(&cursor->mouse);
 }

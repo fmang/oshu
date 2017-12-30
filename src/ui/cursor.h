@@ -17,6 +17,9 @@ struct oshu_display;
  * \brief
  * Fancy software mouse cursor.
  *
+ * To enable this module, the #OSHU_FANCY_CURSOR flag must be enabled for the
+ * display. Otherwise, this module behaves like a stub and do nothing.
+ *
  * \{
  */
 
