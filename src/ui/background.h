@@ -16,6 +16,9 @@ struct oshu_display;
  * \brief
  * Picture background.
  *
+ * To enable this module, the #OSHU_SHOW_BACKGROUND flag must be enabled for
+ * the display. Otherwise, this module behaves like a stub and does nothing.
+ *
  * \{
  */
 

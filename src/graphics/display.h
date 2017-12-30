@@ -97,8 +97,7 @@ enum oshu_visual_feature {
 	/**
 	 * Display a background picture rather than a pitch black screen.
 	 *
-	 * \todo
-	 * Implement this flag.
+	 * Implemented by the #ui_background module.
 	 */
 	OSHU_SHOW_BACKGROUND = 0x2,
 	/**

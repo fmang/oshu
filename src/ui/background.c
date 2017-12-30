@@ -117,6 +117,10 @@ static int scale_background(struct oshu_display *display, SDL_Surface **pic)
 int oshu_load_background(struct oshu_display *display, const char *filename, struct oshu_background *background)
 {
 	memset(background, 0, sizeof(*background));
+	background->display = display;
+	if (!(display->features & OSHU_SHOW_BACKGROUND))
+		return 0;
+
 	SDL_Surface *pic = IMG_Load(filename);
 	if (!pic) {
 		oshu_log_error("error loading background: %s", IMG_GetError());
@@ -125,7 +129,6 @@ int oshu_load_background(struct oshu_display *display, const char *filename, str
 	if (scale_background(display, &pic) < 0)
 		return -1;
 
-	background->display = display;
 	background->picture.size = pic->w + I * pic->h;
 	background->picture.origin = 0;
 	background->picture.texture = SDL_CreateTextureFromSurface(display->renderer, pic);
@@ -168,5 +171,7 @@ void oshu_show_background(struct oshu_background *background, double brightness)
 
 void oshu_destroy_background(struct oshu_background *background)
 {
+	if (!(background->display->features & OSHU_SHOW_BACKGROUND))
+		return;
 	oshu_destroy_texture(&background->picture);
 }
