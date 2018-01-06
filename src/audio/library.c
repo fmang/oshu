@@ -328,22 +328,24 @@ round2:
 	return *sample;
 }
 
-void oshu_play_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio)
+static void try_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio, enum oshu_sound_type flag)
 {
-	int target = sound->additions & OSHU_SOUND_TARGET;
-	struct oshu_sample *sample;
-	if (sound->additions & OSHU_NORMAL_SOUND)
-		sample = find_sample(library, sound->sample_set, sound->index, target | OSHU_NORMAL_SOUND);
-	if (sound->additions & OSHU_WHISTLE_SOUND)
-		sample = find_sample(library, sound->additions_set, sound->index, target | OSHU_WHISTLE_SOUND);
-	if (sound->additions & OSHU_FINISH_SOUND)
-		sample = find_sample(library, sound->additions_set, sound->index, target | OSHU_FINISH_SOUND);
-	if (sound->additions & OSHU_CLAP_SOUND)
-		sample = find_sample(library, sound->additions_set, sound->index, target | OSHU_CLAP_SOUND);
-	if (sample) {
-		if (sound->additions & OSHU_SLIDER_SOUND)
+	if (sound->additions & flag) {
+		int target = sound->additions & OSHU_SOUND_TARGET;
+		struct oshu_sample *sample = find_sample(library, sound->sample_set, sound->index, target | flag);
+		if (!sample)
+			return;
+		else if (sound->additions & OSHU_SLIDER_SOUND)
 			oshu_play_loop(audio, sample, sound->volume);
 		else
 			oshu_play_sample(audio, sample, sound->volume);
 	}
+}
+
+void oshu_play_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio)
+{
+	try_sound(library, sound, audio, OSHU_NORMAL_SOUND);
+	try_sound(library, sound, audio, OSHU_WHISTLE_SOUND);
+	try_sound(library, sound, audio, OSHU_FINISH_SOUND);
+	try_sound(library, sound, audio, OSHU_CLAP_SOUND);
 }
