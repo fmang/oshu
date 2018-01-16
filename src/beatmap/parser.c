@@ -1171,36 +1171,48 @@ static int parse_hold_note(struct parser_state *parser, struct oshu_hit *hit)
  */
 static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 {
-	if (*parser->input == '\0') {
-		hit->sound.sample_set = hit->timing_point->sample_set;
-		hit->sound.additions_set = hit->timing_point->sample_set;
-		hit->sound.index = hit->timing_point->sample_index;
-		hit->sound.volume = hit->timing_point->volume;
+	/* 0. Fill defaults. */
+	hit->sound.sample_set = hit->timing_point->sample_set;
+	hit->sound.additions_set = hit->timing_point->sample_set;
+	hit->sound.index = hit->timing_point->sample_index;
+	hit->sound.volume = hit->timing_point->volume;
+	if (*parser->input == '\0')
 		return 0;
-	}
 	if (consume_char(parser, ',') < 0)
 		return - 1;
 	int value;
 	/* 1. Sample set. */
-	if (parse_int_sep(parser, &value, ':') < 0)
+	if (parse_int(parser, &value) < 0)
 		return -1;
 	hit->sound.sample_set = value ? value : hit->timing_point->sample_set;
+	if (*parser->input != ':')
+		return 0;
+	consume_char(parser, ':');
 	/* 2. Additions set. */
-	if (parse_int_sep(parser, &value, ':') < 0)
+	if (parse_int(parser, &value) < 0)
 		return -1;
 	hit->sound.additions_set = value ? value : hit->timing_point->sample_set;
+	if (*parser->input != ':')
+		return 0;
+	consume_char(parser, ':');
 	/* 3. Custom sample set index. */
-	if (parse_int_sep(parser, &value, ':') < 0)
+	if (parse_int(parser, &value) < 0)
 		return -1;
 	hit->sound.index = value ? value : hit->timing_point->sample_index;
+	if (*parser->input != ':')
+		return 0;
+	consume_char(parser, ':');
 	/* 4. Volume. */
-	if (parse_int_sep(parser, &value, ':') < 0)
+	if (parse_int(parser, &value) < 0)
 		return -1;
 	if (value < 0 || value > 100) {
 		parser_error(parser, "invalid volume %d", value);
 		return -1;
 	}
 	hit->sound.volume = value ? (float) value / 100. : hit->timing_point->volume;
+	if (*parser->input != ':')
+		return 0;
+	consume_char(parser, ':');
 	/* 5. File name. */
 	/* Unsupported, so we consume everything. */
 	consume_all(parser);
