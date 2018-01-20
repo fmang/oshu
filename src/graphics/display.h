@@ -120,6 +120,13 @@ enum oshu_visual_feature {
 	 * but disabling it forces software rendering.
 	 */
 	OSHU_HARDWARE_ACCELERATION = 0x8,
+	/**
+	 * Increase the frame rate to 60 FPS.
+	 *
+	 * On low-end hardware, 30 FPS is a good compromise, but most of the
+	 * time 60 is much smoother.
+	 */
+	OSHU_60FPS = 0x10,
 };
 
 /**
@@ -155,7 +162,7 @@ enum oshu_quality_level {
 	 * The scaling algorithm is set to *nearest*. Get ready for aliasing
 	 * and staircases.
 	 */
-	OSHU_MEDIUM_QUALITY = OSHU_LOW_QUALITY|OSHU_SHOW_BACKGROUND|OSHU_FANCY_CURSOR,
+	OSHU_MEDIUM_QUALITY = OSHU_LOW_QUALITY|OSHU_SHOW_BACKGROUND|OSHU_FANCY_CURSOR|OSHU_60FPS,
 	/**
 	 * Best quality.
 	 *
@@ -207,6 +214,15 @@ struct oshu_display {
 	 * variable, using the values defined by #oshu_quality_level.
 	 */
 	int features;
+	/**
+	 * How long a frame should last in seconds.
+	 *
+	 * 0.01666… is 60 FPS.
+	 *
+	 * Its value depends on whether the #OSHU_60FPS is enabled or not. If
+	 * it isn't, then the game runs at 30 FPS.
+	 */
+	double frame_duration;
 };
 
 /**

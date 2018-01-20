@@ -88,6 +88,7 @@ int create_window(struct oshu_display *display)
 	oshu_size window_size = get_default_window_size();
 	if (display->features & OSHU_LINEAR_SCALING)
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	display->frame_duration = 1. / ((display->features|OSHU_60FPS) ? 60. : 30.);
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

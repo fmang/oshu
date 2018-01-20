@@ -18,11 +18,6 @@
 
 #include <SDL2/SDL_image.h>
 
-/**
- * How long a frame should last in seconds. 17 is about 60 FPS.
- */
-static const double frame_duration = .016666666;
-
 static int open_beatmap(const char *beatmap_path, struct oshu_game *game)
 {
 	if (oshu_load_beatmap(beatmap_path, &game->beatmap) < 0) {
@@ -126,13 +121,13 @@ int oshu_run_game(struct oshu_game *game)
 		if (game->screen == &oshu_play_screen)
 			oshu_print_state(game);
 
-		double advance = frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
+		double advance = game->display.frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
 			SDL_Delay(advance * 1000);
 		} else {
 			missed_frames++;
 			if (missed_frames == 1000) {
-				oshu_log_warning("your computer is having a hard time keeping up 60 FPS");
+				oshu_log_warning("your computer is having a hard time keeping up");
 				if (game->display.features)
 					oshu_log_warning("try running oshu! with OSHU_QUALITY=low (see the man page)");
 			}
