@@ -14,6 +14,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <SDL2/SDL.h>
 
 /**
  * Estimate the duration of a beatmap from the timing information of its last
@@ -106,4 +107,62 @@ void oshu_show_score_widget(struct oshu_score_widget *widget)
 void oshu_destroy_score_widget(struct oshu_score_widget *widget)
 {
 	oshu_destroy_texture(&widget->offset_graph);
+}
+
+int oshu_create_score_frame(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_score_frame *frame)
+{
+	memset(frame, 0, sizeof(*frame));
+	frame->display = display;
+	frame->beatmap = beatmap;
+
+	for (struct oshu_hit *hit = beatmap->hits; hit; hit = hit->next) {
+		if (hit->state == OSHU_MISSED_HIT)
+			++frame->bad;
+		else if (hit->state == OSHU_GOOD_HIT)
+			++frame->good;
+	}
+
+	return 0;
+}
+
+void oshu_show_score_frame(struct oshu_score_frame *frame, double opacity)
+{
+	int notes = frame->good + frame->bad;
+	if (notes == 0)
+		return;
+
+	SDL_SetRenderDrawBlendMode(frame->display->renderer, SDL_BLENDMODE_BLEND);
+
+	SDL_Rect back = {
+		.x = 0,
+		.y = cimag(frame->display->view.size) - 20,
+		.w = creal(frame->display->view.size),
+		.h = 20,
+	};
+	SDL_SetRenderDrawColor(frame->display->renderer, 0, 0, 0, 128 * opacity);
+	SDL_RenderFillRect(frame->display->renderer, &back);
+
+	double bar_width = back.w / 1.5;
+	double bar_height = back.h / 4.;
+	SDL_Rect good = {
+		.x = (back.w - bar_width) / 2.,
+		.y = back.y + (back.h - bar_height) / 2.,
+		.w = (double) frame->good / notes * bar_width,
+		.h = bar_height,
+	};
+	SDL_SetRenderDrawColor(frame->display->renderer, 0, 255, 0, 96 * opacity);
+	SDL_RenderFillRect(frame->display->renderer, &good);
+
+	SDL_Rect bad = {
+		.x = good.x + good.w,
+		.y = good.y,
+		.w = bar_width - good.w,
+		.h = good.h,
+	};
+	SDL_SetRenderDrawColor(frame->display->renderer, 255, 0, 0, 96 * opacity);
+	SDL_RenderFillRect(frame->display->renderer, &bad);
+}
+
+void oshu_destroy_score_frame(struct oshu_score_frame *frame)
+{
 }

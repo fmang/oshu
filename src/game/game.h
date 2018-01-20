@@ -33,7 +33,7 @@ struct oshu_game_screen;
 struct oshu_game_ui {
 	struct oshu_background background;
 	struct oshu_metadata_frame metadata;
-	struct oshu_score_widget score;
+	struct oshu_score_frame score;
 	struct oshu_audio_progress_bar audio_progress_bar;
 };
 

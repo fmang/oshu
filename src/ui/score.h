@@ -31,4 +31,15 @@ int oshu_create_score_widget(struct oshu_display *display, struct oshu_beatmap *
 void oshu_show_score_widget(struct oshu_score_widget *widget);
 void oshu_destroy_score_widget(struct oshu_score_widget *widget);
 
+struct oshu_score_frame {
+	struct oshu_display *display;
+	struct oshu_beatmap *beatmap;
+	int good;
+	int bad;
+};
+
+int oshu_create_score_frame(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_score_frame *frame);
+void oshu_show_score_frame(struct oshu_score_frame *frame, double opacity);
+void oshu_destroy_score_frame(struct oshu_score_frame *frame);
+
 /** \} */

@@ -47,9 +47,9 @@ static int draw(struct oshu_game *game)
 	double end = oshu_hit_end_time(oshu_previous_hit(game));
 	double r = oshu_fade_in(end + 1, end + 2, game->clock.now);
 	oshu_show_background(&game->ui.background, r);
-	oshu_show_metadata_frame(&game->ui.metadata, r);
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
-	oshu_show_score_widget(&game->ui.score);
+	oshu_show_metadata_frame(&game->ui.metadata, r);
+	oshu_show_score_frame(&game->ui.score, r);
 	return 0;
 }
 
