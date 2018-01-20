@@ -133,33 +133,29 @@ void oshu_show_score_frame(struct oshu_score_frame *frame, double opacity)
 
 	SDL_SetRenderDrawBlendMode(frame->display->renderer, SDL_BLENDMODE_BLEND);
 
-	SDL_Rect back = {
-		.x = 0,
-		.y = cimag(frame->display->view.size) - 20,
-		.w = creal(frame->display->view.size),
-		.h = 20,
+	SDL_Rect bar = {
+		.x = creal(frame->display->view.size) * 0.15,
+		.y = cimag(frame->display->view.size) - 15,
+		.w = creal(frame->display->view.size) * 0.70,
+		.h = 5,
 	};
-	SDL_SetRenderDrawColor(frame->display->renderer, 0, 0, 0, 128 * opacity);
-	SDL_RenderFillRect(frame->display->renderer, &back);
 
-	double bar_width = back.w / 1.5;
-	double bar_height = back.h / 4.;
 	SDL_Rect good = {
-		.x = (back.w - bar_width) / 2.,
-		.y = back.y + (back.h - bar_height) / 2.,
-		.w = (double) frame->good / notes * bar_width,
-		.h = bar_height,
+		.x = bar.x,
+		.y = bar.y,
+		.w = (double) frame->good / notes * bar.w,
+		.h = bar.h,
 	};
-	SDL_SetRenderDrawColor(frame->display->renderer, 0, 255, 0, 96 * opacity);
+	SDL_SetRenderDrawColor(frame->display->renderer, 0, 255, 0, 196 * opacity);
 	SDL_RenderFillRect(frame->display->renderer, &good);
 
 	SDL_Rect bad = {
 		.x = good.x + good.w,
 		.y = good.y,
-		.w = bar_width - good.w,
+		.w = bar.w - good.w,
 		.h = good.h,
 	};
-	SDL_SetRenderDrawColor(frame->display->renderer, 255, 0, 0, 96 * opacity);
+	SDL_SetRenderDrawColor(frame->display->renderer, 255, 0, 0, 196 * opacity);
 	SDL_RenderFillRect(frame->display->renderer, &bad);
 }
 
