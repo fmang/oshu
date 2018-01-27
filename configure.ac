@@ -8,9 +8,10 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile docs/Makefile share/Makefile])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
-AC_USE_SYSTEM_EXTENSIONS
+AC_USE_SYSTEM_EXTENSIONS # asprintf
 
 # Checks for programs.
+AC_LANG([C++])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
