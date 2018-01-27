@@ -62,10 +62,15 @@ struct oshu_game {
 	int stop;
 	int autoplay;
 	struct oshu_game_screen *screen;
-	/** Mode-specific data, defined inside each mode's header file. */
-	union {
-		struct osu_state osu;
-	};
+	/**
+	 * Mode-specific data, defined inside each mode's header file.
+	 *
+	 * \todo
+	 * Turn it into a pointer to an interface with virtual members. C++
+	 * won't allow unions with non-trivial members, so the old anonymous
+	 * union won't do.
+	 */
+	struct osu_state osu;
 	/**
 	 * Pointer to the next clickable hit.
 	 *
