@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 	}
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, verbosity);
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, (SDL_LogPriority) verbosity);
 	av_log_set_level(verbosity <= SDL_LOG_PRIORITY_DEBUG ? AV_LOG_INFO : AV_LOG_ERROR);
 
 	char *beatmap_path = realpath(argv[optind], NULL);
