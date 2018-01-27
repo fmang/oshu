@@ -1,63 +1,63 @@
 bin_PROGRAMS = oshu
 
 oshu_SOURCES = \
-	oshu.c \
-	audio/audio.c \
+	oshu.cc \
+	audio/audio.cc \
 	audio/audio.h \
-	audio/library.c \
+	audio/library.cc \
 	audio/library.h \
-	audio/sample.c \
+	audio/sample.cc \
 	audio/sample.h \
-	audio/stream.c \
+	audio/stream.cc \
 	audio/stream.h \
-	audio/track.c \
+	audio/track.cc \
 	audio/track.h \
 	beatmap/beatmap.h \
-	beatmap/geometry.c \
+	beatmap/geometry.cc \
 	beatmap/geometry.h \
-	beatmap/helpers.c \
-	beatmap/parser.c \
+	beatmap/helpers.cc \
+	beatmap/parser.cc \
 	beatmap/parser.h \
 	beatmap/tokens.h \
-	game/actions.c \
-	game/clock.c \
+	game/actions.cc \
+	game/clock.cc \
 	game/clock.h \
-	game/controls.c \
+	game/controls.cc \
 	game/controls.h \
-	game/game.c \
+	game/game.cc \
 	game/game.h \
-	game/helpers.c \
+	game/helpers.cc \
 	game/mode.h \
-	game/screens/pause.c \
-	game/screens/play.c \
-	game/screens/score.c \
+	game/screens/pause.cc \
+	game/screens/play.cc \
+	game/screens/score.cc \
 	game/screens/screens.h \
-	game/tty.c \
+	game/tty.cc \
 	game/tty.h \
-	graphics/display.c \
+	graphics/display.cc \
 	graphics/display.h \
-	graphics/paint.c \
+	graphics/paint.cc \
 	graphics/paint.h \
-	graphics/texture.c \
+	graphics/texture.cc \
 	graphics/texture.h \
-	graphics/transitions.c \
+	graphics/transitions.cc \
 	graphics/transitions.h \
-	graphics/view.c \
+	graphics/view.cc \
 	graphics/view.h \
 	log.h \
-	osu/draw.c \
-	osu/osu.c \
+	osu/draw.cc \
+	osu/osu.cc \
 	osu/osu.h \
-	osu/paint.c \
-	ui/audio.c \
+	osu/paint.cc \
+	ui/audio.cc \
 	ui/audio.h \
-	ui/background.c \
+	ui/background.cc \
 	ui/background.h \
-	ui/cursor.c \
+	ui/cursor.cc \
 	ui/cursor.h \
-	ui/metadata.c \
+	ui/metadata.cc \
 	ui/metadata.h \
-	ui/score.c \
+	ui/score.cc \
 	ui/score.h \
 	ui/ui.h
 

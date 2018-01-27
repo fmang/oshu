@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([oshu], [1.6.0], [fmang+oshu@mg0.fr])
-AC_CONFIG_SRCDIR([src/oshu.c])
+AC_CONFIG_SRCDIR([src/oshu.cc])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile docs/Makefile share/Makefile])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
