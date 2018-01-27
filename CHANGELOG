@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.6.0 - TBA
------------
+1.6.0 - 2018-01-27
+------------------
 
 Featuring an improved user interface.
 
@@ -10,10 +10,10 @@ The game now displays the beatmap's metadata in-game, provides a clearer pause
 screen and ends with a score screen. In the short term, the console should only
 be targeted at the most curious users.
 
-oshu! now supports a few performance settings configurable from the
-*OSHU_QUALITY* and *OSHU_WINDOW_SIZE* environment variables. This may be
-required for the game to be playable on low hardware, and in particular the
-Raspberry Pi. More details in the man page.
+oshu! supports a few performance settings configurable from the *OSHU_QUALITY*
+and *OSHU_WINDOW_SIZE* environment variables. This may be required for the game
+to be playable on low hardware, and in particular the Raspberry Pi. More
+details in the man page.
 
 1.5.0 - 2017-11-25
 ------------------
