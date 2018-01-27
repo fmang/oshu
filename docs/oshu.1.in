@@ -62,8 +62,8 @@ Rewind the song by 10 seconds, and leave a 1-second break.
 Forward the song by 20 seconds.
 .SS Pause
 .PP
-When the game is paused, the key layout for your region is used. Their
-positions don't matter, but their letters do.
+When the game is paused, your local keyboard layout is used.
+These keys also apply to the score screen at the end.
 .TP
 \fBQ\fR
 Quit the game.
@@ -71,8 +71,8 @@ Quit the game.
 .SH CONFIGURATION
 .PP
 oshu! currently doesn't read a configuration file, but reads the environment.
-You may therefore easily configure oshu! from your .bashrc, or by creating a
-wrapper script.
+You may configure oshu! from your .bashrc, or by creating a wrapper script
+\fIexport\fRing your variables.
 .PP
 Here's the list of supported environment variables:
 .TP
