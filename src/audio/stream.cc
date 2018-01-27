@@ -113,8 +113,8 @@ static int next_frame(struct oshu_stream *stream)
 static int convert_frame(struct SwrContext *converter, AVFrame *frame, int index, float *samples, int wanted)
 {
 	const uint8_t *data[frame->channels];
-	int sample_size = av_get_bytes_per_sample(frame->format);
-	if (av_sample_fmt_is_planar(frame->format)) {
+	int sample_size = av_get_bytes_per_sample((AVSampleFormat) frame->format);
+	if (av_sample_fmt_is_planar((AVSampleFormat) frame->format)) {
 		for (int c = 0; c < frame->channels; ++c)
 			data[c] = frame->data[c] + index * sample_size;
 	} else {

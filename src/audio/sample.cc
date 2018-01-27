@@ -33,7 +33,7 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 		oshu_log_error("SDL audio conversion error: %s", SDL_GetError());
 		return -1;
 	}
-	sample->samples = realloc(sample->samples, sample->size * converter.len_mult);
+	sample->samples = (float*) realloc(sample->samples, sample->size * converter.len_mult);
 	if (sample->samples == NULL) {
 		oshu_log_error("could not resize the samples buffer");
 		return -1;
@@ -43,7 +43,7 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 	SDL_ConvertAudio(&converter);
 	sample->size = converter.len_cvt;
 	/* reclaim the unrequired memory */
-	sample->samples = realloc(sample->samples, sample->size);
+	sample->samples = (float*) realloc(sample->samples, sample->size);
 	assert (sample->samples != NULL);
 	return 0;
 }

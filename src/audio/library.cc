@@ -89,9 +89,9 @@ static void grow_room(struct oshu_sound_room *room)
 	if (room->size < room->capacity)
 		return;
 	room->capacity += 8;
-	room->shelves = realloc(room->shelves, room->capacity * sizeof(*room->shelves));
+	room->shelves = (oshu_sound_shelf*) realloc(room->shelves, room->capacity * sizeof(*room->shelves));
 	assert (room->shelves != NULL);
-	room->indices = realloc(room->indices, room->capacity * sizeof(*room->indices));
+	room->indices = (int*) realloc(room->indices, room->capacity * sizeof(*room->indices));
 	assert (room->indices != NULL);
 }
 
@@ -248,7 +248,7 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
 	if (!path)
 		return -1;
 	oshu_log_debug("registering %s", path);
-	*sample = calloc(1, sizeof(**sample));
+	*sample = (oshu_sample*) calloc(1, sizeof(**sample));
 	assert (*sample != NULL);
 	assert (library->format != NULL);
 	int rc = oshu_load_sample(path, library->format, *sample);
@@ -307,15 +307,16 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
  *
  * \sa oshu_play_sound
  */
-struct oshu_sample* find_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, enum oshu_sound_type type)
+struct oshu_sample* find_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type)
 {
+	struct oshu_sample **sample {nullptr};
 	struct oshu_sound_room *room = get_room(library, set);
 	if (!room)
 		return NULL;
 	struct oshu_sound_shelf *shelf = find_shelf(room, index);
 	if (!shelf)
 		goto round2;
-	struct oshu_sample **sample = get_sample(shelf, type);
+	sample = get_sample(shelf, type);
 	if (sample && *sample)
 		return *sample;
 round2:
