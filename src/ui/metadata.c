@@ -36,6 +36,11 @@ static PangoLayout* setup_layout(struct oshu_painter *p)
 	return layout;
 }
 
+
+/**
+ * \todo
+ * Handle errors.
+ */
 static int paint_stars(struct oshu_metadata_frame *frame)
 {
 	oshu_size size = 360 + 60 * I;
@@ -54,7 +59,8 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 	const char *version = meta->version;
 	assert (version != NULL);
 	char *text;
-	asprintf(&text, "%s\n%s", version, difficulty);
+	int rc = asprintf(&text, "%s\n%s", version, difficulty);
+	assert (rc >= 0);
 	assert (text != NULL);
 
 	int width, height;
@@ -70,11 +76,15 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 	free(difficulty);
 
 	struct oshu_texture *texture = &frame->stars;
-	int rc = oshu_finish_painting(&p, texture);
+	rc = oshu_finish_painting(&p, texture);
 	texture->origin = creal(size);
 	return rc;
 }
 
+/**
+ * \todo
+ * Handle errors.
+ */
 static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 {
 	oshu_size size = 640 + 60 * I;
@@ -86,7 +96,8 @@ static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 	const char *title = unicode ? meta->title_unicode : meta->title;
 	const char *artist = unicode ? meta->artist_unicode : meta->artist;
 	char *text;
-	asprintf(&text, "%s\n%s", title, artist);
+	int rc = asprintf(&text, "%s\n%s", title, artist);
+	assert (rc >= 0);
 	assert (text != NULL);
 
 	int width, height;
@@ -100,7 +111,7 @@ static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 	free(text);
 
 	struct oshu_texture *texture = unicode ? &frame->unicode : &frame->ascii;
-	int rc = oshu_finish_painting(&p, texture);
+	rc = oshu_finish_painting(&p, texture);
 	texture->origin = 0;
 	return rc;
 }
