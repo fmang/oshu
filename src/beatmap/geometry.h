@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <complex.h>
+#include <complex>
 
 /**
  * \defgroup geometry Geometry
@@ -22,19 +22,19 @@
  *
  * The coordinate system is arbitrary.
  */
-typedef double complex oshu_point;
+using oshu_point = std::complex<double>;
 
 /**
  * A 2D vector.
  *
  * This is distinct from #oshu_point for readability.
  */
-typedef double complex oshu_vector;
+using oshu_vector = std::complex<double>;
 
 /**
  * A 2D size.
  */
-typedef double complex oshu_size;
+using oshu_size = std::complex<double>;
 
 /**
  * Return the width / height ratio of a size.

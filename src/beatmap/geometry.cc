@@ -14,17 +14,9 @@
  */
 static double epsilon = 0.001;
 
-/**
- * Compute the squared Euclidean distance between *p* and *q*: Δx² + Δy².
- */
-static double distance2(oshu_point p, oshu_point q)
-{
-	return (p - q) * conj(p - q);
-}
-
 double oshu_ratio(oshu_size size)
 {
-	return creal(size) / cimag(size);
+	return std::real(size) / std::imag(size);
 }
 
 /**
@@ -32,14 +24,14 @@ double oshu_ratio(oshu_size size)
  */
 static void extend_box(oshu_point p, oshu_point *top_left, oshu_point *bottom_right)
 {
-	if (creal(p) < creal(*top_left))
-		*top_left = creal(p) + I * cimag(*top_left);
-	if (cimag(p) < cimag(*top_left))
-		*top_left = creal(*top_left) + I * cimag(p);
-	if (creal(p) > creal(*bottom_right))
-		*bottom_right = creal(p) + I * cimag(*bottom_right);
-	if (cimag(p) > cimag(*bottom_right))
-		*bottom_right = creal(*bottom_right) + I * cimag(p);
+	if (std::real(p) < std::real(*top_left))
+		*top_left = oshu_point(std::real(p), std::imag(*top_left));
+	if (std::imag(p) < std::imag(*top_left))
+		*top_left = oshu_point(std::real(*top_left), std::imag(p));
+	if (std::real(p) > std::real(*bottom_right))
+		*bottom_right = oshu_point(std::real(p), std::imag(*bottom_right));
+	if (std::imag(p) > std::imag(*bottom_right))
+		*bottom_right = oshu_point(std::real(*bottom_right), std::imag(p));
 }
 
 /* Bézier *********************************************************************/
@@ -177,18 +169,18 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
 
 	oshu_log_debug("expanding the bezier path by %f pixels", extension);
 	oshu_vector direction = end - before_end;
-	if (cabs(direction) < epsilon) {
+	if (std::abs(direction) < epsilon) {
 		oshu_log_warning("cannot grow a bezier path whose end is stationary");
 		return -1;
 	}
 
 	bezier->segment_count++;
-	bezier->indices = realloc(bezier->indices, (bezier->segment_count + 1) * sizeof(*bezier->indices));
+	bezier->indices = (int*) realloc(bezier->indices, (bezier->segment_count + 1) * sizeof(*bezier->indices));
 	bezier->indices[bezier->segment_count] = n + 2;
 
-	bezier->control_points = realloc(bezier->control_points, (n + 2) * sizeof(*bezier->control_points));
+	bezier->control_points = (oshu_point*) realloc(bezier->control_points, (n + 2) * sizeof(*bezier->control_points));
 	bezier->control_points[n] = end;
-	bezier->control_points[n + 1] = end + direction / cabs(direction) * extension;
+	bezier->control_points[n + 1] = end + direction / std::abs(direction) * extension;
 	return 0;
 }
 
@@ -237,7 +229,7 @@ begin:
 	for (int i = 0; i <= n; i++) {
 		double t = (double) i / n;
 		oshu_point current = bezier_at(bezier, t);
-		length += cabs(prev - current);
+		length += std::abs(prev - current);
 		l[i] = length;
 		prev = current;
 	}
@@ -310,7 +302,7 @@ static oshu_point line_at(struct oshu_line *line, double t)
 
 static void normalize_line(struct oshu_line *line, double target_length)
 {
-	double actual_length = cabs(line->start - line->end);
+	double actual_length = std::abs(line->start - line->end);
 	assert (target_length > 0);
 	assert (actual_length > 0);
 	double factor = target_length / actual_length;
@@ -329,7 +321,7 @@ void line_bounding_box(struct oshu_line *line, oshu_point *top_left, oshu_point 
 static oshu_point arc_at(struct oshu_arc *arc, double t)
 {
 	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
-	return arc->center + arc->radius * cexp(angle * I);
+	return arc->center + std::polar(arc->radius, angle);
 }
 
 /**
@@ -339,9 +331,9 @@ static oshu_point arc_at(struct oshu_arc *arc, double t)
  */
 int arc_center(oshu_point a, oshu_point b, oshu_point c, oshu_point *center)
 {
-	double a2 = distance2(b, c);
-	double b2 = distance2(a, c);
-	double c2 = distance2(a, b);
+	double a2 = std::norm(b - c);
+	double b2 = std::norm(a - c);
+	double c2 = std::norm(a - b);
 	if (a2 < epsilon || b2 < epsilon || c2 < epsilon)
 		return -1;
 
@@ -361,10 +353,10 @@ int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *ar
 	if (arc_center(a, b, c, &arc->center) < 0)
 		return -1;
 
-	arc->radius = cabs(a - arc->center);
-	arc->start_angle = carg(a - arc->center);
-	arc->end_angle = carg(c - arc->center);
-	double cross = cimag(conj(c - a) * (b - a));
+	arc->radius = std::abs(a - arc->center);
+	arc->start_angle = std::arg(a - arc->center);
+	arc->end_angle = std::arg(c - arc->center);
+	double cross = std::imag(conj(c - a) * (b - a));
 
 	if (cross < 0 && arc->start_angle > arc->end_angle)
 		arc->end_angle += 2. * M_PI;
@@ -412,7 +404,7 @@ void arc_bounding_box(struct oshu_arc *arc, oshu_point *top_left, oshu_point *bo
 	oshu_vector radius = arc->radius;
 	for (int i = 1; i < 8; ++i) {
 		angle += M_PI / 2.;
-		radius *= I;
+		radius *= oshu_vector(0, 1);
 		if (min < angle && angle < max)
 			extend_box(arc->center + radius, top_left, bottom_right);
 	}
