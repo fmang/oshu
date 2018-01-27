@@ -1,5 +1,5 @@
 /**
- * \file game/controls.c
+ * \file game/controls.cc
  * \ingroup game_controls
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file ui/score.c
+ * \file ui/score.cc
  * \ingroup ui_score
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file game/clock.c
+ * \file game/clock.cc
  * \ingroup game_clock
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file game/screens/pause.c
+ * \file game/screens/pause.cc
  * \ingroup game_screens
  *
  * \brief

@@ -1,5 +1,5 @@
 /**
- * \file graphics/view.c
+ * \file graphics/view.cc
  * \ingroup graphics_view
  */
 

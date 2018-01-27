@@ -1,5 +1,5 @@
 /**
- * \file beatmap/helpers.c
+ * \file beatmap/helpers.cc
  * \ingroup beatmap
  *
  * \brief

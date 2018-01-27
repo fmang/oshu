@@ -1,5 +1,5 @@
 /**
- * \file game/screens/play.c
+ * \file game/screens/play.cc
  * \ingroup game_screens
  *
  * \brief

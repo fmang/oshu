@@ -1,5 +1,5 @@
 /**
- * \file graphics/transitions.c
+ * \file graphics/transitions.cc
  * \ingroup graphics_transitions
  */
 

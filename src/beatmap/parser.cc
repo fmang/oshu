@@ -1,5 +1,5 @@
 /**
- * \file beatmap/parser.c
+ * \file beatmap/parser.cc
  * \ingroup beatmap
  *
  * \brief

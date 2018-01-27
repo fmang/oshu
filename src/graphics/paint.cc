@@ -1,5 +1,5 @@
 /**
- * \file graphics/paint.c
+ * \file graphics/paint.cc
  * \ingroup graphics_paint
  */
 

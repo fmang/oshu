@@ -1,5 +1,5 @@
 /**
- * \file ui/metadata.c
+ * \file ui/metadata.cc
  * \ingroup ui_metadata
  */
 

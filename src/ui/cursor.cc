@@ -1,5 +1,5 @@
 /**
- * \file ui/cursor.c
+ * \file ui/cursor.cc
  * \ingroup ui_cursor
  */
 

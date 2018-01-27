@@ -1,5 +1,5 @@
 /**
- * \file audio/library.c
+ * \file audio/library.cc
  * \ingroup audio_library
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file audio/sample.c
+ * \file audio/sample.cc
  * \ingroup audio_sample
  */
 

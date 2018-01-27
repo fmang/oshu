@@ -1,5 +1,5 @@
 /**
- * \file game/helpers.c
+ * \file game/helpers.cc
  * \ingroup game_helpers
  */
 

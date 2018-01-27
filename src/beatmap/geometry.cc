@@ -1,5 +1,5 @@
 /**
- * \file beatmap/geometry.c
+ * \file beatmap/geometry.cc
  * \ingroup geometry
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file audio/stream.c
+ * \file audio/stream.cc
  * \ingroup audio_stream
  */
 

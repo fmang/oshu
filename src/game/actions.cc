@@ -1,5 +1,5 @@
 /**
- * \file game/actions.c
+ * \file game/actions.cc
  * \ingroup game_actions
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file graphics/texture.c
+ * \file graphics/texture.cc
  * \ingroup graphics_texture
  */
 

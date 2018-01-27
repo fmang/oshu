@@ -1,5 +1,5 @@
 /**
- * \file ui/audio.c
+ * \file ui/audio.cc
  * \ingroup ui_audio
  */
 

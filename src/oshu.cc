@@ -1,5 +1,5 @@
 /**
- * \file oshu.c
+ * \file oshu.cc
  *
  * \brief
  * Main entry-point for the game.

@@ -1,5 +1,5 @@
 /**
- * \file graphics/display.c
+ * \file graphics/display.cc
  * \ingroup graphics_display
  */
 

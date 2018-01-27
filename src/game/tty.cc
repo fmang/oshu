@@ -1,5 +1,5 @@
 /**
- * \file game/tty.c
+ * \file game/tty.cc
  * \ingroup game_tty
  */
 

@@ -1,5 +1,5 @@
 /**
- * \file ui/background.c
+ * \file ui/background.cc
  * \ingroup ui_background
  */
 
