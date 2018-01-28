@@ -19,7 +19,7 @@ static double brighter(double v)
 static int paint_approach_circle(struct oshu_game *game)
 {
 	double radius = game->beatmap.difficulty.circle_radius + game->beatmap.difficulty.approach_size;
-	oshu_size size = (1. + I) * radius * 2.;
+	oshu_size size = oshu_size(radius * 2., radius * 2.);
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -39,7 +39,7 @@ static int paint_approach_circle(struct oshu_game *game)
 static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct oshu_texture *texture)
 {
 	double radius = game->beatmap.difficulty.circle_radius;
-	oshu_size size = (1. + I) * radius * 2.;
+	oshu_size size = oshu_size(radius * 2., radius * 2.);
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -75,21 +75,21 @@ static int paint_circle(struct oshu_game *game, struct oshu_color *color, struct
 static void build_path(cairo_t *cr, struct oshu_slider *slider)
 {
 	if (slider->path.type == OSHU_LINEAR_PATH) {
-		cairo_move_to(cr, creal(slider->path.line.start), cimag(slider->path.line.start));
-		cairo_line_to(cr, creal(slider->path.line.end), cimag(slider->path.line.end));
+		cairo_move_to(cr, std::real(slider->path.line.start), std::imag(slider->path.line.start));
+		cairo_line_to(cr, std::real(slider->path.line.end), std::imag(slider->path.line.end));
 	} else if (slider->path.type == OSHU_PERFECT_PATH) {
 		struct oshu_arc *arc = &slider->path.arc;
 		if (arc->start_angle < arc->end_angle)
-			cairo_arc(cr, creal(arc->center), cimag(arc->center), arc->radius, arc->start_angle, arc->end_angle);
+			cairo_arc(cr, std::real(arc->center), std::imag(arc->center), arc->radius, arc->start_angle, arc->end_angle);
 		else
-			cairo_arc_negative(cr, creal(arc->center), cimag(arc->center), arc->radius, arc->start_angle, arc->end_angle);
+			cairo_arc_negative(cr, std::real(arc->center), std::imag(arc->center), arc->radius, arc->start_angle, arc->end_angle);
 	} else {
 		oshu_point start = oshu_path_at(&slider->path, 0);
-		cairo_move_to(cr, creal(start), cimag(start));
+		cairo_move_to(cr, std::real(start), std::imag(start));
 		int resolution = slider->length / 5. + 5;
 		for (int i = 1; i <= resolution; ++i) {
 			oshu_point pt = oshu_path_at(&slider->path, (double) i / resolution);
-			cairo_line_to(cr, creal(pt), cimag(pt));
+			cairo_line_to(cr, std::real(pt), std::imag(pt));
 		}
 	}
 }
@@ -108,15 +108,15 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 {
 	int start = SDL_GetTicks();
 	assert (hit->type & OSHU_SLIDER_HIT);
-	oshu_vector radius = game->beatmap.difficulty.circle_radius * (1. + I);
+	double radius = game->beatmap.difficulty.circle_radius;
 	oshu_point top_left, bottom_right;
 	oshu_path_bounding_box(&hit->slider.path, &top_left, &bottom_right);
-	oshu_size size = bottom_right - top_left + 2. * radius;
+	oshu_size size = bottom_right - top_left + oshu_vector{2, 2} * radius;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
 
-	cairo_translate(p.cr, - creal(top_left) + radius, - cimag(top_left) + radius);
+	cairo_translate(p.cr, - std::real(top_left) + radius, - std::imag(top_left) + radius);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 	double opacity = 0.7;
 
@@ -135,8 +135,8 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	cairo_stroke_preserve(p.cr);
 
 	cairo_pattern_t *pattern = cairo_pattern_create_radial(
-		creal(top_left), cimag(top_left), 0.,
-		creal(top_left), cimag(top_left), cabs(size / 1.5)
+		std::real(top_left), std::imag(top_left), 0.,
+		std::real(top_left), std::imag(top_left), std::abs(size / 1.5)
 	);
 	cairo_pattern_add_color_stop_rgba(pattern, 0,
 		brighter(hit->color->red), brighter(hit->color->green), brighter(hit->color->blue), opacity);
@@ -151,12 +151,12 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 	cairo_set_line_width(p.cr, 1);
 	for (int i = 1; i <= hit->slider.repeat; ++i) {
 		double ratio = (double) i / hit->slider.repeat;
-		cairo_arc(p.cr, creal(end), cimag(end), (radius - 4.) * ratio, 0, 2. * M_PI);
+		cairo_arc(p.cr, std::real(end), std::imag(end), (radius - 4.) * ratio, 0, 2. * M_PI);
 		cairo_stroke(p.cr);
 	}
 
 	/* Start point. */
-	cairo_arc(p.cr, creal(hit->p), cimag(hit->p), radius - 4, 0, 2. * M_PI);
+	cairo_arc(p.cr, std::real(hit->p), std::imag(hit->p), radius - 4, 0, 2. * M_PI);
 	cairo_set_source(p.cr, pattern);
 	cairo_fill_preserve(p.cr);
 
@@ -166,7 +166,7 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 
 	cairo_pattern_destroy(pattern);
 
-	hit->texture = calloc(1, sizeof(*hit->texture));
+	hit->texture = (oshu_texture*) calloc(1, sizeof(*hit->texture));
 	assert (hit->texture != NULL);
 	if (oshu_finish_painting(&p, hit->texture) < 0) {
 		free(hit->texture);
@@ -174,14 +174,14 @@ int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit)
 		return -1;
 	}
 
-	hit->texture->origin = hit->p - top_left + radius;
+	hit->texture->origin = hit->p - top_left + oshu_vector{1, 1} * radius;
 	oshu_log_verbose("slider drawn in %.3f seconds", (SDL_GetTicks() - start) / 1000.);
 	return 0;
 }
 
 static int paint_slider_ball(struct oshu_game *game) {
 	double radius = game->beatmap.difficulty.slider_tolerance;
-	oshu_size size = (1. + I) * radius * 2.;
+	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -217,7 +217,7 @@ static int paint_slider_ball(struct oshu_game *game) {
 static int paint_good_mark(struct oshu_game *game, int offset, struct oshu_texture *texture)
 {
 	double radius = game->beatmap.difficulty.circle_radius / 3.5;
-	oshu_size size = (1. + I) * radius * 2.;
+	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -247,7 +247,7 @@ static int paint_good_mark(struct oshu_game *game, int offset, struct oshu_textu
 static int paint_bad_mark(struct oshu_game *game)
 {
 	double half = game->beatmap.difficulty.circle_radius / 4.7;
-	oshu_size size = (1. + I) * (half + 2) * 2.;
+	oshu_size size = oshu_size{1, 1} * (half + 2) * 2.;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -273,7 +273,7 @@ static int paint_bad_mark(struct oshu_game *game)
 static int paint_skip_mark(struct oshu_game *game)
 {
 	double radius = game->beatmap.difficulty.circle_radius / 4.7;
-	oshu_size size = (1. + I) * (radius + 2) * 2.;
+	oshu_size size = oshu_size{1, 1} * (radius + 2) * 2.;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -301,7 +301,7 @@ static int paint_skip_mark(struct oshu_game *game)
 static int paint_connector(struct oshu_game *game)
 {
 	double radius = 3;
-	oshu_size size = (1. + I) * radius * 2.;
+	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
 	struct oshu_painter p;
 	oshu_start_painting(&game->display, size, &p);
@@ -329,7 +329,7 @@ int osu_paint_resources(struct oshu_game *game)
 	/* Circle hits. */
 	assert (game->beatmap.color_count > 0);
 	assert (game->beatmap.colors != NULL);
-	game->osu.circles = calloc(game->beatmap.color_count, sizeof(*game->osu.circles));
+	game->osu.circles = (oshu_texture*) calloc(game->beatmap.color_count, sizeof(*game->osu.circles));
 	assert (game->osu.circles != NULL);
 	struct oshu_color *color = game->beatmap.colors;
 	for (int i = 0; i < game->beatmap.color_count; ++i) {

@@ -28,7 +28,7 @@ static struct oshu_hit* find_hit(struct oshu_game *game, oshu_point p)
 			continue;
 		if (hit->state != OSHU_INITIAL_HIT)
 			continue;
-		if (cabs(p - hit->p) <= game->beatmap.difficulty.circle_radius)
+		if (std::abs(p - hit->p) <= game->beatmap.difficulty.circle_radius)
 			return hit;
 	}
 	return NULL;
@@ -111,7 +111,7 @@ static int check(struct oshu_game *game)
 		osu_view(game);
 		oshu_point mouse = oshu_get_mouse(&game->display);
 		oshu_reset_view(&game->display);
-		if (cabs(ball - mouse) > game->beatmap.difficulty.slider_tolerance) {
+		if (std::abs(ball - mouse) > game->beatmap.difficulty.slider_tolerance) {
 			oshu_stop_loop(&game->audio);
 			game->osu.current_slider = NULL;
 			hit->state = OSHU_MISSED_HIT;
@@ -236,8 +236,8 @@ static int destroy(struct oshu_game *game)
 
 void osu_view(struct oshu_game *game)
 {
-	oshu_fit_view(&game->display.view, 640 + 480 * I);
-	oshu_resize_view(&game->display.view, 512 + 384 * I);
+	oshu_fit_view(&game->display.view, oshu_size{640, 480});
+	oshu_resize_view(&game->display.view, oshu_size{512, 384});
 }
 
 struct oshu_game_mode osu_mode = {

@@ -21,7 +21,7 @@ static void draw_hint(struct oshu_game *game, struct oshu_hit *hit)
 		double radius = base_radius + ratio * game->beatmap.difficulty.approach_size;
 		oshu_draw_scaled_texture(
 			&game->display, &game->osu.approach_circle, hit->p,
-			2. * radius / creal(game->osu.approach_circle.size)
+			2. * radius / std::real(game->osu.approach_circle.size)
 		);
 	}
 }
@@ -117,7 +117,7 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu
 	oshu_point a_end = oshu_end_point(a);
 	double radius = game->beatmap.difficulty.circle_radius;
 	double interval = 15;
-	double center_distance = cabs(b->p - a_end);
+	double center_distance = std::abs(b->p - a_end);
 	double edge_distance = center_distance - 2 * radius;
 	if (edge_distance < interval)
 		return;
