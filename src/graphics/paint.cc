@@ -30,6 +30,7 @@ static void destroy_painter(struct oshu_painter *painter)
 
 int oshu_start_painting(struct oshu_display *display, oshu_size size, struct oshu_painter *painter)
 {
+	cairo_status_t s;
 	memset(painter, 0, sizeof(*painter));
 	painter->display = display;
 	painter->size = size;
@@ -39,7 +40,7 @@ int oshu_start_painting(struct oshu_display *display, oshu_size size, struct osh
 
 	/* 1. SDL */
 	painter->destination = SDL_CreateRGBSurface(
-		0, creal(size), cimag(size), 32,
+		0, std::real(size), std::imag(size), 32,
 		0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 	if (!painter->destination) {
 		oshu_log_error("could not create a painting surface: %s", SDL_GetError());
@@ -52,9 +53,9 @@ int oshu_start_painting(struct oshu_display *display, oshu_size size, struct osh
 
 	/* 2. Cairo surface */
 	painter->surface = cairo_image_surface_create_for_data(
-		painter->destination->pixels, CAIRO_FORMAT_ARGB32,
-		creal(size), cimag(size), painter->destination->pitch);
-	cairo_status_t s = cairo_surface_status(painter->surface);
+		(unsigned char*) painter->destination->pixels, CAIRO_FORMAT_ARGB32,
+		std::real(size), std::imag(size), painter->destination->pitch);
+	s = cairo_surface_status(painter->surface);
 	if (s != CAIRO_STATUS_SUCCESS) {
 		oshu_log_error("cairo surface error: %s", cairo_status_to_string(s));
 		goto fail;
@@ -86,7 +87,7 @@ fail:
  */
 static void unpremultiply(SDL_Surface *surface)
 {
-	uint8_t *pixels = surface->pixels;
+	uint8_t *pixels = (uint8_t*) surface->pixels;
 	assert (surface->pitch % 4 == 0);
 	assert (surface->pitch == 4 * surface->w);
 	uint8_t *end = pixels + surface->h * surface->pitch;

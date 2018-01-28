@@ -27,10 +27,10 @@ void oshu_fit_view(struct oshu_view *view, oshu_size size)
 	double current_ratio = oshu_ratio(view->size);
 	if (current_ratio > wanted_ratio) {
 		/* the window is too wide */
-		oshu_scale_view(view, cimag(view->size) / cimag(size));
+		oshu_scale_view(view, std::imag(view->size) / std::imag(size));
 	} else {
 		/* the window is too high */
-		oshu_scale_view(view, creal(view->size) / creal(size));
+		oshu_scale_view(view, std::real(view->size) / std::real(size));
 	}
 	oshu_resize_view(view, size);
 }
@@ -51,5 +51,5 @@ void oshu_reset_view(struct oshu_display *display)
 	SDL_GetWindowSize(display->window, &w, &h);
 	display->view.zoom = 1.;
 	display->view.origin = 0;
-	display->view.size = w + h * I;
+	display->view.size = oshu_size(w, h);
 }

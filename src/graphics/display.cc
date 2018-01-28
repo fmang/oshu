@@ -24,17 +24,18 @@
  */
 static oshu_size get_default_window_size()
 {
+	int width, height;
 	char *value = getenv("OSHU_WINDOW_SIZE");
 	if (!value || !*value) /* null or empty */
 		goto def;
 	/* Width */
 	char *x;
-	int width = strtol(value, &x, 10);
+	width = strtol(value, &x, 10);
 	if (*x != 'x')
 		goto invalid;
 	/* Height */
 	char *end;
-	int height = strtol(x + 1, &end, 10);
+	height = strtol(x + 1, &end, 10);
 	if (*end != '\0')
 		goto invalid;
 	/* Putting it together */
@@ -45,12 +46,12 @@ static oshu_size get_default_window_size()
 		oshu_log_warning("it's unlikely you have a screen bigger than 4K");
 		goto invalid;
 	} else {
-		return width + height * I;
+		return oshu_size(width, height);
 	}
 invalid:
 	oshu_log_warning("rejected OSHU_WINDOW_SIZE value %s, defaulting to 960x720", value);
 def:
-	return 960 + 720 * I;
+	return oshu_size{960, 720};
 }
 
 /**
@@ -92,7 +93,7 @@ int create_window(struct oshu_display *display)
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		creal(window_size), cimag(window_size),
+		std::real(window_size), std::imag(window_size),
 		SDL_WINDOW_RESIZABLE
 	);
 	if (display->window == NULL)
@@ -140,5 +141,5 @@ oshu_point oshu_get_mouse(struct oshu_display *display)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	return oshu_unproject(&display->view, x + y * I);
+	return oshu_unproject(&display->view, oshu_point(x, y));
 }

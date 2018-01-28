@@ -20,7 +20,7 @@ int oshu_load_texture(struct oshu_display *display, const char *filename, struct
 	texture->origin = 0;
 	int tw, th;
 	SDL_QueryTexture(texture->texture, NULL, NULL, &tw, &th);
-	texture->size = tw + th * I;
+	texture->size = oshu_size(tw, th);
 	return 0;
 }
 
@@ -37,8 +37,8 @@ void oshu_draw_scaled_texture(struct oshu_display *display, struct oshu_texture 
 	oshu_point top_left = oshu_project(&display->view, p - texture->origin * ratio);
 	oshu_size size = texture->size * ratio * display->view.zoom;
 	SDL_Rect dest = {
-		.x = creal(top_left), .y = cimag(top_left),
-		.w = creal(size), .h = cimag(size),
+		.x = (int) std::real(top_left), .y = (int) std::imag(top_left),
+		.w = (int) std::real(size), .h = (int) std::imag(size),
 	};
 	SDL_RenderCopy(display->renderer, texture->texture, NULL, &dest);
 }
