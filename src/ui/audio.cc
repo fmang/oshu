@@ -30,9 +30,9 @@ void oshu_show_audio_progress_bar(struct oshu_audio_progress_bar *bar)
 	double height = 4;
 	SDL_Rect shape = {
 		.x = 0,
-		.y = cimag(bar->display->view.size) - height,
-		.w = progression * creal(bar->display->view.size),
-		.h = height,
+		.y = (int) (std::imag(bar->display->view.size) - height),
+		.w = (int) (progression * std::real(bar->display->view.size)),
+		.h = (int) height,
 	};
 	SDL_SetRenderDrawColor(bar->display->renderer, 255, 255, 255, 48);
 	SDL_SetRenderDrawBlendMode(bar->display->renderer, SDL_BLENDMODE_BLEND);

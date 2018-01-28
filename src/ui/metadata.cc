@@ -25,7 +25,7 @@ static PangoLayout* setup_layout(struct oshu_painter *p)
 	cairo_set_operator(p->cr, CAIRO_OPERATOR_SOURCE);
 
 	PangoLayout *layout = pango_cairo_create_layout(p->cr);
-	pango_layout_set_width(layout, PANGO_SCALE * (creal(p->size) - 2. * padding));
+	pango_layout_set_width(layout, PANGO_SCALE * (std::real(p->size) - 2. * padding));
 	pango_layout_set_ellipsize(layout, PANGO_ELLIPSIZE_END);
 	pango_layout_set_spacing(layout, 5 * PANGO_SCALE);
 
@@ -43,12 +43,12 @@ static PangoLayout* setup_layout(struct oshu_painter *p)
  */
 static int paint_stars(struct oshu_metadata_frame *frame)
 {
-	oshu_size size = 360 + 60 * I;
+	oshu_size size {360, 60};
 	struct oshu_painter p;
 	oshu_start_painting(frame->display, size, &p);
 	PangoLayout *layout = setup_layout(&p);
 
-	char *sky = " ★ ★ ★ ★ ★ ★ ★ ★ ★ ★";
+	const char *sky = " ★ ★ ★ ★ ★ ★ ★ ★ ★ ★";
 	int stars = frame->beatmap->difficulty.overall_difficulty;
 	assert (stars >= 0);
 	assert (stars <= 10);
@@ -68,7 +68,7 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 	pango_layout_set_alignment(layout, PANGO_ALIGN_RIGHT);
 	pango_layout_get_size(layout, &width, &height);
 	cairo_set_source_rgba(p.cr, 1, 1, 1, .5);
-	cairo_move_to(p.cr, padding, (cimag(size) - height / PANGO_SCALE) / 2.);
+	cairo_move_to(p.cr, padding, (std::imag(size) - height / PANGO_SCALE) / 2.);
 	pango_cairo_show_layout(p.cr, layout);
 
 	g_object_unref(layout);
@@ -77,7 +77,7 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 
 	struct oshu_texture *texture = &frame->stars;
 	rc = oshu_finish_painting(&p, texture);
-	texture->origin = creal(size);
+	texture->origin = std::real(size);
 	return rc;
 }
 
@@ -87,7 +87,7 @@ static int paint_stars(struct oshu_metadata_frame *frame)
  */
 static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 {
-	oshu_size size = 640 + 60 * I;
+	oshu_size size {640, 60};
 	struct oshu_painter p;
 	oshu_start_painting(frame->display, size, &p);
 	PangoLayout *layout = setup_layout(&p);
@@ -104,7 +104,7 @@ static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 	pango_layout_set_text(layout, text, -1);
 	pango_layout_get_size(layout, &width, &height);
 	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
-	cairo_move_to(p.cr, padding, (cimag(size) - height / PANGO_SCALE) / 2.);
+	cairo_move_to(p.cr, padding, (std::imag(size) - height / PANGO_SCALE) / 2.);
 	pango_cairo_show_layout(p.cr, layout);
 
 	g_object_unref(layout);
@@ -148,8 +148,8 @@ void oshu_show_metadata_frame(struct oshu_metadata_frame *frame, double opacity)
 	SDL_Rect back = {
 		.x = 0,
 		.y = 0,
-		.w = creal(frame->display->view.size),
-		.h = cimag(frame->ascii.size),
+		.w = (int) std::real(frame->display->view.size),
+		.h = (int) std::imag(frame->ascii.size),
 	};
 	SDL_SetRenderDrawColor(frame->display->renderer, 0, 0, 0, 128 * opacity);
 	SDL_SetRenderDrawBlendMode(frame->display->renderer, SDL_BLENDMODE_BLEND);
@@ -168,7 +168,7 @@ void oshu_show_metadata_frame(struct oshu_metadata_frame *frame, double opacity)
 	oshu_draw_texture(frame->display, meta, 0);
 
 	SDL_SetTextureAlphaMod(frame->stars.texture, opacity * 255);
-	oshu_draw_texture(frame->display, &frame->stars, creal(frame->display->view.size));
+	oshu_draw_texture(frame->display, &frame->stars, std::real(frame->display->view.size));
 }
 
 void oshu_destroy_metadata_frame(struct oshu_metadata_frame *frame)

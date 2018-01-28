@@ -27,16 +27,16 @@ static void fit(struct oshu_display *display, oshu_size size, SDL_Rect *dest)
 
 	if (window_ratio > pic_ratio) {
 		/* the window is too wide */
-		dest->w = creal(vsize);
+		dest->w = std::real(vsize);
 		dest->h = dest->w / pic_ratio;
 		dest->x = 0;
-		dest->y = (cimag(vsize) - dest->h) / 2;
+		dest->y = (std::imag(vsize) - dest->h) / 2;
 	} else {
 		/* the window is too high */
-		dest->h = cimag(vsize);
+		dest->h = std::imag(vsize);
 		dest->w = dest->h * pic_ratio;
 		dest->y = 0;
-		dest->x = (creal(vsize) - dest->w) / 2;
+		dest->x = (std::real(vsize) - dest->w) / 2;
 	}
 }
 
@@ -73,7 +73,7 @@ static void fit(struct oshu_display *display, oshu_size size, SDL_Rect *dest)
 static int scale_background(struct oshu_display *display, SDL_Surface **pic)
 {
 	SDL_Rect target_rect;
-	fit(display, (*pic)->w + I * (*pic)->h, &target_rect);
+	fit(display, oshu_size((*pic)->w, (*pic)->h), &target_rect);
 	if (target_rect.w >= (*pic)->w)
 		return 0; /* don't upscale */
 	double zoom = (double) target_rect.w / (*pic)->w;
@@ -93,10 +93,10 @@ static int scale_background(struct oshu_display *display, SDL_Surface **pic)
 	SDL_LockSurface(target);
 	SDL_LockSurface(*pic);
 	cairo_surface_t *source = cairo_image_surface_create_for_data(
-		(*pic)->pixels, CAIRO_FORMAT_RGB24,
+		(unsigned char*) (*pic)->pixels, CAIRO_FORMAT_RGB24,
 		(*pic)->w, (*pic)->h, (*pic)->pitch);
 	cairo_surface_t *dest = cairo_image_surface_create_for_data(
-		target->pixels, CAIRO_FORMAT_RGB24,
+		(unsigned char*) target->pixels, CAIRO_FORMAT_RGB24,
 		target->w, target->h, target->pitch);
 
 	cairo_t *cr = cairo_create(dest);
@@ -129,7 +129,7 @@ int oshu_load_background(struct oshu_display *display, const char *filename, str
 	if (scale_background(display, &pic) < 0)
 		return -1;
 
-	background->picture.size = pic->w + I * pic->h;
+	background->picture.size = oshu_size(pic->w, pic->h);
 	background->picture.origin = 0;
 	background->picture.texture = SDL_CreateTextureFromSurface(display->renderer, pic);
 	SDL_FreeSurface(pic);
