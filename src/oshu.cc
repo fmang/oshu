@@ -12,7 +12,10 @@
 #include "log.h"
 #include "game/game.h"
 
+extern "C" {
 #include <libavutil/log.h>
+}
+
 #include <SDL2/SDL.h>
 
 #include <errno.h>

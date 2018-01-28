@@ -6,9 +6,11 @@
 #include "audio/stream.h"
 #include "log.h"
 
+extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
 #include <libswresample/swresample.h>
+}
 
 #include <assert.h>
 
