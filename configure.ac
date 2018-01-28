@@ -13,7 +13,7 @@ AC_USE_SYSTEM_EXTENSIONS # asprintf
 # Checks for programs.
 AC_LANG([C++])
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
+AX_CHECK_COMPILE_FLAG([-std=c++14], [CXXFLAGS="$CXXFLAGS -std=c++14"], [AC_MSG_ERROR([your C++ support does not support the -std=c++14 flag])])
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 
 # Checks for libraries.
