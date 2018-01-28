@@ -58,10 +58,10 @@ static void draw_pause(struct oshu_display *display)
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 128);
 	SDL_SetRenderDrawBlendMode(display->renderer, SDL_BLENDMODE_BLEND);
 	SDL_Rect bar = {
-		.x = creal(screen) / 2. - size / 2.,
-		.y = cimag(screen) / 2. - size / 2.,
-		.w = thickness,
-		.h = size,
+		.x = (int) (std::real(screen) / 2. - size / 2.),
+		.y = (int) (std::imag(screen) / 2. - size / 2.),
+		.w = (int) thickness,
+		.h = (int) size,
 	};
 	SDL_RenderFillRect(display->renderer, &bar);
 	bar.x += size - thickness;
