@@ -73,7 +73,7 @@ repositories.
 - ffmpeg or libav,
 - cairo,
 - pango,
-- a C99 compiler,
+- a C++14 compiler,
 - pkg-config,
 - autoconf, automake (when building from the git repository).
 

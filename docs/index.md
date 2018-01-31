@@ -78,7 +78,7 @@ agnostic to the game mode.
 The \ref osu module implements the osu!standard game mode. It extends the game
 module, while the game module only briefly refers to it to dispatch events.
 
-The *main* module \ref oshu.c is the entry-point of oshu! and provides a
+The *main* module \ref oshu.cc is the entry-point of oshu! and provides a
 command-line interface to briefly configure the game, and then yields control
 to the game module.
 
@@ -91,16 +91,8 @@ which is either 0 on success, and a negative value on error. That negative
 value will be -1 most of the time.
 
 Error messages are logged with \ref oshu_log_error by the *callee*. This makes
-the code clearer for the caller, and besides, the callee has much more details
-about the error than the caller.
+the code clearer for the caller, and the callee has much more details about the
+error than the caller.
 
-
-Style convention
-----------------
-
-Linux kernel coding style full power.
-
-For function names, make them the most natural sounding you can. Use
-*oshu_create_thing* than *oshu_thing_create*. This is not how oshu started, so
-you'll see the old naming on older code, but as modules get refactored they'll
-adopt the new convention.
+With C++, more and more functions will starting exceptions rather than handling
+errors manually.

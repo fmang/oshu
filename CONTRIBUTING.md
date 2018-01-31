@@ -24,7 +24,8 @@ detect Doxygen.
 Technical choices
 -----------------
 
-C is love, C is life.
+C is love, but the cost of purity is high and sacrifices type safety. The code
+is being ported to modern C++ but its paradigm will remain mostly procedural
 
 Since this project is meant to have fun, let's also have fun while making it!
 
