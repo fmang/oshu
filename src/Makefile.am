@@ -27,7 +27,6 @@ oshu_SOURCES = \
 	game/game.cc \
 	game/game.h \
 	game/helpers.cc \
-	game/mode.h \
 	game/screens/pause.cc \
 	game/screens/play.cc \
 	game/screens/score.cc \

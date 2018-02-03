@@ -34,7 +34,7 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 			if (!game->autoplay) {
 				enum oshu_finger key = oshu_translate_key(&event->key.keysym);
 				if (key != OSHU_UNKNOWN_KEY)
-					game->mode->press(game, key);
+					game->press(key);
 			}
 		}
 		break;
@@ -42,16 +42,16 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 		if (!game->autoplay) {
 			enum oshu_finger key = oshu_translate_key(&event->key.keysym);
 			if (key != OSHU_UNKNOWN_KEY)
-				game->mode->release(game, key);
+				game->release(key);
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 		if (!game->autoplay)
-			game->mode->press(game, OSHU_LEFT_BUTTON);
+			game->press(OSHU_LEFT_BUTTON);
 		break;
 	case SDL_MOUSEBUTTONUP:
 		if (!game->autoplay)
-			game->mode->release(game, OSHU_LEFT_BUTTON);
+			game->release(OSHU_LEFT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
@@ -94,9 +94,9 @@ static int update(struct oshu_game *game)
 	if (game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
 	if (game->autoplay)
-		game->mode->autoplay(game);
+		game->check_autoplay();
 	else
-		game->mode->check(game);
+		game->check();
 	check_end(game);
 	return 0;
 }
@@ -145,7 +145,7 @@ static int draw(struct oshu_game *game)
 	draw_background(game);
 	oshu_show_metadata_frame(&game->ui.metadata, oshu_fade_out(5, 6, game->clock.system));
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
-	game->mode->draw(game);
+	game->draw();
 	return 0;
 }
 

@@ -5,24 +5,15 @@
 
 #pragma once
 
-#include "game/controls.h"
+#include "game/game.h"
 #include "graphics/texture.h"
 #include "ui/cursor.h"
-
-struct oshu_game;
-struct oshu_game_mode;
-struct oshu_hit;
 
 /**
  * \defgroup osu Osu
  *
  * \brief
  * osu!standard game mode.
- *
- * Most of the functions defined in this module are internal.
- *
- * It is connected to the game module by its #osu_state structure and #osu_mode
- * object.
  *
  * \{
  */
@@ -101,6 +92,19 @@ struct osu_state {
 	struct oshu_cursor_widget cursor;
 };
 
+struct osu_game : public oshu_game {
+	struct osu_state osu;
+
+	int initialize() override;
+	int destroy() override;
+	int check() override;
+	int check_autoplay() override;
+	int draw() override;
+	int press(enum oshu_finger key) override;
+	int release(enum oshu_finger key) override;
+	int relinquish() override;
+};
+
 /**
  * Paint all the required textures for the beatmap.
  *
@@ -108,7 +112,7 @@ struct osu_state {
  *
  * Sliders are not painted. Instead, you must call #osu_paint_slider.
  */
-int osu_paint_resources(struct oshu_game *game);
+int osu_paint_resources(struct osu_game *game);
 
 /**
  * Paint a slider.
@@ -121,19 +125,12 @@ int osu_paint_resources(struct oshu_game *game);
  *
  * Slider textures are freed with #osu_free_resources.
  */
-int osu_paint_slider(struct oshu_game *game, struct oshu_hit *hit);
+int osu_paint_slider(struct osu_game *game, struct oshu_hit *hit);
 
 /**
  * Free the dynamic resources of the game mode.
  */
-void osu_free_resources(struct oshu_game *game);
-
-/**
- * The main drawing callback of the mode.
- *
- * Exported in its own sub-module because it is relatively complex.
- */
-int osu_draw(struct oshu_game *game);
+void osu_free_resources(struct osu_game *game);
 
 /**
  * Set-up the coordinate system for the osu!standard mode.
@@ -144,11 +141,6 @@ int osu_draw(struct oshu_game *game);
  * It is the caller's responsibility to reset the view, preferably such that
  * the #osu_view/#oshu_reset_view pairing looks obvious.
  */
-void osu_view(struct oshu_game *game);
-
-/**
- * Implementation of the standard osu! game mode.
- */
-extern struct oshu_game_mode osu_mode;
+void osu_view(struct osu_game *game);
 
 /** \} */

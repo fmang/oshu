@@ -11,6 +11,7 @@
 
 #include "log.h"
 #include "game/game.h"
+#include "osu/osu.h"
 
 extern "C" {
 #include <libavutil/log.h>
@@ -56,7 +57,7 @@ static const char *help =
 	"Check the man page oshu(1) for details.\n"
 ;
 
-static struct oshu_game current_game;
+static struct osu_game current_game;
 
 static void signal_handler(int signum)
 {

@@ -24,9 +24,7 @@ static int open_beatmap(const char *beatmap_path, struct oshu_game *game)
 		oshu_log_error("no beatmap, aborting");
 		return -1;
 	}
-	if (game->beatmap.mode == OSHU_OSU_MODE) {
-		game->mode = &osu_mode;
-	} else {
+	if (game->beatmap.mode != OSHU_OSU_MODE) {
 		oshu_log_error("unsupported game mode");
 		return -1;
 	}
@@ -84,7 +82,7 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 		goto fail;
 	if (create_ui(game) < 0)
 		goto fail;
-	if (game->mode->initialize(game) < 0)
+	if (game->initialize() < 0)
 		goto fail;
 	return 0;
 fail:
@@ -149,8 +147,7 @@ static void destroy_ui(struct oshu_game *game)
 void oshu_destroy_game(struct oshu_game *game)
 {
 	assert (game != NULL);
-	if (game->mode)
-		game->mode->destroy(game);
+	game->destroy();
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);

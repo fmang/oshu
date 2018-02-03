@@ -11,10 +11,9 @@
 #include "audio/library.h"
 #include "beatmap/beatmap.h"
 #include "game/clock.h"
-#include "game/mode.h"
+#include "game/controls.h"
 #include "ui/ui.h"
 #include "graphics/display.h"
-#include "osu/osu.h"
 
 struct oshu_game_screen;
 
@@ -40,37 +39,17 @@ struct oshu_game_ui {
 /**
  * The full game state, from the beatmap state to the audio and graphical
  * context.
- *
- * \todo
- * Add a field for the current timing point, and update it from the main loop.
- * It contains the kiai mode and milliseconds per beat, which is in theory
- * needed by most modes.
  */
-struct oshu_game {
+struct oshu_game_state {
 	struct oshu_beatmap beatmap;
 	struct oshu_audio audio;
 	struct oshu_sound_library library;
 	struct oshu_display display;
 	struct oshu_clock clock;
 	struct oshu_game_ui ui;
-	/**
-	 * The game mode configuration.
-	 *
-	 * It is always allocated statically, so you must not free it.
-	 */
-	struct oshu_game_mode *mode;
 	int stop;
 	int autoplay;
 	struct oshu_game_screen *screen;
-	/**
-	 * Mode-specific data, defined inside each mode's header file.
-	 *
-	 * \todo
-	 * Turn it into a pointer to an interface with virtual members. C++
-	 * won't allow unions with non-trivial members, so the old anonymous
-	 * union won't do.
-	 */
-	struct osu_state osu;
 	/**
 	 * Pointer to the next clickable hit.
 	 *
@@ -91,6 +70,87 @@ struct oshu_game {
 	 * cursor is never null, even after the last hit was played.
 	 */
 	struct oshu_hit *hit_cursor;
+};
+
+/**
+ * The game base object.
+ *
+ * It is defined as a game state with a set of pure virtual methods to
+ * implement.
+ *
+ * Game modes inherit from this class and implement all these methods.
+ */
+struct oshu_game : public oshu_game_state {
+
+	virtual ~oshu_game() = default;
+
+	/**
+	 * Initialize the mode-specific objects.
+	 *
+	 * \todo
+	 * Port to RAII.
+	 */
+	virtual int initialize() = 0;
+
+	/**
+	 * Initialize the mode-specific objects.
+	 *
+	 * \todo
+	 * Port to RAII.
+	 */
+	virtual int destroy() = 0;
+
+	/**
+	 * Called at every game iteration, unless the game is paused.
+	 *
+	 * The job of this function is to check the game clock and see if notes
+	 * were missed, or other things of the same kind.
+	 *
+	 * There's no guarantee this callback is called at regular intervals.
+	 *
+	 * For autoplay, use #autoplay instead.
+	 */
+	virtual int check() = 0;
+
+	/**
+	 * Called pretty much like #check, except it's for autoplay mode.
+	 */
+	virtual int check_autoplay() = 0;
+
+	/**
+	 * Draw the game on the display.
+	 */
+	virtual int draw() = 0;
+
+	/**
+	 * Handle a key press keyboard event, or mouse button press event.
+	 *
+	 * Key repeats are filtered out by the parent module, along with any
+	 * key used by the game module itself, like escape or space to pause, q
+	 * to quit, &c. Same goes for mouse buttons.
+	 *
+	 * If you need the mouse position, use #oshu_get_mouse to have it in
+	 * game coordinates.
+	 *
+	 * This callback isn't called when the game is paused or on autoplay.
+	 *
+	 * \sa release
+	 */
+	virtual int press(enum oshu_finger key) = 0;
+
+	/**
+	 * See #press.
+	 */
+	virtual int release(enum oshu_finger key) = 0;
+
+	/**
+	 * Release any held object, like sliders or hold notes.
+	 *
+	 * This function is called whenever the user seeks somewhere in the
+	 * song.
+	 */
+	virtual int relinquish() = 0;
+
 };
 
 /**

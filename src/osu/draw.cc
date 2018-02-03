@@ -6,12 +6,13 @@
  * Drawing routines specific to the osu!standard game mode.
  */
 
-#include "game/game.h"
+#include "osu/osu.h"
+
 #include "graphics/texture.h"
 
 #include <assert.h>
 
-static void draw_hint(struct oshu_game *game, struct oshu_hit *hit)
+static void draw_hint(struct osu_game *game, struct oshu_hit *hit)
 {
 	double now = game->clock.now;
 	if (hit->time > now && hit->state == OSHU_INITIAL_HIT) {
@@ -26,7 +27,7 @@ static void draw_hint(struct oshu_game *game, struct oshu_hit *hit)
 	}
 }
 
-static void draw_hit_mark(struct oshu_game *game, struct oshu_hit *hit)
+static void draw_hit_mark(struct osu_game *game, struct oshu_hit *hit)
 {
 	if (hit->state == OSHU_GOOD_HIT) {
 		double leniency = game->beatmap.difficulty.leniency;
@@ -43,7 +44,7 @@ static void draw_hit_mark(struct oshu_game *game, struct oshu_hit *hit)
 	}
 }
 
-static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
+static void draw_hit_circle(struct osu_game *game, struct oshu_hit *hit)
 {
 	struct oshu_display *display = &game->display;
 	if (hit->state == OSHU_INITIAL_HIT) {
@@ -55,7 +56,7 @@ static void draw_hit_circle(struct oshu_game *game, struct oshu_hit *hit)
 	}
 }
 
-static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
+static void draw_slider(struct osu_game *game, struct oshu_hit *hit)
 {
 	struct oshu_display *display = &game->display;
 	double now = game->clock.now;
@@ -77,7 +78,7 @@ static void draw_slider(struct oshu_game *game, struct oshu_hit *hit)
 	}
 }
 
-static void draw_hit(struct oshu_game *game, struct oshu_hit *hit)
+static void draw_hit(struct osu_game *game, struct oshu_hit *hit)
 {
 	if (hit->type & OSHU_SLIDER_HIT)
 		draw_slider(game, hit);
@@ -110,7 +111,7 @@ static void draw_hit(struct oshu_game *game, struct oshu_hit *hit)
  * Voilà!
  *
  */
-static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu_hit *b)
+static void connect_hits(struct osu_game *game, struct oshu_hit *a, struct oshu_hit *b)
 {
 	if (a->state != OSHU_INITIAL_HIT && a->state != OSHU_SLIDING_HIT)
 		return;
@@ -135,23 +136,23 @@ static void connect_hits(struct oshu_game *game, struct oshu_hit *a, struct oshu
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
  */
-int osu_draw(struct oshu_game *game)
+int osu_game::draw()
 {
-	osu_view(game);
-	struct oshu_hit *cursor = oshu_look_hit_up(game, game->beatmap.difficulty.approach_time);
+	osu_view(this);
+	struct oshu_hit *cursor = oshu_look_hit_up(this, this->beatmap.difficulty.approach_time);
 	struct oshu_hit *next = NULL;
-	double now = game->clock.now;
+	double now = this->clock.now;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->previous) {
 		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
 			continue;
-		if (oshu_hit_end_time(hit) < now - game->beatmap.difficulty.approach_time)
+		if (oshu_hit_end_time(hit) < now - this->beatmap.difficulty.approach_time)
 			break;
 		if (next && next->combo == hit->combo)
-			connect_hits(game, hit, next);
-		draw_hit(game, hit);
+			connect_hits(this, hit, next);
+		draw_hit(this, hit);
 		next = hit;
 	}
-	oshu_show_cursor(&game->osu.cursor);
-	oshu_reset_view(&game->display);
+	oshu_show_cursor(&this->osu.cursor);
+	oshu_reset_view(&this->display);
 	return 0;
 }

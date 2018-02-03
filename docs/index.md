@@ -42,12 +42,8 @@ digraph modules {
 	Game -> Graphics;
 	Game -> Beatmap;
 	Game -> UI;
-	subgraph {
-		rank=same;
-		Osu -> Game;
-		Game -> Osu;
-	}
-	Main -> Game;
+	Osu -> Game;
+	Main -> Osu;
 }
 \enddot
 
@@ -75,8 +71,8 @@ of the game. It watches the audio and the user's keyboard and mouse events to
 manipulate the beatmap state, then schedules the drawing of the window. It is
 agnostic to the game mode.
 
-The \ref osu module implements the osu!standard game mode. It extends the game
-module, while the game module only briefly refers to it to dispatch events.
+The \ref osu module implements the osu!standard game mode as an extension of
+the \ref game module.
 
 The *main* module \ref oshu.cc is the entry-point of oshu! and provides a
 command-line interface to briefly configure the game, and then yields control

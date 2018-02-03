@@ -13,7 +13,7 @@ void oshu_rewind_game(struct oshu_game *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
 	game->clock.now = game->audio.music.current_timestamp;
-	game->mode->relinquish(game);
+	game->relinquish();
 	oshu_print_state(game);
 
 	assert (game->hit_cursor != NULL);
@@ -27,7 +27,7 @@ void oshu_forward_game(struct oshu_game *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp + offset);
 	game->clock.now = game->audio.music.current_timestamp;
-	game->mode->relinquish(game);
+	game->relinquish();
 
 	oshu_print_state(game);
 
