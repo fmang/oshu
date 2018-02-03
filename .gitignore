@@ -25,4 +25,5 @@ Makefile.in
 /share/samples*
 
 /src/oshu
+/src/oshu-library
 /oshu-*.tar.*

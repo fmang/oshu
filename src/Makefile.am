@@ -1,4 +1,6 @@
-bin_PROGRAMS = oshu
+bin_PROGRAMS = oshu oshu-library
+
+AM_CXXFLAGS = -iquote . -DPKGDATADIR='"$(pkgdatadir)"'
 
 oshu_SOURCES = \
 	oshu.cc \
@@ -60,5 +62,8 @@ oshu_SOURCES = \
 	ui/score.h \
 	ui/ui.h
 
-oshu_CXXFLAGS = -iquote . -DPKGDATADIR='"$(pkgdatadir)"' $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LSWR_CFLAGS) $(LAVU_CFLAGS) $(PANGOCAIRO_CFLAGS) $(CAIRO_CFLAGS)
+oshu_CXXFLAGS = $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LSWR_CFLAGS) $(LAVU_CFLAGS) $(PANGOCAIRO_CFLAGS) $(CAIRO_CFLAGS)
 oshu_LDADD = -lm $(SDL2_LIBS) $(SDL2_image_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LSWR_LIBS) $(LAVU_LIBS) $(PANGOCAIRO_LIBS) $(CAIRO_LIBS)
+
+oshu_library_SOURCES = \
+	library/oshu-library.cc
