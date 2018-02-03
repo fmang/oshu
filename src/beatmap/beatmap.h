@@ -904,6 +904,27 @@ struct oshu_beatmap {
 int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap);
 
 /**
+ * Parse the first sections of a beatmap to get the metadata and difficulty
+ * information.
+ *
+ * This function should load the following fields:
+ *
+ * - #oshu_beatmap::audio_filename,
+ * - #oshu_beatmap::background_filename,
+ * - #oshu_beatmap::mode,
+ * - #oshu_beatmap::metadata,
+ * - #oshu_beatmap::difficulty.
+ *
+ * However, because most fields may be missing from the beatmap, you cannot
+ * assume they all have non-NULL values.
+ *
+ * The aim of this function, compared to #oshu_load_beatmap, is not to load the
+ * timing points, colors, and hit objects, which contain most of the beatmap's
+ * data.
+ */
+int oshu_load_beatmap_headers(const char *path, struct oshu_beatmap *beatmap);
+
+/**
  * Free any object dynamically allocated inside the beatmap.
  */
 void oshu_destroy_beatmap(struct oshu_beatmap *beatmap);

@@ -1243,7 +1243,7 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
  * Create the parser state, then read the input file line-by-line, feeding it
  * to the parser automaton with #process_input.
  */
-static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatmap)
+static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatmap, bool headers_only)
 {
 	struct parser_state parser;
 	memset(&parser, 0, sizeof(parser));
@@ -1261,7 +1261,9 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 		parser.input = line;
 		parser.line_number++;
 		process_input(&parser);
-		/* ignore parsing errors */
+		/* ^ note: ignore parsing errors */
+		if (headers_only && parser.section == BEATMAP_TIMING_POINTS)
+			break;
 	}
 	free(line);
 	/* Finalize the hits sequence. */
@@ -1320,7 +1322,8 @@ static int validate(struct oshu_beatmap *beatmap)
 	return 0;
 }
 
-int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap)
+static int load_beatmap(const char *path, struct oshu_beatmap *beatmap, bool headers_only)
+
 {
 	oshu_log_debug("loading beatmap %s", path);
 	struct stat s;
@@ -1338,7 +1341,7 @@ int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap)
 		return -1;
 	}
 	initialize(beatmap);
-	int rc = parse_file(input, path, beatmap);
+	int rc = parse_file(input, path, beatmap, headers_only);
 	fclose(input);
 	if (rc < 0)
 		goto fail;
@@ -1350,6 +1353,16 @@ fail:
 	oshu_log_error("error loading the beatmap file");
 	oshu_destroy_beatmap(beatmap);
 	return -1;
+}
+
+int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap)
+{
+	return load_beatmap(path, beatmap, false);
+}
+
+int oshu_load_beatmap_headers(const char *path, struct oshu_beatmap *beatmap)
+{
+	return load_beatmap(path, beatmap, true);
 }
 
 static void free_metadata(struct oshu_metadata *meta)
