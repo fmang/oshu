@@ -1244,6 +1244,10 @@ static int parse_additions(struct parser_state *parser, struct oshu_hit *hit)
 /**
  * Create the parser state, then read the input file line-by-line, feeding it
  * to the parser automaton with #process_input.
+ *
+ * \todo
+ * Stop reading the file if the header is incorrect. It's no use printing a
+ * mega list of warnings if the file clearly looks nothing like text.
  */
 static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatmap, bool headers_only)
 {
