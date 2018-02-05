@@ -66,4 +66,5 @@ oshu_CXXFLAGS = $(AM_CXXFLAGS) $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS
 oshu_LDADD = -lm $(SDL2_LIBS) $(SDL2_image_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LSWR_LIBS) $(LAVU_LIBS) $(PANGOCAIRO_LIBS) $(CAIRO_LIBS)
 
 oshu_library_SOURCES = \
-	library/oshu-library.cc
+	library/oshu-library.cc \
+	library/library.cc

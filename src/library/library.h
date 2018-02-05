@@ -1,11 +1,13 @@
 /**
- * \file library.h
+ * \file library/library.h
  * \ingroup library
  */
 
 #pragma once
 
 #include <string>
+
+#include <dirent.h>
 
 /**
  * \defgroup library Library
@@ -38,11 +40,15 @@ namespace library {
 class beatmap_finder {
 public:
 	beatmap_finder();
+	~beatmap_finder();
 	/**
 	 * Return the path of the found beatmap.
 	 * When the end is reached, return an empty string.
 	 */
 	std::string next();
+private:
+	DIR* root_dir;
+	DIR* beatmap_dir;
 };
 
 }}

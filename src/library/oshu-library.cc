@@ -1,3 +1,10 @@
+/**
+ * \file library/oshu-library.cc
+ * \ingroup library
+ */
+
+#include <library/library.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <unistd.h>
@@ -51,5 +58,10 @@ int main(int argc, char **argv)
 {
 	move_home();
 	print_current_directory();
+	std::string path;
+	oshu::library::beatmap_finder finder;
+	while (path = finder.next(), !path.empty()) {
+		std::cout << path << std::endl;
+	}
 	return 0;
 }
