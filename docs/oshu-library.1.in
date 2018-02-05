@@ -1,0 +1,20 @@
+.TH OSHU-LIBRARY "1" "February 2018" "oshu! @VERSION@" "User Manual"
+
+.SH NAME
+oshu-library \- Manage a beatmap collection for oshu!
+
+.SH SYNOPSIS
+.B oshu-library index
+
+.SH DESCRIPTION
+.PP
+\fBoshu-library\fR is a tool for importing, deleting, and indexing a collection
+of osu! beatmaps. It is currently at an early stage and only support indexing.
+
+.SH AUTHOR
+Written by Frédéric Mangano-Tarumi <fmang+oshu at mg0 fr>.
+
+.SH BUGS
+Report bugs at <https://github.com/fmang/oshu/issues>.
+.br
+Feel also free to join the official IRC channel, #oshu at chat.freenode.net.

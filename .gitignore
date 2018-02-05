@@ -21,6 +21,7 @@ Makefile.in
 /docs/html
 /docs/latex
 /docs/oshu.1
+/docs/oshu-library.1
 
 /share/samples*
 
