@@ -529,6 +529,8 @@ static int process_difficulty(struct parser_state *parser)
 		break;
 	case OverallDifficulty:
 		difficulty->overall_difficulty = value;
+		difficulty->leniency = 0.1 + 0.04 * (5. - value) / 5.;
+		assert (difficulty->leniency > 0.);
 		break;
 	case SliderMultiplier:
 		difficulty->slider_multiplier = value;
