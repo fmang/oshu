@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
-  <mime-type type="text/x-osu">
+  <mime-type type="text/x-osu-beatmap">
     <comment>osu! beatmap file</comment>
     <comment lang="fr">Fichier de beatmap osu!</comment>
     <magic priority="50">
