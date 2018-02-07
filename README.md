@@ -91,8 +91,8 @@ If you want to have oshu integrated in your desktop:
 
 	$ cd share
 	$ desktop-file-install --dir $PREFIX/share/applications oshu.desktop
-	$ xdg-mime install x-osu.xml
-	$ xdg-mime default oshu.desktop text/x-osu
+	$ xdg-mime install x-osu-beatmap.xml
+	$ xdg-mime default oshu.desktop text/x-osu-beatmap
 
 If you're lucky, someone may have packaged it for your distribution.
 
