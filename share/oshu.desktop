@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=oshu!
+GenericName=Rhythm Game
+GenericName[fr]=Jeu de Rythme
+Comment=Fast osu! port
+Comment[fr]=Adaptation rapide de osu!
+Exec=oshu %F
+MimeType=text/x-osu-beatmap
+Terminal=true
+Categories=Game;X-Music;X-Rhythm
