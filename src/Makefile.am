@@ -1,9 +1,14 @@
-bin_PROGRAMS = oshu oshu-library
+SUBDIRS = . tests
 
-AM_CXXFLAGS = -iquote . -DPKGDATADIR='"$(pkgdatadir)"'
+AM_CXXFLAGS = \
+	-iquote . -DPKGDATADIR='"$(pkgdatadir)"' \
+	$(SDL2_CFLAGS) $(SDL2_image_CFLAGS) \
+	$(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LSWR_CFLAGS) $(LAVU_CFLAGS) \
+	$(PANGOCAIRO_CFLAGS) $(CAIRO_CFLAGS)
 
-oshu_SOURCES = \
-	oshu.cc \
+noinst_LIBRARIES = liboshu.a
+
+liboshu_a_SOURCES = \
 	audio/audio.cc \
 	audio/audio.h \
 	audio/library.cc \
@@ -62,8 +67,10 @@ oshu_SOURCES = \
 	ui/score.h \
 	ui/ui.h
 
-oshu_CXXFLAGS = $(AM_CXXFLAGS) $(SDL2_CFLAGS) $(SDL2_image_CFLAGS) $(LAVF_CFLAGS) $(LAVC_CFLAGS) $(LSWR_CFLAGS) $(LAVU_CFLAGS) $(PANGOCAIRO_CFLAGS) $(CAIRO_CFLAGS)
-oshu_LDADD = -lm $(SDL2_LIBS) $(SDL2_image_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LSWR_LIBS) $(LAVU_LIBS) $(PANGOCAIRO_LIBS) $(CAIRO_LIBS)
+bin_PROGRAMS = oshu oshu-library
+
+oshu_SOURCES = oshu.cc
+oshu_LDADD = liboshu.a -lm $(SDL2_LIBS) $(SDL2_image_LIBS) $(LAVF_LIBS) $(LAVC_LIBS) $(LSWR_LIBS) $(LAVU_LIBS) $(PANGOCAIRO_LIBS) $(CAIRO_LIBS)
 
 oshu_library_SOURCES = \
 	library/oshu-library.cc \

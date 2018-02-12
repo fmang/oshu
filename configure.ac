@@ -5,7 +5,7 @@ AC_PREREQ([2.69])
 AC_INIT([oshu], [1.7.0], [fmang+oshu@mg0.fr])
 AC_CONFIG_SRCDIR([src/oshu.cc])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile src/Makefile docs/Makefile share/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile src/tests/Makefile docs/Makefile share/Makefile])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_USE_SYSTEM_EXTENSIONS # asprintf
@@ -14,6 +14,7 @@ AC_USE_SYSTEM_EXTENSIONS # asprintf
 AC_LANG([C++])
 AC_PROG_CXX
 AX_CHECK_COMPILE_FLAG([-std=c++14], [CXXFLAGS="$CXXFLAGS -std=c++14"], [AC_MSG_ERROR([your C++ support does not support the -std=c++14 flag])])
+AC_PROG_RANLIB
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 
 # Checks for libraries.
@@ -34,6 +35,6 @@ PKG_CHECK_MODULES([PANGOCAIRO], [pangocairo])
 
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([docs/Doxyfile])])
-AC_CONFIG_FILES([docs/oshu.1])
+AC_CONFIG_FILES([docs/oshu.1 docs/oshu-library.1])
 
 AC_OUTPUT
