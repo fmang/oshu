@@ -3,7 +3,7 @@
  * \ingroup audio_library
  */
 
-#include "../config.h"
+#include "config.h"
 
 #include "audio/library.h"
 #include "audio/audio.h"

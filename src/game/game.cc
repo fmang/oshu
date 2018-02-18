@@ -5,7 +5,7 @@
  * Implemention game initialization, destruction and the main loop.
  */
 
-#include "../config.h"
+#include "config.h"
 
 #include "game/game.h"
 #include "game/screens/screens.h"

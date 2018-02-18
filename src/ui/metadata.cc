@@ -3,7 +3,7 @@
  * \ingroup ui_metadata
  */
 
-#include "../config.h"
+#include "config.h"
 
 #include "ui/metadata.h"
 

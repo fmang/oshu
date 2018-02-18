@@ -3,7 +3,7 @@
  * \ingroup ui_score
  */
 
-#include "../config.h"
+#include "config.h"
 
 #include "ui/score.h"
 
