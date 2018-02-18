@@ -14,6 +14,7 @@ pkg_check_modules(PANGO REQUIRED pangocairo)
 
 include(GNUInstallDirs)
 configure_file(config.h.in config.h)
-include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(src)
+add_subdirectory(share)
