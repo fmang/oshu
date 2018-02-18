@@ -7,7 +7,7 @@
  * Interpret command-line arguments and spawn everything.
  */
 
-#include "../config.h"
+#include "config.h"
 
 #include "log.h"
 #include "game/game.h"
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 				verbosity--;
 			break;
 		case OPT_HELP:
-			puts("oshu! version " VERSION);
+			puts("oshu! version " OSHU_VERSION);
 			puts(usage);
 			fputs(help, stdout);
 			return 0;

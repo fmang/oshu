@@ -68,3 +68,30 @@ target_compile_options(
 	"${CAIRO_CFLAGS}"
 	"${PANGO_CFLAGS}"
 )
+
+add_executable(
+	oshu
+	oshu.cc
+	$<TARGET_OBJECTS:liboshu>
+)
+
+target_compile_options(
+	oshu PUBLIC
+	"${SDL_CFLAGS}"
+	"${FFMPEG_CFLAGS}"
+	"${CAIRO_CFLAGS}"
+	"${PANGO_CFLAGS}"
+)
+
+target_link_libraries(
+	oshu PUBLIC
+	"${SDL_LIBRARIES}"
+	"${FFMPEG_LIBRARIES}"
+	"${CAIRO_LIBRARIES}"
+	"${PANGO_LIBRARIES}"
+)
+
+install(
+	TARGETS oshu
+	RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)
