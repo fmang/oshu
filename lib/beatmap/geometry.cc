@@ -3,7 +3,7 @@
  * \ingroup geometry
  */
 
-#include "geometry.h"
+#include "beatmap/geometry.h"
 #include "log.h"
 
 #include <assert.h>

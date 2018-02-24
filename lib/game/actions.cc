@@ -1,11 +1,11 @@
-/**
+/*2
  * \file game/actions.cc
  * \ingroup game_actions
  */
 
 #include "game/game.h"
-#include "game/screens/screens.h"
 #include "game/tty.h"
+#include "./screens/screens.h"
 
 #include <assert.h>
 

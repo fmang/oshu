@@ -6,8 +6,8 @@
  * Beatmap loader.
  */
 
+#include "./parser.h"
 #include "beatmap/beatmap.h"
-#include "beatmap/parser.h"
 #include "log.h"
 
 #include <assert.h>
@@ -246,7 +246,7 @@ static int parse_quoted_string(struct parser_state *parser, char **str)
  */
 static const char* token_strings[NUM_TOKENS] = {
 #define TOKEN(t) #t,
-#include "beatmap/tokens.h"
+#include "./tokens.h"
 #undef TOKEN
 };
 

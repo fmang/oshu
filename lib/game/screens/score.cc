@@ -6,7 +6,7 @@
  * Implement the score screen, when the game is finished.
  */
 
-#include "game/screens/screens.h"
+#include "./screens.h"
 
 #include "game/game.h"
 #include "graphics/transitions.h"

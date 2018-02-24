@@ -57,7 +57,7 @@
  */
 enum token {
 #define TOKEN(t) t,
-#include "beatmap/tokens.h"
+#include "./tokens.h"
 #undef TOKEN
 NUM_TOKENS,
 };

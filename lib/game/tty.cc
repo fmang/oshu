@@ -6,7 +6,7 @@
 #include "game/tty.h"
 
 #include "game/game.h"
-#include "game/screens/screens.h"
+#include "./screens/screens.h"
 
 #include <unistd.h>
 

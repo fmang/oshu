@@ -6,8 +6,9 @@
  * Implement the pause screen.
  */
 
+#include "./screens.h"
+
 #include "game/game.h"
-#include "game/screens/screens.h"
 
 #include <SDL2/SDL.h>
 

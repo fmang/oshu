@@ -6,7 +6,7 @@
  * Implement the main game screen.
  */
 
-#include "game/screens/screens.h"
+#include "./screens.h"
 
 #include "game/game.h"
 #include "game/tty.h"
