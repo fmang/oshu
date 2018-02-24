@@ -69,23 +69,24 @@ First of all, make sure you have the required dependencies. These things are so
 common that I may assure you they're in your distribution's official
 repositories.
 
+- CMake 3.10 or newer,
+- a C++14 compiler,
+- pkg-config,
 - SDL2 and SDL2_image,
 - ffmpeg or libav,
 - cairo,
-- pango,
-- a C++14 compiler,
-- pkg-config,
-- autoconf, automake (when building from the git repository).
+- pango.
 
-oshu! is a standard autoconf'd project, so install it the regular way with:
+To build oshu!, follow the standard CMake procedure:
 
-	# ./autogen.sh if the configure file is missing.
-	./configure --prefix="$HOME/.local"
+	mkdir build
+	cd build
+	cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
 	make && make install
 
 If you do use the `$HOME/.local` prefix, make sure you add `~/.local/bin` to
-your PATH, or invoke oshu! by specifying the full path like `~/.local/bin/oshu
-BEATMAP.osu`. Otherwise you may use the default `/usr/local`.
+your PATH, or invoke oshu! by specifying the full path like
+`~/.local/bin/oshu BEATMAP.osu`.
 
 If you want to have oshu integrated in your desktop:
 
