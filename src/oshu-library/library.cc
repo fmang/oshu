@@ -1,5 +1,5 @@
 /**
- * \file library/library.cc
+ * \file src/oshu-library/library.cc
  * \ingroup library
  */
 
@@ -25,7 +25,7 @@ beatmap_finder::~beatmap_finder()
  * \todo
  * Return an actual list of .osu files, not their directory.
  */
-std::string beatmap_finder::beatmap_finder::next()
+std::string beatmap_finder::next()
 {
 	for (;;) {
 		errno = 0;

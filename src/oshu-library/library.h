@@ -1,5 +1,5 @@
 /**
- * \file library/library.h
+ * \file src/oshu-library/library.h
  * \ingroup library
  */
 

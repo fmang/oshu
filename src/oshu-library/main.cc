@@ -1,5 +1,5 @@
 /**
- * \file library/oshu-library.cc
+ * \file src/oshu-library/main.cc
  * \ingroup library
  */
 

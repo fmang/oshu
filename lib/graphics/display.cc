@@ -10,9 +10,7 @@
 #include <SDL2/SDL.h>
 
 /**
- * Define the window size when the game starts.
- *
- * It reads the OSHU_WINDOW_SIZE environment if defined, and falls back on the
+ * Read the OSHU_WINDOW_SIZE environment if defined, and falls back on the
  * default 960×720 resolution if the variable is invalid or absent.
  *
  * The value of the variable follows the format `WxH` where W is the width in

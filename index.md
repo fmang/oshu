@@ -74,7 +74,7 @@ agnostic to the game mode.
 The \ref osu module implements the osu!standard game mode as an extension of
 the \ref game module.
 
-The *main* module \ref oshu.cc is the entry-point of oshu! and provides a
+The *main* module \ref src/oshu/main.cc is the entry-point of oshu! and provides a
 command-line interface to briefly configure the game, and then yields control
 to the game module.
 
