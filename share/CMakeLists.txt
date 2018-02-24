@@ -3,4 +3,5 @@ install(
 	DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}
 )
 
+add_subdirectory(desktop)
 add_subdirectory(man)

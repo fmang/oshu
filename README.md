@@ -88,14 +88,14 @@ If you do use the `$HOME/.local` prefix, make sure you add `~/.local/bin` to
 your PATH, or invoke oshu! by specifying the full path like
 `~/.local/bin/oshu BEATMAP.osu`.
 
-If you want to have oshu integrated in your desktop:
+The files required for desktop integration are deployed with `make install`,
+but you may need to refresh the cache databases yourself. Note that package
+managers are usually good at refreshing them automatically.
 
-	$ cd share
-	$ desktop-file-install --dir $PREFIX/share/applications oshu.desktop
-	$ xdg-mime install x-osu-beatmap.xml
-	$ xdg-mime default oshu.desktop text/x-osu-beatmap
+You may force the refreshing with:
 
-If you're lucky, someone may have packaged it for your distribution.
+	update-desktop-database $PREFIX/share/applications
+	update-mime-database $PREFIX/share/mime
 
 
 Goals
@@ -131,7 +131,6 @@ Documentation
 -------------
 
 The user manual's man page is installed in the standard man directory, but you
-may view it directly from `docs/oshu.1` or straight from the template at
-`docs/oshu.1.in`.
+may view it directly from `share/man/`.
 
 For the technical documentation, please look at `CONTRIBUTING.md`.
