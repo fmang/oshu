@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 				verbosity--;
 			break;
 		case OPT_HELP:
-			puts("oshu! version " OSHU_VERSION);
+			puts("oshu! version " PROJECT_VERSION);
 			puts(usage);
 			fputs(help, stdout);
 			return 0;

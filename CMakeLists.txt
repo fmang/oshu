@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(oshu)
-set(OSHU_VERSION 1.7.0)
+project(
+	oshu
+	VERSION 2.0.0
+	LANGUAGES CXX
+)
 
-enable_language(CXX)
 set(CMAKE_CXX_STANDARD 14)
 
 include(FindPkgConfig)
