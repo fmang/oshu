@@ -25,10 +25,9 @@ The main problem with osu! is that it required Windows and a graphics card.
 Even with that, it sometimes get slow unless the computer is a beast… Hell, the
 mania and taiko mode could be played in a terminal!
 
-oshu! is currently mostly targeted at Linux users familiar with the console,
-but it doesn't have to be that way. All it needs are volunteers to build and
-test the project on the various operating systems and desktop environments out
-there.
+oshu! is currently mostly targeted at Linux users, but it doesn't have to be
+that way. All it needs are volunteers to build and test the project on the
+various operating systems and desktop environments out there.
 
 By the way, the name comes from osu! but with the s pronounced sh, because it's
 a mini-osu.
@@ -81,12 +80,20 @@ To build oshu!, follow the standard CMake procedure:
 
 	mkdir build
 	cd build
-	cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+	cmake -DCMAKE_INSTALL_PREFIX=~/.local -DDEFAULT_SKIN=osu ..
 	make && make install
 
 If you do use the `$HOME/.local` prefix, make sure you add `~/.local/bin` to
 your PATH, or invoke oshu! by specifying the full path like
 `~/.local/bin/oshu BEATMAP.osu`.
+
+The `-DDEFAULT_SKIN=osu` causes CMake to download the default osu! skin and
+make it the default. If you're satisfied with the minimal skin, or if you can't
+connect to Internet, you may leave out this option, or write out explicitly
+`-DDEFAULT_SKIN=minimal`.
+
+If you want to install skins without making them the default, you can list them
+like `-DSKINS=minimal;osu`.
 
 The files required for desktop integration are deployed with `make install`,
 but you may need to refresh the cache databases yourself. Note that package
