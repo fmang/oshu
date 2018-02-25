@@ -19,7 +19,7 @@ set(OSHU_DATA_DIRECTORY "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}")
 set(OSHU_SKINS_DIRECTORY "${OSHU_DATA_DIRECTORY}/skins")
 
 configure_file(config.h.in config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 include_directories(include)
 
@@ -29,9 +29,9 @@ add_subdirectory(share)
 
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
-	configure_file(Doxyfile.in Doxyfile @ONLY)
+	configure_file(Doxyfile.in Doxyfile)
 	add_custom_target(html
-		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+		COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
 		COMMENT "Generating the API documentation in ${CMAKE_BINARY_DIR}/html"
 	)
 endif (DOXYGEN_FOUND)
