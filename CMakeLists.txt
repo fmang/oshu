@@ -15,6 +15,8 @@ pkg_check_modules(CAIRO REQUIRED cairo)
 pkg_check_modules(PANGO REQUIRED pangocairo)
 
 include(GNUInstallDirs)
+set(OSHU_DATA_DIRECTORY "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}")
+set(OSHU_SKINS_DIRECTORY "${OSHU_DATA_DIRECTORY}/skins")
 
 configure_file(config.h.in config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

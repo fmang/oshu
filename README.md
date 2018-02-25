@@ -80,20 +80,20 @@ To build oshu!, follow the standard CMake procedure:
 
 	mkdir build
 	cd build
-	cmake -DCMAKE_INSTALL_PREFIX=~/.local -DDEFAULT_SKIN=osu ..
+	cmake -DCMAKE_INSTALL_PREFIX=~/.local -DOSHU_DEFAULT_SKIN=osu ..
 	make && make install
 
 If you do use the `$HOME/.local` prefix, make sure you add `~/.local/bin` to
 your PATH, or invoke oshu! by specifying the full path like
 `~/.local/bin/oshu BEATMAP.osu`.
 
-The `-DDEFAULT_SKIN=osu` causes CMake to download the default osu! skin and
-make it the default. If you're satisfied with the minimal skin, or if you can't
-connect to Internet, you may leave out this option, or write out explicitly
-`-DDEFAULT_SKIN=minimal`.
+The `-DOSHU_DEFAULT_SKIN=osu` causes CMake to download the default osu! skin
+and make it the default. If you're satisfied with the minimal skin, or if you
+can't connect to Internet, you may leave out this option, or write out
+explicitly `-DOSHU_DEFAULT_SKIN=minimal`.
 
 If you want to install skins without making them the default, you can list them
-like `-DSKINS=minimal;osu`.
+like `-DOSHU_SKINS=minimal;osu`.
 
 The files required for desktop integration are deployed with `make install`,
 but you may need to refresh the cache databases yourself. Note that package

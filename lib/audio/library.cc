@@ -224,7 +224,7 @@ static char* locate_sample(enum oshu_sample_set_family set, int index, int type)
 	} else {
 		/* Check the installation's data directory. */
 		char *path;
-		int rc = asprintf(&path, "%s/skins/default/%s", PKGDATADIR, filename);
+		int rc = asprintf(&path, "%s/default/%s", OSHU_SKINS_DIRECTORY, filename);
 		assert (rc >= 0);
 		if (access(path, R_OK) == 0)
 			return path;
