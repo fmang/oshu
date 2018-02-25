@@ -38,8 +38,8 @@ Getting started
 ---------------
 
 First, you need to download a few beatmaps from osu's website.
-See https://osu.ppy.sh/p/packlist to get packs, or
-https://osu.ppy.sh/p/beatmaplist for a finer selection.
+See https://osu.ppy.sh/beatmaps/packs to get packs, or
+https://osu.ppy.sh/beatmapsets for a finer selection.
 
 The beatmaps are distributed as *.osz* files, which are disguised ZIP files.
 You need to extract using *unzip* or a similar tool. Rename them to *.zip* if
