@@ -30,24 +30,33 @@
  */
 static std::string skin_directory()
 {
-	const char *skin = OSHU_DEFAULT_SKIN;
 	const char *env = getenv("OSHU_SKIN");
-	if (!env || !*env)
+	if (!env || !*env) {
 		;
-	else if (strchr(env, '/'))
-		return env;
-	else
-		skin = env;
+	} else if (strchr(env, '/')) {
+		if (!access(env, R_OK))
+			return env; /* found! */
+		else
+			oshu_log_debug("could not find skin directory %s", env);
+	} else {
+		std::ostringstream os;
+		os << OSHU_SKINS_DIRECTORY << "/" << env;
+		std::string dir = os.str();
+		if (!access(dir.c_str(), R_OK))
+			return dir;
+		else
+			oshu_log_debug("could not find skin %s in directory %s", env, OSHU_SKINS_DIRECTORY);
+	}
+	/* The OSHU_SKIN variable wasn't helpful, so let's resort to the default skin. */
 	std::ostringstream os;
-	os << OSHU_SKINS_DIRECTORY << "/" << skin;
-	std::string dir = os.str();
-	oshu_log_debug("skin directory: %s", dir.c_str());
-	return dir;
+	os << OSHU_SKINS_DIRECTORY << "/" << OSHU_DEFAULT_SKIN;
+	return os.str();
 }
 
 void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format)
 {
 	library->skin_directory = skin_directory();
+	oshu_log_debug("using skin directory %s", library->skin_directory.c_str());
 	library->format = format;
 }
 
