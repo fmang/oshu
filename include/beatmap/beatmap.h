@@ -875,6 +875,8 @@ struct oshu_beatmap {
 	 * \brief [Colours] section.
 	 *
 	 * It's a circular linked list, as described in #oshu_color.
+	 *
+	 * \sa color_count
 	 */
 	struct oshu_color *colors;
 	/**

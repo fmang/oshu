@@ -391,12 +391,15 @@ static int process_section(struct parser_state *parser)
 	case Colours:
 	case HitObjects:
 		parser->section = (enum beatmap_section) token;
-		return 0;
+		break;
 	default:
 		parser_error(parser, "unknown section");
 		parser->section = BEATMAP_UNKNOWN;
 		return -1;
 	}
+	if (parser->section == BEATMAP_HIT_OBJECTS)
+		validate_colors(parser);
+	return 0;
 }
 
 static int process_general(struct parser_state *parser)
@@ -755,6 +758,18 @@ static int parse_color_channel(struct parser_state *parser, double *ch)
 	}
 	*ch = (double) v / 255.;
 	return 0;
+}
+
+static void validate_colors(struct parser_state *parser)
+{
+	if (parser->beatmap->colors)
+		return;
+	oshu_log_debug("no colors; generating a default color scheme");
+	oshu_color *color = (oshu_color*) calloc(1, sizeof(*color));
+	color->red = color->green = color->blue = 128;
+	color->next = color;
+	parser->beatmap->colors = color;
+	parser->beatmap->color_count = 1;
 }
 
 /*****************************************************************************/

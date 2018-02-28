@@ -217,6 +217,7 @@ static int process_input(P*);
 		static int process_color_combo(P*);
 		static int parse_color(P*, struct oshu_color**);
 		static int parse_color_channel(P*, double*);
+		static void validate_colors(P*);
 	static int process_hit_object(P*);
 		static int parse_hit_object(P*, struct oshu_hit**);
 			static int parse_common_hit(P*, struct oshu_hit*);
