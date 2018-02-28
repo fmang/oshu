@@ -129,6 +129,15 @@ struct oshu_sound_library {
 	/**
 	 * Path to the skin directory, containing the samples.
 	 *
+	 * By default, it is built from the `OSHU_SKINS_DIRECTORY` and
+	 * `OSHU_DEFAULT_SKIN` configuration variables at build time.
+	 *
+	 * You may change that directory with the `OSHU_SKIN` environment
+	 * variable, which may contain the short name of the skin, or an
+	 * absolute path. Relative paths are interpreted relative to the
+	 * beatmap's directory but that may change in the future, don't rely on
+	 * it.
+	 *
 	 * It may, but should not, end with a trailing slash.
 	 */
 	std::string skin_directory;

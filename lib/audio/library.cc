@@ -23,11 +23,26 @@
 #include <SDL2/SDL_timer.h>
 #include <sstream>
 
+/**
+ * Determine the directory of the skin to use.
+ *
+ * See #oshu_sound_library::skin_directory for details.
+ */
 static std::string skin_directory()
 {
+	const char *skin = OSHU_DEFAULT_SKIN;
+	const char *env = getenv("OSHU_SKIN");
+	if (!env || !*env)
+		;
+	else if (strchr(env, '/'))
+		return env;
+	else
+		skin = env;
 	std::ostringstream os;
-	os << OSHU_SKINS_DIRECTORY << "/" << OSHU_DEFAULT_SKIN;
-	return os.str();
+	os << OSHU_SKINS_DIRECTORY << "/" << skin;
+	std::string dir = os.str();
+	oshu_log_debug("skin directory: %s", dir.c_str());
+	return dir;
 }
 
 void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format)
