@@ -68,6 +68,27 @@ These keys also apply to the score screen at the end.
 \fBQ\fR
 Quit the game.
 
+.SH SKINS
+.PP
+The default sound effects played when hit objects are hit are defined by the
+\fIskin\fR in osu! terminology. A skin directory contains a collection of
+\fI.wav\fR files, like \fInormal-hitnormal.wav\fR, or
+\fIsoft-hitwhistle.wav\fR.
+.PP
+All the sample files are optional. If a beatmap refers to a missing sample,
+nothing is played.
+.PP
+The skins are located at \fI@OSHU_SKINS_DIRECTORY@\fR. The default skin is
+\fI@OSHU_DEFAULT_SKIN@\fR. These values are configured at build time, but you
+may alter the skins directory and the \fIdefault\fR symlink inside it to change
+these settings.
+.PP
+On invocation, a non-default skin may be selected with the \fIOSHU_SKIN\fR
+environment variable. If it contains a skin name, like \fIminimal\fR, it is
+searched for inside the skins directory. You may also specify an absolute path.
+When \fIOSHU_SKIN\fR is incorrect or refers to an unknown skin, oshu! falls
+back to the default skin. You can use the --verbose flag to debug it.
+
 .SH CONFIGURATION
 .PP
 oshu! currently doesn't read a configuration file, but reads the environment.
@@ -86,6 +107,9 @@ fallback default size of 960x720.
 This variables controls the visual effects and other rendering quality
 settings. It may take one of \fIlow\fR, \fImedium\fR, and \fIhigh\fR. The
 default is \fIhigh\fR.
+.TP
+\fBOSHU_SKIN\fR
+Refer to the SKINS section above.
 
 .SH AUTHOR
 Written by Frédéric Mangano-Tarumi <fmang+oshu at mg0 fr>.
