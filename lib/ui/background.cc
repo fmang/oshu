@@ -171,6 +171,8 @@ void oshu_show_background(struct oshu_background *background, double brightness)
 
 void oshu_destroy_background(struct oshu_background *background)
 {
+	if (!background->display) /* uninitialized background */
+		return;
 	if (!(background->display->features & OSHU_SHOW_BACKGROUND))
 		return;
 	oshu_destroy_texture(&background->picture);
