@@ -15,6 +15,11 @@ pkg_check_modules(CAIRO REQUIRED cairo)
 pkg_check_modules(PANGO REQUIRED pangocairo)
 
 include(GNUInstallDirs)
+# GNUInstallDirs creates one variable for the install() commands, and one for
+# the final absolute path. We'll suffix the former with INSTALL_DIRECTORY.
+set(OSHU_DATA_INSTALL_DIRECTORY "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
+set(OSHU_SKINS_INSTALL_DIRECTORY "${OSHU_DATA_INSTALL_DIRECTORY}/skins")
+# Absolute paths for config.h:
 set(OSHU_DATA_DIRECTORY "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}")
 set(OSHU_SKINS_DIRECTORY "${OSHU_DATA_DIRECTORY}/skins")
 
