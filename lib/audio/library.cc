@@ -357,7 +357,8 @@ static void try_sound(struct oshu_sound_library *library, struct oshu_hit_sound 
 {
 	if (sound->additions & flag) {
 		int target = sound->additions & OSHU_SOUND_TARGET;
-		struct oshu_sample *sample = find_sample(library, sound->sample_set, sound->index, target | flag);
+		oshu_sample_set_family set = (flag == OSHU_NORMAL_SOUND) ? sound->sample_set : sound->additions_set;
+		struct oshu_sample *sample = find_sample(library, set, sound->index, target | flag);
 		if (!sample)
 			return;
 		else if (sound->additions & OSHU_SLIDER_SOUND)
