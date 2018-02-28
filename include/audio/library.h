@@ -7,6 +7,8 @@
 
 #include "beatmap/beatmap.h"
 
+#include <string>
+
 struct oshu_audio;
 struct oshu_sample;
 
@@ -124,6 +126,12 @@ struct oshu_sound_room {
  * \sa oshu_sample_set_family
  */
 struct oshu_sound_library {
+	/**
+	 * Path to the skin directory, containing the samples.
+	 *
+	 * It may, but should not, end with a trailing slash.
+	 */
+	std::string skin_directory;
 	/**
 	 * Format of the samples in the library.
 	 */

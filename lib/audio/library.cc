@@ -21,9 +21,18 @@
 #include <string.h>
 #include <unistd.h>
 #include <SDL2/SDL_timer.h>
+#include <sstream>
+
+static std::string skin_directory()
+{
+	std::ostringstream os;
+	os << OSHU_SKINS_DIRECTORY << "/" << OSHU_DEFAULT_SKIN;
+	return os.str();
+}
 
 void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format)
 {
+	library->skin_directory = skin_directory();
 	library->format = format;
 }
 
@@ -154,14 +163,13 @@ static struct oshu_sample** get_sample(struct oshu_sound_shelf *shelf, int type)
 /**
  * Generate the file name for a sample given its characteristics.
  *
- * *size* is the size of the character *buffer*, and it should be at least 32
- * bytes. If the buffer is too short, an error is printed and -1 is returned.
- *
  * Sample outputs:
  * - `soft-hitclap9.wav`,
  * - `drum-hitwhistle.wav`.
+ *
+ * If the set or type is invalid, return an empty string.
  */
-static int make_sample_file_name(enum oshu_sample_set_family set, int index, int type, char *buffer, int size)
+static std::string make_sample_file_name(enum oshu_sample_set_family set, int index, int type)
 {
 	/* Set name. */
 	const char *set_name;
@@ -171,7 +179,7 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, int
 	case OSHU_DRUM_SAMPLE_SET:   set_name = "drum"; break;
 	default:
 		oshu_log_debug("unknown sample set %d", (int) set);
-		return -1;
+		return {};
 	}
 	/* Type name. */
 	const char *type_name;
@@ -184,54 +192,42 @@ static int make_sample_file_name(enum oshu_sample_set_family set, int index, int
 	case OSHU_SLIDER_SOUND|OSHU_WHISTLE_SOUND: type_name = "sliderwhistle"; break;
 	default:
 		oshu_log_debug("unknown sample type %d", (int) set);
-		return -1;
+		return {};
 	}
 	/* Combine everything. */
-	int rc;
+	std::ostringstream os;
+	os << set_name << '-' << type_name;
 	if (index > 1)
-		rc = snprintf(buffer, size, "%s-%s%d.wav", set_name, type_name, index);
-	else
-		rc = snprintf(buffer, size, "%s-%s.wav", set_name, type_name);
-	if (rc < 0) {
-		oshu_log_error("sample file name formatting failed");
-		return -1;
-	} else if (rc >= size) {
-		oshu_log_error("sample file name was truncated");
-		return -1;
-	}
-	return 0;
+		os << index;
+	os << ".wav";
+	return os.str();
 }
 
 /**
  * Look up a sample file from various directories.
  *
- * Return a dynamically allocated buffer with the path to a WAV file on
- * success, NULL on failure.
- *
  * The special index 0 does not look into the beatmap directory but straight
  * into the default set. Any non-0 index will only look in the beatmap
  * directory.
+ *
+ * If no suitable sample file was found, an empty string is returned.
  */
-static char* locate_sample(enum oshu_sample_set_family set, int index, int type)
+static std::string locate_sample(oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type)
 {
-	char filename[32];
-	if (make_sample_file_name(set, index, type, filename, sizeof(filename)) < 0)
-		return NULL;
+	std::string filename = make_sample_file_name(set, index, type);
+	if (filename.empty())
+		return {};
 	if (index > 0) {
 		/* Check the current directory. */
-		if (access(filename, R_OK) == 0)
-			return strdup(filename);
+		if (access(filename.c_str(), R_OK) == 0)
+			return filename;
 	} else {
 		/* Check the installation's data directory. */
-		char *path;
-		int rc = asprintf(&path, "%s/default/%s", OSHU_SKINS_DIRECTORY, filename);
-		assert (rc >= 0);
-		if (access(path, R_OK) == 0)
+		std::string path = library->skin_directory + "/" + filename;
+		if (access(path.c_str(), R_OK) == 0)
 			return path;
-		else
-			free(path);
 	}
-	return NULL;
+	return {};
 }
 
 int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type)
@@ -249,15 +245,14 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
 		return -1;
 	if (*sample) /* already loaded */
 		return 0;
-	char *path = locate_sample(set, index, type);
-	if (!path)
+	std::string path = locate_sample(library, set, index, type);
+	if (path.empty())
 		return -1;
-	oshu_log_debug("registering %s", path);
+	oshu_log_debug("registering %s", path.c_str());
 	*sample = (oshu_sample*) calloc(1, sizeof(**sample));
 	assert (*sample != NULL);
 	assert (library->format != NULL);
-	int rc = oshu_load_sample(path, library->format, *sample);
-	free(path);
+	int rc = oshu_load_sample(path.c_str(), library->format, *sample);
 	if (rc < 0)
 		oshu_log_debug("continuing the process with an empty sample");
 	return 0;
