@@ -60,16 +60,19 @@ static const char *help =
 	"Check the man page oshu(1) for details.\n"
 ;
 
+static const char *version =
+	"oshu! " PROJECT_VERSION "\n"
+	"Copyright (C) 2018 Frédéric Mangano-Tarumi\n"
+	"License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n"
+	"This is free software: you are free to change and redistribute it.\n"
+	"There is NO WARRANTY, to the extent permitted by law.\n"
+;
+
 static struct osu_game current_game;
 
 static void signal_handler(int signum)
 {
 	oshu_stop_game(&current_game);
-}
-
-static void print_version()
-{
-	puts("oshu! version " PROJECT_VERSION);
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -124,7 +127,7 @@ int main(int argc, char **argv)
 			pause = 1;
 			break;
 		case OPT_VERSION:
-			print_version();
+			fputs(version, stdout);
 			return 0;
 		default:
 			fputs(usage, stderr);
