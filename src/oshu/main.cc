@@ -114,7 +114,6 @@ int main(int argc, char **argv)
 				verbosity--;
 			break;
 		case OPT_HELP:
-			print_version();
 			puts(usage);
 			fputs(help, stdout);
 			return 0;
