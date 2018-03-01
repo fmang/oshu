@@ -45,18 +45,17 @@ static struct option options[] = {
 static const char *flags = "vh";
 
 static const char *usage =
-	"Usage: oshu [-v] BEATMAP.osu\n"
+	"Usage: oshu [OPTION]... BEATMAP.osu\n"
 	"       oshu --help\n"
-	"       oshu --version\n"
 ;
 
 static const char *help =
 	"Options:\n"
 	"  -v, --verbose       Increase the verbosity.\n"
 	"  -h, --help          Show this help message.\n"
+	"  --version           Output version information.\n"
 	"  --autoplay          Perform a perfect run.\n"
 	"  --pause             Start the game paused.\n"
-	"  --version           Print program version.\n"
 	"\n"
 	"Check the man page oshu(1) for details.\n"
 ;
