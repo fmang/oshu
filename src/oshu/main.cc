@@ -30,6 +30,7 @@ enum option_values {
 	OPT_HELP = 'h',
 	OPT_PAUSE = 0x10001,
 	OPT_VERBOSE = 'v',
+	OPT_VERSION = 0x10002,
 };
 
 static struct option options[] = {
@@ -37,6 +38,7 @@ static struct option options[] = {
 	{"help", no_argument, 0, OPT_HELP},
 	{"pause", no_argument, 0, OPT_PAUSE},
 	{"verbose", no_argument, 0, OPT_VERBOSE},
+	{"version", no_argument, 0, OPT_VERSION},
 	{0, 0, 0, 0},
 };
 
@@ -45,6 +47,7 @@ static const char *flags = "vh";
 static const char *usage =
 	"Usage: oshu [-v] BEATMAP.osu\n"
 	"       oshu --help\n"
+	"       oshu --version\n"
 ;
 
 static const char *help =
@@ -53,6 +56,7 @@ static const char *help =
 	"  -h, --help          Show this help message.\n"
 	"  --autoplay          Perform a perfect run.\n"
 	"  --pause             Start the game paused.\n"
+	"  --version           Print program version.\n"
 	"\n"
 	"Check the man page oshu(1) for details.\n"
 ;
@@ -62,6 +66,11 @@ static struct osu_game current_game;
 static void signal_handler(int signum)
 {
 	oshu_stop_game(&current_game);
+}
+
+static void print_version()
+{
+	puts("oshu! version " PROJECT_VERSION);
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -106,7 +115,7 @@ int main(int argc, char **argv)
 				verbosity--;
 			break;
 		case OPT_HELP:
-			puts("oshu! version " PROJECT_VERSION);
+			print_version();
 			puts(usage);
 			fputs(help, stdout);
 			return 0;
@@ -116,6 +125,9 @@ int main(int argc, char **argv)
 		case OPT_PAUSE:
 			pause = 1;
 			break;
+		case OPT_VERSION:
+			print_version();
+			return 0;
 		default:
 			fputs(usage, stderr);
 			return 2;
