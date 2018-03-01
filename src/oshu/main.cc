@@ -30,6 +30,7 @@ enum option_values {
 	OPT_HELP = 'h',
 	OPT_PAUSE = 0x10001,
 	OPT_VERBOSE = 'v',
+	OPT_VERSION = 0x10002,
 };
 
 static struct option options[] = {
@@ -37,13 +38,14 @@ static struct option options[] = {
 	{"help", no_argument, 0, OPT_HELP},
 	{"pause", no_argument, 0, OPT_PAUSE},
 	{"verbose", no_argument, 0, OPT_VERBOSE},
+	{"version", no_argument, 0, OPT_VERSION},
 	{0, 0, 0, 0},
 };
 
 static const char *flags = "vh";
 
 static const char *usage =
-	"Usage: oshu [-v] BEATMAP.osu\n"
+	"Usage: oshu [OPTION]... BEATMAP.osu\n"
 	"       oshu --help\n"
 ;
 
@@ -51,10 +53,19 @@ static const char *help =
 	"Options:\n"
 	"  -v, --verbose       Increase the verbosity.\n"
 	"  -h, --help          Show this help message.\n"
+	"  --version           Output version information.\n"
 	"  --autoplay          Perform a perfect run.\n"
 	"  --pause             Start the game paused.\n"
 	"\n"
 	"Check the man page oshu(1) for details.\n"
+;
+
+static const char *version =
+	"oshu! " PROJECT_VERSION "\n"
+	"Copyright (C) 2018 Frédéric Mangano-Tarumi\n"
+	"License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n"
+	"This is free software: you are free to change and redistribute it.\n"
+	"There is NO WARRANTY, to the extent permitted by law.\n"
 ;
 
 static struct osu_game current_game;
@@ -106,7 +117,6 @@ int main(int argc, char **argv)
 				verbosity--;
 			break;
 		case OPT_HELP:
-			puts("oshu! version " PROJECT_VERSION);
 			puts(usage);
 			fputs(help, stdout);
 			return 0;
@@ -116,6 +126,9 @@ int main(int argc, char **argv)
 		case OPT_PAUSE:
 			pause = 1;
 			break;
+		case OPT_VERSION:
+			fputs(version, stdout);
+			return 0;
 		default:
 			fputs(usage, stderr);
 			return 2;
