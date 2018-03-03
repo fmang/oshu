@@ -31,6 +31,8 @@ include_directories(include)
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(share)
+enable_testing()
+add_subdirectory(test)
 
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
