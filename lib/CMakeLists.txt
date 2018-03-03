@@ -8,6 +8,7 @@ add_library(
 	beatmap/geometry.cc
 	beatmap/helpers.cc
 	beatmap/parser.cc
+	core/log.cc
 	game/actions.cc
 	game/clock.cc
 	game/controls.cc

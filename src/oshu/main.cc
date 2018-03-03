@@ -140,6 +140,7 @@ int main(int argc, char **argv)
 		return 2;
 	}
 
+	oshu::log::priority = static_cast<oshu::log::level>(verbosity);
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, (SDL_LogPriority) verbosity);
 	av_log_set_level(verbosity <= SDL_LOG_PRIORITY_DEBUG ? AV_LOG_INFO : AV_LOG_ERROR);

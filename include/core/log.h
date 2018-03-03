@@ -1,5 +1,5 @@
 /**
- * \file core/log.h
+ * \file include/core/log.h
  * \ingroup core_log
  */
 
@@ -131,12 +131,12 @@ extern level priority;
  */
 std::ostream& logger(level priority);
 
-std::ostream& critical();
-std::ostream& error();
-std::ostream& warning();
-std::ostream& info();
-std::ostream& debug();
 std::ostream& verbose();
+std::ostream& debug();
+std::ostream& info();
+std::ostream& warning();
+std::ostream& error();
+std::ostream& critical();
 
 /** \} */
 
