@@ -45,6 +45,8 @@
 
 #include "beatmap/beatmap.h"
 
+#include <exception>
+
 /**
  * Enumerate all the special strings that may be found in a header file.
  *
@@ -230,3 +232,13 @@ static int process_input(P*);
 			static int parse_spinner(P*, struct oshu_hit*);
 			static int parse_hold_note(P*, struct oshu_hit*);
 			static int parse_additions(P*, struct oshu_hit*);
+
+namespace oshu {
+namespace beatmap {
+namespace parser {
+
+struct invalid_header: public std::exception {
+	const char* what() const throw() { return "invalid osu beatmap header"; }
+};
+
+}}}

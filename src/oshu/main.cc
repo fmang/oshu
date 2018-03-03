@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 {
 	int autoplay = 0;
 	int pause = 0;
-	int verbosity = SDL_LOG_PRIORITY_WARNING;
+	int verbosity = SDL_LOG_PRIORITY_WARN;
 
 	for (;;) {
 		int c = getopt_long(argc, argv, flags, options, NULL);

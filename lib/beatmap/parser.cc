@@ -71,6 +71,8 @@ static const struct oshu_beatmap default_beatmap = {
 		##__VA_ARGS__ \
 	)
 
+using namespace oshu::beatmap::parser;
+
 /* Primitives ****************************************************************/
 
 static int consume_all(struct parser_state *parser)
@@ -357,13 +359,11 @@ static int process_header(struct parser_state *parser)
 	while (*parser->input && *parser->input != 'o')
 		++parser->input;
 	if (consume_string(parser, osu_file_header) < 0)
-		return -1;
+		throw invalid_header();
 	if (parse_int(parser, &parser->beatmap->version) < 0)
-		return -1;
-	if (parser->beatmap->version < 0) {
-		parser_error(parser, "invalid osu beatmap version");
-		return -1;
-	}
+		throw invalid_header();
+	if (parser->beatmap->version < 0)
+		throw invalid_header();
 	parser->section = BEATMAP_ROOT;
 	oshu_log_debug("beatmap version: %d", parser->beatmap->version);
 	return 0;
@@ -1272,6 +1272,7 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 	parser.source = name;
 	parser.beatmap = beatmap;
 	parser.last_hit = beatmap->hits;
+	int rc = 0;
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t nread;
@@ -1281,7 +1282,13 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 		parser.buffer = line;
 		parser.input = line;
 		parser.line_number++;
-		process_input(&parser);
+		try {
+			process_input(&parser);
+		} catch (invalid_header& e) {
+			oshu::log::error() << e.what() << std::endl;
+			rc = -1;
+			break;
+		}
 		/* ^ note: ignore parsing errors */
 		if (headers_only && parser.section == BEATMAP_TIMING_POINTS)
 			break;
@@ -1294,7 +1301,7 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 	end->time = INFINITY;
 	parser.last_hit->next = end;
 	end->previous = parser.last_hit;
-	return 0;
+	return rc;
 }
 
 static void dump_beatmap_info(struct oshu_beatmap *beatmap)
