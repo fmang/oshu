@@ -140,4 +140,4 @@ Documentation
 The user manual's man page is installed in the standard man directory, but you
 may view it directly from `share/man/`.
 
-For the technical documentation, please look at `CONTRIBUTING.md`.
+For the technical documentation, please look at CONTRIBUTING.md.
