@@ -1,6 +1,8 @@
 add_executable(
 	oshu
 	main.cc
+	$<TARGET_OBJECTS:liboshu-core>
+	$<TARGET_OBJECTS:liboshu-beatmap>
 	$<TARGET_OBJECTS:liboshu>
 )
 
