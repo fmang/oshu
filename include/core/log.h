@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <iosfwd>
 #include <SDL2/SDL_log.h>
 
 /**
@@ -12,11 +13,25 @@
  * \ingroup core
  *
  * \brief
- * Macros for logging messages.
+ * Facility for logging messages.
+ *
+ * ### Legacy interface
  *
  * This module provides a set of macros to avoid mentionning the verbosely
  * named `SDL_LOG_CATEGORY_APPLICATION` parameter when using SDL's logging
  * facility.
+ *
+ * It works with C and looks like printf calls, but requires SDL to be linked
+ * with the executable.
+ *
+ * ### New interface
+ *
+ * The new C++ interface is based on the standard iostream library.
+ *
+ * It is a bit more verbose but it is also easier to extend, and also
+ * type-safe.
+ *
+ * See #oshu::core::log.
  *
  * \{
  */
@@ -63,3 +78,54 @@
 #define oshu_log_critical(...) SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, __VA_ARGS__)
 
 /** \} */
+
+namespace oshu {
+inline namespace core {
+
+/** \ingroup core_log */
+namespace log {
+
+/**
+ * Logging level, a.k.a. verbosity.
+ *
+ * The bigger the more verbose and less important.
+ */
+enum class level : int {
+	critical,
+	error,
+	warning,
+	info,
+	debug,
+	verbose,
+};
+
+/**
+ * Current log level.
+ *
+ * Only messages with a level higher or equal to this level are logged. The
+ * other messages are silently discarded.
+ */
+extern level verbosity;
+
+/**
+ * Return the output stream for the wanted verbosity.
+ *
+ * If the verbosity is greater than or equal to #verbosity, return a handle to
+ * std::clog, otherwise return a dummy stream.
+ *
+ * It is your responsibility to write std::endl at the end of your log message.
+ *
+ * You should use #critical, #error, #warning, #info, #debug or #verbose to
+ * access your logger than this function directly, as they prefix your message
+ * with the log level.
+ */
+std::ostream& logger(level verbosity);
+
+std::ostream& critical();
+std::ostream& error();
+std::ostream& warning();
+std::ostream& info();
+std::ostream& debug();
+std::ostream& verbose();
+
+}}}
