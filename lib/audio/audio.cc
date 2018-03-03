@@ -7,7 +7,7 @@
  */
 
 #include "audio/audio.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <assert.h>
 

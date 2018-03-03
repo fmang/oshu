@@ -5,7 +5,7 @@
 
 #include "game/game.h"
 #include "./screens/screens.h"
-#include "log.h"
+#include "core/log.h"
 
 void oshu_initialize_clock(struct oshu_game *game)
 {

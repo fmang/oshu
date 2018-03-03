@@ -6,7 +6,7 @@
 #include "osu/osu.h"
 
 #include "graphics/paint.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <assert.h>
 #include <SDL2/SDL_timer.h>

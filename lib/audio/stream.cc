@@ -4,7 +4,7 @@
  */
 
 #include "audio/stream.h"
-#include "log.h"
+#include "core/log.h"
 
 extern "C" {
 #include <libavformat/avformat.h>

@@ -8,7 +8,7 @@
 
 #include "./parser.h"
 #include "beatmap/beatmap.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <assert.h>
 #include <errno.h>

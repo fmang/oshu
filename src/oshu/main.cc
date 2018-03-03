@@ -9,7 +9,7 @@
 
 #include "config.h"
 
-#include "log.h"
+#include "core/log.h"
 #include "game/game.h"
 #include "osu/osu.h"
 

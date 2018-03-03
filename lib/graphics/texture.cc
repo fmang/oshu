@@ -6,7 +6,7 @@
 #include "graphics/texture.h"
 
 #include "graphics/display.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <SDL2/SDL_image.h>
 

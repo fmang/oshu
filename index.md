@@ -47,9 +47,8 @@ digraph modules {
 }
 \enddot
 
-The \ref log module provides a wrapper around SDL's logging facility and is
-used about everywhere in the code. It's an implicit dependency of all the
-modules.
+The \ref core module provides generic modules used about everywhere in the
+code. It's an implicit dependency of all the modules.
 
 The \ref beatmap module handles the complete loading and parsing of the beatmap
 files. It is self-contained. In particular, it is not going to load anything

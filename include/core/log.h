@@ -1,13 +1,15 @@
 /**
- * \file log.h
- * \ingroup log
+ * \file core/log.h
+ * \ingroup core_log
  */
 
 #pragma once
 
 #include <SDL2/SDL_log.h>
 
-/** \defgroup log Log
+/**
+ * \defgroup core_log Log
+ * \ingroup core
  *
  * \brief
  * Macros for logging messages.

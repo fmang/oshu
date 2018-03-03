@@ -7,7 +7,7 @@
 
 #include "graphics/display.h"
 #include "graphics/texture.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <assert.h>
 #include <SDL2/SDL.h>

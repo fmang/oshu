@@ -13,7 +13,7 @@
 #include "audio/library.h"
 #include "audio/audio.h"
 #include "audio/sample.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <assert.h>
 #include <stdio.h>

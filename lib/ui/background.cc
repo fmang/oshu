@@ -6,7 +6,7 @@
 #include "ui/background.h"
 
 #include "graphics/display.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <assert.h>
 #include <cairo/cairo.h>

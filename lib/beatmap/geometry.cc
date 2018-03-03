@@ -4,7 +4,7 @@
  */
 
 #include "beatmap/geometry.h"
-#include "log.h"
+#include "core/log.h"
 
 #include <assert.h>
 

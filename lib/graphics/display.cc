@@ -5,7 +5,7 @@
 
 #include "graphics/display.h"
 
-#include "log.h"
+#include "core/log.h"
 
 #include <SDL2/SDL.h>
 
