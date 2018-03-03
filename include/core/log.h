@@ -86,17 +86,22 @@ inline namespace core {
 namespace log {
 
 /**
- * Logging level, a.k.a. verbosity.
+ * Logging level, a.k.a. priority.
  *
- * The bigger the more verbose and less important.
+ * The bigger the more important.
+ *
+ * It is currently fully compatible with SDL's log priorities, but only reuses
+ * the constants. No SDL functions will be called, so there's no need to link
+ * to SDL for that. In the mid-term, the enum will be unrelated to SDL's, even
+ * though they're likely to remain equal.
  */
 enum class level : int {
-	critical,
-	error,
-	warning,
-	info,
-	debug,
-	verbose,
+	verbose = SDL_LOG_PRIORITY_VERBOSE,
+	debug = SDL_LOG_PRIORITY_DEBUG,
+	info = SDL_LOG_PRIORITY_INFO,
+	warning = SDL_LOG_PRIORITY_WARN,
+	error = SDL_LOG_PRIORITY_ERROR,
+	critical = SDL_LOG_PRIORITY_CRITICAL,
 };
 
 /**
@@ -105,12 +110,12 @@ enum class level : int {
  * Only messages with a level higher or equal to this level are logged. The
  * other messages are silently discarded.
  */
-extern level verbosity;
+extern level priority;
 
 /**
  * Return the output stream for the wanted verbosity.
  *
- * If the verbosity is greater than or equal to #verbosity, return a handle to
+ * If the level is greater than or equal to #prority, return a handle to
  * std::clog, otherwise return a dummy stream.
  *
  * It is your responsibility to write std::endl at the end of your log message.
@@ -119,7 +124,7 @@ extern level verbosity;
  * access your logger than this function directly, as they prefix your message
  * with the log level.
  */
-std::ostream& logger(level verbosity);
+std::ostream& logger(level priority);
 
 std::ostream& critical();
 std::ostream& error();
