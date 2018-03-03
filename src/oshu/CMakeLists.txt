@@ -1,9 +1,6 @@
 add_executable(
 	oshu
 	main.cc
-	$<TARGET_OBJECTS:liboshu-core>
-	$<TARGET_OBJECTS:liboshu-beatmap>
-	$<TARGET_OBJECTS:liboshu>
 )
 
 target_compile_options(
@@ -16,6 +13,7 @@ target_compile_options(
 
 target_link_libraries(
 	oshu PUBLIC
+	liboshu
 	${SDL_LIBRARIES}
 	${FFMPEG_LIBRARIES}
 	${CAIRO_LIBRARIES}

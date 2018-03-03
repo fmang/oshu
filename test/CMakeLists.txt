@@ -2,8 +2,6 @@ add_executable(
 	zerotokei
 	EXCLUDE_FROM_ALL
 	zerotokei.cc
-	$<TARGET_OBJECTS:liboshu-core>
-	$<TARGET_OBJECTS:liboshu-beatmap>
 )
 
 target_compile_options(
@@ -13,6 +11,7 @@ target_compile_options(
 
 target_link_libraries(
 	zerotokei PUBLIC
+	liboshu
 	${SDL_LIBRARIES}
 )
 

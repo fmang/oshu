@@ -1,32 +1,14 @@
 add_library(
-	liboshu-core OBJECT
-	core/log.cc
-)
-
-target_compile_options(
-	liboshu-core PUBLIC
-	${SDL_CFLAGS}
-)
-
-add_library(
-	liboshu-beatmap OBJECT
-	beatmap/geometry.cc
-	beatmap/helpers.cc
-	beatmap/parser.cc
-)
-
-target_compile_options(
-	liboshu-beatmap PUBLIC
-	${SDL_CFLAGS}
-)
-
-add_library(
-	liboshu OBJECT
+	liboshu STATIC
 	audio/audio.cc
 	audio/library.cc
 	audio/sample.cc
 	audio/stream.cc
 	audio/track.cc
+	beatmap/geometry.cc
+	beatmap/helpers.cc
+	beatmap/parser.cc
+	core/log.cc
 	game/actions.cc
 	game/clock.cc
 	game/controls.cc
