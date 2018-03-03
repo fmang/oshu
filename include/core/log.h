@@ -86,6 +86,11 @@ inline namespace core {
 namespace log {
 
 /**
+ * \ingroup core_log
+ * \{
+ */
+
+/**
  * Logging level, a.k.a. priority.
  *
  * The bigger the more important.
@@ -115,7 +120,7 @@ extern level priority;
 /**
  * Return the output stream for the wanted verbosity.
  *
- * If the level is greater than or equal to #prority, return a handle to
+ * If the level is greater than or equal to #priority, return a handle to
  * std::clog, otherwise return a dummy stream.
  *
  * It is your responsibility to write std::endl at the end of your log message.
@@ -132,5 +137,7 @@ std::ostream& warning();
 std::ostream& info();
 std::ostream& debug();
 std::ostream& verbose();
+
+/** \} */
 
 }}}
