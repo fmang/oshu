@@ -77,6 +77,8 @@ void oshu_show_cursor(struct oshu_cursor_widget *cursor)
 
 void oshu_destroy_cursor(struct oshu_cursor_widget *cursor)
 {
+	if (!cursor->display)
+		return;
 	if (!(cursor->display->features & OSHU_FANCY_CURSOR))
 		return;
 
