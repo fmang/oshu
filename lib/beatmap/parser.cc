@@ -1011,6 +1011,9 @@ static int parse_point(struct parser_state *parser, oshu_point *p)
  *
  * Consumes:
  * `168:88`
+ *
+ * \todo
+ * Parse polyline paths, like `L|X:Y|X:Y`.
  */
 static int parse_linear_slider(struct parser_state *parser, struct oshu_hit *hit)
 {

@@ -39,6 +39,32 @@
  *
  * All these functions return 0 on success, and -1 on failure. The callee
  * should print an message using #parser_error failure.
+ *
+ * ### SAX-like parser
+ *
+ * Rather than hiding the parser, it could be exposed and configurable through
+ * a callback interface with virtual methods.
+ *
+ * ```c
+ * struct parser {
+ * 	virtual void title(const std::string&) {}
+ * 	virtual void timing_point(const timing_point_record&) {}
+ * 	virtual void color(struct color&) {}
+ * 	virtual void hit_object(const hit_object_record&) {}
+ * };
+ * ```
+ *
+ * With that kind of parser, it's easy to build a fast parser that, say, only
+ * stores the metadata. No need to store the whole beatmap in the memory
+ * everytime or make special cases in the parser.
+ *
+ * The main advantage is that the parsing and interpretation are separated,
+ * isolating these two complex logics. The performance cost doesn't sound too
+ * heavy.
+ *
+ * \todo
+ * Build the SAX-like parser.
+ *
  */
 
 #pragma once
@@ -99,6 +125,9 @@ enum beatmap_section {
  *
  * You'll note the parsing is based on an automaton model, with a transition
  * function receiving one line at a time, and updating the parser state.
+ *
+ * \todo
+ * Consider using std::istream instead of reinventing the wheel.
  */
 struct parser_state {
 	/**

@@ -299,6 +299,16 @@ enum oshu_hit_state {
  * Its fields will look confusing and overlapping, like #index which looks like
  * it applies to both #sample_set and #additions_set, even though they're
  * different sample sets?
+ *
+ * \todo
+ * This structure is too hard to use. The difference between #sample_set and
+ * #additions_set is a trap. The #additions field is a combination instead of a
+ * simple type. It would be easier to have a structure for 1 sound, and
+ * associate a list of sounds to hit objects. The downside is that it would
+ * cause a memory indirection, and require more memory. The upside is that the
+ * #oshu_hit_sound to filename conversion is easier. As a compromise, if
+ * performance matters, the list can be a structure like the current one, with
+ * an iterator to convert the compacted multi-sound pack to simple sounds.
  */
 struct oshu_hit_sound {
 	/**

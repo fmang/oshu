@@ -28,6 +28,10 @@ struct oshu_game_screen;
 
 /**
  * The game user inteface, composed with widgets from the \ref ui module.
+ *
+ * \todo
+ * This structure should not be part of the game, but belong to its own module.
+ * The GUI module should refer to the game, instead of the game owning the GUI.
  */
 struct oshu_game_ui {
 	struct oshu_background background;

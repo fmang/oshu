@@ -48,6 +48,9 @@ double oshu_ratio(oshu_size size);
  *
  * It's formally the same as a degree 1 Bézier curve, but we'll keep that type
  * to make experiments.
+ *
+ * \todo
+ * Support polyline paths.
  */
 struct oshu_line {
 	oshu_point start;

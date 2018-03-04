@@ -1,11 +1,6 @@
 /**
  * \file audio/library.cc
  * \ingroup audio_library
- *
- * \todo
- * This whole sub-module should not be in the audio module, but deserves to be
- * in a dedicated *skin* module. *audio* then won't depend on *beatmap*
- * anymore.
  */
 
 #include "config.h"

@@ -45,6 +45,10 @@ static int open_audio(struct oshu_game *game)
 	return 0;
 }
 
+/**
+ * \todo
+ * Avoid asprintf, it's not standard.
+ */
 static int open_display(struct oshu_game *game)
 {
 	if (oshu_open_display(&game->display) < 0) {

@@ -40,6 +40,9 @@ static PangoLayout* setup_layout(struct oshu_painter *p)
 /**
  * \todo
  * Handle errors.
+ *
+ * \todo
+ * Avoid asprintf, it's not standard.
  */
 static int paint_stars(struct oshu_metadata_frame *frame)
 {
@@ -84,6 +87,9 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 /**
  * \todo
  * Handle errors.
+ *
+ * \todo
+ * Avoid asprintf, it's not standard.
  */
 static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 {
