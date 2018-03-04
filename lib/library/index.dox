@@ -1,0 +1,11 @@
+/**
+ * \defgroup library Library
+ *
+ * \brief
+ * Discover resources.
+ */
+
+/**
+ * \namespace oshu::library
+ * \ingroup library
+ */
