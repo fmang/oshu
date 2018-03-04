@@ -24,3 +24,19 @@ install(
 	TARGETS oshu
 	RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
+
+add_executable(
+	oshu-library
+	oshu-library.cc
+)
+
+target_compile_options(
+	oshu-library PUBLIC
+	${SDL_CFLAGS}
+)
+
+target_link_libraries(
+	oshu-library PUBLIC
+	liboshu
+	${SDL_LIBRARIES}
+)

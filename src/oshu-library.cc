@@ -1,9 +1,9 @@
 /**
  * \file src/oshu-library/main.cc
- * \ingroup library
  */
 
-#include <library/library.h>
+#include "core/log.h"
+#include "library/beatmaps.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -46,22 +46,10 @@ static void move_home()
 		throw std::system_error(errno, std::system_category(), "could not chdir to " + home);
 }
 
-static void print_current_directory()
-{
-	char buffer[FILENAME_MAX];
-	if (!getcwd(buffer, sizeof(buffer)))
-		throw std::system_error(errno, std::system_category());
-	std::cout << "Here: " << buffer << std::endl;
-}
-
 int main(int argc, char **argv)
 {
+	oshu::log::priority = oshu::log::level::verbose;
 	move_home();
-	print_current_directory();
-	std::string path;
-	oshu::library::beatmap_finder finder;
-	while (path = finder.next(), !path.empty()) {
-		std::cout << path << std::endl;
-	}
+	oshu::library::find_beatmap_sets("beatmaps");
 	return 0;
 }
