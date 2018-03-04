@@ -73,6 +73,7 @@ beatmap_set::beatmap_set(const std::string &path)
 			}
 		}
 	}
+	closedir(dir);
 }
 
 /**
@@ -107,6 +108,7 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 			}
 		}
 	}
+	closedir(dir);
 	return sets;
 }
 
