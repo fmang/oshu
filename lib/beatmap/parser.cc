@@ -570,11 +570,16 @@ static int process_difficulty(struct parser_state *parser)
  */
 static int process_event(struct parser_state *parser)
 {
+	if (parser->beatmap->background_filename) {
+		/* skip events after we got the background */
+		goto skip;
+	}
 	if (!strncmp(parser->input, "0,0,", 4)) {
 		parser->input += 4;
 		if (parse_quoted_string(parser, &parser->beatmap->background_filename) < 0)
 			return -1;
 	}
+skip:
 	consume_all(parser);
 	return 0;
 }
