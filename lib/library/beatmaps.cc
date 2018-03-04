@@ -24,6 +24,14 @@ beatmap_entry::beatmap_entry(const std::string &path)
 	oshu::log::verbose() << "beatmap_entry(" << path << ")" << std::endl;
 }
 
+static bool osu_file(const char *filename)
+{
+	size_t l = strlen(filename);
+	if (l < 4)
+		return false;
+	return !strcmp(filename + l - 4, ".osu");
+}
+
 /**
  * \todo
  * Implement.
@@ -43,6 +51,8 @@ beatmap_set::beatmap_set(const std::string &path)
 			break;
 		} else if (entry->d_name[0] == '.') {
 			// hidden file, ignore
+			continue;
+		} else if (!osu_file(entry->d_name)) {
 			continue;
 		} else {
 			std::ostringstream os;
