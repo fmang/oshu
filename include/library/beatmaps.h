@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -53,6 +54,8 @@ struct beatmap_entry {
 	std::string artist;
 	std::string version;
 };
+
+std::ostream& operator<<(std::ostream&, const beatmap_entry&);
 
 /**
  * Group beatmaps from the same set together.

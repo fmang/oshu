@@ -5,6 +5,7 @@
 
 #include "library/beatmaps.h"
 
+#include "beatmap/beatmap.h"
 #include "core/log.h"
 
 #include <dirent.h>
@@ -21,7 +22,19 @@ namespace library {
  */
 beatmap_entry::beatmap_entry(const std::string &path)
 {
-	oshu::log::verbose() << "beatmap_entry(" << path << ")" << std::endl;
+	oshu_beatmap beatmap;
+	int rc = oshu_load_beatmap_headers(path.c_str(), &beatmap);
+	if (rc < 0)
+		throw std::runtime_error("could not load beatmap " + path);
+	title = beatmap.metadata.title;
+	artist = beatmap.metadata.artist;
+	version = beatmap.metadata.version;
+	oshu_destroy_beatmap(&beatmap);
+}
+
+std::ostream& operator<<(std::ostream &os, const beatmap_entry &entry)
+{
+	return os << entry.artist << " - " << entry.title << " [" << entry.version << "]";
 }
 
 static bool osu_file(const char *filename)
@@ -32,10 +45,6 @@ static bool osu_file(const char *filename)
 	return !strcmp(filename + l - 4, ".osu");
 }
 
-/**
- * \todo
- * Implement.
- */
 beatmap_set::beatmap_set(const std::string &path)
 {
 	DIR *dir = opendir(path.c_str());
@@ -55,9 +64,13 @@ beatmap_set::beatmap_set(const std::string &path)
 		} else if (!osu_file(entry->d_name)) {
 			continue;
 		} else {
-			std::ostringstream os;
-			os << path << "/" << entry->d_name;
-			entries.emplace_back(os.str());
+			try {
+				std::ostringstream os;
+				os << path << "/" << entry->d_name;
+				entries.emplace_back(os.str());
+			} catch(std::runtime_error&) {
+				oshu::log::warning() << "ignoring invalid beatmap " << path << std::endl;
+			}
 		}
 	}
 }
@@ -73,7 +86,6 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 	DIR *dir = opendir(path.c_str());
 	if (!dir)
 		throw std::system_error(errno, std::system_category(), "could not open the beatmaps directory");
-
 	for (;;) {
 		errno = 0;
 		struct dirent* entry = readdir(dir);
@@ -95,7 +107,6 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 			}
 		}
 	}
-
 	return sets;
 }
 

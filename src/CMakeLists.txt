@@ -27,6 +27,7 @@ install(
 
 add_executable(
 	oshu-library
+	EXCLUDE_FROM_ALL
 	oshu-library.cc
 )
 

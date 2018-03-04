@@ -50,6 +50,10 @@ int main(int argc, char **argv)
 {
 	oshu::log::priority = oshu::log::level::verbose;
 	move_home();
-	oshu::library::find_beatmap_sets("beatmaps");
+	for (auto& set : oshu::library::find_beatmap_sets("beatmaps")) {
+		for (auto& entry : set.entries) {
+			oshu::log::verbose() << entry << std::endl;
+		}
+	}
 	return 0;
 }
