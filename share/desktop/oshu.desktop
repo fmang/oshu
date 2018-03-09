@@ -5,6 +5,6 @@ GenericName=Rhythm Game
 GenericName[fr]=Jeu de Rythme
 Comment=Fast osu! port
 Comment[fr]=Adaptation rapide de osu!
-Exec=oshu %F
+Exec=oshu %f
 MimeType=text/x-osu-beatmap
 Categories=Game;X-Music;X-Rhythm
