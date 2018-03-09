@@ -21,6 +21,38 @@ Doxygen is detected by CMake when you configure the project. You may need to
 re-run CMake if it didn't detect Doxygen after you installed it.
 
 
+Pull Requests
+-------------
+
+Pull requests are always welcome, but you should follow a few rules:
+
+1. Make your code look like the rest of the project.
+
+   Follow the Linux kernel coding style, but feel free to improvise something
+   if that makes the code look better.
+
+2. Document what you're doing.
+
+   Explain the context, and don't repeat the code.
+
+3. Focus your work, and don't be greedy.
+
+   If you have an ambitious goal, like making a game mode, don't come and dump
+   a thousand-line wall of code. Make small focused pull requests that add up.
+
+4. Be reactive.
+
+   Expect your pull request to be reviewed in the next few days after you open
+   the pull request. If your pull request begins to rot and becomes conflicting
+   with the master branch, things may get complicated.
+
+5. Communicate your intentions.
+
+   If you have an idea, come talk about it on IRC, or open an issue on GitHub
+   to get feedback. That's the best way to ensure your work won't cause
+   conflicts, or stray off topic.
+
+
 Technical choices
 -----------------
 
