@@ -16,11 +16,8 @@
 namespace oshu {
 namespace library {
 
-/**
- * \todo
- * Implement.
- */
 beatmap_entry::beatmap_entry(const std::string &path)
+: path(path)
 {
 	oshu_beatmap beatmap;
 	int rc = oshu_load_beatmap_headers(path.c_str(), &beatmap);
@@ -45,6 +42,10 @@ static bool osu_file(const char *filename)
 	return !strcmp(filename + l - 4, ".osu");
 }
 
+/**
+ * \todo
+ * Filter out unsupported beatmaps.
+ */
 beatmap_set::beatmap_set(const std::string &path)
 {
 	DIR *dir = opendir(path.c_str());

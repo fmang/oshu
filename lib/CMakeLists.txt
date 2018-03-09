@@ -24,6 +24,7 @@ add_library(
 	graphics/transitions.cc
 	graphics/view.cc
 	library/beatmaps.cc
+	library/html.cc
 	osu/draw.cc
 	osu/osu.cc
 	osu/paint.cc

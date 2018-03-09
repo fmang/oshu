@@ -4,8 +4,10 @@
 
 #include "core/log.h"
 #include "library/beatmaps.h"
+#include "library/html.h"
 
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <unistd.h>
 
@@ -50,10 +52,8 @@ int main(int argc, char **argv)
 {
 	oshu::log::priority = oshu::log::level::verbose;
 	move_home();
-	for (auto& set : oshu::library::find_beatmap_sets("beatmaps")) {
-		for (auto& entry : set.entries) {
-			oshu::log::verbose() << entry << std::endl;
-		}
-	}
+	auto sets = oshu::library::find_beatmap_sets("beatmaps");
+	std::ofstream index("index.html");
+	oshu::library::html::generate_beatmap_set_listing(sets, index);
 	return 0;
 }

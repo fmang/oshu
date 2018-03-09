@@ -53,6 +53,10 @@ struct beatmap_entry {
 	std::string title;
 	std::string artist;
 	std::string version;
+	/**
+	 * Path to the .osu beatmap the entry was constructed with.
+	 */
+	std::string path;
 };
 
 std::ostream& operator<<(std::ostream&, const beatmap_entry&);

@@ -11,6 +11,8 @@
  * Generate an HTML library browser.
  */
 
+#pragma once
+
 #include "library/beatmaps.h"
 
 #include <iosfwd>
