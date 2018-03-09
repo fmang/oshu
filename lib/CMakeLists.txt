@@ -35,6 +35,12 @@ add_library(
 	ui/score.cc
 )
 
+set_target_properties(
+	liboshu
+	PROPERTIES
+	OUTPUT_NAME oshu
+)
+
 target_compile_options(
 	liboshu PUBLIC
 	${SDL_CFLAGS}
