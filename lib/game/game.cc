@@ -45,10 +45,6 @@ static int open_audio(struct oshu_game *game)
 	return 0;
 }
 
-/**
- * \todo
- * Avoid asprintf, it's not standard.
- */
 static int open_display(struct oshu_game *game)
 {
 	if (oshu_open_display(&game->display) < 0) {
@@ -56,11 +52,9 @@ static int open_display(struct oshu_game *game)
 		return -1;
 	}
 	struct oshu_metadata *meta = &game->beatmap.metadata;
-	char *title;
-	if (asprintf(&title, "%s - %s ♯ %s 𝄞 oshu!", meta->artist, meta->title, meta->version) >= 0) {
-		SDL_SetWindowTitle(game->display.window, title);
-		free(title);
-	}
+	std::ostringstream title;
+	title << meta->artist << " - " << meta->title << " ♯ " << meta->version << " 𝄞 oshu!";
+	SDL_SetWindowTitle(game->display.window, title.str().c_str());
 	oshu_reset_view(&game->display);
 	return 0;
 }

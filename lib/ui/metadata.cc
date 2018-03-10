@@ -40,46 +40,38 @@ static PangoLayout* setup_layout(struct oshu_painter *p)
 /**
  * \todo
  * Handle errors.
- *
- * \todo
- * Avoid asprintf, it's not standard.
  */
 static int paint_stars(struct oshu_metadata_frame *frame)
 {
 	oshu_size size {360, 60};
 	struct oshu_painter p;
 	oshu_start_painting(frame->display, size, &p);
-	PangoLayout *layout = setup_layout(&p);
 
 	const char *sky = " ★ ★ ★ ★ ★ ★ ★ ★ ★ ★";
 	int stars = frame->beatmap->difficulty.overall_difficulty;
 	assert (stars >= 0);
 	assert (stars <= 10);
 	int star_length = strlen(sky) / 10;
-	char *difficulty = strndup(sky, star_length * stars);
+	std::string difficulty (sky, star_length * stars);
 
 	struct oshu_metadata *meta = &frame->beatmap->metadata;
 	const char *version = meta->version;
 	assert (version != NULL);
-	char *text;
-	int rc = asprintf(&text, "%s\n%s", version, difficulty);
-	assert (rc >= 0);
-	assert (text != NULL);
+	std::ostringstream os;
+	os << version << "\n" << difficulty;
 
-	int width, height;
-	pango_layout_set_text(layout, text, -1);
+	PangoLayout *layout = setup_layout(&p);
+	pango_layout_set_text(layout, os.str().c_str(), -1);
 	pango_layout_set_alignment(layout, PANGO_ALIGN_RIGHT);
+	int width, height;
 	pango_layout_get_size(layout, &width, &height);
 	cairo_set_source_rgba(p.cr, 1, 1, 1, .5);
 	cairo_move_to(p.cr, padding, (std::imag(size) - height / PANGO_SCALE) / 2.);
 	pango_cairo_show_layout(p.cr, layout);
-
 	g_object_unref(layout);
-	free(text);
-	free(difficulty);
 
 	struct oshu_texture *texture = &frame->stars;
-	rc = oshu_finish_painting(&p, texture);
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = std::real(size);
 	return rc;
 }
@@ -87,37 +79,30 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 /**
  * \todo
  * Handle errors.
- *
- * \todo
- * Avoid asprintf, it's not standard.
  */
 static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 {
 	oshu_size size {640, 60};
 	struct oshu_painter p;
 	oshu_start_painting(frame->display, size, &p);
-	PangoLayout *layout = setup_layout(&p);
 
 	struct oshu_metadata *meta = &frame->beatmap->metadata;
 	const char *title = unicode ? meta->title_unicode : meta->title;
 	const char *artist = unicode ? meta->artist_unicode : meta->artist;
-	char *text;
-	int rc = asprintf(&text, "%s\n%s", title, artist);
-	assert (rc >= 0);
-	assert (text != NULL);
+	std::ostringstream os;
+	os << title << "\n" << artist;
 
+	PangoLayout *layout = setup_layout(&p);
+	pango_layout_set_text(layout, os.str().c_str(), -1);
 	int width, height;
-	pango_layout_set_text(layout, text, -1);
 	pango_layout_get_size(layout, &width, &height);
 	cairo_set_source_rgba(p.cr, 1, 1, 1, 1);
 	cairo_move_to(p.cr, padding, (std::imag(size) - height / PANGO_SCALE) / 2.);
 	pango_cairo_show_layout(p.cr, layout);
-
 	g_object_unref(layout);
-	free(text);
 
 	struct oshu_texture *texture = unicode ? &frame->unicode : &frame->ascii;
-	rc = oshu_finish_painting(&p, texture);
+	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = 0;
 	return rc;
 }
