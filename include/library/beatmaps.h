@@ -53,6 +53,14 @@ namespace library {
 struct beatmap_entry {
 	explicit beatmap_entry(const std::string &path);
 	oshu_mode mode;
+	/**
+	 * Difficulty indicator.
+	 *
+	 * Naively, use the overall difficulty because there's nothing to
+	 * compute. More advanced difficulty calculators exist but this would
+	 * multiply the time required to build an index.
+	 */
+	int difficulty;
 	std::string title;
 	std::string artist;
 	std::string version;
@@ -61,8 +69,6 @@ struct beatmap_entry {
 	 */
 	std::string path;
 };
-
-std::ostream& operator<<(std::ostream&, const beatmap_entry&);
 
 /**
  * Group beatmaps from the same set together.
@@ -77,8 +83,7 @@ std::ostream& operator<<(std::ostream&, const beatmap_entry&);
 struct beatmap_set {
 	explicit beatmap_set(const std::string &path);
 	/**
-	 * \todo
-	 * Sort entries by difficulty.
+	 * List of beatmap entries inside this set, sorted by difficulty.
 	 */
 	std::vector<beatmap_entry> entries;
 	bool empty() const;

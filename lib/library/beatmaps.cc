@@ -8,6 +8,7 @@
 #include "beatmap/beatmap.h"
 #include "core/log.h"
 
+#include <algorithm>
 #include <dirent.h>
 #include <iostream>
 #include <sstream>
@@ -24,19 +25,11 @@ beatmap_entry::beatmap_entry(const std::string &path)
 	if (rc < 0)
 		throw std::runtime_error("could not load beatmap " + path);
 	mode = beatmap.mode;
+	difficulty = beatmap.difficulty.overall_difficulty;
 	title = beatmap.metadata.title;
 	artist = beatmap.metadata.artist;
 	version = beatmap.metadata.version;
 	oshu_destroy_beatmap(&beatmap);
-}
-
-/**
- * \todo
- * Drop if it's not used.
- */
-std::ostream& operator<<(std::ostream &os, const beatmap_entry &entry)
-{
-	return os << entry.artist << " - " << entry.title << " [" << entry.version << "]";
 }
 
 static bool osu_file(const char *filename)
@@ -83,12 +76,18 @@ static void find_entries(const std::string &path, beatmap_set &set)
 	closedir(dir);
 }
 
+static bool compare_entries(const beatmap_entry &a, const beatmap_entry &b)
+{
+	return a.difficulty < b.difficulty;
+}
+
 beatmap_set::beatmap_set(const std::string &path)
 {
 	find_entries(path, *this);
 	if (!empty()) {
 		title = entries[0].title;
 		artist = entries[0].artist;
+		std::sort(entries.begin(), entries.end(), compare_entries);
 	}
 }
 

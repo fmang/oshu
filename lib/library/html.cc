@@ -14,6 +14,7 @@ namespace html {
 static const char *head = R"html(
 <!doctype html>
 <meta charset="utf-8" />
+<title>oshu! beatmaps listing</title>
 )html";
 
 /**
