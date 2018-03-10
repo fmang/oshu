@@ -29,6 +29,10 @@ beatmap_entry::beatmap_entry(const std::string &path)
 	oshu_destroy_beatmap(&beatmap);
 }
 
+/**
+ * \todo
+ * Drop if it's not used.
+ */
 std::ostream& operator<<(std::ostream &os, const beatmap_entry &entry)
 {
 	return os << entry.artist << " - " << entry.title << " [" << entry.version << "]";
@@ -42,11 +46,7 @@ static bool osu_file(const char *filename)
 	return !strcmp(filename + l - 4, ".osu");
 }
 
-/**
- * \todo
- * Filter out unsupported beatmaps.
- */
-beatmap_set::beatmap_set(const std::string &path)
+static void find_entries(const std::string &path, beatmap_set &set)
 {
 	DIR *dir = opendir(path.c_str());
 	if (!dir)
@@ -68,14 +68,33 @@ beatmap_set::beatmap_set(const std::string &path)
 			try {
 				std::ostringstream os;
 				os << path << "/" << entry->d_name;
-				entries.emplace_back(os.str());
-			} catch(std::runtime_error&) {
+				set.entries.emplace_back(os.str());
+			} catch(std::runtime_error &e) {
+				oshu::log::warning() << e.what() << std::endl;
 				oshu::log::warning() << "ignoring invalid beatmap " << path << std::endl;
 			}
 		}
 	}
 	closedir(dir);
 }
+
+/**
+ * \todo
+ * Filter out unsupported beatmaps.
+ */
+beatmap_set::beatmap_set(const std::string &path)
+{
+	find_entries(path, *this);
+	if (!empty()) {
+		title = entries[0].title;
+		artist = entries[0].artist;
+	}
+}
+
+bool beatmap_set::empty() const
+{
+	return entries.empty();
+};
 
 /**
  * \todo

@@ -22,15 +22,20 @@ static const char *head = R"html(
  */
 static void generate_entry(const beatmap_entry &entry, std::ostream &os)
 {
-	os << "<li><a href=\"" << entry.path << "\">" << entry << "</a></li>";
+	os << "<li><a href=\"" << entry.path << "\">" << entry.version << "</a></li>";
 }
 
+/**
+ * \todo
+ * Escape.
+ */
 static void generate_set(const beatmap_set &set, std::ostream &os)
 {
 	os << "<article>";
+	os << "<h4>" << set.artist << " - " << set.title << "</h4><ul>";
 	for (const beatmap_entry &entry : set.entries)
 		generate_entry(entry, os);
-	os << "</article>";
+	os << "</ul></article>";
 }
 
 void generate_beatmap_set_listing(const std::vector<beatmap_set> &sets, std::ostream &os)

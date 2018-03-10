@@ -46,7 +46,7 @@ namespace library {
  * To save resources, it uses #oshu_load_beatmap_headers.
  *
  * \todo
- * Reuse the beatmap structure.
+ * Reuse the beatmap structure?
  */
 struct beatmap_entry {
 	explicit beatmap_entry(const std::string &path);
@@ -73,7 +73,14 @@ std::ostream& operator<<(std::ostream&, const beatmap_entry&);
  */
 struct beatmap_set {
 	explicit beatmap_set(const std::string &path);
+	/**
+	 * \todo
+	 * Sort entries by difficulty.
+	 */
 	std::vector<beatmap_entry> entries;
+	bool empty() const;
+	std::string title;
+	std::string artist;
 };
 
 /**
