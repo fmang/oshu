@@ -7,6 +7,7 @@ project(
 )
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FindPkgConfig)
 pkg_check_modules(SDL REQUIRED sdl2 SDL2_image)
