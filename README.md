@@ -68,13 +68,18 @@ First of all, make sure you have the required dependencies. These things are so
 common that I may assure you they're in your distribution's official
 repositories.
 
-- CMake 3.10 or newer,
+- CMake 3.10,
 - a C++14 compiler,
 - pkg-config,
-- SDL2 and SDL2_image,
-- ffmpeg or libav,
-- cairo,
-- pango.
+- SDL2 2.0.7,
+- SDL2_image 2.0.2,
+- ffmpeg 3.4.1,
+- cairo 1.15.10,
+- pango 1.40.14.
+
+Note that the versions specified above are indicative. It is very likely your
+build will work with older or newer versions. If you need support for a
+specific version, feel free to ask.
 
 To build oshu!, follow the standard CMake procedure:
 
