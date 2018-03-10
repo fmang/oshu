@@ -23,6 +23,7 @@ beatmap_entry::beatmap_entry(const std::string &path)
 	int rc = oshu_load_beatmap_headers(path.c_str(), &beatmap);
 	if (rc < 0)
 		throw std::runtime_error("could not load beatmap " + path);
+	mode = beatmap.mode;
 	title = beatmap.metadata.title;
 	artist = beatmap.metadata.artist;
 	version = beatmap.metadata.version;
@@ -68,7 +69,11 @@ static void find_entries(const std::string &path, beatmap_set &set)
 			try {
 				std::ostringstream os;
 				os << path << "/" << entry->d_name;
-				set.entries.emplace_back(os.str());
+				beatmap_entry entry (os.str());
+				if (entry.mode != OSHU_OSU_MODE)
+					oshu::log::debug() << "skipping " << path << ": unsupported mode" << std::endl;
+				else
+					set.entries.push_back(std::move(entry));
 			} catch(std::runtime_error &e) {
 				oshu::log::warning() << e.what() << std::endl;
 				oshu::log::warning() << "ignoring invalid beatmap " << path << std::endl;
@@ -78,10 +83,6 @@ static void find_entries(const std::string &path, beatmap_set &set)
 	closedir(dir);
 }
 
-/**
- * \todo
- * Filter out unsupported beatmaps.
- */
 beatmap_set::beatmap_set(const std::string &path)
 {
 	find_entries(path, *this);

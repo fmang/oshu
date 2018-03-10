@@ -28,6 +28,9 @@ static void generate_entry(const beatmap_entry &entry, std::ostream &os)
 /**
  * \todo
  * Escape.
+ *
+ * \todo
+ * Generate links to the osu! website. Like https://osu.ppy.sh/beatmapsets/729191
  */
 static void generate_set(const beatmap_set &set, std::ostream &os)
 {

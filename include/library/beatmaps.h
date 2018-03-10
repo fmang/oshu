@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "beatmap/beatmap.h"
+
 #include <iosfwd>
 #include <string>
 #include <vector>
@@ -50,6 +52,7 @@ namespace library {
  */
 struct beatmap_entry {
 	explicit beatmap_entry(const std::string &path);
+	oshu_mode mode;
 	std::string title;
 	std::string artist;
 	std::string version;
