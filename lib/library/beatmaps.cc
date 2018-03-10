@@ -96,10 +96,6 @@ bool beatmap_set::empty() const
 	return entries.empty();
 };
 
-/**
- * \todo
- * Factor it with #beatmap_set::beatmap_set.
- */
 std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 {
 	std::vector<beatmap_set> sets;
@@ -122,7 +118,9 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 			try {
 				std::ostringstream os;
 				os << path << "/" << entry->d_name;
-				sets.emplace_back(os.str());
+				beatmap_set set (os.str());
+				if (!set.empty())
+					sets.push_back(std::move(set));
 			} catch (std::system_error& e) {
 				oshu::log::debug() << e.what() << std::endl;
 			}
