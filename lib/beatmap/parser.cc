@@ -414,7 +414,10 @@ static int process_general(struct parser_state *parser)
 	switch (key) {
 	case AudioFilename:
 		if ((rc = parse_string(parser, &beatmap->audio_filename)) == 0) {
-			if (strchr(beatmap->audio_filename, '/') != NULL) {
+			if (!beatmap->audio_filename) {
+				parser_error(parser, "empty audio file name");
+				rc = -1;
+			} else if (strchr(beatmap->audio_filename, '/') != NULL) {
 				parser_error(parser, "slashes are forbidden in audio file names");
 				rc = -1;
 			}
