@@ -6,10 +6,40 @@
 #include "library/html.h"
 
 #include <iostream>
+#include <unordered_map>
 
 namespace oshu {
 namespace library {
 namespace html {
+
+escape::escape(const char *str)
+: data(str)
+{
+}
+
+escape::escape(const std::string &str)
+: data(str.c_str())
+{
+}
+
+static std::unordered_map<char, std::string> escape_sequences = {
+	{'<', "&lt;"},
+	{'>', "&gt;"},
+	{'&', "&amp;"},
+	{'"', "&quot;"}, // for attributes
+};
+
+std::ostream& operator<<(std::ostream &os, const escape &e)
+{
+	for (const char *c = e.data; *c; ++c) {
+		auto i = escape_sequences.find(*c);
+		if (i != escape_sequences.end())
+			os << i->second;
+		else
+			os << *c;
+	}
+	return os;
+}
 
 static const char *head = R"html(
 <!doctype html>
@@ -17,26 +47,19 @@ static const char *head = R"html(
 <title>oshu! beatmaps listing</title>
 )html";
 
-/**
- * \todo
- * Escape the metadata and the path.
- */
 static void generate_entry(const beatmap_entry &entry, std::ostream &os)
 {
-	os << "<li><a href=\"" << entry.path << "\">" << entry.version << "</a></li>";
+	os << "<li><a href=\"" << escape{entry.path} << "\">" << escape{entry.version} << "</a></li>";
 }
 
 /**
- * \todo
- * Escape.
- *
  * \todo
  * Generate links to the osu! website. Like https://osu.ppy.sh/beatmapsets/729191
  */
 static void generate_set(const beatmap_set &set, std::ostream &os)
 {
 	os << "<article>";
-	os << "<h4>" << set.artist << " - " << set.title << "</h4><ul>";
+	os << "<h4>" << escape{set.artist} << " - " << escape{set.title} << "</h4><ul>";
 	for (const beatmap_entry &entry : set.entries)
 		generate_entry(entry, os);
 	os << "</ul></article>";
