@@ -3,6 +3,8 @@
  * \ingroup library_html
  */
 
+#include "config.h"
+
 #include "library/html.h"
 
 #include <iostream>
@@ -45,6 +47,7 @@ static const char *head = R"html(
 <!doctype html>
 <meta charset="utf-8" />
 <title>oshu! beatmaps listing</title>
+<h1>oshu! beatmaps listing</h1>
 )html";
 
 static void generate_entry(const beatmap_entry &entry, std::ostream &os)
@@ -68,6 +71,7 @@ static void generate_set(const beatmap_set &set, std::ostream &os)
 void generate_beatmap_set_listing(const std::vector<beatmap_set> &sets, std::ostream &os)
 {
 	os << head;
+	os << "<link rel=\"stylesheet\" href=\"" << escape{OSHU_WEB_DIRECTORY} << "/style.css\" />";
 	for (const beatmap_set &set : sets)
 		generate_set(set, os);
 }

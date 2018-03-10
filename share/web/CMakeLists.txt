@@ -1,0 +1,4 @@
+install(
+	FILES style.css
+	DESTINATION "${OSHU_WEB_INSTALL_DIRECTORY}"
+)

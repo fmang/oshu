@@ -19,9 +19,11 @@ include(GNUInstallDirs)
 # the final absolute path. We'll suffix the former with INSTALL_DIRECTORY.
 set(OSHU_DATA_INSTALL_DIRECTORY "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
 set(OSHU_SKINS_INSTALL_DIRECTORY "${OSHU_DATA_INSTALL_DIRECTORY}/skins")
+set(OSHU_WEB_INSTALL_DIRECTORY "${OSHU_DATA_INSTALL_DIRECTORY}/web")
 # Absolute paths for config.h:
 set(OSHU_DATA_DIRECTORY "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}")
 set(OSHU_SKINS_DIRECTORY "${OSHU_DATA_DIRECTORY}/skins")
+set(OSHU_WEB_DIRECTORY "${OSHU_DATA_DIRECTORY}/web")
 
 configure_file(config.h.in config.h)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
