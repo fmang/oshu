@@ -58,6 +58,10 @@ static void generate_entry(const beatmap_entry &entry, std::ostream &os)
 /**
  * \todo
  * Generate links to the osu! website. Like https://osu.ppy.sh/beatmapsets/729191
+ *
+ * \todo
+ * Add a picture. If the background images are too heavy, maybe we'll need to
+ * resize them, and possibly also crop them for uniformity.
  */
 static void generate_set(const beatmap_set &set, std::ostream &os)
 {

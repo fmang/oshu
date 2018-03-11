@@ -56,6 +56,10 @@ struct SDL_Window;
  * 	Pango -> Cairo;
  * }
  * \enddot
+ *
+ * \todo
+ * Merge this module with ui into a new *gui* module?
+ *
  */
 
 /**

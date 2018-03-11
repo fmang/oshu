@@ -26,6 +26,12 @@
  * - You can render the widget with its void `show` function. They usually only
  *   take the widget object, but may receive additional parameters.
  *
+ * \todo
+ * Merge this module with graphics and call it *gui*?
+ *
+ * \todo
+ * Drop this meta-header. Turn it into a .dox file for documentation.
+ *
  */
 
 #include "ui/audio.h"

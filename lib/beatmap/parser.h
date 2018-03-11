@@ -46,7 +46,7 @@
  * a callback interface with virtual methods.
  *
  * ```c
- * struct parser {
+ * struct builder {
  * 	virtual void title(const std::string&) {}
  * 	virtual void timing_point(const timing_point_record&) {}
  * 	virtual void color(struct color&) {}

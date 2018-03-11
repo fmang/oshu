@@ -15,6 +15,10 @@
  * \brief
  * osu!standard game mode.
  *
+ * \todo
+ * In the future, this should be split into two modules: the game mechanics in
+ * the game module, and the renderer in the gui module.
+ *
  * \{
  */
 

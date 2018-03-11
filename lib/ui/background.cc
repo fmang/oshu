@@ -1,6 +1,12 @@
 /**
  * \file ui/background.cc
  * \ingroup ui_background
+ *
+ * \todo
+ * The image loader uses SDL2_image, and then toys with cairo to resize it.
+ * Instead, we could use ImageMagick to do both a once. In the near future,
+ * we'll require ImageMagick anyway to generate thumbnails. Let's use that
+ * opportunity to delete the SDL2_image dependency too.
  */
 
 #include "ui/background.h"

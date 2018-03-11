@@ -4,6 +4,9 @@
  *
  * \brief
  * Definition of the highest-level audio module.
+ *
+ * \todo
+ * Rename this file to engine.h after renaming #oshu_audio.
  */
 
 #pragma once
@@ -149,6 +152,9 @@
  * procedures in order to be accessed peacefully from another thread. You don't
  * need to bother with locking when using the accessors defined in this module
  * though. Only lock when accessing multiple fields directly.
+ *
+ * \todo
+ * Rename this to oshu::audio::engine.
  */
 struct oshu_audio {
 	/**

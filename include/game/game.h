@@ -45,6 +45,10 @@ struct oshu_game_ui {
  * context.
  */
 struct oshu_game_state {
+	/**
+	 * \todo
+	 * Take the beatmap by reference when the game state is constructed.
+	 */
 	struct oshu_beatmap beatmap;
 	struct oshu_audio audio;
 	struct oshu_sound_library library;
@@ -53,6 +57,11 @@ struct oshu_game_state {
 	struct oshu_game_ui ui;
 	int stop;
 	int autoplay;
+	/**
+	 * \todo
+	 * The screens are a visual aspect of the game, not part of the
+	 * mechanics, and should be moved into the gui module.
+	 */
 	struct oshu_game_screen *screen;
 	/**
 	 * Pointer to the next clickable hit.
@@ -83,6 +92,11 @@ struct oshu_game_state {
  * implement.
  *
  * Game modes inherit from this class and implement all these methods.
+ *
+ * \todo
+ * This should be turned into a oshu::game::mode interface, and not inherit a
+ * state. If anything, the state should inherit the mode and called *base_game*
+ * or something like that.
  */
 struct oshu_game : public oshu_game_state {
 
@@ -123,6 +137,10 @@ struct oshu_game : public oshu_game_state {
 
 	/**
 	 * Draw the game on the display.
+	 *
+	 * \todo
+	 * Since this is not related to the game mechanics, the whole drawing
+	 * engine should be split off the game module.
 	 */
 	virtual int draw() = 0;
 
@@ -167,6 +185,11 @@ struct oshu_game : public oshu_game_state {
  *
  * On failure, the game object is destroyed and left in an unspecified state.
  * On success, it's up to you to destroy it with #oshu_destroy_game.
+ *
+ * \todo
+ * It should not be the responsibility of this module to load the beatmap. If
+ * the beatmap is a taiko beatmap, then the taiko game should be instanciated,
+ * not the base module. Instead, take a beatmap by reference.
  */
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game);
 
