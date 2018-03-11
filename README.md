@@ -68,13 +68,13 @@ First of all, make sure you have the required dependencies. These things are so
 common that I may assure you they're in your distribution's official
 repositories.
 
-- CMake 3.10,
+- CMake 3.9,
 - a C++14 compiler,
 - pkg-config,
-- SDL2 2.0.7,
-- SDL2_image 2.0.2,
-- ffmpeg 3.4.1,
-- cairo 1.15.10,
+- SDL2 ≥ 2.0.5,
+- SDL2_image 2.0.1,
+- ffmpeg 3.3.6,
+- cairo 1.14.8,
 - pango 1.40.14.
 
 Note that the versions specified above are indicative. It is very likely your
