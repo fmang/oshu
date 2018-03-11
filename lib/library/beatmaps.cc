@@ -102,7 +102,7 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 
 	DIR *dir = opendir(path.c_str());
 	if (!dir)
-		throw std::system_error(errno, std::system_category(), "could not open the beatmaps directory");
+		throw std::system_error(errno, std::system_category(), "could not open the beatmaps directory " + path);
 	for (;;) {
 		errno = 0;
 		struct dirent* entry = readdir(dir);
