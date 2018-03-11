@@ -109,6 +109,9 @@ enum class level : int {
 	critical = SDL_LOG_PRIORITY_CRITICAL,
 };
 
+level& operator++(level&);
+level& operator--(level&);
+
 /**
  * Current log level.
  *

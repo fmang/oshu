@@ -105,7 +105,6 @@ int main(int argc, char **argv)
 {
 	int autoplay = 0;
 	int pause = 0;
-	int verbosity = SDL_LOG_PRIORITY_WARN;
 
 	for (;;) {
 		int c = getopt_long(argc, argv, flags, options, NULL);
@@ -113,8 +112,7 @@ int main(int argc, char **argv)
 			break;
 		switch (c) {
 		case OPT_VERBOSE:
-			if (verbosity > SDL_LOG_PRIORITY_VERBOSE)
-				verbosity--;
+			--oshu::log::priority;
 			break;
 		case OPT_HELP:
 			puts(usage);
@@ -140,10 +138,9 @@ int main(int argc, char **argv)
 		return 2;
 	}
 
-	oshu::log::priority = static_cast<oshu::log::level>(verbosity);
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, (SDL_LogPriority) verbosity);
-	av_log_set_level(verbosity <= SDL_LOG_PRIORITY_DEBUG ? AV_LOG_INFO : AV_LOG_ERROR);
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, static_cast<SDL_LogPriority>(oshu::log::priority));
+	av_log_set_level(oshu::log::priority <= oshu::log::level::debug ? AV_LOG_INFO : AV_LOG_ERROR);
 
 	char *beatmap_path = realpath(argv[optind], NULL);
 	if (beatmap_path == NULL) {

@@ -13,6 +13,24 @@ namespace log {
 
 level priority = level::warning;
 
+level& operator++(level &l)
+{
+	if (l == level::critical)
+		return l;
+	int raw = static_cast<int>(l);
+	l = static_cast<level>(raw + 1);
+	return l;
+}
+
+level& operator--(level &l)
+{
+	if (l == level::verbose)
+		return l;
+	int raw = static_cast<int>(l);
+	l = static_cast<level>(raw - 1);
+	return l;
+}
+
 /**
  * Dummy output stream.
  */

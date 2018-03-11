@@ -61,6 +61,7 @@ static int build_index(int argc, char **argv)
 	auto sets = oshu::library::find_beatmap_sets("../beatmaps");
 	std::ofstream index("index.html");
 	oshu::library::html::generate_beatmap_set_listing(sets, index);
+	std::cout << home << "/web/index.html" << std::endl;
 	return 0;
 }
 
@@ -83,7 +84,6 @@ void print_usage(std::ostream &os)
 
 int main(int argc, char **argv)
 {
-	oshu::log::priority = oshu::log::level::verbose;
 	if (argc < 2) {
 		print_usage(std::cerr);
 		return 1;
