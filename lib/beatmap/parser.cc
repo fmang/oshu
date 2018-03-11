@@ -456,6 +456,13 @@ static int process_general(struct parser_state *parser)
 		/* Known values so far: `Default`. */
 	case StoryFireInFront:
 		/* What is this? */
+	case EditorBookmarks:
+		/* Looks like it contains a list of comma-separated time offsets:
+		 * `24271,51160,72273,106051,130051,163829` */
+	case EditorDistanceSpacing:
+		/* Known values so far: `1.5`. */
+	case SpecialStyle:
+		/* Known values so far: `0`. */
 	case WidescreenStoryboard:
 		/* Storyboard are far from being supported. */
 		rc = consume_all(parser);
