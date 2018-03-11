@@ -52,9 +52,8 @@ static std::string get_oshu_home()
 	throw std::runtime_error("could not locate the oshu! home");
 }
 
-int main(int argc, char **argv)
+static int build_index(int argc, char **argv)
 {
-	oshu::log::priority = oshu::log::level::verbose;
 	std::string home = get_oshu_home();
 	ensure_directory(home);
 	ensure_directory(home + "/web");
@@ -63,4 +62,38 @@ int main(int argc, char **argv)
 	std::ofstream index("index.html");
 	oshu::library::html::generate_beatmap_set_listing(sets, index);
 	return 0;
+}
+
+struct command {
+	const char *name;
+	int (*run)(int argc, char **argv);
+};
+
+static command commands[] = {
+	{"build-index", build_index},
+	{},
+};
+
+void print_usage(std::ostream &os)
+{
+	os << "Usage:" << std::endl;
+	for (command *cmd = commands; cmd->name; ++cmd)
+		os << "    oshu-library " << cmd->name << std::endl;
+}
+
+int main(int argc, char **argv)
+{
+	oshu::log::priority = oshu::log::level::verbose;
+	if (argc < 2) {
+		print_usage(std::cerr);
+		return 1;
+	}
+	const char *cmdarg = argv[1];
+	for (command *cmd = commands; cmd->name; ++cmd) {
+		if (!strcmp(cmd->name, cmdarg))
+			return cmd->run(argc - 1, argv + 1);
+	}
+	std::cerr << "unknown command: " << argv[1] << std::endl;
+	print_usage(std::cerr);
+	return 1;
 }
