@@ -1,5 +1,5 @@
 /**
- * \file src/oshu-library/main.cc
+ * \file src/oshu-library.cc
  */
 
 #include "core/log.h"

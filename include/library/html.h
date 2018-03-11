@@ -4,7 +4,7 @@
  */
 
 /**
- * \degroup library_html HTML
+ * \defgroup library_html HTML
  * \ingroup library
  *
  * \brief

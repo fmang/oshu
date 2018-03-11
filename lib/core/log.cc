@@ -1,5 +1,5 @@
 /**
- * \file src/core/log.cc
+ * \file lib/core/log.cc
  * \ingroup core_log
  */
 
