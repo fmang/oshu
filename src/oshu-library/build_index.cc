@@ -1,5 +1,7 @@
 /**
  * \file src/oshu-library/build_index.cc
+ *
+ * Command for generating the HTML beatmap index.
  */
 
 #include <cstdlib>

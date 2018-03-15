@@ -1,5 +1,9 @@
 /**
  * \file src/oshu-library/main.cc
+ *
+ * The main entry point of oshu-library.
+ *
+ * It handles all the sub-commands generically through the \ref command.h glue.
  */
 
 #include "config.h"
