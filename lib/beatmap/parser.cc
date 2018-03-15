@@ -463,6 +463,8 @@ static int process_general(struct parser_state *parser)
 		/* Known values so far: `1.5`. */
 	case SpecialStyle:
 		/* Known values so far: `0`. */
+	case SamplesMatchPlaybackRate:
+		/* Known values so far: `0` (probably a pseudo-boolean). */
 	case WidescreenStoryboard:
 		/* Storyboard are far from being supported. */
 		rc = consume_all(parser);
