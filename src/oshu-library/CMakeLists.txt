@@ -2,6 +2,7 @@ add_executable(
 	oshu-library
 	EXCLUDE_FROM_ALL
 	main.cc
+	build_index.cc
 )
 
 target_compile_options(
