@@ -365,7 +365,7 @@ static int process_header(struct parser_state *parser)
 	if (parser->beatmap->version < 0)
 		throw invalid_header();
 	parser->section = BEATMAP_ROOT;
-	oshu_log_debug("beatmap version: %d", parser->beatmap->version);
+	oshu_log_verbose("beatmap version: %d", parser->beatmap->version);
 	return 0;
 }
 
@@ -1324,12 +1324,6 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 	return rc;
 }
 
-static void dump_beatmap_info(struct oshu_beatmap *beatmap)
-{
-	oshu_log_debug("audio filename: %s", beatmap->audio_filename);
-	oshu_log_debug("slider multiplier: %.1f", beatmap->difficulty.slider_multiplier);
-}
-
 /**
  * Initialize the beatmap to its defaults, and add the first unreachable hit
  * object.
@@ -1393,7 +1387,6 @@ static int load_beatmap(const char *path, struct oshu_beatmap *beatmap, bool hea
 	fclose(input);
 	if (rc < 0)
 		goto fail;
-	dump_beatmap_info(beatmap);
 	if (validate(beatmap) < 0)
 		goto fail;
 	return 0;

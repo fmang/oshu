@@ -160,12 +160,12 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
  */
 static void dump_stream_info(struct oshu_stream *stream)
 {
-	oshu_log_debug("============ Audio information ============");
-	oshu_log_debug("            Codec: %s.", stream->codec->long_name);
-	oshu_log_debug("      Sample rate: %d Hz.", stream->decoder->sample_rate);
-	oshu_log_debug(" Average bit rate: %ld kbps.", stream->decoder->bit_rate / 1000);
-	oshu_log_debug("    Sample format: %s.", av_get_sample_fmt_name(stream->decoder->sample_fmt));
-	oshu_log_debug("         Duration: %0.3f", stream->duration);
+	oshu_log_info("============ Audio information ============");
+	oshu_log_info("            Codec: %s.", stream->codec->long_name);
+	oshu_log_info("      Sample rate: %d Hz.", stream->decoder->sample_rate);
+	oshu_log_info(" Average bit rate: %ld kbps.", stream->decoder->bit_rate / 1000);
+	oshu_log_info("    Sample format: %s.", av_get_sample_fmt_name(stream->decoder->sample_fmt));
+	oshu_log_info("         Duration: %0.3f", stream->duration);
 }
 
 /**
