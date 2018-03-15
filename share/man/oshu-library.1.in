@@ -1,15 +1,44 @@
-.TH OSHU-LIBRARY "1" "February 2018" "oshu! @VERSION@" "User Manual"
+.TH OSHU-LIBRARY "1" "February 2018" "oshu! @PROJECT_VERSION@" "User Manual"
 
 .SH NAME
 oshu-library \- Manage a beatmap collection for oshu!
 
 .SH SYNOPSIS
-.B oshu-library index
+.B oshu-library build-index
+[-v]
+.br
+.B oshu-library help
 
 .SH DESCRIPTION
 .PP
 \fBoshu-library\fR is a tool for importing, deleting, and indexing a collection
 of osu! beatmaps. It is currently at an early stage and only support indexing.
+.PP
+The library has a notion of home directory, which is the parent directory of
+all oshu!'s resources. Its usual path is \fI~/.oshu\fR, but you can override
+ride it with the \fBOSHU_HOME\fR environment variable. Its structure is shown
+below:
+.PP
+.EX
+~/.oshu/
+    beatmaps/
+        12345 Someone - Something/
+            Someone - Something (Someone else) [Difficulty].osu
+    web/
+        index.html
+.EE
+
+.SH INDEX
+.PP
+To make browsing beatmaps and spawning oshu! easier, you can generate an HTML
+index of our beatmap collection. Simply run \fBoshu-library build-index\fR and
+it will scan the beatmaps directory in your oshu! home. The output is the path
+of the generated HTML index file. Open it with your favorite web browser.
+.PP
+The following options are supported:
+.TP
+\fB\-v, \-\-verbose\fR
+Increase the verbosity.
 
 .SH AUTHOR
 Written by Frédéric Mangano-Tarumi <fmang+oshu at mg0 fr>.
