@@ -2,15 +2,12 @@
  * \file src/oshu-library/main.cc
  */
 
+#include "config.h"
+
 #include <cstring>
 #include <iostream>
 
 #include "./command.h"
-
-command commands[] = {
-	build_index,
-	{},
-};
 
 static void print_usage(std::ostream &os)
 {
@@ -18,6 +15,27 @@ static void print_usage(std::ostream &os)
 	for (command *cmd = commands; cmd->name; ++cmd)
 		os << "    oshu-library " << cmd->name << std::endl;
 }
+
+static int print_help(int argc, char **argv)
+{
+	std::cout << "oshu-library " << PROJECT_VERSION << std::endl;
+	std::cout << "Manage your beatmaps." << std::endl << std::endl;
+	print_usage(std::cout);
+	std::cout << std::endl;
+	std::cout << "Please refer to the oshu-library(1) man page for details." << std::endl;
+	return 0;
+}
+
+command help {
+	.name = "help",
+	.run = print_help,
+};
+
+command commands[] = {
+	build_index,
+	help,
+	{},
+};
 
 int main(int argc, char **argv)
 {

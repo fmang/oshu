@@ -10,5 +10,6 @@ struct command {
 };
 
 extern command build_index;
+extern command help;
 
 extern command commands[];
