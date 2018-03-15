@@ -56,6 +56,13 @@ keyboard keys instead of clicking.
 For more detailed explainations, see:
 https://www.youtube.com/results?search_query=osu+tutorial
 
+You can use the experimental beatmap collection browser by extracting your
+beatmaps to the `~/.oshu/beatmaps/` directory, the running
+`oshu-library build-index`. Point your browser to the path it tells you and
+start playing. Note that for your browser to open the beatmaps with oshu!, you
+need to make sure the desktop integration is properly set up. See the section
+below.
+
 
 Install
 -------
