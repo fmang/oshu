@@ -1,6 +1,20 @@
 Changelog
 =========
 
+2.0.0 - 2018-03-21
+------------------
+
+Desktop integration, marking the start of a new direction.
+
+Now that the main gameplay for the standard mode is there, it's time to make it
+easier to use for everyone. 2.0 features an experimental beatmap indexer
+generating an HTML listing of all your beatmaps. Coupled with the desktop
+integrations, you can open oshu! from your web browser.
+
+The codebase was migrated to C++ to benefit from stronger type safety and
+automatic memory management. The build system is now CMake instead of the
+autotools, preparing for Windows support.
+
 1.6.0 - 2018-01-27
 ------------------
 
