@@ -23,6 +23,7 @@ add_library(
 	gui/cursor.cc
 	gui/metadata.cc
 	gui/score.cc
+	gui/window.cc
 	library/beatmaps.cc
 	library/html.cc
 	osu/draw.cc

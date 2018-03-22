@@ -11,6 +11,7 @@
 
 #include "core/log.h"
 #include "game/game.h"
+#include "gui/window.h"
 #include "osu/osu.h"
 
 extern "C" {
@@ -93,8 +94,8 @@ int run(const char *beatmap_path, int autoplay, int pause)
 	if (pause)
 		oshu_pause_game(&current_game);
 
-	if ((rc = oshu_run_game(&current_game)) < 0)
-		oshu_log_error("error while running the game, aborting");
+	oshu::gui::window main_window {current_game};
+	oshu::gui::loop(main_window);
 
 	oshu_destroy_game(&current_game);
 	SDL_Quit();

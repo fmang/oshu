@@ -88,52 +88,6 @@ fail:
 	return -1;
 }
 
-static void draw(struct oshu_game *game)
-{
-	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
-	SDL_RenderClear(game->display.renderer);
-	game->screen->draw(game);
-	SDL_RenderPresent(game->display.renderer);
-}
-
-int oshu_run_game(struct oshu_game *game)
-{
-	oshu_welcome(game);
-	oshu_initialize_clock(game);
-
-	SDL_Event event;
-	int missed_frames = 0;
-
-	while (!game->stop) {
-		oshu_update_clock(game);
-		oshu_reset_view(&game->display);
-		while (SDL_PollEvent(&event))
-			game->screen->on_event(game, &event);
-		game->screen->update(game);
-		draw(game);
-
-		/* Calling oshu_print_state before draw causes some flickering
-		 * on the tty, for some reason. */
-		if (game->screen == &oshu_play_screen)
-			oshu_print_state(game);
-
-		double advance = game->display.frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
-		if (advance > 0) {
-			SDL_Delay(advance * 1000);
-		} else {
-			missed_frames++;
-			if (missed_frames == 1000) {
-				oshu_log_warning("your computer is having a hard time keeping up");
-				if (game->display.features)
-					oshu_log_warning("try running oshu! with OSHU_QUALITY=low (see the man page)");
-			}
-		}
-	}
-
-	oshu_log_debug("%d missed frames", missed_frames);
-	return 0;
-}
-
 static void destroy_ui(struct oshu_game *game)
 {
 	oshu_destroy_background(&game->ui.background);
