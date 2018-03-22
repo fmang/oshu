@@ -1,6 +1,6 @@
 /**
- * \file game/screens/play.cc
- * \ingroup game_screens
+ * \file lib/gui/screens/play.cc
+ * \ingroup gui_screens
  *
  * \brief
  * Implement the main game screen.
@@ -10,12 +10,14 @@
 
 #include "game/game.h"
 #include "game/tty.h"
+#include "gui/window.h"
 #include "video/transitions.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(struct oshu_game *game, union SDL_Event *event)
+static int on_event(oshu::gui::window &w, union SDL_Event *event)
 {
+	oshu_game *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -23,6 +25,7 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 		switch (event->key.keysym.sym) {
 		case OSHU_PAUSE_KEY:
 			oshu_pause_game(game);
+			w.screen = &oshu_pause_screen;
 			break;
 		case OSHU_REWIND_KEY:
 			oshu_rewind_game(game, 10.);
@@ -57,8 +60,10 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_MINIMIZED:
 		case SDL_WINDOWEVENT_FOCUS_LOST:
-			if (!game->autoplay && game->hit_cursor->next)
+			if (!game->autoplay && game->hit_cursor->next) {
 				oshu_pause_game(game);
+				w.screen = &oshu_pause_screen;
+			}
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
 			oshu_stop_game(game);
@@ -76,8 +81,9 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
  *
  * The game switches to the score screen, from which the only exit is *death*.
  */
-static void check_end(struct oshu_game *game)
+static void check_end(oshu::gui::window &w)
 {
+	oshu_game *game = &w.game;
 	if (game->hit_cursor->next)
 		return;
 	const double delay = game->beatmap.difficulty.leniency + game->beatmap.difficulty.approach_time;
@@ -85,19 +91,24 @@ static void check_end(struct oshu_game *game)
 		oshu_reset_view(&game->display);
 		oshu_create_score_frame(&game->display, &game->beatmap, &game->ui.score);
 		oshu_congratulate(game);
-		game->screen = &oshu_score_screen;
+		w.screen = &oshu_score_screen;
 	}
 }
 
-static int update(struct oshu_game *game)
+static int update(oshu::gui::window &w)
 {
+	oshu_game *game = &w.game;
+	if (game->paused) {
+		w.screen = &oshu_pause_screen;
+		return 0;
+	}
 	if (game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
 	if (game->autoplay)
 		game->check_autoplay();
 	else
 		game->check();
-	check_end(game);
+	check_end(w);
 	return 0;
 }
 
@@ -127,8 +138,9 @@ static int update(struct oshu_game *game)
  * seconds.
  *
  */
-static void draw_background(struct oshu_game *game)
+static void draw_background(oshu::gui::window &w)
 {
+	oshu_game *game = &w.game;
 	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
 	double break_end = oshu_next_hit(game)->time;
 	double now = game->clock.now;
@@ -138,11 +150,12 @@ static void draw_background(struct oshu_game *game)
 	oshu_show_background(&game->ui.background, ratio);
 }
 
-static int draw(struct oshu_game *game)
+static int draw(oshu::gui::window &w)
 {
+	oshu_game *game = &w.game;
 	if (game->display.features & OSHU_FANCY_CURSOR)
 		SDL_ShowCursor(SDL_DISABLE);
-	draw_background(game);
+	draw_background(w);
 	oshu_show_metadata_frame(&game->ui.metadata, oshu_fade_out(5, 6, game->clock.system));
 	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
 	game->draw();

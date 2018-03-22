@@ -6,7 +6,6 @@
 #include "game/tty.h"
 
 #include "game/game.h"
-#include "./screens/screens.h"
 
 #include <unistd.h>
 
@@ -47,6 +46,13 @@ void oshu_welcome(struct oshu_game *game)
 	printf("\n\n");
 }
 
+/**
+ * \todo
+ * This function is called in too many locations.
+ *
+ * \todo
+ * This function should be deleted once the window can display the time.
+ */
 void oshu_print_state(struct oshu_game *game)
 {
 	if (!isatty(fileno(stdout)))
@@ -58,7 +64,7 @@ void oshu_print_state(struct oshu_game *game)
 	double duration_seconds = duration - duration_minutes * 60;
 	printf(
 		"%s: %d:%06.3f / %d:%06.3f\r",
-		game->screen->name, minutes, seconds,
+		game->paused ? "Paused" : "Playing", minutes, seconds,
 		duration_minutes, duration_seconds
 	);
 	fflush(stdout);

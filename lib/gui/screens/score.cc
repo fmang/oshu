@@ -1,6 +1,6 @@
 /**
- * \file game/screens/score.cc
- * \ingroup game_screens
+ * \file lib/gui/screens/score.cc
+ * \ingroup gui_screens
  *
  * \brief
  * Implement the score screen, when the game is finished.
@@ -9,12 +9,14 @@
 #include "./screens.h"
 
 #include "game/game.h"
+#include "gui/window.h"
 #include "video/transitions.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(struct oshu_game *game, union SDL_Event *event)
+static int on_event(oshu::gui::window &w, union SDL_Event *event)
 {
+	oshu_game *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -36,13 +38,14 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 	return 0;
 }
 
-static int update(struct oshu_game *game)
+static int update(oshu::gui::window &w)
 {
 	return 0;
 }
 
-static int draw(struct oshu_game *game)
+static int draw(oshu::gui::window &w)
 {
+	oshu_game *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
 	double end = oshu_hit_end_time(oshu_previous_hit(game));
 	double r = oshu_fade_in(end + 1, end + 2, game->clock.now);

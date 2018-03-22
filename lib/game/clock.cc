@@ -3,9 +3,10 @@
  * \ingroup game_clock
  */
 
-#include "game/game.h"
-#include "./screens/screens.h"
+#include "game/clock.h"
+
 #include "core/log.h"
+#include "game/game.h"
 
 void oshu_initialize_clock(struct oshu_game *game)
 {
@@ -34,7 +35,7 @@ void oshu_update_clock(struct oshu_game *game)
 	clock->before = clock->now;
 	clock->system = system;
 
-	if (game->screen == &oshu_pause_screen) {
+	if (game->paused) {
 		/* Don't update the clock when the game is paused. */
 	} else if (clock->before < 0) {
 		/* Leading in. */

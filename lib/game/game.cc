@@ -11,7 +11,6 @@
 #include "game/tty.h"
 #include "video/texture.h"
 #include "core/log.h"
-#include "./screens/screens.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -71,7 +70,6 @@ static int create_ui(struct oshu_game *game)
 
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 {
-	game->screen = &oshu_play_screen;
 	if (open_beatmap(beatmap_path, game) < 0)
 		goto fail;
 	if (open_audio(game) < 0)

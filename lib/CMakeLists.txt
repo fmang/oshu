@@ -14,15 +14,15 @@ add_library(
 	game/controls.cc
 	game/game.cc
 	game/helpers.cc
-	game/screens/pause.cc
-	game/screens/play.cc
-	game/screens/score.cc
 	game/tty.cc
 	gui/audio.cc
 	gui/background.cc
 	gui/cursor.cc
 	gui/metadata.cc
 	gui/score.cc
+	gui/screens/pause.cc
+	gui/screens/play.cc
+	gui/screens/score.cc
 	gui/window.cc
 	library/beatmaps.cc
 	library/html.cc

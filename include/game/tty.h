@@ -24,6 +24,9 @@ struct oshu_game;
  * For maximum fanciness, this module assumes ANSI color sequences are
  * supported.
  *
+ * \todo
+ * This tty module is out of place in the game module.
+ *
  * \{
  */
 

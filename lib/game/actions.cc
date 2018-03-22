@@ -5,7 +5,6 @@
 
 #include "game/game.h"
 #include "game/tty.h"
-#include "./screens/screens.h"
 
 #include <assert.h>
 
@@ -41,7 +40,7 @@ void oshu_forward_game(struct oshu_game *game, double offset)
 void oshu_pause_game(struct oshu_game *game)
 {
 	oshu_pause_audio(&game->audio);
-	game->screen = &oshu_pause_screen;
+	game->paused = true;
 	oshu_print_state(game);
 }
 
@@ -49,7 +48,8 @@ void oshu_unpause_game(struct oshu_game *game)
 {
 	if (game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
-	game->screen = &oshu_play_screen;
+	game->paused = false;
+	oshu_print_state(game);
 }
 
 void oshu_stop_game(struct oshu_game *game)

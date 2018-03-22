@@ -9,20 +9,22 @@
 #include "game/game.h"
 #include "game/tty.h"
 
-/**
- * \todo
- * Screens should be moved to the GUI module.
- */
-#include "../game/screens/screens.h"
+#include "./screens/screens.h"
 
 namespace oshu {
 namespace gui {
 
-static void draw(struct oshu_game *game)
+window::window(oshu_game &game)
+: game(game), screen(&oshu_play_screen)
 {
+}
+
+static void draw(window &w)
+{
+	oshu_game *game = &w.game;
 	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(game->display.renderer);
-	game->screen->draw(game);
+	w.screen->draw(w);
 	SDL_RenderPresent(game->display.renderer);
 }
 
@@ -39,13 +41,13 @@ void loop(window &w)
 		oshu_update_clock(game);
 		oshu_reset_view(&game->display);
 		while (SDL_PollEvent(&event))
-			game->screen->on_event(game, &event);
-		game->screen->update(game);
-		draw(game);
+			w.screen->on_event(w, &event);
+		w.screen->update(w);
+		draw(w);
 
 		/* Calling oshu_print_state before draw causes some flickering
 		 * on the tty, for some reason. */
-		if (game->screen == &oshu_play_screen)
+		if (w.screen == &oshu_play_screen)
 			oshu_print_state(game);
 
 		double advance = game->display.frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);

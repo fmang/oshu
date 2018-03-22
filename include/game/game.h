@@ -15,8 +15,6 @@
 #include "gui/gui.h"
 #include "video/display.h"
 
-struct oshu_game_screen;
-
 /**
  * \defgroup game Game
  *
@@ -57,12 +55,7 @@ struct oshu_game_state {
 	struct oshu_game_ui ui;
 	int stop;
 	int autoplay;
-	/**
-	 * \todo
-	 * The screens are a visual aspect of the game, not part of the
-	 * mechanics, and should be moved into the gui module.
-	 */
-	struct oshu_game_screen *screen;
+	bool paused;
 	/**
 	 * Pointer to the next clickable hit.
 	 *
@@ -262,13 +255,15 @@ struct oshu_hit* oshu_previous_hit(struct oshu_game *game);
 
 /**
  * Resume the game.
+ *
+ * \sa oshu_pause_game
  */
 void oshu_unpause_game(struct oshu_game *game);
 
 /**
  * Pause the game.
  *
- * Enter the #oshu_pause_screen screen.
+ * \sa oshu_unpause_game
  */
 void oshu_pause_game(struct oshu_game *game);
 

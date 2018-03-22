@@ -5,7 +5,8 @@
 
 #pragma once
 
-class oshu_game;
+struct oshu_game;
+struct oshu_game_screen;
 
 namespace oshu {
 namespace gui {
@@ -16,6 +17,8 @@ namespace gui {
  *
  * \brief
  * Manage the game's main window.
+ *
+ * \{
  */
 
 /**
@@ -24,11 +27,13 @@ namespace gui {
  * Multiple game windows are currently not supported, and probably never will.
  */
 struct window {
+	window(oshu_game&);
 	/**
 	 * A reference a game object. It is not owned by the window and must
 	 * live longer than the window.
 	 */
 	oshu_game &game;
+	oshu_game_screen *screen;
 };
 
 /**
@@ -36,5 +41,7 @@ struct window {
  * exits.
  */
 void loop(window&);
+
+/** \} */
 
 }}

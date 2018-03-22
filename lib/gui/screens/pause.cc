@@ -1,6 +1,6 @@
 /**
- * \file game/screens/pause.cc
- * \ingroup game_screens
+ * \file lib/gui/screens/pause.cc
+ * \ingroup gui_screens
  *
  * \brief
  * Implement the pause screen.
@@ -9,11 +9,13 @@
 #include "./screens.h"
 
 #include "game/game.h"
+#include "gui/window.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(struct oshu_game *game, union SDL_Event *event)
+static int on_event(oshu::gui::window &w, union SDL_Event *event)
 {
+	oshu_game *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -26,6 +28,7 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 			if (game->clock.now > 0 && !game->autoplay)
 				oshu_rewind_game(game, 1.);
 			oshu_unpause_game(game);
+			w.screen = &oshu_play_screen;
 			break;
 		case OSHU_REWIND_KEY:
 			oshu_rewind_game(game, 10.);
@@ -46,8 +49,11 @@ static int on_event(struct oshu_game *game, union SDL_Event *event)
 	return 0;
 }
 
-static int update(struct oshu_game *game)
+static int update(oshu::gui::window &w)
 {
+	oshu_game *game = &w.game;
+	if (!game->paused)
+		w.screen = &oshu_play_screen;
 	return 0;
 }
 
@@ -69,8 +75,9 @@ static void draw_pause(struct oshu_display *display)
 	SDL_RenderFillRect(display->renderer, &bar);
 }
 
-static int draw(struct oshu_game *game)
+static int draw(oshu::gui::window &w)
 {
+	oshu_game *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
 	oshu_show_background(&game->ui.background, 0);
 	oshu_show_metadata_frame(&game->ui.metadata, 1);
