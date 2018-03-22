@@ -75,6 +75,10 @@ void loop(window &w)
 		}
 	}
 
+	if (w.screen != &oshu_score_screen)
+		puts("");
+		/* write a new line to avoid conflict between the status line
+		 * and the shell prompt */
 	oshu_log_debug("%d missed frames", missed_frames);
 }
 

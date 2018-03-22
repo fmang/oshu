@@ -63,8 +63,8 @@ void oshu_print_state(struct oshu_game *game)
 	int duration_minutes = duration / 60.;
 	double duration_seconds = duration - duration_minutes * 60;
 	printf(
-		"%s: %d:%06.3f / %d:%06.3f\r",
-		game->paused ? "Paused" : "Playing", minutes, seconds,
+		"%s %d:%06.3f / %d:%06.3f\r",
+		game->paused ? "Paused: " : "Playing:", minutes, seconds,
 		duration_minutes, duration_seconds
 	);
 	fflush(stdout);
