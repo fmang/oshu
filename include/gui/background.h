@@ -1,6 +1,6 @@
 /**
- * \file ui/background.h
- * \ingroup ui_background
+ * \file gui/background.h
+ * \ingroup gui_background
  */
 
 #pragma once
@@ -10,8 +10,8 @@
 struct oshu_display;
 
 /**
- * \defgroup ui_background Background
- * \ingroup ui
+ * \defgroup gui_background Background
+ * \ingroup gui
  *
  * \brief
  * Picture background.

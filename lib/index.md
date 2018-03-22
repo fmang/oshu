@@ -26,7 +26,7 @@ digraph modules {
 	Game -> Audio;
 	Game -> Graphics;
 	Game -> Beatmap;
-	Game -> UI;
+	Game -> GUI;
 	Osu -> Game;
 }
 \enddot
@@ -46,7 +46,7 @@ The \ref graphics module handles the window creation and provides accelerated
 drawing primitives. It is not directly related to the game, but uses the
 geometric types defined by the beatmap module.
 
-The \ref ui module provides user interface elements as widgets. Widgets are the
+The \ref gui module provides user interface elements as widgets. Widgets are the
 basic block for a composable user interface.
 
 The \ref game module joins every module together and runs the main event loop

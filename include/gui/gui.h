@@ -1,15 +1,15 @@
 /**
- * \file ui/ui.h
- * \ingroup ui
+ * \file gui/gui.h
+ * \ingroup gui
  */
 
 #pragma once
 
 /**
- * \defgroup ui UI
+ * \defgroup gui GUI
  *
  * \brief
- * Collection of GUI elements.
+ * Collection of graphical user interface elements.
  *
  * All the widgets share a common interface:
  *
@@ -34,8 +34,8 @@
  *
  */
 
-#include "ui/audio.h"
-#include "ui/background.h"
-#include "ui/cursor.h"
-#include "ui/metadata.h"
-#include "ui/score.h"
+#include "gui/audio.h"
+#include "gui/background.h"
+#include "gui/cursor.h"
+#include "gui/metadata.h"
+#include "gui/score.h"

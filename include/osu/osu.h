@@ -7,7 +7,7 @@
 
 #include "game/game.h"
 #include "graphics/texture.h"
-#include "ui/cursor.h"
+#include "gui/cursor.h"
 
 /**
  * \defgroup osu Osu

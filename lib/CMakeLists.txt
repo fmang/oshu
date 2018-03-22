@@ -23,16 +23,16 @@ add_library(
 	graphics/texture.cc
 	graphics/transitions.cc
 	graphics/view.cc
+	gui/audio.cc
+	gui/background.cc
+	gui/cursor.cc
+	gui/metadata.cc
+	gui/score.cc
 	library/beatmaps.cc
 	library/html.cc
 	osu/draw.cc
 	osu/osu.cc
 	osu/paint.cc
-	ui/audio.cc
-	ui/background.cc
-	ui/cursor.cc
-	ui/metadata.cc
-	ui/score.cc
 )
 
 set_target_properties(

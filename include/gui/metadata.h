@@ -1,6 +1,6 @@
 /**
- * \file ui/metadata.h
- * \ingroup ui_metadata
+ * \file gui/metadata.h
+ * \ingroup gui_metadata
  */
 
 #pragma once
@@ -11,8 +11,8 @@ struct oshu_display;
 struct oshu_metadata;
 
 /**
- * \defgroup ui_metadata Metadata
- * \ingroup ui
+ * \defgroup gui_metadata Metadata
+ * \ingroup gui
  *
  * \brief
  * Display beatmap metadata.

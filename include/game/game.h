@@ -12,7 +12,7 @@
 #include "beatmap/beatmap.h"
 #include "game/clock.h"
 #include "game/controls.h"
-#include "ui/ui.h"
+#include "gui/gui.h"
 #include "graphics/display.h"
 
 struct oshu_game_screen;
@@ -27,7 +27,7 @@ struct oshu_game_screen;
  */
 
 /**
- * The game user inteface, composed with widgets from the \ref ui module.
+ * The game user inteface, composed with widgets from the \ref gui module.
  *
  * \todo
  * This structure should not be part of the game, but belong to its own module.

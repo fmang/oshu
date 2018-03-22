@@ -1,11 +1,11 @@
 /**
- * \file ui/score.cc
- * \ingroup ui_score
+ * \file gui/score.cc
+ * \ingroup gui_score
  */
 
 #include "config.h"
 
-#include "ui/score.h"
+#include "gui/score.h"
 
 #include "beatmap/beatmap.h"
 #include "graphics/display.h"
