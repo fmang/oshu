@@ -8,26 +8,22 @@ liboshu is organized into various interconnected modules. For maximum clarity,
 it is important the modules are not circularly linked to each other, and that
 the responsibility of every module is clearly defined.
 
-Below is the dependency graph of the modules:
+Below is the dependency graph of the modules. Dotted edges represent
+undesirable dependencies, and should disappear in the near future.
 
 \dot
 digraph modules {
 	rankdir=BT;
 	node [shape=rect];
 	Beatmap;
-	subgraph {
-		rank=same;
-		Audio;
-		UI -> Graphics;
-	}
-	Audio -> Beatmap;
-	Graphics -> Beatmap;
-	UI -> Beatmap;
+	Audio;
+	Audio -> Beatmap [style=dotted];
+	Video -> Beatmap [style=dotted];
 	Game -> Audio;
 	Game -> Video;
 	Game -> Beatmap;
-	Game -> GUI;
 	Osu -> Game;
+	GUI -> Game;
 }
 \enddot
 

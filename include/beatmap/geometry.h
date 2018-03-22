@@ -14,6 +14,11 @@
  * \brief
  * Bézier paths, among other things.
  *
+ * \todo
+ * The core geometry objects, like #oshu_point, #oshu_vector and #oshu_size
+ * should be moved in the \ref core module. Then, all that should remain are
+ * the paths, and should be moved in a path module.
+ *
  * \{
  */
 
