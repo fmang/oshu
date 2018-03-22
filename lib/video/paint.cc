@@ -1,12 +1,12 @@
 /**
- * \file graphics/paint.cc
- * \ingroup graphics_paint
+ * \file video/paint.cc
+ * \ingroup video_paint
  */
 
-#include "graphics/paint.h"
+#include "video/paint.h"
 
-#include "graphics/display.h"
-#include "graphics/texture.h"
+#include "video/display.h"
+#include "video/texture.h"
 #include "core/log.h"
 
 #include <assert.h>

@@ -5,8 +5,8 @@
 
 #include "gui/cursor.h"
 
-#include "graphics/display.h"
-#include "graphics/paint.h"
+#include "video/display.h"
+#include "video/paint.h"
 
 #include <math.h>
 #include <SDL2/SDL.h>

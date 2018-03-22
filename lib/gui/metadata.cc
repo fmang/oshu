@@ -8,9 +8,9 @@
 #include "gui/metadata.h"
 
 #include "beatmap/beatmap.h"
-#include "graphics/display.h"
-#include "graphics/paint.h"
-#include "graphics/texture.h"
+#include "video/display.h"
+#include "video/paint.h"
+#include "video/texture.h"
 
 #include <assert.h>
 #include <pango/pangocairo.h>

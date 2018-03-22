@@ -1,11 +1,11 @@
 /**
- * \file graphics/view.cc
- * \ingroup graphics_view
+ * \file video/view.cc
+ * \ingroup video_view
  */
 
-#include "graphics/view.h"
+#include "video/view.h"
 
-#include "graphics/display.h"
+#include "video/display.h"
 
 #include <SDL2/SDL.h>
 

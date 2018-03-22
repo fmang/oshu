@@ -18,11 +18,6 @@ add_library(
 	game/screens/play.cc
 	game/screens/score.cc
 	game/tty.cc
-	graphics/display.cc
-	graphics/paint.cc
-	graphics/texture.cc
-	graphics/transitions.cc
-	graphics/view.cc
 	gui/audio.cc
 	gui/background.cc
 	gui/cursor.cc
@@ -33,6 +28,11 @@ add_library(
 	osu/draw.cc
 	osu/osu.cc
 	osu/paint.cc
+	video/display.cc
+	video/paint.cc
+	video/texture.cc
+	video/transitions.cc
+	video/view.cc
 )
 
 set_target_properties(

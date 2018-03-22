@@ -1,6 +1,6 @@
 /**
- * \file graphics/view.h
- * \ingroup graphics_view
+ * \file video/view.h
+ * \ingroup video_view
  */
 
 #pragma once
@@ -10,8 +10,8 @@
 struct oshu_display;
 
 /**
- * \defgroup graphics_view View
- * \ingroup graphics
+ * \defgroup video_view View
+ * \ingroup video
  *
  * \brief
  * Define and transform an affine coordinate system.

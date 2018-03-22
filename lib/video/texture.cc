@@ -1,11 +1,11 @@
 /**
- * \file graphics/texture.cc
- * \ingroup graphics_texture
+ * \file video/texture.cc
+ * \ingroup video_texture
  */
 
-#include "graphics/texture.h"
+#include "video/texture.h"
 
-#include "graphics/display.h"
+#include "video/display.h"
 #include "core/log.h"
 
 #include <SDL2/SDL_image.h>

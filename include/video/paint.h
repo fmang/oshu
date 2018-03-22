@@ -1,6 +1,6 @@
 /**
- * \file graphics/paint.h
- * \ingroup graphics_paint
+ * \file video/paint.h
+ * \ingroup video_paint
  */
 
 #pragma once
@@ -14,8 +14,8 @@ struct oshu_display;
 struct oshu_texture;
 
 /**
- * \defgroup graphics_paint Paint
- * \ingroup graphics
+ * \defgroup video_paint Paint
+ * \ingroup video
  *
  * \brief
  * Draw dynamic graphics with Cairo.
@@ -37,7 +37,7 @@ struct oshu_texture;
  * oshu_finish_painting(&p, display, &t);
  * ```
  *
- * The \ref graphics/paint.h header imports cairo.h for convenience.
+ * The \ref video/paint.h header imports cairo.h for convenience.
  *
  * \{
  */

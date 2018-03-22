@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "graphics/texture.h"
+#include "video/texture.h"
 
 struct oshu_display;
 

@@ -13,7 +13,7 @@
 #include "game/clock.h"
 #include "game/controls.h"
 #include "gui/gui.h"
-#include "graphics/display.h"
+#include "video/display.h"
 
 struct oshu_game_screen;
 

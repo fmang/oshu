@@ -1,32 +1,32 @@
 /**
- * \file graphics/display.h
- * \ingroup graphics_display
+ * \file video/display.h
+ * \ingroup video_display
  */
 
 #pragma once
 
 #include "beatmap/geometry.h"
-#include "graphics/view.h"
+#include "video/view.h"
 
 struct SDL_Renderer;
 struct SDL_Window;
 
 /**
- * \defgroup graphics Graphics
+ * \defgroup video Video
  *
- * The graphics module is an abstraction over SDL2.
+ * The video module is an abstraction over SDL2.
  *
- * The \ref graphics_display module defines a game window abstraction. The
- * coordinate system is configured with the display's \ref graphics_view.
+ * The \ref video_display module defines a game window abstraction. The
+ * coordinate system is configured with the display's \ref video_view.
  *
  * Drawing consists primarily in pasting textures from the \ref
- * graphics_texture module. Most textures are currently generated using the
- * cairo vector graphics library. The \ref graphics_paint module integrates
- * cairo with SDL2 and the \ref graphics_texture module.
+ * video_texture module. Most textures are currently generated using the
+ * cairo vector video library. The \ref video_paint module integrates
+ * cairo with SDL2 and the \ref video_texture module.
  *
  * To draw text, you will need pango, and more specifically pangocairo. Pango
  * is not directly integrated with this module, but is relatively easy to use
- * as all it requires is a cairo context, which the \ref graphics_paint module
+ * as all it requires is a cairo context, which the \ref video_paint module
  * creates. Note that for some reason, drawing text on a transparent background
  * causes a visual glitch unless the blend mode is set to *source*.
  *
@@ -63,8 +63,8 @@ struct SDL_Window;
  */
 
 /**
- * \defgroup graphics_display Display
- * \ingroup graphics
+ * \defgroup video_display Display
+ * \ingroup video
  *
  * \brief
  * Abstract an SDL2 window.
@@ -114,7 +114,7 @@ enum oshu_visual_feature {
 	 * Prefer hardware rendering over software rendering.
 	 *
 	 * Since the graphics are quite simple, unless fancy scaling is enabled
-	 * with #OSHU_LINEAR_SCALING, hardware graphics provide little
+	 * with #OSHU_LINEAR_SCALING, hardware video provide little
 	 * advantage, and may even worsen the performance.
 	 *
 	 * One notable example is the Raspberry Pi which runs much smoother

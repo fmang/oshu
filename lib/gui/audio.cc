@@ -6,7 +6,7 @@
 #include "gui/audio.h"
 
 #include "audio/stream.h"
-#include "graphics/display.h"
+#include "video/display.h"
 
 #include <assert.h>
 #include <SDL2/SDL.h>

@@ -11,7 +11,7 @@
 
 #include "gui/background.h"
 
-#include "graphics/display.h"
+#include "video/display.h"
 #include "core/log.h"
 
 #include <assert.h>

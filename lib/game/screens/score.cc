@@ -9,7 +9,7 @@
 #include "./screens.h"
 
 #include "game/game.h"
-#include "graphics/transitions.h"
+#include "video/transitions.h"
 
 #include <SDL2/SDL.h>
 

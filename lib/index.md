@@ -24,7 +24,7 @@ digraph modules {
 	Graphics -> Beatmap;
 	UI -> Beatmap;
 	Game -> Audio;
-	Game -> Graphics;
+	Game -> Video;
 	Game -> Beatmap;
 	Game -> GUI;
 	Osu -> Game;
@@ -42,7 +42,7 @@ depend on it for one of the structure it defines.
 The \ref audio module handles everything audio-related from audio file loading
 down to the actual output to the sound device.
 
-The \ref graphics module handles the window creation and provides accelerated
+The \ref video module handles the window creation and provides accelerated
 drawing primitives. It is not directly related to the game, but uses the
 geometric types defined by the beatmap module.
 

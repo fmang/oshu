@@ -6,7 +6,7 @@
 #pragma once
 
 #include "game/game.h"
-#include "graphics/texture.h"
+#include "video/texture.h"
 #include "gui/cursor.h"
 
 /**

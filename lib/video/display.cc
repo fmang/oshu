@@ -1,9 +1,9 @@
 /**
- * \file graphics/display.cc
- * \ingroup graphics_display
+ * \file video/display.cc
+ * \ingroup video_display
  */
 
-#include "graphics/display.h"
+#include "video/display.h"
 
 #include "core/log.h"
 

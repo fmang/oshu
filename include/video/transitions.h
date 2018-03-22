@@ -1,13 +1,13 @@
 /**
- * \file graphics/transitions.h
- * \ingroup graphics_transitions
+ * \file video/transitions.h
+ * \ingroup video_transitions
  */
 
 #pragma once
 
 /**
- * \defgroup graphics_transitions Transitions
- * \ingroup graphics
+ * \defgroup video_transitions Transitions
+ * \ingroup video
  *
  * \brief
  * Pure mathematical functions for visual transition effects.

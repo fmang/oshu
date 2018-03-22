@@ -10,7 +10,7 @@
 
 #include "game/game.h"
 #include "game/tty.h"
-#include "graphics/transitions.h"
+#include "video/transitions.h"
 
 #include <SDL2/SDL.h>
 

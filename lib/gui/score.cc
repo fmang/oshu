@@ -8,7 +8,7 @@
 #include "gui/score.h"
 
 #include "beatmap/beatmap.h"
-#include "graphics/display.h"
+#include "video/display.h"
 
 #include <SDL2/SDL.h>
 

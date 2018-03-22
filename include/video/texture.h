@@ -1,6 +1,6 @@
 /**
- * \file graphics/texture.h
- * \ingroup graphics_texture
+ * \file video/texture.h
+ * \ingroup video_texture
  */
 
 #pragma once
@@ -11,8 +11,8 @@ struct oshu_display;
 struct SDL_Texture;
 
 /**
- * \defgroup graphics_texture Texture
- * \ingroup graphics
+ * \defgroup video_texture Texture
+ * \ingroup video
  *
  * \brief
  * Load and draw accelerated textures.
@@ -41,7 +41,7 @@ struct SDL_Texture;
  * Define a texture loaded on the GPU.
  *
  * Load it from a file with #oshu_load_texture or create it using the
- * \ref graphics_paint module, then destroy it with #oshu_destroy_texture.
+ * \ref video_paint module, then destroy it with #oshu_destroy_texture.
  */
 struct oshu_texture {
 	/**

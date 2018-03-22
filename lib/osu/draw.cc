@@ -8,7 +8,7 @@
 
 #include "osu/osu.h"
 
-#include "graphics/texture.h"
+#include "video/texture.h"
 
 #include <assert.h>
 

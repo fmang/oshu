@@ -9,7 +9,7 @@
 
 #include "game/game.h"
 #include "game/tty.h"
-#include "graphics/texture.h"
+#include "video/texture.h"
 #include "core/log.h"
 #include "./screens/screens.h"
 

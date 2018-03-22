@@ -5,7 +5,7 @@
 
 #include "osu/osu.h"
 
-#include "graphics/paint.h"
+#include "video/paint.h"
 #include "core/log.h"
 
 #include <assert.h>

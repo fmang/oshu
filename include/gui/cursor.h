@@ -6,7 +6,7 @@
 #pragma once
 
 #include "beatmap/geometry.h"
-#include "graphics/texture.h"
+#include "video/texture.h"
 
 struct oshu_display;
 

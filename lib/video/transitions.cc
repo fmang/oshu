@@ -1,9 +1,9 @@
 /**
- * \file graphics/transitions.cc
- * \ingroup graphics_transitions
+ * \file video/transitions.cc
+ * \ingroup video_transitions
  */
 
-#include "graphics/transitions.h"
+#include "video/transitions.h"
 
 #include <assert.h>
 
