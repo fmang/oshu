@@ -163,8 +163,17 @@ int main(int argc, char **argv)
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
-	if (run(beatmap_file, autoplay, pause) < 0)
+	if (run(beatmap_file, autoplay, pause) < 0) {
+		if (!isatty(fileno(stdout)))
+			SDL_ShowSimpleMessageBox(
+				SDL_MESSAGEBOX_ERROR,
+				"oshu! fatal error",
+				"oshu! encountered a fatal error. Start it from the command-line to get more details:\n"
+				"$ oshu path/to/your/beatmap.osu",
+				NULL
+			);
 		return 1;
+	}
 
 	free(beatmap_path);
 

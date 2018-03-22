@@ -131,6 +131,10 @@ extern level priority;
  * You should use #critical, #error, #warning, #info, #debug or #verbose to
  * access your logger than this function directly, as they prefix your message
  * with the log level.
+ *
+ * \todo
+ * Support redirecting to a standard file, probably by redirecting std::clog.
+ * However, it won't work with the legacy facility.
  */
 std::ostream& logger(level priority);
 
