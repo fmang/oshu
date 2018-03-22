@@ -1,14 +1,4 @@
 /**
- * \file gui/gui.h
- * \ingroup gui
- *
- * \todo
- * Drop this meta-header. Turn it into a .dox file for documentation.
- */
-
-#pragma once
-
-/**
  * \defgroup gui GUI
  *
  * \brief
@@ -31,8 +21,7 @@
  *
  */
 
-#include "gui/audio.h"
-#include "gui/background.h"
-#include "gui/cursor.h"
-#include "gui/metadata.h"
-#include "gui/score.h"
+/**
+ * \namespace oshu::gui
+ * \ingroup gui
+ */
