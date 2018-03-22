@@ -17,6 +17,18 @@ namespace gui {
 window::window(oshu_game &game)
 : game(game), screen(&oshu_play_screen)
 {
+	if (game.beatmap.background_filename)
+		oshu_load_background(&game.display, game.beatmap.background_filename, &background);
+	oshu_create_metadata_frame(&game.display, &game.beatmap, &game.clock.system, &metadata);
+	oshu_create_audio_progress_bar(&game.display, &game.audio.music, &audio_progress_bar);
+}
+
+window::~window()
+{
+	oshu_destroy_background(&background);
+	oshu_destroy_metadata_frame(&metadata);
+	oshu_destroy_score_frame(&score);
+	oshu_destroy_audio_progress_bar(&audio_progress_bar);
 }
 
 static void draw(window &w)

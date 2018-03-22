@@ -58,16 +58,6 @@ static int open_display(struct oshu_game *game)
 	return 0;
 }
 
-static int create_ui(struct oshu_game *game)
-{
-	if (game->beatmap.background_filename)
-		oshu_load_background(&game->display, game->beatmap.background_filename, &game->ui.background);
-	oshu_create_metadata_frame(&game->display, &game->beatmap, &game->clock.system, &game->ui.metadata);
-	if (oshu_create_audio_progress_bar(&game->display, &game->audio.music, &game->ui.audio_progress_bar) < 0)
-		return -1;
-	return 0;
-}
-
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 {
 	if (open_beatmap(beatmap_path, game) < 0)
@@ -75,8 +65,6 @@ int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 	if (open_audio(game) < 0)
 		goto fail;
 	if (open_display(game) < 0)
-		goto fail;
-	if (create_ui(game) < 0)
 		goto fail;
 	if (game->initialize() < 0)
 		goto fail;
@@ -86,14 +74,6 @@ fail:
 	return -1;
 }
 
-static void destroy_ui(struct oshu_game *game)
-{
-	oshu_destroy_background(&game->ui.background);
-	oshu_destroy_metadata_frame(&game->ui.metadata);
-	oshu_destroy_score_frame(&game->ui.score);
-	oshu_destroy_audio_progress_bar(&game->ui.audio_progress_bar);
-}
-
 void oshu_destroy_game(struct oshu_game *game)
 {
 	assert (game != NULL);
@@ -101,6 +81,5 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);
-	destroy_ui(game);
 	oshu_close_display(&game->display);
 }

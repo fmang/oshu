@@ -79,9 +79,9 @@ static int draw(oshu::gui::window &w)
 {
 	oshu_game *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
-	oshu_show_background(&game->ui.background, 0);
-	oshu_show_metadata_frame(&game->ui.metadata, 1);
-	oshu_show_audio_progress_bar(&game->ui.audio_progress_bar);
+	oshu_show_background(&w.background, 0);
+	oshu_show_metadata_frame(&w.metadata, 1);
+	oshu_show_audio_progress_bar(&w.audio_progress_bar);
 	draw_pause(&game->display);
 	return 0;
 }

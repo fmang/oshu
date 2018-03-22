@@ -12,7 +12,6 @@
 #include "beatmap/beatmap.h"
 #include "game/clock.h"
 #include "game/controls.h"
-#include "gui/gui.h"
 #include "video/display.h"
 
 /**
@@ -23,20 +22,6 @@
  *
  * \{
  */
-
-/**
- * The game user inteface, composed with widgets from the \ref gui module.
- *
- * \todo
- * This structure should not be part of the game, but belong to its own module.
- * The GUI module should refer to the game, instead of the game owning the GUI.
- */
-struct oshu_game_ui {
-	struct oshu_background background;
-	struct oshu_metadata_frame metadata;
-	struct oshu_score_frame score;
-	struct oshu_audio_progress_bar audio_progress_bar;
-};
 
 /**
  * The full game state, from the beatmap state to the audio and graphical
@@ -52,7 +37,6 @@ struct oshu_game_state {
 	struct oshu_sound_library library;
 	struct oshu_display display;
 	struct oshu_clock clock;
-	struct oshu_game_ui ui;
 	int stop;
 	int autoplay;
 	bool paused;

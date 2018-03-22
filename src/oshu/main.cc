@@ -94,8 +94,11 @@ int run(const char *beatmap_path, int autoplay, int pause)
 	if (pause)
 		oshu_pause_game(&current_game);
 
-	oshu::gui::window main_window (current_game);
-	oshu::gui::loop(main_window);
+	{
+		oshu::gui::window main_window (current_game);
+		oshu::gui::loop(main_window);
+		/* ensure the main window is destroyed before the game */
+	}
 
 	oshu_destroy_game(&current_game);
 	SDL_Quit();

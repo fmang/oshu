@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include "gui/audio.h"
+#include "gui/background.h"
+#include "gui/metadata.h"
+#include "gui/score.h"
+
 struct oshu_game;
 struct oshu_game_screen;
 
@@ -28,12 +33,17 @@ namespace gui {
  */
 struct window {
 	window(oshu_game&);
+	~window();
 	/**
 	 * A reference a game object. It is not owned by the window and must
 	 * live longer than the window.
 	 */
 	oshu_game &game;
 	oshu_game_screen *screen;
+	oshu_background background {};
+	oshu_metadata_frame metadata {};
+	oshu_score_frame score {};
+	oshu_audio_progress_bar audio_progress_bar {};
 };
 
 /**
