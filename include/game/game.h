@@ -113,15 +113,6 @@ struct oshu_game : public oshu_game_state {
 	virtual int check_autoplay() = 0;
 
 	/**
-	 * Draw the game on the display.
-	 *
-	 * \todo
-	 * Since this is not related to the game mechanics, the whole drawing
-	 * engine should be split off the game module.
-	 */
-	virtual int draw() = 0;
-
-	/**
 	 * Handle a key press keyboard event, or mouse button press event.
 	 *
 	 * Key repeats are filtered out by the parent module, along with any

@@ -11,6 +11,7 @@
 
 #include "core/log.h"
 #include "game/game.h"
+#include "gui/osu.h"
 #include "gui/window.h"
 #include "osu/osu.h"
 
@@ -95,7 +96,8 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		oshu_pause_game(&current_game);
 
 	{
-		oshu::gui::window main_window (current_game);
+		oshu::gui::osu osu_view (current_game);
+		oshu::gui::window main_window (current_game, osu_view);
 		oshu::gui::loop(main_window);
 		/* ensure the main window is destroyed before the game */
 	}

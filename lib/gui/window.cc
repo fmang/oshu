@@ -14,8 +14,8 @@
 namespace oshu {
 namespace gui {
 
-window::window(oshu_game &game)
-: game(game), screen(&oshu_play_screen)
+window::window(oshu_game &game, widget &game_view)
+: game(game), game_view(game_view), screen(&oshu_play_screen)
 {
 	if (game.beatmap.background_filename)
 		oshu_load_background(&game.display, game.beatmap.background_filename, &background);

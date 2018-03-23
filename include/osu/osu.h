@@ -103,7 +103,6 @@ struct osu_game : public oshu_game {
 	int destroy() override;
 	int check() override;
 	int check_autoplay() override;
-	int draw() override;
 	int press(enum oshu_finger key) override;
 	int release(enum oshu_finger key) override;
 	int relinquish() override;

@@ -19,6 +19,7 @@ add_library(
 	gui/background.cc
 	gui/cursor.cc
 	gui/metadata.cc
+	gui/osu.cc
 	gui/score.cc
 	gui/screens/pause.cc
 	gui/screens/play.cc
@@ -26,7 +27,6 @@ add_library(
 	gui/window.cc
 	library/beatmaps.cc
 	library/html.cc
-	osu/draw.cc
 	osu/osu.cc
 	osu/paint.cc
 	video/display.cc

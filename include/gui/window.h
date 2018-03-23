@@ -16,6 +16,8 @@ struct oshu_game_screen;
 namespace oshu {
 namespace gui {
 
+struct widget;
+
 /**
  * \defgroup gui_window Window
  * \ingroup gui
@@ -32,13 +34,14 @@ namespace gui {
  * Multiple game windows are currently not supported, and probably never will.
  */
 struct window {
-	window(oshu_game&);
+	window(oshu_game&, widget &game_view);
 	~window();
 	/**
 	 * A reference a game object. It is not owned by the window and must
 	 * live longer than the window.
 	 */
 	oshu_game &game;
+	widget &game_view;
 	oshu_game_screen *screen;
 	oshu_background background {};
 	oshu_metadata_frame metadata {};

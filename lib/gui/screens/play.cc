@@ -10,6 +10,7 @@
 
 #include "game/game.h"
 #include "game/tty.h"
+#include "gui/widget.h"
 #include "gui/window.h"
 #include "video/transitions.h"
 
@@ -158,7 +159,7 @@ static int draw(oshu::gui::window &w)
 	draw_background(w);
 	oshu_show_metadata_frame(&w.metadata, oshu_fade_out(5, 6, game->clock.system));
 	oshu_show_audio_progress_bar(&w.audio_progress_bar);
-	game->draw();
+	w.game_view.draw();
 	return 0;
 }
 

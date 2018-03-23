@@ -1,14 +1,15 @@
 /**
- * \file osu/draw.cc
- * \ingroup osu
+ * \file lib/gui/osu.cc
+ * \ingroup gui
  *
  * \brief
  * Drawing routines specific to the osu!standard game mode.
  */
 
-#include "osu/osu.h"
+#include "gui/osu.h"
 
 #include "video/texture.h"
+#include "osu/osu.h"
 
 #include <assert.h>
 
@@ -132,27 +133,36 @@ static void connect_hits(struct osu_game *game, struct oshu_hit *a, struct oshu_
 		oshu_draw_texture(&game->display, &game->osu.connector, start + (i + .5) * step);
 }
 
+namespace oshu {
+namespace gui {
+
+osu::osu(osu_game &game)
+: game(game)
+{
+}
+
 /**
  * Draw all the visible nodes from the beatmap, according to the current
  * position in the song.
  */
-int osu_game::draw()
+void osu::draw()
 {
-	osu_view(this);
-	struct oshu_hit *cursor = oshu_look_hit_up(this, this->beatmap.difficulty.approach_time);
+	osu_view(&game);
+	struct oshu_hit *cursor = oshu_look_hit_up(&game, game.beatmap.difficulty.approach_time);
 	struct oshu_hit *next = NULL;
-	double now = this->clock.now;
+	double now = game.clock.now;
 	for (struct oshu_hit *hit = cursor; hit; hit = hit->previous) {
 		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
 			continue;
-		if (oshu_hit_end_time(hit) < now - this->beatmap.difficulty.approach_time)
+		if (oshu_hit_end_time(hit) < now - game.beatmap.difficulty.approach_time)
 			break;
 		if (next && next->combo == hit->combo)
-			connect_hits(this, hit, next);
-		draw_hit(this, hit);
+			connect_hits(&game, hit, next);
+		draw_hit(&game, hit);
 		next = hit;
 	}
-	oshu_show_cursor(&this->osu.cursor);
-	oshu_reset_view(&this->display);
-	return 0;
+	oshu_show_cursor(&game.osu.cursor);
+	oshu_reset_view(&game.display);
 }
+
+}}
