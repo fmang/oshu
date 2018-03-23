@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "beatmap/geometry.h"
+
 #include <SDL2/SDL_keycode.h>
 
 struct SDL_Keysym;
@@ -109,3 +111,20 @@ enum oshu_control_key {
 };
 
 /** \} */
+
+namespace oshu {
+namespace game {
+
+/**
+ * \ingroup game_controls
+ * \{
+ */
+
+struct mouse {
+	virtual ~mouse() = default;
+	virtual oshu_point position() = 0;
+};
+
+/** \} */
+
+}}

@@ -6,8 +6,10 @@
 #pragma once
 
 #include "game/game.h"
-#include "video/texture.h"
 #include "gui/cursor.h"
+#include "video/texture.h"
+
+#include <memory>
 
 /**
  * \defgroup osu Osu
@@ -39,6 +41,7 @@ struct osu_state {
 	 * irrelevant.
 	 */
 	enum oshu_finger held_key;
+	std::shared_ptr<oshu::game::mouse> mouse;
 };
 
 struct osu_game : public oshu_game {
@@ -52,16 +55,5 @@ struct osu_game : public oshu_game {
 	int release(enum oshu_finger key) override;
 	int relinquish() override;
 };
-
-/**
- * Set-up the coordinate system for the osu!standard mode.
- *
- * The window is mapped to a 640×480 screen with a few margins, yielding a
- * 512×384 logical screen.
- *
- * It is the caller's responsibility to reset the view, preferably such that
- * the #osu_view/#oshu_reset_view pairing looks obvious.
- */
-void osu_view(struct osu_game *game);
 
 /** \} */

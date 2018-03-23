@@ -104,13 +104,11 @@ int osu_game::check()
 {
 	/* Ensure the mouse follows the slider. */
 	sonorize_slider(this); /* < may release the slider! */
-	if (this->osu.current_slider) {
+	if (this->osu.current_slider && osu.mouse) {
 		struct oshu_hit *hit = this->osu.current_slider;
 		double t = (this->clock.now - hit->time) / hit->slider.duration;
 		oshu_point ball = oshu_path_at(&hit->slider.path, t);
-		osu_view(this);
-		oshu_point mouse = oshu_get_mouse(&this->display);
-		oshu_reset_view(&this->display);
+		oshu_point mouse = osu.mouse->position();
 		if (std::abs(ball - mouse) > this->beatmap.difficulty.slider_tolerance) {
 			oshu_stop_loop(&this->audio);
 			this->osu.current_slider = NULL;
@@ -179,9 +177,9 @@ int osu_game::check_autoplay()
  */
 int osu_game::press(enum oshu_finger key)
 {
-	osu_view(this);
-	oshu_point mouse = oshu_get_mouse(&this->display);
-	oshu_reset_view(&this->display);
+	if (!osu.mouse)
+		return 0;
+	oshu_point mouse = osu.mouse->position();
 	struct oshu_hit *hit = find_hit(this, mouse);
 	if (!hit)
 		return 0;
@@ -224,10 +222,4 @@ int osu_game::initialize()
 int osu_game::destroy()
 {
 	return 0;
-}
-
-void osu_view(struct osu_game *game)
-{
-	oshu_fit_view(&game->display.view, oshu_size{640, 480});
-	oshu_resize_view(&game->display.view, oshu_size{512, 384});
 }

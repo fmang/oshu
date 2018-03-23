@@ -149,11 +149,13 @@ namespace gui {
 osu::osu(osu_game &game)
 : game(game)
 {
-	osu_view(&game);
+	osu_view(&game.display);
 	int rc = osu_paint_resources(*this);
 	if (oshu_create_cursor(&game.display, &cursor) < 0)
 		rc = -1;
 	oshu_reset_view(&game.display);
+	mouse = std::make_shared<osu_mouse>(&game.display);
+	game.osu.mouse = mouse;
 }
 
 osu::~osu()
@@ -169,7 +171,7 @@ osu::~osu()
  */
 void osu::draw()
 {
-	osu_view(&game);
+	osu_view(&game.display);
 	struct oshu_hit *cursor = oshu_look_hit_up(&game, game.beatmap.difficulty.approach_time);
 	struct oshu_hit *next = NULL;
 	double now = game.clock.now;
@@ -187,4 +189,23 @@ void osu::draw()
 	oshu_reset_view(&game.display);
 }
 
+osu_mouse::osu_mouse(oshu_display *display)
+: display(display)
+{
+}
+
+oshu_point osu_mouse::position()
+{
+	osu_view(display);
+	oshu_point mouse = oshu_get_mouse(display);
+	oshu_reset_view(display);
+	return mouse;
+}
+
 }}
+
+void osu_view(struct oshu_display *display)
+{
+	oshu_fit_view(&display->view, oshu_size{640, 480});
+	oshu_resize_view(&display->view, oshu_size{512, 384});
+}

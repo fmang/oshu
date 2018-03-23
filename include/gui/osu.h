@@ -5,14 +5,25 @@
 
 #pragma once
 
+#include "game/controls.h"
 #include "gui/cursor.h"
 #include "gui/widget.h"
 #include "video/texture.h"
+
+#include <memory>
 
 struct osu_game;
 
 namespace oshu {
 namespace gui {
+
+struct osu;
+
+struct osu_mouse : public oshu::game::mouse {
+	osu_mouse(oshu_display *display);
+	oshu_display *display;
+	oshu_point position() override;
+};
 
 /**
  * \ingroup gui
@@ -24,6 +35,7 @@ struct osu : public widget {
 	~osu();
 
 	osu_game &game;
+	std::shared_ptr<osu_mouse> mouse;
 
 	void draw() override;
 
@@ -114,3 +126,14 @@ int osu_paint_slider(oshu::gui::osu&, struct oshu_hit *hit);
  * Free the dynamic resources of the game mode.
  */
 void osu_free_resources(oshu::gui::osu&);
+
+/**
+ * Set-up the coordinate system for the osu!standard mode.
+ *
+ * The window is mapped to a 640×480 screen with a few margins, yielding a
+ * 512×384 logical screen.
+ *
+ * It is the caller's responsibility to reset the view, preferably such that
+ * the #osu_view/#oshu_reset_view pairing looks obvious.
+ */
+void osu_view(struct oshu_display *display);
