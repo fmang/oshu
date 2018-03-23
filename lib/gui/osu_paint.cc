@@ -1,12 +1,13 @@
 /**
- * \file osu/paint.cc
- * \ingroup osu
+ * \file lib/gui/osu_paint.cc
+ * \ingroup gui
  */
 
-#include "osu/osu.h"
+#include "gui/osu.h"
 
-#include "video/paint.h"
 #include "core/log.h"
+#include "osu/osu.h"
+#include "video/paint.h"
 
 #include <assert.h>
 #include <SDL2/SDL_timer.h>
@@ -17,8 +18,9 @@ static double brighter(double v)
 	return v < 1. ? v : 1.;
 }
 
-static int paint_approach_circle(struct osu_game *game)
+static int paint_approach_circle(oshu::gui::osu &view)
 {
+	oshu_game *game = &view.game;
 	double radius = game->beatmap.difficulty.circle_radius + game->beatmap.difficulty.approach_size;
 	oshu_size size = oshu_size(radius * 2., radius * 2.);
 
@@ -31,14 +33,15 @@ static int paint_approach_circle(struct osu_game *game)
 	cairo_set_line_width(p.cr, 4);
 	cairo_stroke(p.cr);
 
-	struct oshu_texture *texture = &game->osu.approach_circle;
+	struct oshu_texture *texture = &view.approach_circle;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
 
-static int paint_circle(struct osu_game *game, struct oshu_color *color, struct oshu_texture *texture)
+static int paint_circle(oshu::gui::osu &view, struct oshu_color *color, struct oshu_texture *texture)
 {
+	oshu_game *game = &view.game;
 	double radius = game->beatmap.difficulty.circle_radius;
 	oshu_size size = oshu_size(radius * 2., radius * 2.);
 
@@ -105,8 +108,9 @@ static void build_path(cairo_t *cr, struct oshu_slider *slider)
  * Paint the slider ticks. Preferably updating the ticks every time the slider
  * repeats. Also, clear the ticks as the slider rolls over them.
  */
-int osu_paint_slider(struct osu_game *game, struct oshu_hit *hit)
+int osu_paint_slider(oshu::gui::osu &view, struct oshu_hit *hit)
 {
+	oshu_game *game = &view.game;
 	int start = SDL_GetTicks();
 	assert (hit->type & OSHU_SLIDER_HIT);
 	double radius = game->beatmap.difficulty.circle_radius;
@@ -180,7 +184,8 @@ int osu_paint_slider(struct osu_game *game, struct oshu_hit *hit)
 	return 0;
 }
 
-static int paint_slider_ball(struct osu_game *game) {
+static int paint_slider_ball(oshu::gui::osu &view) {
+	oshu_game *game = &view.game;
 	double radius = game->beatmap.difficulty.slider_tolerance;
 	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
@@ -209,14 +214,15 @@ static int paint_slider_ball(struct osu_game *game) {
 	cairo_fill(p.cr);
 	cairo_pattern_destroy(pattern);
 
-	struct oshu_texture *texture = &game->osu.slider_ball;
+	struct oshu_texture *texture = &view.slider_ball;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
 
-static int paint_good_mark(struct osu_game *game, int offset, struct oshu_texture *texture)
+static int paint_good_mark(oshu::gui::osu &view, int offset, struct oshu_texture *texture)
 {
+	oshu_game *game = &view.game;
 	double radius = game->beatmap.difficulty.circle_radius / 3.5;
 	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
@@ -245,8 +251,9 @@ static int paint_good_mark(struct osu_game *game, int offset, struct oshu_textur
 	return rc;
 }
 
-static int paint_bad_mark(struct osu_game *game)
+static int paint_bad_mark(oshu::gui::osu &view)
 {
+	oshu_game *game = &view.game;
 	double half = game->beatmap.difficulty.circle_radius / 4.7;
 	oshu_size size = oshu_size{1, 1} * (half + 2) * 2.;
 
@@ -265,14 +272,15 @@ static int paint_bad_mark(struct osu_game *game)
 
 	cairo_stroke(p.cr);
 
-	struct oshu_texture *texture = &game->osu.bad_mark;
+	struct oshu_texture *texture = &view.bad_mark;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
 
-static int paint_skip_mark(struct osu_game *game)
+static int paint_skip_mark(oshu::gui::osu &view)
 {
+	oshu_game *game = &view.game;
 	double radius = game->beatmap.difficulty.circle_radius / 4.7;
 	oshu_size size = oshu_size{1, 1} * (radius + 2) * 2.;
 
@@ -293,14 +301,15 @@ static int paint_skip_mark(struct osu_game *game)
 
 	cairo_stroke(p.cr);
 
-	struct oshu_texture *texture = &game->osu.skip_mark;
+	struct oshu_texture *texture = &view.skip_mark;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
 }
 
-static int paint_connector(struct osu_game *game)
+static int paint_connector(oshu::gui::osu &view)
 {
+	oshu_game *game = &view.game;
 	double radius = 3;
 	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
@@ -312,7 +321,7 @@ static int paint_connector(struct osu_game *game)
 	cairo_arc(p.cr, 0, 0, radius - 1, 0, 2. * M_PI);
 	cairo_fill(p.cr);
 
-	struct oshu_texture *texture = &game->osu.connector;
+	struct oshu_texture *texture = &view.connector;
 	int rc = oshu_finish_painting(&p, texture);
 	texture->origin = size / 2.;
 	return rc;
@@ -322,44 +331,46 @@ static int paint_connector(struct osu_game *game)
  * \todo
  * Handle errors.
  */
-int osu_paint_resources(struct osu_game *game)
+int osu_paint_resources(oshu::gui::osu &view)
 {
+	oshu_game *game = &view.game;
 	int start = SDL_GetTicks();
 	oshu_log_debug("painting the textures");
 
 	/* Circle hits. */
 	assert (game->beatmap.color_count > 0);
 	assert (game->beatmap.colors != NULL);
-	game->osu.circles = (oshu_texture*) calloc(game->beatmap.color_count, sizeof(*game->osu.circles));
-	assert (game->osu.circles != NULL);
+	view.circles = (oshu_texture*) calloc(game->beatmap.color_count, sizeof(*view.circles));
+	assert (view.circles != NULL);
 	struct oshu_color *color = game->beatmap.colors;
 	for (int i = 0; i < game->beatmap.color_count; ++i) {
 		oshu_log_verbose("painting circle for combo color #%d", i);
 		assert (color->index == i);
-		paint_circle(game, color, &game->osu.circles[i]);
+		paint_circle(view, color, &view.circles[i]);
 		color = color->next;
 	}
 
-	paint_approach_circle(game);
-	paint_slider_ball(game);
-	paint_good_mark(game, -1, &game->osu.early_mark);
-	paint_good_mark(game, 0, &game->osu.good_mark);
-	paint_good_mark(game, 1, &game->osu.late_mark);
-	paint_bad_mark(game);
-	paint_skip_mark(game);
-	paint_connector(game);
+	paint_approach_circle(view);
+	paint_slider_ball(view);
+	paint_good_mark(view, -1, &view.early_mark);
+	paint_good_mark(view, 0, &view.good_mark);
+	paint_good_mark(view, 1, &view.late_mark);
+	paint_bad_mark(view);
+	paint_skip_mark(view);
+	paint_connector(view);
 
 	int end = SDL_GetTicks();
 	oshu_log_debug("done generating the common textures in %.3f seconds", (end - start) / 1000.);
 	return 0;
 }
 
-void osu_free_resources(struct osu_game *game)
+void osu_free_resources(oshu::gui::osu &view)
 {
-	if (game->osu.circles) {
+	oshu_game *game = &view.game;
+	if (view.circles) {
 		for (int i = 0; i < game->beatmap.color_count; ++i)
-			oshu_destroy_texture(&game->osu.circles[i]);
-		free(game->osu.circles);
+			oshu_destroy_texture(&view.circles[i]);
+		free(view.circles);
 	}
 	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
 		if (hit->texture) {
@@ -368,12 +379,12 @@ void osu_free_resources(struct osu_game *game)
 			hit->texture = NULL;
 		}
 	}
-	oshu_destroy_texture(&game->osu.approach_circle);
-	oshu_destroy_texture(&game->osu.slider_ball);
-	oshu_destroy_texture(&game->osu.good_mark);
-	oshu_destroy_texture(&game->osu.early_mark);
-	oshu_destroy_texture(&game->osu.late_mark);
-	oshu_destroy_texture(&game->osu.bad_mark);
-	oshu_destroy_texture(&game->osu.skip_mark);
-	oshu_destroy_texture(&game->osu.connector);
+	oshu_destroy_texture(&view.approach_circle);
+	oshu_destroy_texture(&view.slider_ball);
+	oshu_destroy_texture(&view.good_mark);
+	oshu_destroy_texture(&view.early_mark);
+	oshu_destroy_texture(&view.late_mark);
+	oshu_destroy_texture(&view.bad_mark);
+	oshu_destroy_texture(&view.skip_mark);
+	oshu_destroy_texture(&view.connector);
 }

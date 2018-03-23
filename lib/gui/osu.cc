@@ -13,8 +13,9 @@
 
 #include <assert.h>
 
-static void draw_hint(struct osu_game *game, struct oshu_hit *hit)
+static void draw_hint(oshu::gui::osu &view, struct oshu_hit *hit)
 {
+	oshu_game *game = &view.game;
 	double now = game->clock.now;
 	if (hit->time > now && hit->state == OSHU_INITIAL_HIT) {
 		SDL_SetRenderDrawColor(game->display.renderer, 255, 128, 64, 255);
@@ -22,69 +23,73 @@ static void draw_hint(struct osu_game *game, struct oshu_hit *hit)
 		double base_radius = game->beatmap.difficulty.circle_radius;
 		double radius = base_radius + ratio * game->beatmap.difficulty.approach_size;
 		oshu_draw_scaled_texture(
-			&game->display, &game->osu.approach_circle, hit->p,
-			2. * radius / std::real(game->osu.approach_circle.size)
+			&game->display, &view.approach_circle, hit->p,
+			2. * radius / std::real(view.approach_circle.size)
 		);
 	}
 }
 
-static void draw_hit_mark(struct osu_game *game, struct oshu_hit *hit)
+static void draw_hit_mark(oshu::gui::osu &view, struct oshu_hit *hit)
 {
+	oshu_game *game = &view.game;
 	if (hit->state == OSHU_GOOD_HIT) {
 		double leniency = game->beatmap.difficulty.leniency;
-		struct oshu_texture *mark = &game->osu.good_mark;
+		struct oshu_texture *mark = &view.good_mark;
 		if (hit->offset < - leniency / 2)
-			mark = &game->osu.early_mark;
+			mark = &view.early_mark;
 		else if (hit->offset > leniency / 2)
-			mark = &game->osu.late_mark;
+			mark = &view.late_mark;
 		oshu_draw_texture(&game->display, mark, oshu_end_point(hit));
 	} else if (hit->state == OSHU_MISSED_HIT) {
-		oshu_draw_texture(&game->display, &game->osu.bad_mark, oshu_end_point(hit));
+		oshu_draw_texture(&game->display, &view.bad_mark, oshu_end_point(hit));
 	} else if (hit->state == OSHU_SKIPPED_HIT) {
-		oshu_draw_texture(&game->display, &game->osu.skip_mark, oshu_end_point(hit));
+		oshu_draw_texture(&game->display, &view.skip_mark, oshu_end_point(hit));
 	}
 }
 
-static void draw_hit_circle(struct osu_game *game, struct oshu_hit *hit)
+static void draw_hit_circle(oshu::gui::osu &view, struct oshu_hit *hit)
 {
+	oshu_game *game = &view.game;
 	struct oshu_display *display = &game->display;
 	if (hit->state == OSHU_INITIAL_HIT) {
 		assert (hit->color != NULL);
-		oshu_draw_texture(display, &game->osu.circles[hit->color->index], hit->p);
-		draw_hint(game, hit);
+		oshu_draw_texture(display, &view.circles[hit->color->index], hit->p);
+		draw_hint(view, hit);
 	} else {
-		draw_hit_mark(game, hit);
+		draw_hit_mark(view, hit);
 	}
 }
 
-static void draw_slider(struct osu_game *game, struct oshu_hit *hit)
+static void draw_slider(oshu::gui::osu &view, struct oshu_hit *hit)
 {
+	oshu_game *game = &view.game;
 	struct oshu_display *display = &game->display;
 	double now = game->clock.now;
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
 		if (!hit->texture) {
-			osu_paint_slider(game, hit);
+			osu_paint_slider(view, hit);
 			assert (hit->texture != NULL);
 		}
 		oshu_draw_texture(&game->display, hit->texture, hit->p);
-		draw_hint(game, hit);
+		draw_hint(view, hit);
 		/* ball */
 		double t = (now - hit->time) / hit->slider.duration;
 		if (hit->state == OSHU_SLIDING_HIT) {
 			oshu_point ball = oshu_path_at(&hit->slider.path, t < 0 ? 0 : t);
-			oshu_draw_texture(display, &game->osu.slider_ball, ball);
+			oshu_draw_texture(display, &view.slider_ball, ball);
 		}
 	} else {
-		draw_hit_mark(game, hit);
+		draw_hit_mark(view, hit);
 	}
 }
 
-static void draw_hit(struct osu_game *game, struct oshu_hit *hit)
+static void draw_hit(oshu::gui::osu &view, struct oshu_hit *hit)
 {
+	oshu_game *game = &view.game;
 	if (hit->type & OSHU_SLIDER_HIT)
-		draw_slider(game, hit);
+		draw_slider(view, hit);
 	else if (hit->type & OSHU_CIRCLE_HIT)
-		draw_hit_circle(game, hit);
+		draw_hit_circle(view, hit);
 }
 
 /**
@@ -112,8 +117,9 @@ static void draw_hit(struct osu_game *game, struct oshu_hit *hit)
  * Voilà!
  *
  */
-static void connect_hits(struct osu_game *game, struct oshu_hit *a, struct oshu_hit *b)
+static void connect_hits(oshu::gui::osu &view, struct oshu_hit *a, struct oshu_hit *b)
 {
+	oshu_game *game = &view.game;
 	if (a->state != OSHU_INITIAL_HIT && a->state != OSHU_SLIDING_HIT)
 		return;
 	oshu_point a_end = oshu_end_point(a);
@@ -130,15 +136,31 @@ static void connect_hits(struct osu_game *game, struct oshu_hit *a, struct oshu_
 	oshu_point start = a_end + direction * radius;
 	oshu_vector step = direction * interval;
 	for (int i = 0; i < steps; ++i)
-		oshu_draw_texture(&game->display, &game->osu.connector, start + (i + .5) * step);
+		oshu_draw_texture(&game->display, &view.connector, start + (i + .5) * step);
 }
 
 namespace oshu {
 namespace gui {
 
+/**
+ * \todo
+ * Handle errors.
+ */
 osu::osu(osu_game &game)
 : game(game)
 {
+	osu_view(&game);
+	int rc = osu_paint_resources(*this);
+	if (oshu_create_cursor(&game.display, &cursor) < 0)
+		rc = -1;
+	oshu_reset_view(&game.display);
+}
+
+osu::~osu()
+{
+	SDL_ShowCursor(SDL_ENABLE);
+	osu_free_resources(*this);
+	oshu_destroy_cursor(&cursor);
 }
 
 /**
@@ -157,11 +179,11 @@ void osu::draw()
 		if (oshu_hit_end_time(hit) < now - game.beatmap.difficulty.approach_time)
 			break;
 		if (next && next->combo == hit->combo)
-			connect_hits(&game, hit, next);
-		draw_hit(&game, hit);
+			connect_hits(*this, hit, next);
+		draw_hit(*this, hit);
 		next = hit;
 	}
-	oshu_show_cursor(&game.osu.cursor);
+	oshu_show_cursor(&this->cursor);
 	oshu_reset_view(&game.display);
 }
 

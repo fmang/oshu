@@ -218,19 +218,11 @@ int osu_game::relinquish()
 
 int osu_game::initialize()
 {
-	osu_view(this);
-	int rc = osu_paint_resources(this);
-	if (oshu_create_cursor(&this->display, &this->osu.cursor) < 0)
-		rc = -1;
-	oshu_reset_view(&this->display);
-	return rc;
+	return 0;
 }
 
 int osu_game::destroy()
 {
-	SDL_ShowCursor(SDL_ENABLE);
-	osu_free_resources(this);
-	oshu_destroy_cursor(&this->osu.cursor);
 	return 0;
 }
 
