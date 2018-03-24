@@ -1,50 +1,21 @@
 /**
- * \file beatmap/geometry.h
- * \ingroup geometry
+ * \file beatmap/path.h
+ * \ingroup beatmap_path
  */
 
 #pragma once
 
-#include <complex>
+#include "core/geometry.h"
 
 /**
- * \defgroup geometry Geometry
+ * \defgroup beatmap_path Path
  * \ingroup beatmap
  *
  * \brief
- * Bézier paths, among other things.
- *
- * \todo
- * The core geometry objects, like #oshu_point, #oshu_vector and #oshu_size
- * should be moved in the \ref core module. Then, all that should remain are
- * the paths, and should be moved in a path module.
+ * Path types, including arcs and Bézier.
  *
  * \{
  */
-
-/**
- * A point in a 2D space.
- *
- * The coordinate system is arbitrary.
- */
-using oshu_point = std::complex<double>;
-
-/**
- * A 2D vector.
- *
- * This is distinct from #oshu_point for readability.
- */
-using oshu_vector = std::complex<double>;
-
-/**
- * A 2D size.
- */
-using oshu_size = std::complex<double>;
-
-/**
- * Return the width / height ratio of a size.
- */
-double oshu_ratio(oshu_size size);
 
 /**
  * A simple line, with a start point and end point.

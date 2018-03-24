@@ -1,9 +1,10 @@
 /**
- * \file beatmap/geometry.cc
- * \ingroup geometry
+ * \file beatmap/path.cc
+ * \ingroup beatmap_path
  */
 
-#include "beatmap/geometry.h"
+#include "beatmap/path.h"
+
 #include "core/log.h"
 
 #include <assert.h>
@@ -13,11 +14,6 @@
  * almost 0 and possibly trigger an error, depending on the context.
  */
 static double epsilon = 0.001;
-
-double oshu_ratio(oshu_size size)
-{
-	return std::real(size) / std::imag(size);
-}
 
 /**
  * Extend a box so that the point *p* fits in.

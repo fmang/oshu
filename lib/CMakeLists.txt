@@ -5,9 +5,10 @@ add_library(
 	audio/sample.cc
 	audio/stream.cc
 	audio/track.cc
-	beatmap/geometry.cc
 	beatmap/helpers.cc
 	beatmap/parser.cc
+	beatmap/path.cc
+	core/geometry.cc
 	core/log.cc
 	game/actions.cc
 	game/clock.cc
