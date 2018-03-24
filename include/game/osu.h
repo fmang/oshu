@@ -1,6 +1,6 @@
 /**
- * \file osu/osu.h
- * \ingroup osu
+ * \file include/game/osu.h
+ * \ingroup game_osu
  */
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <memory>
 
 /**
- * \defgroup osu Osu
+ * \defgroup game_osu Osu
  *
  * \brief
  * osu!standard game mode.

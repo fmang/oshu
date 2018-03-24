@@ -1,11 +1,11 @@
 /**
- * \file osu/osu.cc
- * \ingroup osu
+ * \file lib/game/osu.cc
+ * \ingroup game_osu
  *
  * Implement the osu! standard mode.
  */
 
-#include "osu/osu.h"
+#include "game/osu.h"
 
 #include "game/game.h"
 

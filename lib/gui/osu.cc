@@ -8,8 +8,8 @@
 
 #include "gui/osu.h"
 
+#include "game/osu.h"
 #include "video/texture.h"
-#include "osu/osu.h"
 
 #include <assert.h>
 

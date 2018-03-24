@@ -11,9 +11,9 @@
 
 #include "core/log.h"
 #include "game/game.h"
+#include "game/osu.h"
 #include "gui/osu.h"
 #include "gui/window.h"
-#include "osu/osu.h"
 
 extern "C" {
 #include <libavutil/log.h>

@@ -6,7 +6,7 @@
 #include "gui/osu.h"
 
 #include "core/log.h"
-#include "osu/osu.h"
+#include "game/osu.h"
 #include "video/paint.h"
 
 #include <assert.h>

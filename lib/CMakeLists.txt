@@ -14,6 +14,7 @@ add_library(
 	game/controls.cc
 	game/game.cc
 	game/helpers.cc
+	game/osu.cc
 	game/tty.cc
 	gui/audio.cc
 	gui/background.cc
@@ -28,7 +29,6 @@ add_library(
 	gui/window.cc
 	library/beatmaps.cc
 	library/html.cc
-	osu/osu.cc
 	video/display.cc
 	video/paint.cc
 	video/texture.cc
