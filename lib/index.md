@@ -29,8 +29,6 @@ digraph modules {
 	Game -> Audio;
 	Game -> Beatmap;
 	Game -> Video [style=dotted];
-	GUI -> Audio;
-	GUI -> Beatmap;
 	GUI -> Game;
 	GUI -> Video;
 	Library -> Beatmap;
