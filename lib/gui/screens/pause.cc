@@ -10,6 +10,7 @@
 
 #include "game/game.h"
 #include "gui/window.h"
+#include "video/display.h"
 
 #include <SDL2/SDL.h>
 

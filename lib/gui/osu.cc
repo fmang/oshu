@@ -9,6 +9,7 @@
 #include "gui/osu.h"
 
 #include "game/osu.h"
+#include "video/display.h"
 #include "video/texture.h"
 
 #include <assert.h>

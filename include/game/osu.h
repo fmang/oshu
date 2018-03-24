@@ -6,8 +6,6 @@
 #pragma once
 
 #include "game/game.h"
-#include "gui/cursor.h"
-#include "video/texture.h"
 
 #include <memory>
 

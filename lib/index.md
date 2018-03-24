@@ -15,14 +15,25 @@ undesirable dependencies, and should disappear in the near future.
 digraph modules {
 	rankdir=BT;
 	node [shape=rect];
-	Beatmap;
+
+	# Module list
 	Audio;
+	Beatmap;
+	Game;
+	GUI;
+	Library;
+	Video;
+
+	# Dependencies
 	Audio -> Beatmap [style=dotted];
-	Video -> Beatmap [style=dotted];
 	Game -> Audio;
-	Game -> Video;
 	Game -> Beatmap;
+	Game -> Video [style=dotted];
+	GUI -> Audio;
+	GUI -> Beatmap;
 	GUI -> Game;
+	GUI -> Video;
+	Library -> Beatmap;
 }
 \enddot
 
@@ -38,13 +49,15 @@ The \ref audio module handles everything audio-related from audio file loading
 down to the actual output to the sound device.
 
 The \ref video module handles the window creation and provides accelerated
-drawing primitives. It is not directly related to the game, but uses the
-geometric types defined by the beatmap module.
+drawing primitives. It is not directly related to the game in itself.
 
-The \ref gui module provides user interface elements as widgets. Widgets are the
-basic block for a composable user interface.
+The \ref game module defines what a mode is, and implements the game mechanics,
+reacting to input and controlling the audio playback along with updating the
+beatmap.
 
-The \ref game module joins every module together and runs the main event loop
-of the game. It watches the audio and the user's keyboard and mouse events to
-manipulate the beatmap state, then schedules the drawing of the window. It is
-agnostic to the game mode.
+The \ref gui module manages the main game window and forwards input to the game
+module. It implements widgets for displaying the main game, and some other
+visual items like the progress bar, software cursor, &c.
+
+The \ref library module scans the filesystem for assets. It is currently only
+used by the oshu-library tool, and not part of the main game.

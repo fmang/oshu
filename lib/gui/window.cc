@@ -8,6 +8,7 @@
 #include "core/log.h"
 #include "game/game.h"
 #include "game/tty.h"
+#include "video/display.h"
 
 #include "./screens/screens.h"
 

@@ -12,7 +12,6 @@
 #include "beatmap/beatmap.h"
 #include "game/clock.h"
 #include "game/controls.h"
-#include "video/display.h"
 
 /**
  * \defgroup game Game

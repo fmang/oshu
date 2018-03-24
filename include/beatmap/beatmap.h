@@ -538,6 +538,9 @@ struct oshu_hit {
 	 *
 	 * It is up to the game module to decide how to allocate it, draw it,
 	 * and free it.
+	 *
+	 * \todo
+	 * The GUI module should manage its own texture cache.
 	 */
 	struct oshu_texture *texture;
 	/**

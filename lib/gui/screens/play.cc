@@ -12,6 +12,7 @@
 #include "game/tty.h"
 #include "gui/widget.h"
 #include "gui/window.h"
+#include "video/display.h"
 #include "video/transitions.h"
 
 #include <SDL2/SDL.h>
