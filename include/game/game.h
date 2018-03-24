@@ -35,7 +35,6 @@ struct oshu_game_state {
 	struct oshu_beatmap beatmap;
 	struct oshu_audio audio;
 	struct oshu_sound_library library;
-	struct oshu_display display;
 	struct oshu_clock clock;
 	int stop;
 	int autoplay;

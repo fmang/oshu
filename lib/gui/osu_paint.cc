@@ -25,7 +25,7 @@ static int paint_approach_circle(oshu::gui::osu &view)
 	oshu_size size = oshu_size(radius * 2., radius * 2.);
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_arc(p.cr, 0, 0, radius - 3, 0, 2. * M_PI);
@@ -46,7 +46,7 @@ static int paint_circle(oshu::gui::osu &view, struct oshu_color *color, struct o
 	oshu_size size = oshu_size(radius * 2., radius * 2.);
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
 	double opacity = 0.7;
@@ -119,7 +119,7 @@ int osu_paint_slider(oshu::gui::osu &view, struct oshu_hit *hit)
 	oshu_size size = bottom_right - top_left + oshu_vector{2, 2} * radius;
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 
 	cairo_translate(p.cr, - std::real(top_left) + radius, - std::imag(top_left) + radius);
 	cairo_set_operator(p.cr, CAIRO_OPERATOR_SOURCE);
@@ -190,7 +190,7 @@ static int paint_slider_ball(oshu::gui::osu &view) {
 	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	/* tolerance */
@@ -227,7 +227,7 @@ static int paint_good_mark(oshu::gui::osu &view, int offset, struct oshu_texture
 	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	if (offset == 0) {
@@ -258,7 +258,7 @@ static int paint_bad_mark(oshu::gui::osu &view)
 	oshu_size size = oshu_size{1, 1} * (half + 2) * 2.;
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 	cairo_translate(p.cr, half + 2, half + 2);
 
 	cairo_set_source_rgba(p.cr, .9, 0, 0, .4);
@@ -285,7 +285,7 @@ static int paint_skip_mark(oshu::gui::osu &view)
 	oshu_size size = oshu_size{1, 1} * (radius + 2) * 2.;
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 	cairo_translate(p.cr, radius + 2, radius + 2);
 
 	cairo_set_source_rgba(p.cr, .3, .3, 1, .6);
@@ -314,7 +314,7 @@ static int paint_connector(oshu::gui::osu &view)
 	oshu_size size = oshu_size{1, 1} * radius * 2.;
 
 	struct oshu_painter p;
-	oshu_start_painting(&game->display, size, &p);
+	oshu_start_painting(view.display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_set_source_rgba(p.cr, 1, 1, 1, .5);

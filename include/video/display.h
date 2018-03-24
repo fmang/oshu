@@ -88,6 +88,9 @@ struct SDL_Window;
  *
  * Enabling a flag is always worse for performance, so the fastest setup is 0,
  * and the fanciest is OR'ing all these flags together.
+ *
+ * \todo
+ * Make a higher level object instead of exposing the raw flags.
  */
 enum oshu_visual_feature {
 	/**

@@ -95,11 +95,14 @@ int run(const char *beatmap_path, int autoplay, int pause)
 	if (pause)
 		oshu_pause_game(&current_game);
 
-	{
-		oshu::gui::osu osu_view (current_game);
-		oshu::gui::window main_window (current_game, osu_view);
+	try {
+		oshu::gui::window main_window (current_game);
+		std::shared_ptr<oshu::gui::osu> osu_view = std::make_shared<oshu::gui::osu>(main_window.display, current_game);
+		main_window.game_view = osu_view;
 		oshu::gui::loop(main_window);
 		/* ensure the main window is destroyed before the game */
+	} catch (std::exception &e) {
+		oshu::log::critical() << e.what() << std::endl;
 	}
 
 	oshu_destroy_game(&current_game);

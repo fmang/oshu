@@ -31,9 +31,10 @@ struct osu_mouse : public oshu::game::mouse {
  */
 
 struct osu : public widget {
-	osu(osu_game &game);
+	osu(oshu_display *display, osu_game &game);
 	~osu();
 
+	oshu_display *display;
 	osu_game &game;
 	std::shared_ptr<osu_mouse> mouse;
 

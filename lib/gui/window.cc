@@ -11,16 +11,29 @@
 
 #include "./screens/screens.h"
 
+static void open_display(oshu::gui::window &w)
+{
+	w.display = new oshu_display {};
+	if (oshu_open_display(w.display) < 0)
+		throw std::runtime_error("no display, aborting");
+	struct oshu_metadata *meta = &w.game.beatmap.metadata;
+	std::ostringstream title;
+	title << meta->artist << " - " << meta->title << " ♯ " << meta->version << " 𝄞 oshu!";
+	SDL_SetWindowTitle(w.display->window, title.str().c_str());
+	oshu_reset_view(w.display);
+}
+
 namespace oshu {
 namespace gui {
 
-window::window(oshu_game &game, widget &game_view)
-: game(game), game_view(game_view), screen(&oshu_play_screen)
+window::window(oshu_game &game)
+: game(game), screen(&oshu_play_screen)
 {
+	open_display(*this);
 	if (game.beatmap.background_filename)
-		oshu_load_background(&game.display, game.beatmap.background_filename, &background);
-	oshu_create_metadata_frame(&game.display, &game.beatmap, &game.clock.system, &metadata);
-	oshu_create_audio_progress_bar(&game.display, &game.audio.music, &audio_progress_bar);
+		oshu_load_background(display, game.beatmap.background_filename, &background);
+	oshu_create_metadata_frame(display, &game.beatmap, &game.clock.system, &metadata);
+	oshu_create_audio_progress_bar(display, &game.audio.music, &audio_progress_bar);
 }
 
 window::~window()
@@ -29,15 +42,16 @@ window::~window()
 	oshu_destroy_metadata_frame(&metadata);
 	oshu_destroy_score_frame(&score);
 	oshu_destroy_audio_progress_bar(&audio_progress_bar);
+	oshu_close_display(display);
 }
 
 static void draw(window &w)
 {
 	oshu_game *game = &w.game;
-	SDL_SetRenderDrawColor(game->display.renderer, 0, 0, 0, 255);
-	SDL_RenderClear(game->display.renderer);
+	SDL_SetRenderDrawColor(w.display->renderer, 0, 0, 0, 255);
+	SDL_RenderClear(w.display->renderer);
 	w.screen->draw(w);
-	SDL_RenderPresent(game->display.renderer);
+	SDL_RenderPresent(w.display->renderer);
 }
 
 void loop(window &w)
@@ -51,7 +65,7 @@ void loop(window &w)
 
 	while (!game->stop) {
 		oshu_update_clock(game);
-		oshu_reset_view(&game->display);
+		oshu_reset_view(w.display);
 		while (SDL_PollEvent(&event))
 			w.screen->on_event(w, &event);
 		w.screen->update(w);
@@ -62,14 +76,14 @@ void loop(window &w)
 		if (w.screen == &oshu_play_screen)
 			oshu_print_state(game);
 
-		double advance = game->display.frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
+		double advance = w.display->frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
 		if (advance > 0) {
 			SDL_Delay(advance * 1000);
 		} else {
 			missed_frames++;
 			if (missed_frames == 1000) {
 				oshu_log_warning("your computer is having a hard time keeping up");
-				if (game->display.features)
+				if (w.display->features)
 					oshu_log_warning("try running oshu! with OSHU_QUALITY=low (see the man page)");
 			}
 		}

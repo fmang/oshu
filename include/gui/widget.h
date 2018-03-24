@@ -14,6 +14,7 @@ namespace gui {
  */
 
 struct widget {
+	virtual ~widget() = default;
 	virtual void draw() = 0;
 };
 

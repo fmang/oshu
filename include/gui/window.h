@@ -10,6 +10,8 @@
 #include "gui/metadata.h"
 #include "gui/score.h"
 
+#include <memory>
+
 struct oshu_game;
 struct oshu_game_screen;
 
@@ -34,14 +36,21 @@ struct widget;
  * Multiple game windows are currently not supported, and probably never will.
  */
 struct window {
-	window(oshu_game&, widget &game_view);
+	window(oshu_game&);
 	~window();
+	/**
+	 * The window's associated SDL display.
+	 *
+	 * It is automatically created when the window is constructed, and
+	 * destroyed with the window too.
+	 */
+	oshu_display *display;
 	/**
 	 * A reference a game object. It is not owned by the window and must
 	 * live longer than the window.
 	 */
 	oshu_game &game;
-	widget &game_view;
+	std::shared_ptr<widget> game_view;
 	oshu_game_screen *screen;
 	oshu_background background {};
 	oshu_metadata_frame metadata {};

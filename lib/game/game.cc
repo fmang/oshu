@@ -7,10 +7,9 @@
 
 #include "config.h"
 
+#include "core/log.h"
 #include "game/game.h"
 #include "game/tty.h"
-#include "video/texture.h"
-#include "core/log.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -44,27 +43,11 @@ static int open_audio(struct oshu_game *game)
 	return 0;
 }
 
-static int open_display(struct oshu_game *game)
-{
-	if (oshu_open_display(&game->display) < 0) {
-		oshu_log_error("no display, aborting");
-		return -1;
-	}
-	struct oshu_metadata *meta = &game->beatmap.metadata;
-	std::ostringstream title;
-	title << meta->artist << " - " << meta->title << " ♯ " << meta->version << " 𝄞 oshu!";
-	SDL_SetWindowTitle(game->display.window, title.str().c_str());
-	oshu_reset_view(&game->display);
-	return 0;
-}
-
 int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
 {
 	if (open_beatmap(beatmap_path, game) < 0)
 		goto fail;
 	if (open_audio(game) < 0)
-		goto fail;
-	if (open_display(game) < 0)
 		goto fail;
 	if (game->initialize() < 0)
 		goto fail;
@@ -81,5 +64,4 @@ void oshu_destroy_game(struct oshu_game *game)
 	oshu_destroy_beatmap(&game->beatmap);
 	oshu_close_audio(&game->audio);
 	oshu_close_sound_library(&game->library);
-	oshu_close_display(&game->display);
 }
