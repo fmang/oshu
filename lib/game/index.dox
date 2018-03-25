@@ -1,0 +1,8 @@
+/**
+ * \defgroup game Game
+ */
+
+/**
+ * \namespace oshu::game
+ * \ingroup game
+ */
