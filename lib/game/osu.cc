@@ -12,6 +12,11 @@
 
 #include <assert.h>
 
+osu_game::osu_game(const char *beatmap_path)
+: oshu_game(beatmap_path)
+{
+}
+
 /**
  * Find the first clickable hit object that contains the given x/y coordinates.
  *
@@ -212,15 +217,5 @@ int osu_game::relinquish()
 		oshu_stop_loop(&this->audio);
 		this->current_slider = NULL;
 	}
-	return 0;
-}
-
-int osu_game::initialize()
-{
-	return 0;
-}
-
-int osu_game::destroy()
-{
 	return 0;
 }

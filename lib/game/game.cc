@@ -43,25 +43,17 @@ static int open_audio(struct oshu_game *game)
 	return 0;
 }
 
-int oshu_create_game(const char *beatmap_path, struct oshu_game *game)
+oshu_game::oshu_game(const char *beatmap_path)
 {
-	if (open_beatmap(beatmap_path, game) < 0)
-		goto fail;
-	if (open_audio(game) < 0)
-		goto fail;
-	if (game->initialize() < 0)
-		goto fail;
-	return 0;
-fail:
-	oshu_destroy_game(game);
-	return -1;
+	if (open_beatmap(beatmap_path, this) < 0)
+		throw std::runtime_error("could not load the beatmap");
+	if (open_audio(this) < 0)
+		throw std::runtime_error("could not open the audio device");
 }
 
-void oshu_destroy_game(struct oshu_game *game)
+oshu_game::~oshu_game()
 {
-	assert (game != NULL);
-	game->destroy();
-	oshu_destroy_beatmap(&game->beatmap);
-	oshu_close_audio(&game->audio);
-	oshu_close_sound_library(&game->library);
+	oshu_destroy_beatmap(&beatmap);
+	oshu_close_audio(&audio);
+	oshu_close_sound_library(&library);
 }

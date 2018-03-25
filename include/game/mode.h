@@ -25,22 +25,6 @@ struct mode {
 	virtual ~mode() = default;
 
 	/**
-	 * Initialize the mode-specific objects.
-	 *
-	 * \todo
-	 * Port to RAII.
-	 */
-	virtual int initialize() = 0;
-
-	/**
-	 * Initialize the mode-specific objects.
-	 *
-	 * \todo
-	 * Port to RAII.
-	 */
-	virtual int destroy() = 0;
-
-	/**
 	 * Called at every game iteration, unless the game is paused.
 	 *
 	 * The job of this function is to check the game clock and see if notes

@@ -20,6 +20,8 @@
  */
 
 struct osu_game : public oshu_game {
+	osu_game(const char *beatmap_path);
+
 	/**
 	 * Slider hit object the user is holding.
 	 *
@@ -35,8 +37,6 @@ struct osu_game : public oshu_game {
 	enum oshu_finger held_key;
 	std::shared_ptr<oshu::game::mouse> mouse;
 
-	int initialize() override;
-	int destroy() override;
 	int check() override;
 	int check_autoplay() override;
 	int press(enum oshu_finger key) override;

@@ -26,6 +26,21 @@
  */
 struct oshu_game : public oshu::game::mode {
 	/**
+	 * Create the game context for a beatmap, and load all the associated assets.
+	 *
+	 * After creating the game, you're free to toy with the options of the game,
+	 * especially autoplay and pause.
+	 *
+	 * When you're done settings the game up, call #oshu_run_game.
+	 *
+	 * \todo
+	 * It should not be the responsibility of this module to load the beatmap. If
+	 * the beatmap is a taiko beatmap, then the taiko game should be instanciated,
+	 * not the base module. Instead, take a beatmap by reference.
+	 */
+	oshu_game(const char *beatmap_path);
+	~oshu_game();
+	/**
 	 * \todo
 	 * Take the beatmap by reference when the game state is constructed.
 	 */
@@ -57,37 +72,6 @@ struct oshu_game : public oshu::game::mode {
 	 */
 	struct oshu_hit *hit_cursor;
 };
-
-/**
- * Create the game context for a beatmap, and load all the associated assets.
- *
- * After creating the game, you're free to toy with the options of the game,
- * especially autoplay and pause.
- *
- * When you're done settings the game up, call #oshu_run_game.
- *
- * On failure, the game object is destroyed and left in an unspecified state.
- * On success, it's up to you to destroy it with #oshu_destroy_game.
- *
- * \todo
- * It should not be the responsibility of this module to load the beatmap. If
- * the beatmap is a taiko beatmap, then the taiko game should be instanciated,
- * not the base module. Instead, take a beatmap by reference.
- */
-int oshu_create_game(const char *beatmap_path, struct oshu_game *game);
-
-/**
- * Free all the dynamic memory associated to the game object, but no the object
- * itself.
- */
-void oshu_destroy_game(struct oshu_game *game);
-
-/**
- * Start the main event loop.
- *
- * You can stop it with #oshu_stop_game.
- */
-int oshu_run_game(struct oshu_game *game);
 
 /**
  * \defgroup game_helpers Helpers

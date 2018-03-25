@@ -70,11 +70,12 @@ static const char *version =
 	"There is NO WARRANTY, to the extent permitted by law.\n"
 ;
 
-static struct osu_game current_game;
+static std::unique_ptr<osu_game> current_game;
 
 static void signal_handler(int signum)
 {
-	oshu_stop_game(&current_game);
+	if (current_game)
+		oshu_stop_game(current_game.get());
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -86,26 +87,23 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		return -1;
 	}
 
-	if ((rc = oshu_create_game(beatmap_path, &current_game)) < 0) {
-		oshu_log_error("game initialization failed");
-		return -1;
-	}
-
-	current_game.autoplay = autoplay;
-	if (pause)
-		oshu_pause_game(&current_game);
-
 	try {
-		oshu::ui::window main_window (current_game);
-		std::shared_ptr<oshu::ui::osu> osu_view = std::make_shared<oshu::ui::osu>(main_window.display, current_game);
+		current_game = std::make_unique<osu_game>(beatmap_path);
+		current_game->autoplay = autoplay;
+		if (pause)
+			oshu_pause_game(current_game.get());
+
+		oshu::ui::window main_window (*current_game);
+		std::shared_ptr<oshu::ui::osu> osu_view = std::make_shared<oshu::ui::osu>(main_window.display, *current_game);
 		main_window.game_view = osu_view;
 		oshu::ui::loop(main_window);
-		/* ensure the main window is destroyed before the game */
+
 	} catch (std::exception &e) {
 		oshu::log::critical() << e.what() << std::endl;
+		rc = -1;
 	}
 
-	oshu_destroy_game(&current_game);
+	current_game.release();
 	SDL_Quit();
 	return rc;
 }
