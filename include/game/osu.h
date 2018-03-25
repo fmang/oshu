@@ -11,21 +11,15 @@
 
 /**
  * \defgroup game_osu Osu
+ * \ingroup game
  *
  * \brief
  * osu!standard game mode.
  *
- * \todo
- * In the future, this should be split into two modules: the game mechanics in
- * the game module, and the renderer in the ui module.
- *
  * \{
  */
 
-/**
- * Parts of the game state specific to osu!standard mode.
- */
-struct osu_state {
+struct osu_game : public oshu_game {
 	/**
 	 * Slider hit object the user is holding.
 	 *
@@ -40,10 +34,6 @@ struct osu_state {
 	 */
 	enum oshu_finger held_key;
 	std::shared_ptr<oshu::game::mouse> mouse;
-};
-
-struct osu_game : public oshu_game {
-	struct osu_state osu;
 
 	int initialize() override;
 	int destroy() override;

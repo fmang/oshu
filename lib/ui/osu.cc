@@ -157,7 +157,7 @@ osu::osu(oshu_display *display, osu_game &game)
 		rc = -1;
 	oshu_reset_view(display);
 	mouse = std::make_shared<osu_mouse>(display);
-	game.osu.mouse = mouse;
+	game.mouse = mouse;
 }
 
 osu::~osu()

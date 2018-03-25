@@ -56,7 +56,7 @@ static void jettison_hit(struct oshu_hit *hit)
  */
 static void release_slider(struct osu_game *game)
 {
-	struct oshu_hit *hit = game->osu.current_slider;
+	struct oshu_hit *hit = game->current_slider;
 	if (!hit)
 		return;
 	assert (hit->type & OSHU_SLIDER_HIT);
@@ -68,7 +68,7 @@ static void release_slider(struct osu_game *game)
 	}
 	jettison_hit(hit);
 	oshu_stop_loop(&game->audio);
-	game->osu.current_slider = NULL;
+	game->current_slider = NULL;
 }
 
 /**
@@ -78,7 +78,7 @@ static void release_slider(struct osu_game *game)
  */
 static void sonorize_slider(struct osu_game *game)
 {
-	struct oshu_hit *hit = game->osu.current_slider;
+	struct oshu_hit *hit = game->current_slider;
 	if (!hit)
 		return;
 	assert (hit->type & OSHU_SLIDER_HIT);
@@ -105,14 +105,14 @@ int osu_game::check()
 {
 	/* Ensure the mouse follows the slider. */
 	sonorize_slider(this); /* < may release the slider! */
-	if (this->osu.current_slider && osu.mouse) {
-		struct oshu_hit *hit = this->osu.current_slider;
+	if (this->current_slider && mouse) {
+		struct oshu_hit *hit = this->current_slider;
 		double t = (this->clock.now - hit->time) / hit->slider.duration;
 		oshu_point ball = oshu_path_at(&hit->slider.path, t);
-		oshu_point mouse = osu.mouse->position();
-		if (std::abs(ball - mouse) > this->beatmap.difficulty.slider_tolerance) {
+		oshu_point m = mouse->position();
+		if (std::abs(ball - m) > this->beatmap.difficulty.slider_tolerance) {
 			oshu_stop_loop(&this->audio);
-			this->osu.current_slider = NULL;
+			this->current_slider = NULL;
 			hit->state = OSHU_MISSED_HIT;
 			jettison_hit(hit);
 		}
@@ -146,8 +146,8 @@ static void activate_hit(struct osu_game *game, struct oshu_hit *hit, enum oshu_
 	if (hit->type & OSHU_SLIDER_HIT) {
 		release_slider(game);
 		hit->state = OSHU_SLIDING_HIT;
-		game->osu.current_slider = hit;
-		game->osu.held_key = key;
+		game->current_slider = hit;
+		game->held_key = key;
 		oshu_play_sound(&game->library, &hit->sound, &game->audio);
 		oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
 	} else if (hit->type & OSHU_CIRCLE_HIT) {
@@ -178,10 +178,10 @@ int osu_game::check_autoplay()
  */
 int osu_game::press(enum oshu_finger key)
 {
-	if (!osu.mouse)
+	if (!mouse)
 		return 0;
-	oshu_point mouse = osu.mouse->position();
-	struct oshu_hit *hit = find_hit(this, mouse);
+	oshu_point m = mouse->position();
+	struct oshu_hit *hit = find_hit(this, m);
 	if (!hit)
 		return 0;
 	if (fabs(hit->time - this->clock.now) < this->beatmap.difficulty.leniency) {
@@ -200,17 +200,17 @@ int osu_game::press(enum oshu_finger key)
  */
 int osu_game::release(enum oshu_finger key)
 {
-	if (this->osu.held_key == key)
+	if (this->held_key == key)
 		release_slider(this);
 	return 0;
 }
 
 int osu_game::relinquish()
 {
-	if (this->osu.current_slider) {
-		this->osu.current_slider->state = OSHU_INITIAL_HIT;
+	if (this->current_slider) {
+		this->current_slider->state = OSHU_INITIAL_HIT;
 		oshu_stop_loop(&this->audio);
-		this->osu.current_slider = NULL;
+		this->current_slider = NULL;
 	}
 	return 0;
 }
