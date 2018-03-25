@@ -1,14 +1,14 @@
 /**
- * \file include/gui/window.h
- * \ingroup gui_window
+ * \file include/ui/window.h
+ * \ingroup ui_window
  */
 
 #pragma once
 
-#include "gui/audio.h"
-#include "gui/background.h"
-#include "gui/metadata.h"
-#include "gui/score.h"
+#include "ui/audio.h"
+#include "ui/background.h"
+#include "ui/metadata.h"
+#include "ui/score.h"
 
 #include <memory>
 
@@ -16,13 +16,13 @@ struct oshu_game;
 struct oshu_game_screen;
 
 namespace oshu {
-namespace gui {
+namespace ui {
 
 struct widget;
 
 /**
- * \defgroup gui_window Window
- * \ingroup gui
+ * \defgroup ui_window Window
+ * \ingroup ui
  *
  * \brief
  * Manage the game's main window.

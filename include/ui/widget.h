@@ -1,15 +1,15 @@
 /**
- * \file include/gui/widget.h
- * \ingroup gui
+ * \file include/ui/widget.h
+ * \ingroup ui
  */
 
 #pragma once
 
 namespace oshu {
-namespace gui {
+namespace ui {
 
 /**
- * \ingroup gui
+ * \ingroup ui
  * \{
  */
 

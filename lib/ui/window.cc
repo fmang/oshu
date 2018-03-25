@@ -1,9 +1,9 @@
 /**
- * \file lib/gui/window.cc
- * \ingroup gui_window
+ * \file lib/ui/window.cc
+ * \ingroup ui_window
  */
 
-#include "gui/window.h"
+#include "ui/window.h"
 
 #include "core/log.h"
 #include "game/game.h"
@@ -12,7 +12,7 @@
 
 #include "./screens/screens.h"
 
-static void open_display(oshu::gui::window &w)
+static void open_display(oshu::ui::window &w)
 {
 	w.display = new oshu_display {};
 	if (oshu_open_display(w.display) < 0)
@@ -25,7 +25,7 @@ static void open_display(oshu::gui::window &w)
 }
 
 namespace oshu {
-namespace gui {
+namespace ui {
 
 window::window(oshu_game &game)
 : game(game), screen(&oshu_play_screen)

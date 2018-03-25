@@ -1,9 +1,9 @@
 /**
- * \file gui/audio.cc
- * \ingroup gui_audio
+ * \file ui/audio.cc
+ * \ingroup ui_audio
  */
 
-#include "gui/audio.h"
+#include "ui/audio.h"
 
 #include "audio/stream.h"
 #include "video/display.h"

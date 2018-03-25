@@ -1,6 +1,6 @@
 /**
- * \file lib/gui/screens/play.cc
- * \ingroup gui_screens
+ * \file lib/ui/screens/play.cc
+ * \ingroup ui_screens
  *
  * \brief
  * Implement the main game screen.
@@ -10,14 +10,14 @@
 
 #include "game/game.h"
 #include "game/tty.h"
-#include "gui/widget.h"
-#include "gui/window.h"
+#include "ui/widget.h"
+#include "ui/window.h"
 #include "video/display.h"
 #include "video/transitions.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(oshu::gui::window &w, union SDL_Event *event)
+static int on_event(oshu::ui::window &w, union SDL_Event *event)
 {
 	oshu_game *game = &w.game;
 	switch (event->type) {
@@ -83,7 +83,7 @@ static int on_event(oshu::gui::window &w, union SDL_Event *event)
  *
  * The game switches to the score screen, from which the only exit is *death*.
  */
-static void check_end(oshu::gui::window &w)
+static void check_end(oshu::ui::window &w)
 {
 	oshu_game *game = &w.game;
 	if (game->hit_cursor->next)
@@ -97,7 +97,7 @@ static void check_end(oshu::gui::window &w)
 	}
 }
 
-static int update(oshu::gui::window &w)
+static int update(oshu::ui::window &w)
 {
 	oshu_game *game = &w.game;
 	if (game->paused) {
@@ -140,7 +140,7 @@ static int update(oshu::gui::window &w)
  * seconds.
  *
  */
-static void draw_background(oshu::gui::window &w)
+static void draw_background(oshu::ui::window &w)
 {
 	oshu_game *game = &w.game;
 	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
@@ -152,7 +152,7 @@ static void draw_background(oshu::gui::window &w)
 	oshu_show_background(&w.background, ratio);
 }
 
-static int draw(oshu::gui::window &w)
+static int draw(oshu::ui::window &w)
 {
 	oshu_game *game = &w.game;
 	if (w.display->features & OSHU_FANCY_CURSOR)

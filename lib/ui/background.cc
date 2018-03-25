@@ -1,6 +1,6 @@
 /**
- * \file gui/background.cc
- * \ingroup gui_background
+ * \file ui/background.cc
+ * \ingroup ui_background
  *
  * \todo
  * The image loader uses SDL2_image, and then toys with cairo to resize it.
@@ -9,7 +9,7 @@
  * opportunity to delete the SDL2_image dependency too.
  */
 
-#include "gui/background.h"
+#include "ui/background.h"
 
 #include "video/display.h"
 #include "core/log.h"

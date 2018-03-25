@@ -1,11 +1,11 @@
 /**
- * \file gui/metadata.cc
- * \ingroup gui_metadata
+ * \file ui/metadata.cc
+ * \ingroup ui_metadata
  */
 
 #include "config.h"
 
-#include "gui/metadata.h"
+#include "ui/metadata.h"
 
 #include "beatmap/beatmap.h"
 #include "video/display.h"

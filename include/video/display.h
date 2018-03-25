@@ -58,7 +58,7 @@ struct SDL_Window;
  * \enddot
  *
  * \todo
- * Merge this module with ui into a new *gui* module?
+ * Merge this module with ui into a new *ui* module?
  *
  */
 
@@ -104,13 +104,13 @@ enum oshu_visual_feature {
 	/**
 	 * Display a background picture rather than a pitch black screen.
 	 *
-	 * Implemented by the \ref gui_background module.
+	 * Implemented by the \ref ui_background module.
 	 */
 	OSHU_SHOW_BACKGROUND = 0x2,
 	/**
 	 * Show a fancy software mouse cursor instead of the default one.
 	 *
-	 * This flag is implemented by the \ref gui_cursor module.
+	 * This flag is implemented by the \ref ui_cursor module.
 	 */
 	OSHU_FANCY_CURSOR = 0x4,
 	/**

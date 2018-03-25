@@ -1,6 +1,6 @@
 /**
- * \file gui/cursor.h
- * \ingroup gui_cursor
+ * \file ui/cursor.h
+ * \ingroup ui_cursor
  */
 
 #pragma once
@@ -11,8 +11,8 @@
 struct oshu_display;
 
 /**
- * \defgroup gui_cursor Cursor
- * \ingroup gui
+ * \defgroup ui_cursor Cursor
+ * \ingroup ui
  *
  * \brief
  * Fancy software mouse cursor.

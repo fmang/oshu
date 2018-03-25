@@ -17,19 +17,19 @@ add_library(
 	game/helpers.cc
 	game/osu.cc
 	game/tty.cc
-	gui/audio.cc
-	gui/background.cc
-	gui/cursor.cc
-	gui/metadata.cc
-	gui/osu.cc
-	gui/osu_paint.cc
-	gui/score.cc
-	gui/screens/pause.cc
-	gui/screens/play.cc
-	gui/screens/score.cc
-	gui/window.cc
 	library/beatmaps.cc
 	library/html.cc
+	ui/audio.cc
+	ui/background.cc
+	ui/cursor.cc
+	ui/metadata.cc
+	ui/osu.cc
+	ui/osu_paint.cc
+	ui/score.cc
+	ui/screens/pause.cc
+	ui/screens/play.cc
+	ui/screens/score.cc
+	ui/window.cc
 	video/display.cc
 	video/paint.cc
 	video/texture.cc

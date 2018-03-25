@@ -1,6 +1,6 @@
 /**
- * \file gui/score.h
- * \ingroup gui_score
+ * \file ui/score.h
+ * \ingroup ui_score
  */
 
 #pragma once
@@ -9,8 +9,8 @@ struct oshu_beatmap;
 struct oshu_display;
 
 /**
- * \defgroup gui_score Score
- * \ingroup gui
+ * \defgroup ui_score Score
+ * \ingroup ui
  *
  * \brief
  * Show the game score and statistics.

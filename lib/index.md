@@ -20,7 +20,7 @@ digraph modules {
 	Audio;
 	Beatmap;
 	Game;
-	GUI;
+	UI;
 	Library;
 	Video;
 
@@ -29,8 +29,8 @@ digraph modules {
 	Game -> Audio;
 	Game -> Beatmap;
 	Game -> Video [style=dotted];
-	GUI -> Game;
-	GUI -> Video;
+	UI -> Game;
+	UI -> Video;
 	Library -> Beatmap;
 }
 \enddot
@@ -53,7 +53,7 @@ The \ref game module defines what a mode is, and implements the game mechanics,
 reacting to input and controlling the audio playback along with updating the
 beatmap.
 
-The \ref gui module manages the main game window and forwards input to the game
+The \ref ui module manages the main game window and forwards input to the game
 module. It implements widgets for displaying the main game, and some other
 visual items like the progress bar, software cursor, &c.
 

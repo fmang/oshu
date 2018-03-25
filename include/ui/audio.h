@@ -1,6 +1,6 @@
 /**
- * \file gui/audio.h
- * \ingroup gui_audio
+ * \file ui/audio.h
+ * \ingroup ui_audio
  */
 
 #pragma once
@@ -9,8 +9,8 @@ struct oshu_display;
 struct oshu_stream;
 
 /**
- * \defgroup gui_audio Audio
- * \ingroup gui
+ * \defgroup ui_audio Audio
+ * \ingroup ui
  *
  * \brief
  * Audio-related widgets.

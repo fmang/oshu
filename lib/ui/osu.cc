@@ -1,12 +1,12 @@
 /**
- * \file lib/gui/osu.cc
- * \ingroup gui
+ * \file lib/ui/osu.cc
+ * \ingroup ui
  *
  * \brief
  * Drawing routines specific to the osu!standard game mode.
  */
 
-#include "gui/osu.h"
+#include "ui/osu.h"
 
 #include "game/osu.h"
 #include "video/display.h"
@@ -14,7 +14,7 @@
 
 #include <assert.h>
 
-static void draw_hint(oshu::gui::osu &view, struct oshu_hit *hit)
+static void draw_hint(oshu::ui::osu &view, struct oshu_hit *hit)
 {
 	oshu_game *game = &view.game;
 	double now = game->clock.now;
@@ -30,7 +30,7 @@ static void draw_hint(oshu::gui::osu &view, struct oshu_hit *hit)
 	}
 }
 
-static void draw_hit_mark(oshu::gui::osu &view, struct oshu_hit *hit)
+static void draw_hit_mark(oshu::ui::osu &view, struct oshu_hit *hit)
 {
 	oshu_game *game = &view.game;
 	if (hit->state == OSHU_GOOD_HIT) {
@@ -48,7 +48,7 @@ static void draw_hit_mark(oshu::gui::osu &view, struct oshu_hit *hit)
 	}
 }
 
-static void draw_hit_circle(oshu::gui::osu &view, struct oshu_hit *hit)
+static void draw_hit_circle(oshu::ui::osu &view, struct oshu_hit *hit)
 {
 	oshu_game *game = &view.game;
 	struct oshu_display *display = view.display;
@@ -61,7 +61,7 @@ static void draw_hit_circle(oshu::gui::osu &view, struct oshu_hit *hit)
 	}
 }
 
-static void draw_slider(oshu::gui::osu &view, struct oshu_hit *hit)
+static void draw_slider(oshu::ui::osu &view, struct oshu_hit *hit)
 {
 	oshu_game *game = &view.game;
 	struct oshu_display *display = view.display;
@@ -84,7 +84,7 @@ static void draw_slider(oshu::gui::osu &view, struct oshu_hit *hit)
 	}
 }
 
-static void draw_hit(oshu::gui::osu &view, struct oshu_hit *hit)
+static void draw_hit(oshu::ui::osu &view, struct oshu_hit *hit)
 {
 	oshu_game *game = &view.game;
 	if (hit->type & OSHU_SLIDER_HIT)
@@ -118,7 +118,7 @@ static void draw_hit(oshu::gui::osu &view, struct oshu_hit *hit)
  * Voilà!
  *
  */
-static void connect_hits(oshu::gui::osu &view, struct oshu_hit *a, struct oshu_hit *b)
+static void connect_hits(oshu::ui::osu &view, struct oshu_hit *a, struct oshu_hit *b)
 {
 	oshu_game *game = &view.game;
 	if (a->state != OSHU_INITIAL_HIT && a->state != OSHU_SLIDING_HIT)
@@ -141,7 +141,7 @@ static void connect_hits(oshu::gui::osu &view, struct oshu_hit *a, struct oshu_h
 }
 
 namespace oshu {
-namespace gui {
+namespace ui {
 
 /**
  * \todo

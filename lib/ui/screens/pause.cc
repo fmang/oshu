@@ -1,6 +1,6 @@
 /**
- * \file lib/gui/screens/pause.cc
- * \ingroup gui_screens
+ * \file lib/ui/screens/pause.cc
+ * \ingroup ui_screens
  *
  * \brief
  * Implement the pause screen.
@@ -9,12 +9,12 @@
 #include "./screens.h"
 
 #include "game/game.h"
-#include "gui/window.h"
+#include "ui/window.h"
 #include "video/display.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(oshu::gui::window &w, union SDL_Event *event)
+static int on_event(oshu::ui::window &w, union SDL_Event *event)
 {
 	oshu_game *game = &w.game;
 	switch (event->type) {
@@ -50,7 +50,7 @@ static int on_event(oshu::gui::window &w, union SDL_Event *event)
 	return 0;
 }
 
-static int update(oshu::gui::window &w)
+static int update(oshu::ui::window &w)
 {
 	oshu_game *game = &w.game;
 	if (!game->paused)
@@ -76,7 +76,7 @@ static void draw_pause(struct oshu_display *display)
 	SDL_RenderFillRect(display->renderer, &bar);
 }
 
-static int draw(oshu::gui::window &w)
+static int draw(oshu::ui::window &w)
 {
 	oshu_game *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);

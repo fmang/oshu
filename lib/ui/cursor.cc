@@ -1,9 +1,9 @@
 /**
- * \file gui/cursor.cc
- * \ingroup gui_cursor
+ * \file ui/cursor.cc
+ * \ingroup ui_cursor
  */
 
-#include "gui/cursor.h"
+#include "ui/cursor.h"
 
 #include "video/display.h"
 #include "video/paint.h"

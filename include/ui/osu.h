@@ -1,13 +1,13 @@
 /**
- * \file include/gui/osu.h
- * \ingroup gui
+ * \file include/ui/osu.h
+ * \ingroup ui
  */
 
 #pragma once
 
 #include "game/controls.h"
-#include "gui/cursor.h"
-#include "gui/widget.h"
+#include "ui/cursor.h"
+#include "ui/widget.h"
 #include "video/texture.h"
 
 #include <memory>
@@ -15,7 +15,7 @@
 struct osu_game;
 
 namespace oshu {
-namespace gui {
+namespace ui {
 
 struct osu;
 
@@ -26,7 +26,7 @@ struct osu_mouse : public oshu::game::mouse {
 };
 
 /**
- * \ingroup gui
+ * \ingroup ui
  * \{
  */
 
@@ -108,7 +108,7 @@ struct osu : public widget {
  *
  * Sliders are not painted. Instead, you must call #osu_paint_slider.
  */
-int osu_paint_resources(oshu::gui::osu&);
+int osu_paint_resources(oshu::ui::osu&);
 
 /**
  * Paint a slider.
@@ -121,12 +121,12 @@ int osu_paint_resources(oshu::gui::osu&);
  *
  * Slider textures are freed with #osu_free_resources.
  */
-int osu_paint_slider(oshu::gui::osu&, struct oshu_hit *hit);
+int osu_paint_slider(oshu::ui::osu&, struct oshu_hit *hit);
 
 /**
  * Free the dynamic resources of the game mode.
  */
-void osu_free_resources(oshu::gui::osu&);
+void osu_free_resources(oshu::ui::osu&);
 
 /**
  * Set-up the coordinate system for the osu!standard mode.

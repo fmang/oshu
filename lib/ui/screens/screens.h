@@ -1,6 +1,6 @@
 /**
- * \file lib/gui/screens/screens.h
- * \ingroup gui_screens
+ * \file lib/ui/screens/screens.h
+ * \ingroup ui_screens
  */
 
 #pragma once
@@ -8,13 +8,13 @@
 union SDL_Event;
 
 namespace oshu {
-namespace gui {
+namespace ui {
 struct window;
 }}
 
 /**
- * \defgroup gui_screens Screens
- * \ingroup gui
+ * \defgroup ui_screens Screens
+ * \ingroup ui
  *
  * \brief
  * Game states.
@@ -69,11 +69,11 @@ struct oshu_game_screen {
 	 * The main game module may preprocess the event, or even filter it.
 	 * For instance, when the window is closed.
 	 */
-	int (*on_event)(oshu::gui::window&, union SDL_Event *event);
+	int (*on_event)(oshu::ui::window&, union SDL_Event *event);
 	/**
 	 * The update function is run at every iteration of the main loop.
 	 */
-	int (*update)(oshu::gui::window&);
+	int (*update)(oshu::ui::window&);
 	/**
 	 * Draw the screen.
 	 *
@@ -82,7 +82,7 @@ struct oshu_game_screen {
 	 *
 	 * Beside that, no implicit drawing is done for you.
 	 */
-	int (*draw)(oshu::gui::window&);
+	int (*draw)(oshu::ui::window&);
 };
 
 /* Defined in play.c */

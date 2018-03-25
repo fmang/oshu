@@ -1,6 +1,6 @@
 /**
- * \file lib/gui/screens/score.cc
- * \ingroup gui_screens
+ * \file lib/ui/screens/score.cc
+ * \ingroup ui_screens
  *
  * \brief
  * Implement the score screen, when the game is finished.
@@ -9,12 +9,12 @@
 #include "./screens.h"
 
 #include "game/game.h"
-#include "gui/window.h"
+#include "ui/window.h"
 #include "video/transitions.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(oshu::gui::window &w, union SDL_Event *event)
+static int on_event(oshu::ui::window &w, union SDL_Event *event)
 {
 	oshu_game *game = &w.game;
 	switch (event->type) {
@@ -38,12 +38,12 @@ static int on_event(oshu::gui::window &w, union SDL_Event *event)
 	return 0;
 }
 
-static int update(oshu::gui::window &w)
+static int update(oshu::ui::window &w)
 {
 	return 0;
 }
 
-static int draw(oshu::gui::window &w)
+static int draw(oshu::ui::window &w)
 {
 	oshu_game *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);

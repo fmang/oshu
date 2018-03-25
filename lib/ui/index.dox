@@ -1,5 +1,5 @@
 /**
- * \defgroup gui GUI
+ * \defgroup ui UI
  *
  * \brief
  * Collection of graphical user interface elements.
@@ -22,6 +22,6 @@
  */
 
 /**
- * \namespace oshu::gui
- * \ingroup gui
+ * \namespace oshu::ui
+ * \ingroup ui
  */

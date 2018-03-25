@@ -12,8 +12,8 @@
 #include "core/log.h"
 #include "game/game.h"
 #include "game/osu.h"
-#include "gui/osu.h"
-#include "gui/window.h"
+#include "ui/osu.h"
+#include "ui/window.h"
 
 extern "C" {
 #include <libavutil/log.h>
@@ -96,10 +96,10 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		oshu_pause_game(&current_game);
 
 	try {
-		oshu::gui::window main_window (current_game);
-		std::shared_ptr<oshu::gui::osu> osu_view = std::make_shared<oshu::gui::osu>(main_window.display, current_game);
+		oshu::ui::window main_window (current_game);
+		std::shared_ptr<oshu::ui::osu> osu_view = std::make_shared<oshu::ui::osu>(main_window.display, current_game);
 		main_window.game_view = osu_view;
-		oshu::gui::loop(main_window);
+		oshu::ui::loop(main_window);
 		/* ensure the main window is destroyed before the game */
 	} catch (std::exception &e) {
 		oshu::log::critical() << e.what() << std::endl;
