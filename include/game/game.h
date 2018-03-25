@@ -44,13 +44,13 @@ struct oshu_game : public oshu::game::mode {
 	 * \todo
 	 * Take the beatmap by reference when the game state is constructed.
 	 */
-	struct oshu_beatmap beatmap;
-	struct oshu_audio audio;
-	struct oshu_sound_library library;
-	struct oshu_clock clock;
-	int stop;
-	int autoplay;
-	bool paused;
+	struct oshu_beatmap beatmap {};
+	struct oshu_audio audio {};
+	struct oshu_sound_library library {};
+	struct oshu_clock clock {};
+	int stop {};
+	int autoplay {};
+	bool paused {};
 	/**
 	 * Pointer to the next clickable hit.
 	 *
@@ -70,7 +70,7 @@ struct oshu_game : public oshu::game::mode {
 	 * With the two sentinels in the beatmap's hits linked list, this
 	 * cursor is never null, even after the last hit was played.
 	 */
-	struct oshu_hit *hit_cursor;
+	struct oshu_hit *hit_cursor {};
 };
 
 /**

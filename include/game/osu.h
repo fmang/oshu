@@ -27,15 +27,15 @@ struct osu_game : public oshu_game {
 	 *
 	 * NULL most of the time.
 	 */
-	struct oshu_hit *current_slider;
+	struct oshu_hit *current_slider {};
 	/**
 	 * Keyboard key or mouse button associated to the #current_slider.
 	 *
 	 * When the #current_slider is NULL, the value of this field is
 	 * irrelevant.
 	 */
-	enum oshu_finger held_key;
-	std::shared_ptr<oshu::game::mouse> mouse;
+	enum oshu_finger held_key {};
+	std::shared_ptr<oshu::game::mouse> mouse {};
 
 	int check() override;
 	int check_autoplay() override;
