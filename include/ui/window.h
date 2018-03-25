@@ -10,8 +10,6 @@
 #include "ui/metadata.h"
 #include "ui/score.h"
 
-#include <memory>
-
 struct oshu_game;
 struct oshu_game_screen;
 
@@ -50,7 +48,18 @@ struct window {
 	 * live longer than the window.
 	 */
 	oshu_game &game;
-	std::shared_ptr<widget> game_view;
+	/**
+	 * The widget responsible for drawing the main game objects, specific
+	 * to the mode.
+	 *
+	 * It must be destroyed before the window, because the window destroys
+	 * the display the widget uploads its textures to.
+	 *
+	 * \todo
+	 * Use a smart weak pointer? Alternatively, make the window the unique
+	 * owner of the view.
+	 */
+	widget *game_view;
 	oshu_game_screen *screen;
 	oshu_background background {};
 	oshu_metadata_frame metadata {};

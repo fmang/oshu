@@ -94,8 +94,8 @@ int run(const char *beatmap_path, int autoplay, int pause)
 			oshu_pause_game(current_game.get());
 
 		oshu::ui::window main_window (*current_game);
-		std::shared_ptr<oshu::ui::osu> osu_view = std::make_shared<oshu::ui::osu>(main_window.display, *current_game);
-		main_window.game_view = osu_view;
+		oshu::ui::osu osu_view (main_window.display, *current_game);
+		main_window.game_view = &osu_view;
 		oshu::ui::loop(main_window);
 
 	} catch (std::exception &e) {
