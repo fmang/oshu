@@ -184,6 +184,11 @@ int osu_paint_slider(oshu::ui::osu &view, struct oshu_hit *hit)
 	return 0;
 }
 
+/**
+ * \todo
+ * It looks like cairo_fill with a pattern triggers jumps depending on
+ * uninitialised values, which propagates.
+ */
 static int paint_slider_ball(oshu::ui::osu &view) {
 	oshu_game *game = &view.game;
 	double radius = game->beatmap.difficulty.slider_tolerance;
