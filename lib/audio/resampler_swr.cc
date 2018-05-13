@@ -11,6 +11,7 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
+#include <iostream>
 #include <stdexcept>
 
 /**
@@ -38,6 +39,7 @@ namespace audio {
  */
 resampler::resampler(struct AVCodecContext *input, int output_sample_rate)
 {
+	oshu::log::debug() << "using libswresample" << std::endl;
 	swr = swr_alloc_set_opts(
 		nullptr,
 		/* output */
