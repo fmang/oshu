@@ -273,6 +273,7 @@ void oshu_close_stream(struct oshu_stream *stream)
 		avcodec_free_context(&stream->decoder);
 	if (stream->demuxer)
 		avformat_close_input(&stream->demuxer);
+	stream->converter.reset(nullptr);
 }
 
 int oshu_seek_stream(struct oshu_stream *stream, double target)
