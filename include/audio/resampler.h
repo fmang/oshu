@@ -5,15 +5,21 @@
 
 #pragma once
 
+#include <cstdint>
+
 struct AVCodecContext;
+struct SwrContext;
 
 namespace oshu {
 namespace audio {
 
 /**
- * The resample converts audio samples from one format to another.
+ * \defgroup audio_resampler Resampler
+ * \ingroup audio
  *
- * For simplicity, this one is specialized for use with libavcodec, and
+ * The resampling process converts audio samples from one format to another.
+ *
+ * For simplicity, this module is specialized for use with libavcodec, and
  * restricted to outputting stereo 32-bit floating samples.
  *
  * Its main reason for being is to expose a common interface between
@@ -24,14 +30,25 @@ namespace audio {
  *
  * More details on libswresample vs. libavresample at
  * https://lists.ffmpeg.org/pipermail/ffmpeg-devel/2012-April/123746.html
+ *
+ * \{
  */
+
 class resampler {
 
 public:
 	resampler(struct AVCodecContext *input, int output_sample_rate);
 	~resampler();
-	void convert(uint8_t *out, uint8_t out_count, uint8_t *in, uint8_t in_count);
+	void convert(uint8_t **out, int out_count, const uint8_t **in, int in_count);
 
-}
+private:
+	/**
+	 * libswresample context.
+	 */
+	struct SwrContext *swr = nullptr;
+
+};
+
+/** \} */
 
 }}

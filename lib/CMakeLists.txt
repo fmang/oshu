@@ -2,6 +2,7 @@ add_library(
 	liboshu STATIC
 	audio/audio.cc
 	audio/library.cc
+	audio/resampler_swr.cc
 	audio/sample.cc
 	audio/stream.cc
 	audio/track.cc
