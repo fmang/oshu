@@ -39,7 +39,19 @@ class resampler {
 public:
 	resampler(struct AVCodecContext *input, int output_sample_rate);
 	~resampler();
-	void convert(uint8_t **out, int out_count, const uint8_t **in, int in_count);
+	/**
+	 * Main conversion function, wrapping `swr_convert`.
+	 *
+	 * \param out output buffers, only the first one need be set in case of packed audio
+	 * \param out_count amount of space available for output in samples per channel
+	 * \param in input buffers, only the first one need to be set in case of packed audio
+	 * \param in_count number of input samples available in one channel
+	 *
+	 * \return number of samples output per channel
+	 *
+	 * On error, an runtime error is raised.
+	 */
+	int convert(uint8_t **out, int out_count, const uint8_t **in, int in_count);
 
 private:
 	/**

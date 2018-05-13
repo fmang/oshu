@@ -70,13 +70,15 @@ resampler::~resampler()
 		swr_free(&swr);
 }
 
-void resampler::convert(uint8_t **out, int out_count, const uint8_t **in, int in_count)
+int resampler::convert(uint8_t **out, int out_count, const uint8_t **in, int in_count)
 {
 	int rc = swr_convert(swr, out, out_count, in, in_count);
 	if (rc < 0) {
 		oshu_log_error("audio sample conversion error");
 		log_av_error(rc);
 		throw std::runtime_error("libswresample conversion error");
+	} else {
+		return rc;
 	}
 }
 

@@ -125,11 +125,10 @@ static int convert_frame(oshu_stream *stream, AVFrame *frame, int index, float *
 	int left = frame->nb_samples - index;
 	int consume = left < wanted ? left : wanted;
 	try {
-		stream->converter->convert((uint8_t**) &samples, consume, data, consume);
+		return stream->converter->convert((uint8_t**) &samples, consume, data, consume);
 	} catch (std::runtime_error &e) {
 		return -1;
 	}
-	return 0;
 }
 
 int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
