@@ -1,5 +1,5 @@
 /**
- * \file src/audio/resampler_avr.cc
+ * \file lib/audio/resampler_avr.cc
  * \ingroup audio_resampler
  *
  * \brief

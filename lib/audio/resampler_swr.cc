@@ -1,5 +1,5 @@
 /**
- * \file src/audio/resampler_swr.cc
+ * \file lib/audio/resampler_swr.cc
  * \ingroup audio_resampler
  *
  * \brief
