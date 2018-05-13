@@ -7,6 +7,7 @@
 
 #include <cstdint>
 
+struct AVAudioResampleContext;
 struct AVCodecContext;
 struct SwrContext;
 
@@ -51,13 +52,21 @@ public:
 	 *
 	 * On error, an runtime error is raised.
 	 */
-	int convert(uint8_t **out, int out_count, const uint8_t **in, int in_count);
+	int convert(uint8_t **out, int out_count, uint8_t **in, int in_count);
 
 private:
 	/**
 	 * libswresample context.
+	 *
+	 * Only one of #swr or #avr may be not null.
 	 */
 	struct SwrContext *swr = nullptr;
+	/**
+	 * libavresample context.
+	 *
+	 * Conflicts with #avr.
+	 */
+	struct AVAudioResampleContext *avr = nullptr;
 
 };
 

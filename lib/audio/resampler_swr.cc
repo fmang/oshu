@@ -1,6 +1,9 @@
 /**
  * \file src/audio/resampler_swr.cc
  * \ingroup audio_resampler
+ *
+ * \brief
+ * libswresample backend for the resampler.
  */
 
 #include "audio/resampler.h"
@@ -70,9 +73,9 @@ resampler::~resampler()
 		swr_free(&swr);
 }
 
-int resampler::convert(uint8_t **out, int out_count, const uint8_t **in, int in_count)
+int resampler::convert(uint8_t **out, int out_count, uint8_t **in, int in_count)
 {
-	int rc = swr_convert(swr, out, out_count, in, in_count);
+	int rc = swr_convert(swr, out, out_count, const_cast<const uint8_t**>(in), in_count);
 	if (rc < 0) {
 		oshu_log_error("audio sample conversion error");
 		log_av_error(rc);

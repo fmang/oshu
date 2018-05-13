@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FindPkgConfig)
 pkg_check_modules(SDL REQUIRED sdl2 SDL2_image)
-pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libswresample libavutil)
+pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libavresample libavutil)
 pkg_check_modules(CAIRO REQUIRED cairo)
 pkg_check_modules(PANGO REQUIRED pangocairo)
 
