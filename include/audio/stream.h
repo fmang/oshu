@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include "audio/resampler.h"
+
+#include <memory>
+
 /**
  * \defgroup audio_stream Stream
  * \ingroup audio
@@ -99,11 +103,8 @@ struct oshu_stream {
 	 * The audio resampler that converts whatever audio data format #frame
 	 * contains into the packed stereo 32-bit float samples we use for our
 	 * output.
-	 *
-	 * Its input format is based on the #decoder, which must match the
-	 * format of every decoded #frame.
 	 */
-	struct SwrContext *converter;
+	std::unique_ptr<oshu::audio::resampler> converter;
 	/**
 	 * The sample rate of the output stream when read with
 	 * #oshu_read_stream.

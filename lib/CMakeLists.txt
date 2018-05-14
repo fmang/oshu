@@ -2,6 +2,7 @@ add_library(
 	liboshu STATIC
 	audio/audio.cc
 	audio/library.cc
+	audio/resampler_${RESAMPLE_BACKEND}.cc
 	audio/sample.cc
 	audio/stream.cc
 	audio/track.cc
@@ -47,6 +48,7 @@ target_compile_options(
 	liboshu PUBLIC
 	${SDL_CFLAGS}
 	${FFMPEG_CFLAGS}
+	${RESAMPLE_CFLAGS}
 	${CAIRO_CFLAGS}
 	${PANGO_CFLAGS}
 )

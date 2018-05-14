@@ -9,7 +9,6 @@
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
-#include <libswresample/swresample.h>
 }
 
 #include <assert.h>
@@ -112,9 +111,9 @@ static int next_frame(struct oshu_stream *stream)
  * array, according to index. The second half passes the translated planes into
  * the resampler, which will write the converted samples into the output.
  */
-static int convert_frame(struct SwrContext *converter, AVFrame *frame, int index, float *samples, int wanted)
+static int convert_frame(oshu_stream *stream, AVFrame *frame, int index, float *samples, int wanted)
 {
-	const uint8_t *data[frame->channels];
+	uint8_t *data[frame->channels];
 	int sample_size = av_get_bytes_per_sample((AVSampleFormat) frame->format);
 	if (av_sample_fmt_is_planar((AVSampleFormat) frame->format)) {
 		for (int c = 0; c < frame->channels; ++c)
@@ -125,13 +124,11 @@ static int convert_frame(struct SwrContext *converter, AVFrame *frame, int index
 
 	int left = frame->nb_samples - index;
 	int consume = left < wanted ? left : wanted;
-	int rc = swr_convert(converter, (uint8_t**) &samples, consume, data, consume);
-	if (rc < 0) {
-		oshu_log_error("audio sample conversion error");
-		log_av_error(rc);
+	try {
+		return stream->converter->convert((uint8_t**) &samples, consume, data, consume);
+	} catch (std::runtime_error &e) {
 		return -1;
 	}
-	return rc;
 }
 
 int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
@@ -143,7 +140,7 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
 				return -1;
 			continue;
 		}
-		int rc = convert_frame(stream->converter, stream->frame, stream->sample_index, samples, left);
+		int rc = convert_frame(stream, stream->frame, stream->sample_index, samples, left);
 		if (rc < 0)
 			return -1;
 		left -= rc;
@@ -244,40 +241,6 @@ fail:
 	return -1;
 }
 
-/**
- * Initialize the libswresample converter to resample data from
- * #oshu_stream::decoder into a definied output format.
- *
- * The output sample rate must be defined in #oshu_stream::sample_rate.
- */
-static int open_converter(struct oshu_stream *stream)
-{
-	assert (channels == 2);
-	stream->converter = swr_alloc_set_opts(
-		stream->converter,
-		/* output */
-		AV_CH_LAYOUT_STEREO,
-		AV_SAMPLE_FMT_FLT,
-		stream->sample_rate,
-		/* input */
-		stream->decoder->channel_layout,
-		stream->decoder->sample_fmt,
-		stream->decoder->sample_rate,
-		0, NULL
-	);
-	if (!stream->converter) {
-		oshu_log_error("error allocating the audio resampler");
-		return -1;
-	}
-	int rc = swr_init(stream->converter);
-	if (rc < 0) {
-		oshu_log_error("error initializing the audio resampler");
-		log_av_error(rc);
-		return -1;
-	}
-	return 0;
-}
-
 int oshu_open_stream(const char *url, struct oshu_stream *stream)
 {
 	av_register_all();
@@ -287,8 +250,11 @@ int oshu_open_stream(const char *url, struct oshu_stream *stream)
 		goto fail;
 	dump_stream_info(stream);
 	stream->sample_rate = stream->decoder->sample_rate;
-	if (open_converter(stream) < 0)
+	try {
+		stream->converter = std::make_unique<oshu::audio::resampler>(stream->decoder, stream->sample_rate);
+	} catch (std::runtime_error &e) {
 		goto fail;
+	}
 	if (next_frame(stream) < 0)
 		goto fail;
 	return 0;
@@ -306,8 +272,7 @@ void oshu_close_stream(struct oshu_stream *stream)
 		avcodec_free_context(&stream->decoder);
 	if (stream->demuxer)
 		avformat_close_input(&stream->demuxer);
-	if (stream->converter)
-		swr_free(&stream->converter);
+	stream->converter.reset(nullptr);
 }
 
 int oshu_seek_stream(struct oshu_stream *stream, double target)

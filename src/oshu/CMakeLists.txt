@@ -7,6 +7,7 @@ target_compile_options(
 	oshu PUBLIC
 	${SDL_CFLAGS}
 	${FFMPEG_CFLAGS}
+	${RESAMPLE_CFLAGS}
 	${CAIRO_CFLAGS}
 	${PANGO_CFLAGS}
 )
@@ -16,6 +17,7 @@ target_link_libraries(
 	liboshu
 	${SDL_LIBRARIES}
 	${FFMPEG_LIBRARIES}
+	${RESAMPLE_LIBRARIES}
 	${CAIRO_LIBRARIES}
 	${PANGO_LIBRARIES}
 )
