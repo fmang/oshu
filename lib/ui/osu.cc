@@ -16,7 +16,7 @@
 
 static void draw_hint(oshu::ui::osu &view, struct oshu_hit *hit)
 {
-	oshu_game *game = &view.game;
+	oshu::game::base *game = &view.game;
 	double now = game->clock.now;
 	if (hit->time > now && hit->state == OSHU_INITIAL_HIT) {
 		SDL_SetRenderDrawColor(view.display->renderer, 255, 128, 64, 255);
@@ -32,7 +32,7 @@ static void draw_hint(oshu::ui::osu &view, struct oshu_hit *hit)
 
 static void draw_hit_mark(oshu::ui::osu &view, struct oshu_hit *hit)
 {
-	oshu_game *game = &view.game;
+	oshu::game::base *game = &view.game;
 	if (hit->state == OSHU_GOOD_HIT) {
 		double leniency = game->beatmap.difficulty.leniency;
 		struct oshu_texture *mark = &view.good_mark;
@@ -50,7 +50,7 @@ static void draw_hit_mark(oshu::ui::osu &view, struct oshu_hit *hit)
 
 static void draw_hit_circle(oshu::ui::osu &view, struct oshu_hit *hit)
 {
-	oshu_game *game = &view.game;
+	oshu::game::base *game = &view.game;
 	struct oshu_display *display = view.display;
 	if (hit->state == OSHU_INITIAL_HIT) {
 		assert (hit->color != NULL);
@@ -63,7 +63,7 @@ static void draw_hit_circle(oshu::ui::osu &view, struct oshu_hit *hit)
 
 static void draw_slider(oshu::ui::osu &view, struct oshu_hit *hit)
 {
-	oshu_game *game = &view.game;
+	oshu::game::base *game = &view.game;
 	struct oshu_display *display = view.display;
 	double now = game->clock.now;
 	if (hit->state == OSHU_INITIAL_HIT || hit->state == OSHU_SLIDING_HIT) {
@@ -86,7 +86,7 @@ static void draw_slider(oshu::ui::osu &view, struct oshu_hit *hit)
 
 static void draw_hit(oshu::ui::osu &view, struct oshu_hit *hit)
 {
-	oshu_game *game = &view.game;
+	oshu::game::base *game = &view.game;
 	if (hit->type & OSHU_SLIDER_HIT)
 		draw_slider(view, hit);
 	else if (hit->type & OSHU_CIRCLE_HIT)
@@ -120,7 +120,7 @@ static void draw_hit(oshu::ui::osu &view, struct oshu_hit *hit)
  */
 static void connect_hits(oshu::ui::osu &view, struct oshu_hit *a, struct oshu_hit *b)
 {
-	oshu_game *game = &view.game;
+	oshu::game::base *game = &view.game;
 	if (a->state != OSHU_INITIAL_HIT && a->state != OSHU_SLIDING_HIT)
 		return;
 	oshu_point a_end = oshu_end_point(a);

@@ -5,7 +5,10 @@
 
 #pragma once
 
-struct oshu_game;
+namespace oshu {
+namespace game {
+class base;
+}}
 
 /**
  * \defgroup game_tty TTY
@@ -35,7 +38,7 @@ struct oshu_game;
  *
  * Show the beatmap's metadata and difficulty information.
  */
-void oshu_welcome(struct oshu_game *game);
+void oshu_welcome(struct oshu::game::base *game);
 
 /**
  * Show the state of the game (paused/playing) and the current song position.
@@ -47,13 +50,13 @@ void oshu_welcome(struct oshu_game *game);
  * glitches. If you write `foo\rx`, you get `xoo`. This is the reason the
  * Paused string literal has an extra space.
  */
-void oshu_print_state(struct oshu_game *game);
+void oshu_print_state(struct oshu::game::base *game);
 
 /**
  * Congratulate the user when the beatmap is over.
  *
  * Show the number of good hits and bad hits.
  */
-void oshu_congratulate(struct oshu_game *game);
+void oshu_congratulate(struct oshu::game::base *game);
 
 /** \} */

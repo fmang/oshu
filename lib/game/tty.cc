@@ -5,7 +5,7 @@
 
 #include "game/tty.h"
 
-#include "game/game.h"
+#include "game/base.h"
 
 #include <unistd.h>
 
@@ -21,7 +21,7 @@ void print_dual(const char *ascii, const char *unicode)
 		printf("  Unknown\n");
 }
 
-void oshu_welcome(struct oshu_game *game)
+void oshu_welcome(struct oshu::game::base *game)
 {
 	struct oshu_beatmap *beatmap = &game->beatmap;
 	struct oshu_metadata *meta = &beatmap->metadata;
@@ -53,7 +53,7 @@ void oshu_welcome(struct oshu_game *game)
  * \todo
  * This function should be deleted once the window can display the time.
  */
-void oshu_print_state(struct oshu_game *game)
+void oshu_print_state(struct oshu::game::base *game)
 {
 	if (!isatty(fileno(stdout)))
 		return;
@@ -70,7 +70,7 @@ void oshu_print_state(struct oshu_game *game)
 	fflush(stdout);
 }
 
-void oshu_congratulate(struct oshu_game *game)
+void oshu_congratulate(struct oshu::game::base *game)
 {
 	/* Clear the status line. */
 	printf("\r                                        \r");

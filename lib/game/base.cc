@@ -8,7 +8,7 @@
 #include "config.h"
 
 #include "core/log.h"
-#include "game/game.h"
+#include "game/base.h"
 #include "game/tty.h"
 
 #include <assert.h>
@@ -16,7 +16,7 @@
 
 #include <SDL2/SDL_image.h>
 
-static int open_beatmap(const char *beatmap_path, struct oshu_game *game)
+static int open_beatmap(const char *beatmap_path, struct oshu::game::base *game)
 {
 	if (oshu_load_beatmap(beatmap_path, &game->beatmap) < 0) {
 		oshu_log_error("no beatmap, aborting");
@@ -31,7 +31,7 @@ static int open_beatmap(const char *beatmap_path, struct oshu_game *game)
 	return 0;
 }
 
-static int open_audio(struct oshu_game *game)
+static int open_audio(struct oshu::game::base *game)
 {
 	assert (game->beatmap.audio_filename != NULL);
 	if (oshu_open_audio(game->beatmap.audio_filename, &game->audio) < 0) {
@@ -43,7 +43,10 @@ static int open_audio(struct oshu_game *game)
 	return 0;
 }
 
-oshu_game::oshu_game(const char *beatmap_path)
+namespace oshu {
+namespace game {
+
+base::base(const char *beatmap_path)
 {
 	if (open_beatmap(beatmap_path, this) < 0)
 		throw std::runtime_error("could not load the beatmap");
@@ -51,9 +54,11 @@ oshu_game::oshu_game(const char *beatmap_path)
 		throw std::runtime_error("could not open the audio device");
 }
 
-oshu_game::~oshu_game()
+base::~base()
 {
 	oshu_destroy_beatmap(&beatmap);
 	oshu_close_audio(&audio);
 	oshu_close_sound_library(&library);
 }
+
+}}

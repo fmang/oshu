@@ -10,7 +10,11 @@
 #include "ui/metadata.h"
 #include "ui/score.h"
 
-struct oshu_game;
+namespace oshu {
+namespace game {
+class base;
+}}
+
 struct oshu_game_screen;
 
 namespace oshu {
@@ -34,7 +38,7 @@ struct widget;
  * Multiple game windows are currently not supported, and probably never will.
  */
 struct window {
-	window(oshu_game&);
+	window(oshu::game::base&);
 	~window();
 	/**
 	 * The window's associated SDL display.
@@ -47,7 +51,7 @@ struct window {
 	 * A reference a game object. It is not owned by the window and must
 	 * live longer than the window.
 	 */
-	oshu_game &game;
+	oshu::game::base &game;
 	/**
 	 * The widget responsible for drawing the main game objects, specific
 	 * to the mode.

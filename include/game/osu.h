@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "game/game.h"
+#include "game/base.h"
 
 #include <memory>
 
@@ -19,7 +19,7 @@
  * \{
  */
 
-struct osu_game : public oshu_game {
+struct osu_game : public oshu::game::base {
 	osu_game(const char *beatmap_path);
 
 	/**

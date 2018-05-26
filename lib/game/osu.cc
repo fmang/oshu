@@ -7,13 +7,13 @@
 
 #include "game/osu.h"
 
-#include "game/game.h"
+#include "game/base.h"
 #include "video/texture.h"
 
 #include <assert.h>
 
 osu_game::osu_game(const char *beatmap_path)
-: oshu_game(beatmap_path)
+: oshu::game::base(beatmap_path)
 {
 }
 

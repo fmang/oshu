@@ -8,7 +8,7 @@
 
 #include "./screens.h"
 
-#include "game/game.h"
+#include "game/base.h"
 #include "ui/window.h"
 #include "video/transitions.h"
 
@@ -16,7 +16,7 @@
 
 static int on_event(oshu::ui::window &w, union SDL_Event *event)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -45,7 +45,7 @@ static int update(oshu::ui::window &w)
 
 static int draw(oshu::ui::window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
 	double end = oshu_hit_end_time(oshu_previous_hit(game));
 	double r = oshu_fade_in(end + 1, end + 2, game->clock.now);

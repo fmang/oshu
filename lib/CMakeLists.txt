@@ -11,9 +11,9 @@ add_library(
 	core/geometry.cc
 	core/log.cc
 	game/actions.cc
+	game/base.cc
 	game/clock.cc
 	game/controls.cc
-	game/game.cc
 	game/helpers.cc
 	game/osu.cc
 	game/tty.cc

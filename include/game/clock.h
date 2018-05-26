@@ -5,6 +5,11 @@
 
 #pragma once
 
+namespace oshu {
+namespace game {
+class base;
+}}
+
 /**
  * \defgroup game_clock Clock
  * \ingroup game
@@ -14,8 +19,6 @@
  *
  * \{
  */
-
-struct oshu_game;
 
 /**
  * Keep track of various aspects of the elapsing time.
@@ -60,7 +63,7 @@ struct oshu_clock {
 	double system;
 };
 
-void oshu_initialize_clock(struct oshu_game *game);
+void oshu_initialize_clock(struct oshu::game::base *game);
 
 /**
  * Update the game clock.
@@ -79,6 +82,6 @@ void oshu_initialize_clock(struct oshu_game *game);
  * lead-in phase, because the audio starts when the *now* clock becomes
  * positive, while the audio clock will be null at that moment.
  */
-void oshu_update_clock(struct oshu_game *game);
+void oshu_update_clock(struct oshu::game::base *game);
 
 /** \} */

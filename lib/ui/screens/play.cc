@@ -8,7 +8,7 @@
 
 #include "./screens.h"
 
-#include "game/game.h"
+#include "game/base.h"
 #include "game/tty.h"
 #include "ui/widget.h"
 #include "ui/window.h"
@@ -19,7 +19,7 @@
 
 static int on_event(oshu::ui::window &w, union SDL_Event *event)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -85,7 +85,7 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
  */
 static void check_end(oshu::ui::window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	if (game->hit_cursor->next)
 		return;
 	const double delay = game->beatmap.difficulty.leniency + game->beatmap.difficulty.approach_time;
@@ -99,7 +99,7 @@ static void check_end(oshu::ui::window &w)
 
 static int update(oshu::ui::window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	if (game->paused) {
 		w.screen = &oshu_pause_screen;
 		return 0;
@@ -142,7 +142,7 @@ static int update(oshu::ui::window &w)
  */
 static void draw_background(oshu::ui::window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
 	double break_end = oshu_next_hit(game)->time;
 	double now = game->clock.now;
@@ -154,7 +154,7 @@ static void draw_background(oshu::ui::window &w)
 
 static int draw(oshu::ui::window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	if (w.display->features & OSHU_FANCY_CURSOR)
 		SDL_ShowCursor(SDL_DISABLE);
 	draw_background(w);

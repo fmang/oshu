@@ -3,12 +3,12 @@
  * \ingroup game_actions
  */
 
-#include "game/game.h"
+#include "game/base.h"
 #include "game/tty.h"
 
 #include <assert.h>
 
-void oshu_rewind_game(struct oshu_game *game, double offset)
+void oshu_rewind_game(struct oshu::game::base *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp - offset);
 	game->clock.now = game->audio.music.current_timestamp;
@@ -22,7 +22,7 @@ void oshu_rewind_game(struct oshu_game *game, double offset)
 	}
 }
 
-void oshu_forward_game(struct oshu_game *game, double offset)
+void oshu_forward_game(struct oshu::game::base *game, double offset)
 {
 	oshu_seek_music(&game->audio, game->audio.music.current_timestamp + offset);
 	game->clock.now = game->audio.music.current_timestamp;
@@ -37,14 +37,14 @@ void oshu_forward_game(struct oshu_game *game, double offset)
 	}
 }
 
-void oshu_pause_game(struct oshu_game *game)
+void oshu_pause_game(struct oshu::game::base *game)
 {
 	oshu_pause_audio(&game->audio);
 	game->paused = true;
 	oshu_print_state(game);
 }
 
-void oshu_unpause_game(struct oshu_game *game)
+void oshu_unpause_game(struct oshu::game::base *game)
 {
 	if (game->clock.now >= 0)
 		oshu_play_audio(&game->audio);
@@ -52,7 +52,7 @@ void oshu_unpause_game(struct oshu_game *game)
 	oshu_print_state(game);
 }
 
-void oshu_stop_game(struct oshu_game *game)
+void oshu_stop_game(struct oshu::game::base *game)
 {
 	game->stop = 1;
 }

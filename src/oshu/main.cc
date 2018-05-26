@@ -10,7 +10,7 @@
 #include "config.h"
 
 #include "core/log.h"
-#include "game/game.h"
+#include "game/base.h"
 #include "game/osu.h"
 #include "ui/osu.h"
 #include "ui/window.h"

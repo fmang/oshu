@@ -8,7 +8,7 @@
 
 #include "./screens.h"
 
-#include "game/game.h"
+#include "game/base.h"
 #include "ui/window.h"
 #include "video/display.h"
 
@@ -16,7 +16,7 @@
 
 static int on_event(oshu::ui::window &w, union SDL_Event *event)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -52,7 +52,7 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
 
 static int update(oshu::ui::window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	if (!game->paused)
 		w.screen = &oshu_play_screen;
 	return 0;
@@ -78,7 +78,7 @@ static void draw_pause(struct oshu_display *display)
 
 static int draw(oshu::ui::window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
 	oshu_show_background(&w.background, 0);
 	oshu_show_metadata_frame(&w.metadata, 1);

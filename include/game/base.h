@@ -14,17 +14,16 @@
 #include "game/controls.h"
 #include "game/mode.h"
 
+namespace oshu {
+namespace game {
+
 /**
  * \ingroup game
  *
- * \{
- */
-
-/**
  * The full game state, from the beatmap state to the audio and graphical
  * context.
  */
-struct oshu_game : public oshu::game::mode {
+struct base : public mode {
 	/**
 	 * Create the game context for a beatmap, and load all the associated assets.
 	 *
@@ -38,8 +37,8 @@ struct oshu_game : public oshu::game::mode {
 	 * the beatmap is a taiko beatmap, then the taiko game should be instanciated,
 	 * not the base module. Instead, take a beatmap by reference.
 	 */
-	oshu_game(const char *beatmap_path);
-	~oshu_game();
+	base(const char *beatmap_path);
+	~base();
 	/**
 	 * \todo
 	 * Take the beatmap by reference when the game state is constructed.
@@ -73,8 +72,11 @@ struct oshu_game : public oshu::game::mode {
 	struct oshu_hit *hit_cursor {};
 };
 
+}}
+
 /**
  * \defgroup game_helpers Helpers
+ * \ingroup game
  *
  * \brief
  * Read-only game accessors.
@@ -85,21 +87,21 @@ struct oshu_game : public oshu::game::mode {
 /**
  * Find the first hit object after *now - offset*.
  *
- * It bases the search on the #oshu_game::hit_cursor for performance, but its
+ * It bases the search on the #oshu::game::base::hit_cursor for performance, but its
  * position won't affect the results.
  *
  * For long notes like sliders, the end time is used, not the start time.
  *
  * \sa oshu_look_hit_up
  */
-struct oshu_hit* oshu_look_hit_back(struct oshu_game *game, double offset);
+struct oshu_hit* oshu_look_hit_back(struct oshu::game::base *game, double offset);
 
 /**
  * Find the last hit object before *now + offset*.
  *
  * This is analogous to #oshu_look_hit_back.
  */
-struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset);
+struct oshu_hit* oshu_look_hit_up(struct oshu::game::base *game, double offset);
 
 /**
  * Return the next relevant hit.
@@ -109,12 +111,12 @@ struct oshu_hit* oshu_look_hit_up(struct oshu_game *game, double offset);
  * The final null hit is considered relevant in order to ensure this function
  * always return something.
  */
-struct oshu_hit* oshu_next_hit(struct oshu_game *game);
+struct oshu_hit* oshu_next_hit(struct oshu::game::base *game);
 
 /**
  * Like #oshu_next_hit, but in the other direction.
  */
-struct oshu_hit* oshu_previous_hit(struct oshu_game *game);
+struct oshu_hit* oshu_previous_hit(struct oshu::game::base *game);
 
 /** \} */
 
@@ -132,14 +134,14 @@ struct oshu_hit* oshu_previous_hit(struct oshu_game *game);
  *
  * \sa oshu_pause_game
  */
-void oshu_unpause_game(struct oshu_game *game);
+void oshu_unpause_game(struct oshu::game::base *game);
 
 /**
  * Pause the game.
  *
  * \sa oshu_unpause_game
  */
-void oshu_pause_game(struct oshu_game *game);
+void oshu_pause_game(struct oshu::game::base *game);
 
 /**
  * Rewind the song by the specified offset in seconds.
@@ -147,19 +149,19 @@ void oshu_pause_game(struct oshu_game *game);
  * Rewind the beatmap too but leaving a 1-second break so that we won't seek
  * right before a note.
  */
-void oshu_rewind_game(struct oshu_game *game, double offset);
+void oshu_rewind_game(struct oshu::game::base *game, double offset);
 
 /**
  * See #oshu_rewind_game.
  */
-void oshu_forward_game(struct oshu_game *game, double offset);
+void oshu_forward_game(struct oshu::game::base *game, double offset);
 
 /**
  * Make the game stop at the next iteration.
  *
  * It can be called from a signal handler.
  */
-void oshu_stop_game(struct oshu_game *game);
+void oshu_stop_game(struct oshu::game::base *game);
 
 /** \} */
 

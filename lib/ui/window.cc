@@ -5,8 +5,8 @@
 
 #include "ui/window.h"
 
+#include "game/base.h"
 #include "core/log.h"
-#include "game/game.h"
 #include "game/tty.h"
 #include "video/display.h"
 
@@ -27,7 +27,7 @@ static void open_display(oshu::ui::window &w)
 namespace oshu {
 namespace ui {
 
-window::window(oshu_game &game)
+window::window(oshu::game::base &game)
 : game(game), screen(&oshu_play_screen)
 {
 	open_display(*this);
@@ -48,7 +48,7 @@ window::~window()
 
 static void draw(window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	SDL_SetRenderDrawColor(w.display->renderer, 0, 0, 0, 255);
 	SDL_RenderClear(w.display->renderer);
 	w.screen->draw(w);
@@ -57,7 +57,7 @@ static void draw(window &w)
 
 void loop(window &w)
 {
-	oshu_game *game = &w.game;
+	oshu::game::base *game = &w.game;
 	oshu_welcome(game);
 	oshu_initialize_clock(game);
 
