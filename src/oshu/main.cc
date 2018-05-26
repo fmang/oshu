@@ -70,12 +70,12 @@ static const char *version =
 	"There is NO WARRANTY, to the extent permitted by law.\n"
 ;
 
-static std::unique_ptr<oshu::ui::window> main_window;
+static std::weak_ptr<oshu::ui::window> current_window;
 
 static void signal_handler(int signum)
 {
-	if (main_window)
-		main_window->close();
+	if (auto w = current_window.lock())
+		w->close();
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -93,10 +93,10 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		if (pause)
 			game.pause();
 
-		main_window = std::make_unique<oshu::ui::window>(game);
+		std::shared_ptr<oshu::ui::window> main_window = std::make_shared<oshu::ui::window>(game);
 		main_window->game_view = std::make_unique<oshu::ui::osu>(main_window->display, game);
+		current_window = main_window;
 		main_window->open();
-		main_window.release();
 	} catch (std::exception &e) {
 		oshu::log::critical() << e.what() << std::endl;
 		rc = -1;
