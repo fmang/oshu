@@ -12,57 +12,6 @@ struct SDL_Renderer;
 struct SDL_Window;
 
 /**
- * \defgroup video Video
- *
- * The video module is an abstraction over SDL2.
- *
- * The \ref video_display module defines a game window abstraction. The
- * coordinate system is configured with the display's \ref video_view.
- *
- * Drawing consists primarily in pasting textures from the \ref
- * video_texture module. Most textures are currently generated using the
- * cairo vector video library. The \ref video_paint module integrates
- * cairo with SDL2 and the \ref video_texture module.
- *
- * To draw text, you will need pango, and more specifically pangocairo. Pango
- * is not directly integrated with this module, but is relatively easy to use
- * as all it requires is a cairo context, which the \ref video_paint module
- * creates. Note that for some reason, drawing text on a transparent background
- * causes a visual glitch unless the blend mode is set to *source*.
- *
- * \dot
- * digraph modules {
- * 	rankdir=BT;
- * 	node [shape=rect];
- * 	Paint -> Texture -> Display -> View;
- * 	subgraph {
- * 		rank=same;
- * 		SDL_Window [shape=ellipse];
- * 		SDL_Renderer [shape=ellipse];
- * 		Display -> SDL_Renderer -> SDL_Window;
- * 	}
- * 	subgraph {
- * 		rank=same;
- * 		SDL_Texture [shape=ellipse];
- * 		Texture -> SDL_Texture;
- * 	}
- * 	SDL_Texture -> SDL_Renderer;
- * 	subgraph {
- * 		rank=same;
- * 		Cairo [shape=ellipse];
- * 		Paint -> Cairo [constraint=False];
- * 	}
- * 	Pango [shape=ellipse];
- * 	Pango -> Cairo;
- * }
- * \enddot
- *
- * \todo
- * Merge this module with ui into a new *ui* module?
- *
- */
-
-/**
  * \defgroup video_display Display
  * \ingroup video
  *
