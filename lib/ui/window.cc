@@ -8,6 +8,7 @@
 #include "game/base.h"
 #include "core/log.h"
 #include "game/tty.h"
+#include "ui/widget.h"
 #include "video/display.h"
 
 #include "./screens/screens.h"
@@ -39,6 +40,7 @@ window::window(oshu::game::base &game)
 
 window::~window()
 {
+	game_view.release();
 	oshu_destroy_background(&background);
 	oshu_destroy_metadata_frame(&metadata);
 	oshu_destroy_score_frame(&score);
@@ -55,46 +57,50 @@ static void draw(window &w)
 	SDL_RenderPresent(w.display->renderer);
 }
 
-void loop(window &w)
+void window::open()
 {
-	oshu::game::base *game = &w.game;
-	oshu_welcome(game);
-	oshu_initialize_clock(game);
+	oshu_welcome(&game);
+	oshu_initialize_clock(&game);
 
 	SDL_Event event;
 	int missed_frames = 0;
 
-	while (!game->stop) {
-		oshu_update_clock(game);
-		oshu_reset_view(w.display);
+	while (!stop) {
+		oshu_update_clock(&game);
+		oshu_reset_view(display);
 		while (SDL_PollEvent(&event))
-			w.screen->on_event(w, &event);
-		w.screen->update(w);
-		draw(w);
+			screen->on_event(*this, &event);
+		screen->update(*this);
+		draw(*this);
 
 		/* Calling oshu_print_state before draw causes some flickering
 		 * on the tty, for some reason. */
-		if (w.screen == &oshu_play_screen)
-			oshu_print_state(game);
+		if (screen == &oshu_play_screen)
+			oshu_print_state(&game);
 
-		double advance = w.display->frame_duration - (SDL_GetTicks() / 1000. - game->clock.system);
+		double advance = display->frame_duration - (SDL_GetTicks() / 1000. - game.clock.system);
 		if (advance > 0) {
 			SDL_Delay(advance * 1000);
 		} else {
 			missed_frames++;
 			if (missed_frames == 1000) {
 				oshu_log_warning("your computer is having a hard time keeping up");
-				if (w.display->features)
+				if (display->features)
 					oshu_log_warning("try running oshu! with OSHU_QUALITY=low (see the man page)");
 			}
 		}
 	}
 
-	if (w.screen != &oshu_score_screen)
+	if (screen != &oshu_score_screen)
 		puts("");
 		/* write a new line to avoid conflict between the status line
 		 * and the shell prompt */
 	oshu_log_debug("%d missed frames", missed_frames);
+}
+
+void window::close()
+{
+	stop = true;
 }
 
 }}

@@ -23,7 +23,7 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
 			break;
 		switch (event->key.keysym.sym) {
 		case OSHU_QUIT_KEY:
-			game->stop = true;
+			w.close();
 			break;
 		case OSHU_PAUSE_KEY:
 			if (game->clock.now > 0 && !game->autoplay)
@@ -42,7 +42,7 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_CLOSE:
-			game->stop = true;
+			w.close();
 			break;
 		}
 		break;

@@ -68,7 +68,7 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
 			}
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
-			game->stop = true;
+			w.close();
 			break;
 		}
 		break;

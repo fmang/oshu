@@ -64,16 +64,6 @@ public:
 	 */
 	void forward(double offset);
 	/**
-	 * Make the game stop at the next iteration.
-	 *
-	 * It can be called from a signal handler.
-	 *
-	 * \todo
-	 * Since the main loop is handled from the UI's window, this attribute
-	 * should be taken out of this class and moved to #oshu::ui::window.
-	 */
-	bool stop = false;
-	/**
 	 * \todo
 	 * Take the beatmap by reference when the game state is constructed.
 	 */

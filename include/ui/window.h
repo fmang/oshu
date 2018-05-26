@@ -10,6 +10,8 @@
 #include "ui/metadata.h"
 #include "ui/score.h"
 
+#include <memory>
+
 namespace oshu {
 namespace game {
 class base;
@@ -58,24 +60,29 @@ struct window {
 	 *
 	 * It must be destroyed before the window, because the window destroys
 	 * the display the widget uploads its textures to.
-	 *
-	 * \todo
-	 * Use a smart weak pointer? Alternatively, make the window the unique
-	 * owner of the view.
 	 */
-	widget *game_view;
+	std::unique_ptr<widget> game_view;
 	oshu_game_screen *screen;
 	oshu_background background {};
 	oshu_metadata_frame metadata {};
 	oshu_score_frame score {};
 	oshu_audio_progress_bar audio_progress_bar {};
+	/**
+	 * Start the main loop.
+	 */
+	void open();
+	/**
+	 * End the game and close the window.
+	 */
+	void close();
+private:
+	/**
+	 * When true, the main loop will break.
+	 *
+	 * \sa close
+	 */
+	bool stop = false;
 };
-
-/**
- * Start the main loop. Stops when the user closes the window, or when the game
- * exits.
- */
-void loop(window&);
 
 /** \} */
 

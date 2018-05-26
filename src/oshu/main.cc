@@ -70,12 +70,12 @@ static const char *version =
 	"There is NO WARRANTY, to the extent permitted by law.\n"
 ;
 
-static std::unique_ptr<osu_game> current_game;
+static std::unique_ptr<oshu::ui::window> main_window;
 
 static void signal_handler(int signum)
 {
-	if (current_game)
-		current_game->stop = true;
+	if (main_window)
+		main_window->close();
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -88,22 +88,20 @@ int run(const char *beatmap_path, int autoplay, int pause)
 	}
 
 	try {
-		current_game = std::make_unique<osu_game>(beatmap_path);
-		current_game->autoplay = autoplay;
+		osu_game game(beatmap_path);
+		game.autoplay = autoplay;
 		if (pause)
-			current_game->pause();
+			game.pause();
 
-		oshu::ui::window main_window (*current_game);
-		oshu::ui::osu osu_view (main_window.display, *current_game);
-		main_window.game_view = &osu_view;
-		oshu::ui::loop(main_window);
-
+		main_window = std::make_unique<oshu::ui::window>(game);
+		main_window->game_view = std::make_unique<oshu::ui::osu>(main_window->display, game);
+		main_window->open();
+		main_window.release();
 	} catch (std::exception &e) {
 		oshu::log::critical() << e.what() << std::endl;
 		rc = -1;
 	}
 
-	current_game.release();
 	SDL_Quit();
 	return rc;
 }
