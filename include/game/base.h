@@ -23,7 +23,8 @@ namespace game {
  * The full game state, from the beatmap state to the audio and graphical
  * context.
  */
-struct base : public mode {
+class base : public mode {
+public:
 	/**
 	 * Create the game context for a beatmap, and load all the associated assets.
 	 *
@@ -40,6 +41,39 @@ struct base : public mode {
 	base(const char *beatmap_path);
 	~base();
 	/**
+	 * Resume the game.
+	 *
+	 * \sa oshu_pause_game
+	 */
+	void unpause();
+	/**
+	 * Pause the game.
+	 *
+	 * \sa oshu_unpause_game
+	 */
+	void pause();
+	/**
+	 * Rewind the song by the specified offset in seconds.
+	 *
+	 * Rewind the beatmap too but leaving a 1-second break so that we won't seek
+	 * right before a note.
+	 */
+	void rewind(double offset);
+	/**
+	 * See #oshu_rewind_game.
+	 */
+	void forward(double offset);
+	/**
+	 * Make the game stop at the next iteration.
+	 *
+	 * It can be called from a signal handler.
+	 *
+	 * \todo
+	 * Since the main loop is handled from the UI's window, this attribute
+	 * should be taken out of this class and moved to #oshu::ui::window.
+	 */
+	bool stop = false;
+	/**
 	 * \todo
 	 * Take the beatmap by reference when the game state is constructed.
 	 */
@@ -47,7 +81,6 @@ struct base : public mode {
 	struct oshu_audio audio {};
 	struct oshu_sound_library library {};
 	struct oshu_clock clock {};
-	int stop {};
 	int autoplay {};
 	bool paused {};
 	/**
@@ -117,52 +150,5 @@ struct oshu_hit* oshu_next_hit(struct oshu::game::base *game);
  * Like #oshu_next_hit, but in the other direction.
  */
 struct oshu_hit* oshu_previous_hit(struct oshu::game::base *game);
-
-/** \} */
-
-/**
- * \defgroup game_actions Actions
- *
- * \brief
- * Change the game state.
- *
- * \{
- */
-
-/**
- * Resume the game.
- *
- * \sa oshu_pause_game
- */
-void oshu_unpause_game(struct oshu::game::base *game);
-
-/**
- * Pause the game.
- *
- * \sa oshu_unpause_game
- */
-void oshu_pause_game(struct oshu::game::base *game);
-
-/**
- * Rewind the song by the specified offset in seconds.
- *
- * Rewind the beatmap too but leaving a 1-second break so that we won't seek
- * right before a note.
- */
-void oshu_rewind_game(struct oshu::game::base *game, double offset);
-
-/**
- * See #oshu_rewind_game.
- */
-void oshu_forward_game(struct oshu::game::base *game, double offset);
-
-/**
- * Make the game stop at the next iteration.
- *
- * It can be called from a signal handler.
- */
-void oshu_stop_game(struct oshu::game::base *game);
-
-/** \} */
 
 /** \} */

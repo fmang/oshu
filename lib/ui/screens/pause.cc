@@ -23,26 +23,26 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
 			break;
 		switch (event->key.keysym.sym) {
 		case OSHU_QUIT_KEY:
-			oshu_stop_game(game);
+			game->stop = true;
 			break;
 		case OSHU_PAUSE_KEY:
 			if (game->clock.now > 0 && !game->autoplay)
-				oshu_rewind_game(game, 1.);
-			oshu_unpause_game(game);
+				game->rewind(1.);
+			game->unpause();
 			w.screen = &oshu_play_screen;
 			break;
 		case OSHU_REWIND_KEY:
-			oshu_rewind_game(game, 10.);
+			game->rewind(10.);
 			break;
 		case OSHU_FORWARD_KEY:
-			oshu_forward_game(game, 20.);
+			game->forward(20.);
 			break;
 		}
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_CLOSE:
-			oshu_stop_game(game);
+			game->stop = true;
 			break;
 		}
 		break;

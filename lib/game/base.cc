@@ -61,4 +61,48 @@ base::~base()
 	oshu_close_sound_library(&library);
 }
 
+void base::rewind(double offset)
+{
+	oshu_seek_music(&this->audio, this->audio.music.current_timestamp - offset);
+	this->clock.now = this->audio.music.current_timestamp;
+	this->relinquish();
+	oshu_print_state(this);
+
+	assert (this->hit_cursor != NULL);
+	while (this->hit_cursor->time > this->clock.now + 1.) {
+		this->hit_cursor->state = OSHU_INITIAL_HIT;
+		this->hit_cursor = this->hit_cursor->previous;
+	}
+}
+
+void base::forward(double offset)
+{
+	oshu_seek_music(&this->audio, this->audio.music.current_timestamp + offset);
+	this->clock.now = this->audio.music.current_timestamp;
+	this->relinquish();
+
+	oshu_print_state(this);
+
+	assert (this->hit_cursor != NULL);
+	while (this->hit_cursor->time < this->clock.now + 1.) {
+		this->hit_cursor->state = OSHU_SKIPPED_HIT;
+		this->hit_cursor = this->hit_cursor->next;
+	}
+}
+
+void base::pause()
+{
+	oshu_pause_audio(&this->audio);
+	this->paused = true;
+	oshu_print_state(this);
+}
+
+void base::unpause()
+{
+	if (this->clock.now >= 0)
+		oshu_play_audio(&this->audio);
+	this->paused = false;
+	oshu_print_state(this);
+}
+
 }}

@@ -10,7 +10,6 @@ add_library(
 	beatmap/path.cc
 	core/geometry.cc
 	core/log.cc
-	game/actions.cc
 	game/base.cc
 	game/clock.cc
 	game/controls.cc

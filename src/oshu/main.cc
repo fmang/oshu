@@ -75,7 +75,7 @@ static std::unique_ptr<osu_game> current_game;
 static void signal_handler(int signum)
 {
 	if (current_game)
-		oshu_stop_game(current_game.get());
+		current_game->stop = true;
 }
 
 int run(const char *beatmap_path, int autoplay, int pause)
@@ -91,7 +91,7 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		current_game = std::make_unique<osu_game>(beatmap_path);
 		current_game->autoplay = autoplay;
 		if (pause)
-			oshu_pause_game(current_game.get());
+			current_game->pause();
 
 		oshu::ui::window main_window (*current_game);
 		oshu::ui::osu osu_view (main_window.display, *current_game);

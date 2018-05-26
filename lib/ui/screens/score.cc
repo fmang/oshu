@@ -23,14 +23,14 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
 			break;
 		switch (event->key.keysym.sym) {
 		case OSHU_QUIT_KEY:
-			oshu_stop_game(game);
+			game->stop = true;
 			break;
 		}
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
 		case SDL_WINDOWEVENT_CLOSE:
-			oshu_stop_game(game);
+			game->stop = true;
 			break;
 		}
 		break;
