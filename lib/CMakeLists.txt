@@ -28,7 +28,7 @@ add_library(
 	ui/screens/pause.cc
 	ui/screens/play.cc
 	ui/screens/score.cc
-	ui/window.cc
+	ui/shell.cc
 	video/display.cc
 	video/paint.cc
 	video/texture.cc

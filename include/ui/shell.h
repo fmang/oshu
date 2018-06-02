@@ -1,6 +1,6 @@
 /**
- * \file include/ui/window.h
- * \ingroup ui_window
+ * \file include/ui/shell.h
+ * \ingroup ui_shell
  */
 
 #pragma once
@@ -25,41 +25,39 @@ namespace ui {
 struct widget;
 
 /**
- * \defgroup ui_window Window
+ * \defgroup ui_shell Window
  * \ingroup ui
  *
  * \brief
- * Manage the game's main window.
+ * Manage the game's main interface.
  *
  * \{
  */
 
 /**
- * One game window.
+ * The controller of the main game interface.
  *
- * Multiple game windows are currently not supported, and probably never will.
+ * It does not display the game mode itself, but manages every other generic
+ * component. The main game engine needs to be set in #game_view.
  */
-struct window {
-	window(oshu_display&, oshu::game::base&);
-	~window();
+struct shell {
 	/**
-	 * The window's associated SDL display.
+	 * Create the shell.
 	 *
-	 * It is automatically created when the window is constructed, and
-	 * destroyed with the window too.
+	 * Both the display and the game must outlive the shell.
+	 */
+	shell(oshu_display&, oshu::game::base&);
+	~shell();
+	/**
+	 * The window that the shell managed.
+	 *
+	 * A display should not be associated to more than one shell.
 	 */
 	oshu_display &display;
-	/**
-	 * A reference a game object. It is not owned by the window and must
-	 * live longer than the window.
-	 */
 	oshu::game::base &game;
 	/**
 	 * The widget responsible for drawing the main game objects, specific
 	 * to the mode.
-	 *
-	 * It must be destroyed before the window, because the window destroys
-	 * the display the widget uploads its textures to.
 	 */
 	std::unique_ptr<widget> game_view;
 	oshu_game_screen *screen;
@@ -72,7 +70,7 @@ struct window {
 	 */
 	void open();
 	/**
-	 * End the game and close the window.
+	 * End the game and close the shell.
 	 */
 	void close();
 private:

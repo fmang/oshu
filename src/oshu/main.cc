@@ -12,8 +12,8 @@
 #include "core/log.h"
 #include "game/base.h"
 #include "game/osu.h"
+#include "ui/shell.h"
 #include "ui/osu.h"
-#include "ui/window.h"
 #include "video/display.h"
 
 extern "C" {
@@ -71,11 +71,11 @@ static const char *version =
 	"There is NO WARRANTY, to the extent permitted by law.\n"
 ;
 
-static std::weak_ptr<oshu::ui::window> current_window;
+static std::weak_ptr<oshu::ui::shell> current_shell;
 
 static void signal_handler(int signum)
 {
-	if (auto w = current_window.lock())
+	if (auto w = current_shell.lock())
 		w->close();
 }
 
@@ -95,10 +95,10 @@ int run(const char *beatmap_path, int autoplay, int pause)
 			game.pause();
 
 		oshu_display display;
-		std::shared_ptr<oshu::ui::window> main_window = std::make_shared<oshu::ui::window>(display, game);
-		main_window->game_view = std::make_unique<oshu::ui::osu>(&display, game);
-		current_window = main_window;
-		main_window->open();
+		std::shared_ptr<oshu::ui::shell> shell = std::make_shared<oshu::ui::shell>(display, game);
+		shell->game_view = std::make_unique<oshu::ui::osu>(&display, game);
+		current_shell = shell;
+		shell->open();
 	} catch (std::exception &e) {
 		oshu::log::critical() << e.what() << std::endl;
 		rc = -1;

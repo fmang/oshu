@@ -9,7 +9,7 @@ union SDL_Event;
 
 namespace oshu {
 namespace ui {
-struct window;
+struct shell;
 }}
 
 /**
@@ -20,7 +20,7 @@ struct window;
  * Game states.
  *
  * The main idea is that there is the main loop iterating at a constant 60 FPS
- * rate, and handling the common events, like window closing.
+ * rate, and handling the common events, like shell closing.
  *
  * Then, there are the more specific states. You could imagine a welcome
  * screen, a song selection screen, the actual in-game screen, the pause
@@ -67,13 +67,13 @@ struct oshu_game_screen {
 	 * Called every time an event happens.
 	 *
 	 * The main game module may preprocess the event, or even filter it.
-	 * For instance, when the window is closed.
+	 * For instance, when the shell is closed.
 	 */
-	int (*on_event)(oshu::ui::window&, union SDL_Event *event);
+	int (*on_event)(oshu::ui::shell&, union SDL_Event *event);
 	/**
 	 * The update function is run at every iteration of the main loop.
 	 */
-	int (*update)(oshu::ui::window&);
+	int (*update)(oshu::ui::shell&);
 	/**
 	 * Draw the screen.
 	 *
@@ -82,7 +82,7 @@ struct oshu_game_screen {
 	 *
 	 * Beside that, no implicit drawing is done for you.
 	 */
-	int (*draw)(oshu::ui::window&);
+	int (*draw)(oshu::ui::shell&);
 };
 
 /* Defined in play.c */

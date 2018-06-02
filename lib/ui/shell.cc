@@ -1,9 +1,9 @@
 /**
- * \file lib/ui/window.cc
- * \ingroup ui_window
+ * \file lib/ui/shell.cc
+ * \ingroup ui_shell
  */
 
-#include "ui/window.h"
+#include "ui/shell.h"
 
 #include "game/base.h"
 #include "core/log.h"
@@ -13,7 +13,7 @@
 
 #include "./screens/screens.h"
 
-static void set_title(oshu::ui::window &w)
+static void set_title(oshu::ui::shell &w)
 {
 	struct oshu_metadata *meta = &w.game.beatmap.metadata;
 	std::ostringstream title;
@@ -25,7 +25,7 @@ static void set_title(oshu::ui::window &w)
 namespace oshu {
 namespace ui {
 
-window::window(oshu_display &display, oshu::game::base &game)
+shell::shell(oshu_display &display, oshu::game::base &game)
 : display(display), game(game), screen(&oshu_play_screen)
 {
 	set_title(*this);
@@ -35,7 +35,7 @@ window::window(oshu_display &display, oshu::game::base &game)
 	oshu_create_audio_progress_bar(&display, &game.audio.music, &audio_progress_bar);
 }
 
-window::~window()
+shell::~shell()
 {
 	game_view.release();
 	oshu_destroy_background(&background);
@@ -44,7 +44,7 @@ window::~window()
 	oshu_destroy_audio_progress_bar(&audio_progress_bar);
 }
 
-static void draw(window &w)
+static void draw(shell &w)
 {
 	oshu::game::base *game = &w.game;
 	SDL_SetRenderDrawColor(w.display.renderer, 0, 0, 0, 255);
@@ -53,7 +53,7 @@ static void draw(window &w)
 	SDL_RenderPresent(w.display.renderer);
 }
 
-void window::open()
+void shell::open()
 {
 	oshu_welcome(&game);
 	oshu_initialize_clock(&game);
@@ -94,7 +94,7 @@ void window::open()
 	oshu_log_debug("%d missed frames", missed_frames);
 }
 
-void window::close()
+void shell::close()
 {
 	stop = true;
 }

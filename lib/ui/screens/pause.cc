@@ -9,12 +9,12 @@
 #include "./screens.h"
 
 #include "game/base.h"
-#include "ui/window.h"
+#include "ui/shell.h"
 #include "video/display.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(oshu::ui::window &w, union SDL_Event *event)
+static int on_event(oshu::ui::shell &w, union SDL_Event *event)
 {
 	oshu::game::base *game = &w.game;
 	switch (event->type) {
@@ -50,7 +50,7 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
 	return 0;
 }
 
-static int update(oshu::ui::window &w)
+static int update(oshu::ui::shell &w)
 {
 	oshu::game::base *game = &w.game;
 	if (!game->paused)
@@ -76,7 +76,7 @@ static void draw_pause(struct oshu_display *display)
 	SDL_RenderFillRect(display->renderer, &bar);
 }
 
-static int draw(oshu::ui::window &w)
+static int draw(oshu::ui::shell &w)
 {
 	oshu::game::base *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);

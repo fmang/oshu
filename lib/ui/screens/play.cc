@@ -11,13 +11,13 @@
 #include "game/base.h"
 #include "game/tty.h"
 #include "ui/widget.h"
-#include "ui/window.h"
+#include "ui/shell.h"
 #include "video/display.h"
 #include "video/transitions.h"
 
 #include <SDL2/SDL.h>
 
-static int on_event(oshu::ui::window &w, union SDL_Event *event)
+static int on_event(oshu::ui::shell &w, union SDL_Event *event)
 {
 	oshu::game::base *game = &w.game;
 	switch (event->type) {
@@ -83,7 +83,7 @@ static int on_event(oshu::ui::window &w, union SDL_Event *event)
  *
  * The game switches to the score screen, from which the only exit is *death*.
  */
-static void check_end(oshu::ui::window &w)
+static void check_end(oshu::ui::shell &w)
 {
 	oshu::game::base *game = &w.game;
 	if (game->hit_cursor->next)
@@ -97,7 +97,7 @@ static void check_end(oshu::ui::window &w)
 	}
 }
 
-static int update(oshu::ui::window &w)
+static int update(oshu::ui::shell &w)
 {
 	oshu::game::base *game = &w.game;
 	if (game->paused) {
@@ -140,7 +140,7 @@ static int update(oshu::ui::window &w)
  * seconds.
  *
  */
-static void draw_background(oshu::ui::window &w)
+static void draw_background(oshu::ui::shell &w)
 {
 	oshu::game::base *game = &w.game;
 	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
@@ -152,7 +152,7 @@ static void draw_background(oshu::ui::window &w)
 	oshu_show_background(&w.background, ratio);
 }
 
-static int draw(oshu::ui::window &w)
+static int draw(oshu::ui::shell &w)
 {
 	oshu::game::base *game = &w.game;
 	if (w.display.features & OSHU_FANCY_CURSOR)
