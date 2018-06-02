@@ -14,6 +14,7 @@
 #include "game/osu.h"
 #include "ui/osu.h"
 #include "ui/window.h"
+#include "video/display.h"
 
 extern "C" {
 #include <libavutil/log.h>
@@ -93,8 +94,9 @@ int run(const char *beatmap_path, int autoplay, int pause)
 		if (pause)
 			game.pause();
 
-		std::shared_ptr<oshu::ui::window> main_window = std::make_shared<oshu::ui::window>(game);
-		main_window->game_view = std::make_unique<oshu::ui::osu>(main_window->display, game);
+		oshu_display display;
+		std::shared_ptr<oshu::ui::window> main_window = std::make_shared<oshu::ui::window>(display, game);
+		main_window->game_view = std::make_unique<oshu::ui::osu>(&display, game);
 		current_window = main_window;
 		main_window->open();
 	} catch (std::exception &e) {

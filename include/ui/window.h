@@ -40,7 +40,7 @@ struct widget;
  * Multiple game windows are currently not supported, and probably never will.
  */
 struct window {
-	window(oshu::game::base&);
+	window(oshu_display&, oshu::game::base&);
 	~window();
 	/**
 	 * The window's associated SDL display.
@@ -48,7 +48,7 @@ struct window {
 	 * It is automatically created when the window is constructed, and
 	 * destroyed with the window too.
 	 */
-	oshu_display *display;
+	oshu_display &display;
 	/**
 	 * A reference a game object. It is not owned by the window and must
 	 * live longer than the window.

@@ -83,7 +83,7 @@ static int draw(oshu::ui::window &w)
 	oshu_show_background(&w.background, 0);
 	oshu_show_metadata_frame(&w.metadata, 1);
 	oshu_show_audio_progress_bar(&w.audio_progress_bar);
-	draw_pause(w.display);
+	draw_pause(&w.display);
 	return 0;
 }
 

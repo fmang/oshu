@@ -90,8 +90,8 @@ static void check_end(oshu::ui::window &w)
 		return;
 	const double delay = game->beatmap.difficulty.leniency + game->beatmap.difficulty.approach_time;
 	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + delay) {
-		oshu_reset_view(w.display);
-		oshu_create_score_frame(w.display, &game->beatmap, &w.score);
+		oshu_reset_view(&w.display);
+		oshu_create_score_frame(&w.display, &game->beatmap, &w.score);
 		oshu_congratulate(game);
 		w.screen = &oshu_score_screen;
 	}
@@ -155,7 +155,7 @@ static void draw_background(oshu::ui::window &w)
 static int draw(oshu::ui::window &w)
 {
 	oshu::game::base *game = &w.game;
-	if (w.display->features & OSHU_FANCY_CURSOR)
+	if (w.display.features & OSHU_FANCY_CURSOR)
 		SDL_ShowCursor(SDL_DISABLE);
 	draw_background(w);
 	oshu_show_metadata_frame(&w.metadata, oshu_fade_out(5, 6, game->clock.system));
