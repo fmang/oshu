@@ -15,9 +15,7 @@
 
 static void open_display(oshu::ui::window &w)
 {
-	w.display = new oshu_display {};
-	if (oshu_open_display(w.display) < 0)
-		throw std::runtime_error("no display, aborting");
+	w.display = new oshu_display;
 	struct oshu_metadata *meta = &w.game.beatmap.metadata;
 	std::ostringstream title;
 	title << meta->artist << " - " << meta->title << " ♯ " << meta->version << " 𝄞 oshu!";
@@ -45,7 +43,7 @@ window::~window()
 	oshu_destroy_metadata_frame(&metadata);
 	oshu_destroy_score_frame(&score);
 	oshu_destroy_audio_progress_bar(&audio_progress_bar);
-	oshu_close_display(display);
+	delete display;
 }
 
 static void draw(window &w)

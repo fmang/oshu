@@ -108,22 +108,7 @@ fail:
 	return -1;
 }
 
-/**
- * The default window size is read from the OSHU_WINDOW_SIZE environment
- * variable. More details at #get_default_window_size.
- */
-int oshu_open_display(struct oshu_display *display)
-{
-	if (create_window(display) < 0)
-		goto fail;
-	oshu_reset_view(display);
-	return 0;
-fail:
-	oshu_close_display(display);
-	return -1;
-}
-
-void oshu_close_display(struct oshu_display *display)
+static void close_display(oshu_display *display)
 {
 	if (display->renderer) {
 		SDL_DestroyRenderer(display->renderer);
@@ -133,6 +118,24 @@ void oshu_close_display(struct oshu_display *display)
 		SDL_DestroyWindow(display->window);
 		display->window = NULL;
 	}
+}
+
+/**
+ * The default window size is read from the OSHU_WINDOW_SIZE environment
+ * variable. More details at #get_default_window_size.
+ */
+oshu_display::oshu_display()
+{
+	if (create_window(this) < 0) {
+		close_display(this);
+		throw std::runtime_error("could not open display");
+	}
+	oshu_reset_view(this);
+}
+
+oshu_display::~oshu_display()
+{
+	close_display(this);
 }
 
 oshu_point oshu_get_mouse(struct oshu_display *display)

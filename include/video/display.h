@@ -147,6 +147,11 @@ enum oshu_quality_level {
  */
 struct oshu_display {
 	/**
+	 * Create a display structure, open the SDL window and create the renderer.
+	 */
+	oshu_display();
+	~oshu_display();
+	/**
 	 * The one and only SDL game window.
 	 */
 	struct SDL_Window *window;
@@ -181,22 +186,6 @@ struct oshu_display {
 	double frame_duration;
 };
 
-/**
- * Create a display structure, open the SDL window and create the renderer.
- *
- * \sa oshu_close_display
- */
-int oshu_open_display(struct oshu_display *display);
-
-/**
- * Free the display structure and everything associated to it.
- *
- * *display* is left in an unspecified state, but it is okay to call this
- * function multiple times.
- *
- * Calling it on a null-initialized structure is also valid.
- */
-void oshu_close_display(struct oshu_display *display);
 
 /**
  * Get the mouse position.
