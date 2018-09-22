@@ -280,7 +280,15 @@ static int open_converter(struct oshu_stream *stream)
 
 int oshu_open_stream(const char *url, struct oshu_stream *stream)
 {
+	/*
+	 * av_register_all() got deprecated in lavf 58.9.100
+	 * It is now useless
+	 * https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+	 */
+	#if ( LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58,9,100) )
 	av_register_all();
+	#endif
+
 	if (open_demuxer(url, stream) < 0)
 		goto fail;
 	if (open_decoder(stream) < 0)
