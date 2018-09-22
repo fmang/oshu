@@ -59,6 +59,7 @@ static const char *help =
 	"  --version           Output version information.\n"
 	"  --autoplay          Perform a perfect run.\n"
 	"  --pause             Start the game paused.\n"
+	"  --sfx-volume        Changes the sound effects volume.\n"
 	"\n"
 	"Check the man page oshu(1) for details.\n"
 ;

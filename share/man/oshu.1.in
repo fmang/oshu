@@ -39,6 +39,10 @@ Perform a perfect run on the beatmap without any user interaction.
 \fB\-\-pause\fR
 Start the game in a paused state. Might be useful when you're starting the game
 from a terminal as you won't be holding your mouse when the game starts.
+.TP
+\fB\-\-sfx\-volume\fR
+Sets the volume of the effects (i.e hitsounds), minimum(~mute) is 0, maximum
+is 100
 
 .SH CONTROLS
 .PP
