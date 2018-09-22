@@ -72,6 +72,7 @@ public:
 	struct oshu_sound_library library {};
 	struct oshu_clock clock {};
 	int autoplay {};
+	int sfx_volume {};
 	bool paused {};
 	/**
 	 * Pointer to the next clickable hit.
