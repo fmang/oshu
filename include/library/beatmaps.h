@@ -94,6 +94,8 @@ struct beatmap_set {
 /**
  * Load all the entries found in the given directory.
  *
+ * The entries are sorted alphabetically by artist, then by title.
+ *
  * \warning
  * This function is expensive.
  *

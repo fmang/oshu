@@ -81,6 +81,17 @@ static bool compare_entries(const beatmap_entry &a, const beatmap_entry &b)
 	return a.difficulty < b.difficulty;
 }
 
+static bool compare_sets(const beatmap_set &a, const beatmap_set &b)
+{
+	int cmp = a.artist.compare(b.artist);
+	if (cmp == 0) {
+		// artist is the same, compare titles
+		return a.title.compare(b.title) < 0;
+	} else {
+		return cmp < 0;
+	}
+}
+
 beatmap_set::beatmap_set(const std::string &path)
 {
 	find_entries(path, *this);
@@ -127,6 +138,7 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 		}
 	}
 	closedir(dir);
+	std::sort(sets.begin(), sets.end(), compare_sets);
 	return sets;
 }
 
