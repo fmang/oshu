@@ -65,19 +65,38 @@ static void generate_entry(const beatmap_entry &entry, std::ostream &os)
  */
 static void generate_set(const beatmap_set &set, std::ostream &os)
 {
-	os << "<article>";
-	os << "<h4>" << escape{set.artist} << " - " << escape{set.title} << "</h4><ul>";
+	os << "<h3>" << escape{set.title} << "</h3><ul>";
 	for (const beatmap_entry &entry : set.entries)
 		generate_entry(entry, os);
-	os << "</ul></article>";
+	os << "</ul>";
 }
 
 void generate_beatmap_set_listing(const std::vector<beatmap_set> &sets, std::ostream &os)
 {
 	os << head;
 	os << "<link rel=\"stylesheet\" href=\"" << escape{OSHU_WEB_DIRECTORY} << "/style.css\" />";
-	for (const beatmap_set &set : sets)
-		generate_set(set, os);
+	std::string artist = std::string();
+	bool first_set = true;
+	for (const beatmap_set &set : sets) {
+		if (set.artist.compare(artist) == 0)
+			generate_set(set, os);
+		else {
+			// artist is different, close article if necessary and
+			// create a new one
+			if (first_set) {
+				first_set = false;
+				os << "<article>";
+			} else
+				os << "</article><article>";
+
+			os << "<h2>" << escape{set.artist} << "</h2>";
+			artist = set.artist;
+			generate_set(set, os);
+		}
+	}
+	if (!first_set)
+		// if there was at least one set
+		os << "</article>";
 }
 
 }}}
