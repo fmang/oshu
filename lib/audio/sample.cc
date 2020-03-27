@@ -40,11 +40,14 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 	}
 	converter.buf = (Uint8*) sample->samples;
 	converter.len = sample->size;
-	SDL_ConvertAudio(&converter);
+	if ((rc = SDL_ConvertAudio(&converter))) {
+		oshu_log_error("SDL audio conversion error while converting: %s", SDL_GetError());
+		return -1;
+	}
 	sample->size = converter.len_cvt;
 	/* reclaim the unrequired memory */
 	sample->samples = (float*) realloc(sample->samples, sample->size);
-	assert (sample->samples != NULL);
+	assert (sample->size == 0 || sample->samples != NULL);
 	return 0;
 }
 
