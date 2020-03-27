@@ -31,8 +31,6 @@
  * It is a bit more verbose but it is also easier to extend, and also
  * type-safe.
  *
- * See #oshu::log.
- *
  * \{
  */
 
@@ -119,14 +117,14 @@ extern log_level log_priority;
 /**
  * Return the output stream for the wanted verbosity.
  *
- * If the level is greater than or equal to #priority, return a handle to
+ * If the level is greater than or equal to #log_priority, return a handle to
  * std::clog, otherwise return a dummy stream.
  *
  * It is your responsibility to write std::endl at the end of your log message.
  *
- * You should use #critical, #error, #warning, #info, #debug or #verbose to
- * access your logger than this function directly, as they prefix your message
- * with the log level.
+ * You should use #critical_log, #error_log, #warning_log, #info_log, #debug_log
+ * or #verbose_log to access your logger than this function directly, as they
+ * prefix your message with the log level.
  *
  * \todo
  * Support redirecting to a standard file, probably by redirecting std::clog.

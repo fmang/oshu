@@ -1,5 +1,5 @@
 /**
- * \file game/game.cc
+ * \file game/base.cc
  * \ingroup game
  *
  * Implemention game initialization, destruction and the main loop.

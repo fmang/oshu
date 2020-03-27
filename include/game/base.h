@@ -1,5 +1,5 @@
 /**
- * \file game/game.h
+ * \file game/base.h
  * \ingroup game
  *
  * Define the game module.
@@ -30,8 +30,6 @@ public:
 	 * After creating the game, you're free to toy with the options of the game,
 	 * especially autoplay and pause.
 	 *
-	 * When you're done settings the game up, call #oshu_run_game.
-	 *
 	 * \todo
 	 * It should not be the responsibility of this module to load the beatmap. If
 	 * the beatmap is a taiko beatmap, then the taiko game should be instanciated,
@@ -59,7 +57,7 @@ public:
 	 */
 	void rewind(double offset);
 	/**
-	 * See #oshu_rewind_game.
+	 * See #rewind.
 	 */
 	void forward(double offset);
 	/**

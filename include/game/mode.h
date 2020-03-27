@@ -31,7 +31,7 @@ struct game_mode {
 	 *
 	 * There's no guarantee this callback is called at regular intervals.
 	 *
-	 * For autoplay, use #autoplay instead.
+	 * For autoplay, use #check_autoplay instead.
 	 */
 	virtual int check() = 0;
 

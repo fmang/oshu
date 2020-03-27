@@ -35,7 +35,7 @@ namespace oshu {
  * ```
  *
  * The string object is taken by reference, so it must not be modified or
- * deleted as long as the #escape object is still alive.
+ * deleted as long as the #html_escape object is still alive.
  */
 class html_escape {
 public:
