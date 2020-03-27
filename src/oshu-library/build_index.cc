@@ -35,7 +35,7 @@ static void ensure_directory(const std::string &path)
 			return;
 		throw std::system_error(errno, std::system_category(), "could not create directory " + path);
 	} else {
-		oshu::log::debug() << "created directory " << path << std::endl;
+		oshu::debug_log() << "created directory " << path << std::endl;
 	}
 }
 
@@ -44,7 +44,7 @@ static void change_directory(const std::string &path)
 	if (chdir(path.c_str()) < 0)
 		throw std::system_error(errno, std::system_category(), "could not chdir to " + path);
 	else
-		oshu::log::debug() << "moving to " << path << std::endl;
+		oshu::debug_log() << "moving to " << path << std::endl;
 }
 
 /**
@@ -71,13 +71,13 @@ static std::string get_oshu_home()
 static void do_build_index()
 {
 	std::string home = get_oshu_home();
-	oshu::log::info() << "oshu! home directory: " << home << std::endl;
+	oshu::info_log() << "oshu! home directory: " << home << std::endl;
 	ensure_directory(home);
 	ensure_directory(home + "/web");
 	change_directory(home + "/web");
-	auto sets = oshu::library::find_beatmap_sets("../beatmaps");
+	auto sets = oshu::find_beatmap_sets("../beatmaps");
 	std::ofstream index("index.html");
-	oshu::library::html::generate_beatmap_set_listing(sets, index);
+	oshu::generate_html_beatmap_set_listing(sets, index);
 	std::cout << home << "/web/index.html" << std::endl;
 }
 
@@ -89,7 +89,7 @@ static int run(int argc, char **argv)
 			break;
 		switch (c) {
 		case OPT_VERBOSE:
-			--oshu::log::priority;
+			--oshu::log_priority;
 			break;
 		}
 	}
@@ -99,7 +99,7 @@ static int run(int argc, char **argv)
 		return 2;
 	}
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, static_cast<SDL_LogPriority>(oshu::log::priority));
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, static_cast<SDL_LogPriority>(oshu::log_priority));
 	do_build_index();
 	return 0;
 }

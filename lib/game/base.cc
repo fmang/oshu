@@ -16,7 +16,7 @@
 
 #include <SDL2/SDL_image.h>
 
-static int open_beatmap(const char *beatmap_path, struct oshu::game::base *game)
+static int open_beatmap(const char *beatmap_path, struct oshu::game_base *game)
 {
 	if (oshu_load_beatmap(beatmap_path, &game->beatmap) < 0) {
 		oshu_log_error("no beatmap, aborting");
@@ -31,7 +31,7 @@ static int open_beatmap(const char *beatmap_path, struct oshu::game::base *game)
 	return 0;
 }
 
-static int open_audio(struct oshu::game::base *game)
+static int open_audio(struct oshu::game_base *game)
 {
 	assert (game->beatmap.audio_filename != NULL);
 	if (oshu_open_audio(game->beatmap.audio_filename, &game->audio) < 0) {
@@ -44,9 +44,8 @@ static int open_audio(struct oshu::game::base *game)
 }
 
 namespace oshu {
-namespace game {
 
-base::base(const char *beatmap_path)
+game_base::game_base(const char *beatmap_path)
 {
 	if (open_beatmap(beatmap_path, this) < 0)
 		throw std::runtime_error("could not load the beatmap");
@@ -54,14 +53,14 @@ base::base(const char *beatmap_path)
 		throw std::runtime_error("could not open the audio device");
 }
 
-base::~base()
+game_base::~game_base()
 {
 	oshu_destroy_beatmap(&beatmap);
 	oshu_close_audio(&audio);
 	oshu_close_sound_library(&library);
 }
 
-void base::rewind(double offset)
+void game_base::rewind(double offset)
 {
 	oshu_seek_music(&this->audio, this->audio.music.current_timestamp - offset);
 	this->clock.now = this->audio.music.current_timestamp;
@@ -75,7 +74,7 @@ void base::rewind(double offset)
 	}
 }
 
-void base::forward(double offset)
+void game_base::forward(double offset)
 {
 	oshu_seek_music(&this->audio, this->audio.music.current_timestamp + offset);
 	this->clock.now = this->audio.music.current_timestamp;
@@ -90,14 +89,14 @@ void base::forward(double offset)
 	}
 }
 
-void base::pause()
+void game_base::pause()
 {
 	oshu_pause_audio(&this->audio);
 	this->paused = true;
 	oshu_print_state(this);
 }
 
-void base::unpause()
+void game_base::unpause()
 {
 	if (this->clock.now >= 0)
 		oshu_play_audio(&this->audio);
@@ -105,4 +104,4 @@ void base::unpause()
 	oshu_print_state(this);
 }
 
-}}
+}

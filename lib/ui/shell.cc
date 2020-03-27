@@ -13,7 +13,7 @@
 
 #include "./screens/screens.h"
 
-static void set_title(oshu::ui::shell &w)
+static void set_title(oshu::shell &w)
 {
 	struct oshu_metadata *meta = &w.game.beatmap.metadata;
 	std::ostringstream title;
@@ -23,9 +23,8 @@ static void set_title(oshu::ui::shell &w)
 }
 
 namespace oshu {
-namespace ui {
 
-shell::shell(oshu_display &display, oshu::game::base &game)
+shell::shell(oshu_display &display, oshu::game_base &game)
 : display(display), game(game), screen(&oshu_play_screen)
 {
 	set_title(*this);
@@ -46,7 +45,7 @@ shell::~shell()
 
 static void draw(shell &w)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	SDL_SetRenderDrawColor(w.display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(w.display.renderer);
 	w.screen->draw(w);
@@ -99,4 +98,4 @@ void shell::close()
 	stop = true;
 }
 
-}}
+}

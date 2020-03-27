@@ -71,7 +71,7 @@ static const struct oshu_beatmap default_beatmap = {
 		##__VA_ARGS__ \
 	)
 
-using namespace oshu::beatmap::parser;
+using namespace oshu;
 
 /* Primitives ****************************************************************/
 
@@ -1305,7 +1305,7 @@ static int parse_file(FILE *input, const char *name, struct oshu_beatmap *beatma
 		try {
 			process_input(&parser);
 		} catch (invalid_header& e) {
-			oshu::log::error() << e.what() << std::endl;
+			oshu::error_log() << e.what() << std::endl;
 			rc = -1;
 			break;
 		}

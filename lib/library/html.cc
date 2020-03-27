@@ -11,15 +11,13 @@
 #include <unordered_map>
 
 namespace oshu {
-namespace library {
-namespace html {
 
-escape::escape(const char *str)
+html_escape::html_escape(const char *str)
 : data(str)
 {
 }
 
-escape::escape(const std::string &str)
+html_escape::html_escape(const std::string &str)
 : data(str.c_str())
 {
 }
@@ -31,7 +29,7 @@ static std::unordered_map<char, std::string> escape_sequences = {
 	{'"', "&quot;"}, // for attributes
 };
 
-std::ostream& operator<<(std::ostream &os, const escape &e)
+std::ostream& operator<<(std::ostream &os, const html_escape &e)
 {
 	for (const char *c = e.data; *c; ++c) {
 		auto i = escape_sequences.find(*c);
@@ -52,7 +50,7 @@ static const char *head = R"html(
 
 static void generate_entry(const beatmap_entry &entry, std::ostream &os)
 {
-	os << "<li><a href=\"" << escape{entry.path} << "\">" << escape{entry.version} << "</a></li>";
+	os << "<li><a href=\"" << html_escape{entry.path} << "\">" << html_escape{entry.version} << "</a></li>";
 }
 
 /**
@@ -66,18 +64,18 @@ static void generate_entry(const beatmap_entry &entry, std::ostream &os)
 static void generate_set(const beatmap_set &set, std::ostream &os)
 {
 	os << "<article>";
-	os << "<h4>" << escape{set.artist} << " - " << escape{set.title} << "</h4><ul>";
+	os << "<h4>" << html_escape{set.artist} << " - " << html_escape{set.title} << "</h4><ul>";
 	for (const beatmap_entry &entry : set.entries)
 		generate_entry(entry, os);
 	os << "</ul></article>";
 }
 
-void generate_beatmap_set_listing(const std::vector<beatmap_set> &sets, std::ostream &os)
+void generate_html_beatmap_set_listing(const std::vector<beatmap_set> &sets, std::ostream &os)
 {
 	os << head;
-	os << "<link rel=\"stylesheet\" href=\"" << escape{OSHU_WEB_DIRECTORY} << "/style.css\" />";
+	os << "<link rel=\"stylesheet\" href=\"" << html_escape{OSHU_WEB_DIRECTORY} << "/style.css\" />";
 	for (const beatmap_set &set : sets)
 		generate_set(set, os);
 }
 
-}}}
+}

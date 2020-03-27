@@ -71,7 +71,7 @@ static const char *version =
 	"There is NO WARRANTY, to the extent permitted by law.\n"
 ;
 
-static std::weak_ptr<oshu::ui::shell> current_shell;
+static std::weak_ptr<oshu::shell> current_shell;
 
 static void signal_handler(int signum)
 {
@@ -95,12 +95,12 @@ int run(const char *beatmap_path, int autoplay, int pause)
 			game.pause();
 
 		oshu_display display;
-		std::shared_ptr<oshu::ui::shell> shell = std::make_shared<oshu::ui::shell>(display, game);
-		shell->game_view = std::make_unique<oshu::ui::osu>(&display, game);
+		std::shared_ptr<oshu::shell> shell = std::make_shared<oshu::shell>(display, game);
+		shell->game_view = std::make_unique<oshu::osu_ui>(&display, game);
 		current_shell = shell;
 		shell->open();
 	} catch (std::exception &e) {
-		oshu::log::critical() << e.what() << std::endl;
+		oshu::critical_log() << e.what() << std::endl;
 		rc = -1;
 	}
 
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 			break;
 		switch (c) {
 		case OPT_VERBOSE:
-			--oshu::log::priority;
+			--oshu::log_priority;
 			break;
 		case OPT_HELP:
 			puts(usage);
@@ -146,8 +146,8 @@ int main(int argc, char **argv)
 	}
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, static_cast<SDL_LogPriority>(oshu::log::priority));
-	av_log_set_level(oshu::log::priority <= oshu::log::level::debug ? AV_LOG_INFO : AV_LOG_ERROR);
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, static_cast<SDL_LogPriority>(oshu::log_priority));
+	av_log_set_level(oshu::log_priority <= oshu::log_level::debug ? AV_LOG_INFO : AV_LOG_ERROR);
 
 	char *beatmap_path = realpath(argv[optind], NULL);
 	if (beatmap_path == NULL) {

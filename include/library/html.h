@@ -19,10 +19,6 @@
 #include <vector>
 
 namespace oshu {
-namespace library {
-
-/** \ingroup library_html */
-namespace html {
 
 /**
  * \ingroup library_html
@@ -41,11 +37,11 @@ namespace html {
  * The string object is taken by reference, so it must not be modified or
  * deleted as long as the #escape object is still alive.
  */
-class escape {
+class html_escape {
 public:
-	explicit escape(const char*);
-	explicit escape(const std::string&);
-	friend std::ostream& operator<<(std::ostream&, const escape&);
+	explicit html_escape(const char*);
+	explicit html_escape(const std::string&);
+	friend std::ostream& operator<<(std::ostream&, const html_escape&);
 private:
 	const char *data;
 };
@@ -53,8 +49,8 @@ private:
 /**
  * Generate an HTML listing of a list of beatmap sets.
  */
-void generate_beatmap_set_listing(const std::vector<oshu::library::beatmap_set>&, std::ostream&);
+void generate_html_beatmap_set_listing(const std::vector<oshu::beatmap_set>&, std::ostream&);
 
 /** } */
 
-}}}
+}

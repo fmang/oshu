@@ -20,8 +20,3 @@
  *   take the widget object, but may receive additional parameters.
  *
  */
-
-/**
- * \namespace oshu::ui
- * \ingroup ui
- */

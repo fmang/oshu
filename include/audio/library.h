@@ -44,7 +44,7 @@ struct SDL_AudioSpec;
  * \enddot
  *
  * \todo
- * This module should be moved to oshu::library::skin.
+ * This module should be moved to oshu::skin in the library module.
  *
  * \todo
  * The audio module should not depend on the beatmap module.

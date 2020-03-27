@@ -12,7 +12,6 @@
 #include <vector>
 
 namespace oshu {
-namespace library {
 
 /**
  * \defgroup library_beatmaps Beatmaps
@@ -106,4 +105,4 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path);
 
 /** } */
 
-}}
+}

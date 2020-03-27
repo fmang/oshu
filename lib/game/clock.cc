@@ -8,7 +8,7 @@
 #include "core/log.h"
 #include "game/base.h"
 
-void oshu_initialize_clock(struct oshu::game::base *game)
+void oshu_initialize_clock(struct oshu::game_base *game)
 {
 	if (game->beatmap.audio_lead_in > 0.) {
 		game->clock.now = - game->beatmap.audio_lead_in;
@@ -25,7 +25,7 @@ void oshu_initialize_clock(struct oshu::game::base *game)
  * Find a better way to determine if the music is playing. The clock shouldn't
  * take the game screen into consideration.
  */
-void oshu_update_clock(struct oshu::game::base *game)
+void oshu_update_clock(struct oshu::game_base *game)
 {
 	struct oshu_clock *clock = &game->clock;
 	double system = SDL_GetTicks() / 1000.;

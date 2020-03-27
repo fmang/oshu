@@ -6,9 +6,8 @@
 #pragma once
 
 namespace oshu {
-namespace game {
-class base;
-}}
+class game_base;
+}
 
 /**
  * \defgroup game_clock Clock
@@ -63,7 +62,7 @@ struct oshu_clock {
 	double system;
 };
 
-void oshu_initialize_clock(struct oshu::game::base *game);
+void oshu_initialize_clock(struct oshu::game_base *game);
 
 /**
  * Update the game clock.
@@ -82,6 +81,6 @@ void oshu_initialize_clock(struct oshu::game::base *game);
  * lead-in phase, because the audio starts when the *now* clock becomes
  * positive, while the audio clock will be null at that moment.
  */
-void oshu_update_clock(struct oshu::game::base *game);
+void oshu_update_clock(struct oshu::game_base *game);
 
 /** \} */

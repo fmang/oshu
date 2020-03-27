@@ -17,9 +17,9 @@
 
 #include <SDL2/SDL.h>
 
-static int on_event(oshu::ui::shell &w, union SDL_Event *event)
+static int on_event(oshu::shell &w, union SDL_Event *event)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -83,9 +83,9 @@ static int on_event(oshu::ui::shell &w, union SDL_Event *event)
  *
  * The game switches to the score screen, from which the only exit is *death*.
  */
-static void check_end(oshu::ui::shell &w)
+static void check_end(oshu::shell &w)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	if (game->hit_cursor->next)
 		return;
 	const double delay = game->beatmap.difficulty.leniency + game->beatmap.difficulty.approach_time;
@@ -97,9 +97,9 @@ static void check_end(oshu::ui::shell &w)
 	}
 }
 
-static int update(oshu::ui::shell &w)
+static int update(oshu::shell &w)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	if (game->paused) {
 		w.screen = &oshu_pause_screen;
 		return 0;
@@ -140,9 +140,9 @@ static int update(oshu::ui::shell &w)
  * seconds.
  *
  */
-static void draw_background(oshu::ui::shell &w)
+static void draw_background(oshu::shell &w)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
 	double break_end = oshu_next_hit(game)->time;
 	double now = game->clock.now;
@@ -152,9 +152,9 @@ static void draw_background(oshu::ui::shell &w)
 	oshu_show_background(&w.background, ratio);
 }
 
-static int draw(oshu::ui::shell &w)
+static int draw(oshu::shell &w)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	if (w.display.features & OSHU_FANCY_CURSOR)
 		SDL_ShowCursor(SDL_DISABLE);
 	draw_background(w);

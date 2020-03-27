@@ -19,7 +19,7 @@
  * \{
  */
 
-struct osu_game : public oshu::game::base {
+struct osu_game : public oshu::game_base {
 	osu_game(const char *beatmap_path);
 
 	/**
@@ -35,7 +35,7 @@ struct osu_game : public oshu::game::base {
 	 * irrelevant.
 	 */
 	enum oshu_finger held_key {};
-	std::shared_ptr<oshu::game::mouse> mouse {};
+	std::shared_ptr<oshu::mouse> mouse {};
 
 	int check() override;
 	int check_autoplay() override;

@@ -15,7 +15,6 @@
 #include "game/mode.h"
 
 namespace oshu {
-namespace game {
 
 /**
  * \ingroup game
@@ -23,7 +22,7 @@ namespace game {
  * The full game state, from the beatmap state to the audio and graphical
  * context.
  */
-class base : public mode {
+class game_base : public game_mode {
 public:
 	/**
 	 * Create the game context for a beatmap, and load all the associated assets.
@@ -38,8 +37,8 @@ public:
 	 * the beatmap is a taiko beatmap, then the taiko game should be instanciated,
 	 * not the base module. Instead, take a beatmap by reference.
 	 */
-	base(const char *beatmap_path);
-	~base();
+	game_base(const char *beatmap_path);
+	~game_base();
 	/**
 	 * Resume the game.
 	 *
@@ -95,7 +94,7 @@ public:
 	struct oshu_hit *hit_cursor {};
 };
 
-}}
+}
 
 /**
  * \defgroup game_helpers Helpers
@@ -110,21 +109,21 @@ public:
 /**
  * Find the first hit object after *now - offset*.
  *
- * It bases the search on the #oshu::game::base::hit_cursor for performance, but its
+ * It bases the search on the #oshu::game_base::hit_cursor for performance, but its
  * position won't affect the results.
  *
  * For long notes like sliders, the end time is used, not the start time.
  *
  * \sa oshu_look_hit_up
  */
-struct oshu_hit* oshu_look_hit_back(struct oshu::game::base *game, double offset);
+struct oshu_hit* oshu_look_hit_back(struct oshu::game_base *game, double offset);
 
 /**
  * Find the last hit object before *now + offset*.
  *
  * This is analogous to #oshu_look_hit_back.
  */
-struct oshu_hit* oshu_look_hit_up(struct oshu::game::base *game, double offset);
+struct oshu_hit* oshu_look_hit_up(struct oshu::game_base *game, double offset);
 
 /**
  * Return the next relevant hit.
@@ -134,11 +133,11 @@ struct oshu_hit* oshu_look_hit_up(struct oshu::game::base *game, double offset);
  * The final null hit is considered relevant in order to ensure this function
  * always return something.
  */
-struct oshu_hit* oshu_next_hit(struct oshu::game::base *game);
+struct oshu_hit* oshu_next_hit(struct oshu::game_base *game);
 
 /**
  * Like #oshu_next_hit, but in the other direction.
  */
-struct oshu_hit* oshu_previous_hit(struct oshu::game::base *game);
+struct oshu_hit* oshu_previous_hit(struct oshu::game_base *game);
 
 /** \} */

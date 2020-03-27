@@ -14,9 +14,9 @@
 
 #include <SDL2/SDL.h>
 
-static int on_event(oshu::ui::shell &w, union SDL_Event *event)
+static int on_event(oshu::shell &w, union SDL_Event *event)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)
@@ -38,14 +38,14 @@ static int on_event(oshu::ui::shell &w, union SDL_Event *event)
 	return 0;
 }
 
-static int update(oshu::ui::shell &w)
+static int update(oshu::shell &w)
 {
 	return 0;
 }
 
-static int draw(oshu::ui::shell &w)
+static int draw(oshu::shell &w)
 {
-	oshu::game::base *game = &w.game;
+	oshu::game_base *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
 	double end = oshu_hit_end_time(oshu_previous_hit(game));
 	double r = oshu_fade_in(end + 1, end + 2, game->clock.now);

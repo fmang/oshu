@@ -8,7 +8,6 @@
 #include "game/controls.h"
 
 namespace oshu {
-namespace game {
 
 /**
  * Define the contract for a game mode.
@@ -20,9 +19,9 @@ namespace game {
  *
  * \ingroup game
  */
-struct mode {
+struct game_mode {
 
-	virtual ~mode() = default;
+	virtual ~game_mode() = default;
 
 	/**
 	 * Called at every game iteration, unless the game is paused.
@@ -72,4 +71,4 @@ struct mode {
 
 };
 
-}}
+}

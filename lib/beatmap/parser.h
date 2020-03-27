@@ -263,11 +263,9 @@ static int process_input(P*);
 			static int parse_additions(P*, struct oshu_hit*);
 
 namespace oshu {
-namespace beatmap {
-namespace parser {
 
 struct invalid_header: public std::exception {
 	const char* what() const throw() { return "invalid osu beatmap header"; }
 };
 
-}}}
+}

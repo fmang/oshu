@@ -6,7 +6,6 @@
 #pragma once
 
 namespace oshu {
-namespace ui {
 
 /**
  * \ingroup ui
@@ -20,4 +19,4 @@ struct widget {
 
 /** \} */
 
-}}
+}

@@ -8,26 +8,24 @@
 #include <iostream>
 
 namespace oshu {
-inline namespace core {
-namespace log {
 
-level priority = level::warning;
+log_level log_priority = log_level::warning;
 
-level& operator++(level &l)
+log_level& operator++(log_level &l)
 {
-	if (l == level::critical)
+	if (l == log_level::critical)
 		return l;
 	int raw = static_cast<int>(l);
-	l = static_cast<level>(raw + 1);
+	l = static_cast<log_level>(raw + 1);
 	return l;
 }
 
-level& operator--(level &l)
+log_level& operator--(log_level &l)
 {
-	if (l == level::verbose)
+	if (l == log_level::verbose)
 		return l;
 	int raw = static_cast<int>(l);
-	l = static_cast<level>(raw - 1);
+	l = static_cast<log_level>(raw - 1);
 	return l;
 }
 
@@ -36,19 +34,19 @@ level& operator--(level &l)
  */
 static std::ostream devnull {nullptr};
 
-std::ostream& logger(level priority)
+std::ostream& logger(log_level priority)
 {
-	if (priority >= oshu::core::log::priority)
+	if (log_priority >= oshu::log_priority)
 		return std::clog;
 	else
 		return devnull;
 }
 
-std::ostream& verbose()  { return logger(level::verbose)  << "VERBOSE: "; }
-std::ostream& debug()    { return logger(level::debug)    << "DEBUG: "; }
-std::ostream& info()     { return logger(level::info)     << "INFO: "; }
-std::ostream& warning()  { return logger(level::warning)  << "WARNING: "; }
-std::ostream& error()    { return logger(level::error)    << "ERROR: "; }
-std::ostream& critical() { return logger(level::critical) << "CRITICAL: "; }
+std::ostream& verbose_log()  { return logger(log_level::verbose)  << "VERBOSE: "; }
+std::ostream& debug_log()    { return logger(log_level::debug)    << "DEBUG: "; }
+std::ostream& info_log()     { return logger(log_level::info)     << "INFO: "; }
+std::ostream& warning_log()  { return logger(log_level::warning)  << "WARNING: "; }
+std::ostream& error_log()    { return logger(log_level::error)    << "ERROR: "; }
+std::ostream& critical_log() { return logger(log_level::critical) << "CRITICAL: "; }
 
-}}}
+}

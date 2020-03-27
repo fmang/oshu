@@ -15,11 +15,10 @@
 struct osu_game;
 
 namespace oshu {
-namespace ui {
 
-struct osu;
+struct osu_ui;
 
-struct osu_mouse : public oshu::game::mouse {
+struct osu_mouse : public oshu::mouse {
 	osu_mouse(oshu_display *display);
 	oshu_display *display;
 	oshu_point position() override;
@@ -30,9 +29,9 @@ struct osu_mouse : public oshu::game::mouse {
  * \{
  */
 
-struct osu : public widget {
-	osu(oshu_display *display, osu_game &game);
-	~osu();
+struct osu_ui : public widget {
+	osu_ui(oshu_display *display, osu_game &game);
+	~osu_ui();
 
 	oshu_display *display;
 	osu_game &game;
@@ -99,7 +98,7 @@ struct osu : public widget {
 
 /** \} */
 
-}}
+}
 
 /**
  * Paint all the required textures for the beatmap.
@@ -108,7 +107,7 @@ struct osu : public widget {
  *
  * Sliders are not painted. Instead, you must call #osu_paint_slider.
  */
-int osu_paint_resources(oshu::ui::osu&);
+int osu_paint_resources(oshu::osu_ui&);
 
 /**
  * Paint a slider.
@@ -121,12 +120,12 @@ int osu_paint_resources(oshu::ui::osu&);
  *
  * Slider textures are freed with #osu_free_resources.
  */
-int osu_paint_slider(oshu::ui::osu&, struct oshu_hit *hit);
+int osu_paint_slider(oshu::osu_ui&, struct oshu_hit *hit);
 
 /**
  * Free the dynamic resources of the game mode.
  */
-void osu_free_resources(oshu::ui::osu&);
+void osu_free_resources(oshu::osu_ui&);
 
 /**
  * Set-up the coordinate system for the osu!standard mode.

@@ -13,14 +13,12 @@
 #include <memory>
 
 namespace oshu {
-namespace game {
-class base;
-}}
+class game_base;
+}
 
 struct oshu_game_screen;
 
 namespace oshu {
-namespace ui {
 
 struct widget;
 
@@ -46,7 +44,7 @@ struct shell {
 	 *
 	 * Both the display and the game must outlive the shell.
 	 */
-	shell(oshu_display&, oshu::game::base&);
+	shell(oshu_display&, oshu::game_base&);
 	~shell();
 	/**
 	 * The window that the shell managed.
@@ -54,7 +52,7 @@ struct shell {
 	 * A display should not be associated to more than one shell.
 	 */
 	oshu_display &display;
-	oshu::game::base &game;
+	oshu::game_base &game;
 	/**
 	 * The widget responsible for drawing the main game objects, specific
 	 * to the mode.
@@ -84,4 +82,4 @@ private:
 
 /** \} */
 
-}}
+}

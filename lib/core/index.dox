@@ -7,8 +7,3 @@
  * This group gathers all the small modules that perform generic tasks.
  * It is standalone, and doesn't have any special link with the game in itself.
  */
-
-/**
- * \namespace oshu::core
- * \ingroup core
- */

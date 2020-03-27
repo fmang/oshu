@@ -5,7 +5,7 @@
 
 #include "game/base.h"
 
-struct oshu_hit* oshu_look_hit_back(struct oshu::game::base *game, double offset)
+struct oshu_hit* oshu_look_hit_back(struct oshu::game_base *game, double offset)
 {
 	struct oshu_hit *hit = game->hit_cursor;
 	double target = game->clock.now - offset;
@@ -19,7 +19,7 @@ struct oshu_hit* oshu_look_hit_back(struct oshu::game::base *game, double offset
 	return hit;
 }
 
-struct oshu_hit* oshu_look_hit_up(struct oshu::game::base *game, double offset)
+struct oshu_hit* oshu_look_hit_up(struct oshu::game_base *game, double offset)
 {
 	struct oshu_hit *hit = game->hit_cursor;
 	double target = game->clock.now + offset;
@@ -33,7 +33,7 @@ struct oshu_hit* oshu_look_hit_up(struct oshu::game::base *game, double offset)
 	return hit;
 }
 
-struct oshu_hit* oshu_next_hit(struct oshu::game::base *game)
+struct oshu_hit* oshu_next_hit(struct oshu::game_base *game)
 {
 	struct oshu_hit *hit = game->hit_cursor;
 	for (; hit->next; hit = hit->next) {
@@ -43,7 +43,7 @@ struct oshu_hit* oshu_next_hit(struct oshu::game::base *game)
 	return hit;
 }
 
-struct oshu_hit* oshu_previous_hit(struct oshu::game::base *game)
+struct oshu_hit* oshu_previous_hit(struct oshu::game_base *game)
 {
 	struct oshu_hit *hit = game->hit_cursor;
 	if (!hit->previous)

@@ -15,7 +15,6 @@
 #include <system_error>
 
 namespace oshu {
-namespace library {
 
 beatmap_entry::beatmap_entry(const std::string &path)
 : path(path)
@@ -64,12 +63,12 @@ static void find_entries(const std::string &path, beatmap_set &set)
 				os << path << "/" << entry->d_name;
 				beatmap_entry entry (os.str());
 				if (entry.mode != OSHU_OSU_MODE)
-					oshu::log::debug() << "skipping " << path << ": unsupported mode" << std::endl;
+					oshu::debug_log() << "skipping " << path << ": unsupported mode" << std::endl;
 				else
 					set.entries.push_back(std::move(entry));
 			} catch(std::runtime_error &e) {
-				oshu::log::warning() << e.what() << std::endl;
-				oshu::log::warning() << "ignoring invalid beatmap " << path << std::endl;
+				oshu::warning_log() << e.what() << std::endl;
+				oshu::warning_log() << "ignoring invalid beatmap " << path << std::endl;
 			}
 		}
 	}
@@ -133,7 +132,7 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 				if (!set.empty())
 					sets.push_back(std::move(set));
 			} catch (std::system_error& e) {
-				oshu::log::debug() << e.what() << std::endl;
+				oshu::debug_log() << e.what() << std::endl;
 			}
 		}
 	}
@@ -142,4 +141,4 @@ std::vector<beatmap_set> find_beatmap_sets(const std::string &path)
 	return sets;
 }
 
-}}
+}

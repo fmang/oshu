@@ -78,7 +78,7 @@ enum oshu_finger {
 	 * which makes it look like it's for the left hand.
 	 *
 	 * Anyway, this key is only meant as a temporary value, and it is never
-	 * passed to the #oshu::game::base::press. No need to make special
+	 * passed to the #oshu::game_base::press. No need to make special
 	 * cases for it. However, because new keys might be added in the future
 	 * (who knows?) you should have a sane default case for keys your
 	 * module doesn't handle, if relevant.
@@ -113,7 +113,6 @@ enum oshu_control_key {
 /** \} */
 
 namespace oshu {
-namespace game {
 
 /**
  * \ingroup game_controls
@@ -127,4 +126,4 @@ struct mouse {
 
 /** \} */
 
-}}
+}

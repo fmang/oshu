@@ -8,9 +8,8 @@
 union SDL_Event;
 
 namespace oshu {
-namespace ui {
 struct shell;
-}}
+}
 
 /**
  * \defgroup ui_screens Screens
@@ -69,11 +68,11 @@ struct oshu_game_screen {
 	 * The main game module may preprocess the event, or even filter it.
 	 * For instance, when the shell is closed.
 	 */
-	int (*on_event)(oshu::ui::shell&, union SDL_Event *event);
+	int (*on_event)(oshu::shell&, union SDL_Event *event);
 	/**
 	 * The update function is run at every iteration of the main loop.
 	 */
-	int (*update)(oshu::ui::shell&);
+	int (*update)(oshu::shell&);
 	/**
 	 * Draw the screen.
 	 *
@@ -82,7 +81,7 @@ struct oshu_game_screen {
 	 *
 	 * Beside that, no implicit drawing is done for you.
 	 */
-	int (*draw)(oshu::ui::shell&);
+	int (*draw)(oshu::shell&);
 };
 
 /* Defined in play.c */

@@ -31,7 +31,7 @@
  * It is a bit more verbose but it is also easier to extend, and also
  * type-safe.
  *
- * See #oshu::core::log.
+ * See #oshu::log.
  *
  * \{
  */
@@ -80,10 +80,6 @@
 /** \} */
 
 namespace oshu {
-inline namespace core {
-
-/** \ingroup core_log */
-namespace log {
 
 /**
  * \ingroup core_log
@@ -100,7 +96,7 @@ namespace log {
  * to SDL for that. In the mid-term, the enum will be unrelated to SDL's, even
  * though they're likely to remain equal.
  */
-enum class level : int {
+enum class log_level : int {
 	verbose = SDL_LOG_PRIORITY_VERBOSE,
 	debug = SDL_LOG_PRIORITY_DEBUG,
 	info = SDL_LOG_PRIORITY_INFO,
@@ -109,8 +105,8 @@ enum class level : int {
 	critical = SDL_LOG_PRIORITY_CRITICAL,
 };
 
-level& operator++(level&);
-level& operator--(level&);
+log_level& operator++(log_level&);
+log_level& operator--(log_level&);
 
 /**
  * Current log level.
@@ -118,7 +114,7 @@ level& operator--(level&);
  * Only messages with a level higher or equal to this level are logged. The
  * other messages are silently discarded.
  */
-extern level priority;
+extern log_level log_priority;
 
 /**
  * Return the output stream for the wanted verbosity.
@@ -136,15 +132,15 @@ extern level priority;
  * Support redirecting to a standard file, probably by redirecting std::clog.
  * However, it won't work with the legacy facility.
  */
-std::ostream& logger(level priority);
+std::ostream& logger(log_level priority);
 
-std::ostream& verbose();
-std::ostream& debug();
-std::ostream& info();
-std::ostream& warning();
-std::ostream& error();
-std::ostream& critical();
+std::ostream& verbose_log();
+std::ostream& debug_log();
+std::ostream& info_log();
+std::ostream& warning_log();
+std::ostream& error_log();
+std::ostream& critical_log();
 
 /** \} */
 
-}}}
+}
