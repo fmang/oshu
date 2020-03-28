@@ -87,8 +87,6 @@ static int draw(oshu::shell &w)
 	return 0;
 }
 
-namespace oshu {
-
 /**
  * Pause screen: the music stops.
  *
@@ -102,11 +100,9 @@ namespace oshu {
  * to re-focus.
  *
  */
-struct oshu::game_screen pause_screen = {
+oshu::game_screen oshu::pause_screen = {
 	.name = "Paused",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,
 };
-
-}

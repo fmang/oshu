@@ -165,8 +165,6 @@ static int draw(oshu::shell &w)
 	return 0;
 }
 
-namespace oshu {
-
 /**
  * The standard in-play game screen.
  *
@@ -176,11 +174,9 @@ namespace oshu {
  * This screen relies heavily on the game mode.
  *
  */
-struct oshu::game_screen play_screen = {
+oshu::game_screen oshu::play_screen = {
 	.name = "Playing",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,
 };
-
-}

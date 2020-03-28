@@ -56,19 +56,15 @@ static int draw(oshu::shell &w)
 	return 0;
 }
 
-namespace oshu {
-
 /**
  * Game complete screen.
  *
  * Once this screen is reached, the only command left is *exit*.
  *
  */
-struct oshu::game_screen score_screen = {
+oshu::game_screen oshu::score_screen = {
 	.name = "Finished",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,
 };
-
-}
