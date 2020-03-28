@@ -148,7 +148,7 @@ struct color {
 	double red;
 	double green;
 	double blue;
-	struct oshu::color *next;
+	oshu::color *next;
 };
 
 /**
@@ -230,7 +230,7 @@ struct timing_point {
 	 *
 	 * NULL for the last item.
 	 */
-	struct oshu::timing_point *next;
+	oshu::timing_point *next;
 };
 
 /**
@@ -367,7 +367,7 @@ struct slider {
 	/**
 	 * Path the slider follows.
 	 */
-	struct oshu::path path;
+	oshu::path path;
 	/**
 	 * > repeat (Integer) is the number of times a player will go over the
 	 * > slider. A value of 1 will not repeat, 2 will repeat once, 3 twice,
@@ -399,7 +399,7 @@ struct slider {
 	 * have 2 sounds. For a repeating slider, it implies the sound for the
 	 * same circle will change every time it is repeated.
 	 */
-	struct oshu::hit_sound *sounds;
+	oshu::hit_sound *sounds;
 };
 
 /**
@@ -485,14 +485,14 @@ struct hit {
 	 *
 	 * Sliders have some more sounds on the edges, don't forget them.
 	 */
-	struct oshu::hit_sound sound;
+	oshu::hit_sound sound;
 	/**
 	 * Type-specific properties.
 	 */
 	union {
-		struct oshu::slider slider;
-		struct oshu::spinner spinner;
-		struct oshu::hold_note hold_note;
+		oshu::slider slider;
+		oshu::spinner spinner;
+		oshu::hold_note hold_note;
 	};
 	/**
 	 * \brief Timing point in effect when the hit object should be clicked.
@@ -501,7 +501,7 @@ struct hit {
 	 * also be needed by the game or graphics module to handle the slider
 	 * ticks, using the #oshu::timing_point::beat_duration property.
 	 */
-	struct oshu::timing_point *timing_point;
+	oshu::timing_point *timing_point;
 	/**
 	 * \brief Combo identifier.
 	 *
@@ -528,7 +528,7 @@ struct hit {
 	 * It's closely linked to #combo, and increases in the same way, taking
 	 * into account combo skips.
 	 */
-	struct oshu::color *color;
+	oshu::color *color;
 	/**
 	 * Dynamic state of the hit. Whether it was clicked or not.
 	 *
@@ -544,19 +544,19 @@ struct hit {
 	 * \todo
 	 * The GUI module should manage its own texture cache.
 	 */
-	struct oshu::texture *texture;
+	oshu::texture *texture;
 	/**
 	 * Pointer to the previous element of the linked list.
 	 *
 	 * NULL if it's the first element.
 	 */
-	struct oshu::hit *previous;
+	oshu::hit *previous;
 	/**
 	 * Pointer to the next element of the linked list.
 	 *
 	 * NULL if it's the last element.
 	 */
-	struct oshu::hit *next;
+	oshu::hit *next;
 };
 
 /**
@@ -565,7 +565,7 @@ struct hit {
  * For a circle, that's the same as #oshu::hit::time, but for a slider, spinner
  * or hold note, it's that offset plus the duration of the hit.
  */
-double hit_end_time(struct oshu::hit *hit);
+double hit_end_time(oshu::hit *hit);
 
 /**
  * Compute the last point of a hit object.
@@ -574,7 +574,7 @@ double hit_end_time(struct oshu::hit *hit);
  * the position at the end of the slide. If the slider repeats, it may be the
  * same as the starting point though.
  */
-oshu::point end_point(struct oshu::hit *hit);
+oshu::point end_point(oshu::hit *hit);
 
 /**
  * \brief Complete definition of the [Metadata] section.
@@ -863,11 +863,11 @@ struct beatmap {
 	/**
 	 * \brief [Metadata] section.
 	 */
-	struct oshu::metadata metadata;
+	oshu::metadata metadata;
 	/**
 	 * \brief [Difficulty] section.
 	 */
-	struct oshu::difficulty difficulty;
+	oshu::difficulty difficulty;
 	/**
 	 * \brief Path to the background picture.
 	 *
@@ -885,7 +885,7 @@ struct beatmap {
 	 *
 	 * It's a linked list, in chronological order.
 	 */
-	struct oshu::timing_point *timing_points;
+	oshu::timing_point *timing_points;
 	/**
 	 * \brief [Colours] section.
 	 *
@@ -893,7 +893,7 @@ struct beatmap {
 	 *
 	 * \sa color_count
 	 */
-	struct oshu::color *colors;
+	oshu::color *colors;
 	/**
 	 * Number of colors in the #colors list.
 	 */
@@ -909,7 +909,7 @@ struct beatmap {
 	 * *next* and *previous* pointers. This lets you ensure your hit cursor
 	 * is never null.
 	 */
-	struct oshu::hit *hits;
+	oshu::hit *hits;
 };
 
 /**
@@ -918,7 +918,7 @@ struct beatmap {
  * On failure, the content of *beatmap* is undefined, but any dynamically
  * allocated internal memory is freed.
  */
-int load_beatmap(const char *path, struct oshu::beatmap *beatmap);
+int load_beatmap(const char *path, oshu::beatmap *beatmap);
 
 /**
  * Parse the first sections of a beatmap to get the metadata and difficulty
@@ -939,12 +939,12 @@ int load_beatmap(const char *path, struct oshu::beatmap *beatmap);
  * timing points, colors, and hit objects, which contain most of the beatmap's
  * data.
  */
-int load_beatmap_headers(const char *path, struct oshu::beatmap *beatmap);
+int load_beatmap_headers(const char *path, oshu::beatmap *beatmap);
 
 /**
  * Free any object dynamically allocated inside the beatmap.
  */
-void destroy_beatmap(struct oshu::beatmap *beatmap);
+void destroy_beatmap(oshu::beatmap *beatmap);
 
 /** \} */
 

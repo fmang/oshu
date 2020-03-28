@@ -119,7 +119,7 @@ namespace oshu {
  *
  * ```c
  * SDL_Init(SDL_AUDIO|...);
- * struct oshu::audio audio;
+ * oshu::audio audio;
  * memset(&audio, 0, sizeof(audio));
  * oshu::open_audio("file.ogg", &audio);
  * oshu::play_audio(&audio);
@@ -162,7 +162,7 @@ struct audio {
 	/**
 	 * The background music.
 	 */
-	struct oshu::stream music;
+	oshu::stream music;
 	/**
 	 * Tracks for playing sound effects on top of the music.
 	 *
@@ -173,7 +173,7 @@ struct audio {
 	 *
 	 * \sa oshu::play_sample
 	 */
-	struct oshu::track effects[16];
+	oshu::track effects[16];
 	/**
 	 * Special track for the looping sample.
 	 *
@@ -181,7 +181,7 @@ struct audio {
 	 *
 	 * \sa oshu::play_loop
 	 */
-	struct oshu::track looping;
+	oshu::track looping;
 	/**
 	 * A device ID returned by SDL, and required by most SDL audio
 	 * functions.
@@ -206,7 +206,7 @@ struct audio {
  *
  * \sa oshu_audio_close
  */
-int open_audio(const char *url, struct oshu::audio *audio);
+int open_audio(const char *url, oshu::audio *audio);
 
 /**
  * Start playing!
@@ -216,7 +216,7 @@ int open_audio(const char *url, struct oshu::audio *audio);
  *
  * \sa oshu::pause_audio
  */
-void play_audio(struct oshu::audio *audio);
+void play_audio(oshu::audio *audio);
 
 /**
  * Pause the stream.
@@ -224,7 +224,7 @@ void play_audio(struct oshu::audio *audio);
  * Calling #oshu::play_audio will resume the audio playback where it was
  * left playing.
  */
-void pause_audio(struct oshu::audio *audio);
+void pause_audio(oshu::audio *audio);
 
 /**
  * Play a sample on top of the background music.
@@ -234,7 +234,7 @@ void pause_audio(struct oshu::audio *audio);
  * reached because all the effects tracks are used, the playback of one of
  * the samples is stopped to play the new sample.
  */
-void play_sample(struct oshu::audio *audio, struct oshu::sample *sample, float volume);
+void play_sample(oshu::audio *audio, oshu::sample *sample, float volume);
 
 /**
  * Play a looping sample.
@@ -245,7 +245,7 @@ void play_sample(struct oshu::audio *audio, struct oshu::sample *sample, float v
  * \sa oshu::play_sample
  * \sa oshu::stop_loop
  */
-void play_loop(struct oshu::audio *audio, struct oshu::sample *sample, float volume);
+void play_loop(oshu::audio *audio, oshu::sample *sample, float volume);
 
 /**
  * Seek the music stream to the specifed target position in seconds.
@@ -256,7 +256,7 @@ void play_loop(struct oshu::audio *audio, struct oshu::sample *sample, float vol
  * locks the audio thread, and stops all the currently playing sound effects,
  * which is definitely what you want.
  */
-int seek_music(struct oshu::audio *audio, double target);
+int seek_music(oshu::audio *audio, double target);
 
 /**
  * Stop the looping sample.
@@ -267,12 +267,12 @@ int seek_music(struct oshu::audio *audio, double target);
  *
  * \sa oshu::play_loop
  */
-void stop_loop(struct oshu::audio *audio);
+void stop_loop(oshu::audio *audio);
 
 /**
  * Close the audio stream and free everything associated to it.
  */
-void close_audio(struct oshu::audio *audio);
+void close_audio(oshu::audio *audio);
 
 /** \} */
 

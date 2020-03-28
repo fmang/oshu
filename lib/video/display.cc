@@ -80,7 +80,7 @@ int get_features()
  * The default window size, 960x720 is arbitrary but proportional the the game
  * area. It's just a saner default for most screens.
  */
-int create_window(struct oshu::display *display)
+int create_window(oshu::display *display)
 {
 	memset(display, 0, sizeof(*display));
 	display->features = get_features();
@@ -138,7 +138,7 @@ oshu::display::~display()
 	close_display(this);
 }
 
-oshu::point oshu::get_mouse(struct oshu::display *display)
+oshu::point oshu::get_mouse(oshu::display *display)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y);

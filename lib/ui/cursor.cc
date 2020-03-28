@@ -11,12 +11,12 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 
-static int paint_cursor(struct oshu::cursor_widget *cursor)
+static int paint_cursor(oshu::cursor_widget *cursor)
 {
 	double radius = 14;
 	oshu::size size = oshu::size{1, 1} * radius * 2.;
 
-	struct oshu::painter p;
+	oshu::painter p;
 	oshu::start_painting(cursor->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
@@ -38,7 +38,7 @@ static int paint_cursor(struct oshu::cursor_widget *cursor)
 	return rc;
 }
 
-int oshu::create_cursor(struct oshu::display *display, struct oshu::cursor_widget *cursor)
+int oshu::create_cursor(oshu::display *display, oshu::cursor_widget *cursor)
 {
 	memset(cursor, 0, sizeof(*cursor));
 	cursor->display = display;
@@ -54,7 +54,7 @@ int oshu::create_cursor(struct oshu::display *display, struct oshu::cursor_widge
 	return paint_cursor(cursor);
 }
 
-void oshu::show_cursor(struct oshu::cursor_widget *cursor)
+void oshu::show_cursor(oshu::cursor_widget *cursor)
 {
 	if (!(cursor->display->features & oshu::FANCY_CURSOR))
 		return;
@@ -75,7 +75,7 @@ void oshu::show_cursor(struct oshu::cursor_widget *cursor)
 	}
 }
 
-void oshu::destroy_cursor(struct oshu::cursor_widget *cursor)
+void oshu::destroy_cursor(oshu::cursor_widget *cursor)
 {
 	if (!cursor->display)
 		return;

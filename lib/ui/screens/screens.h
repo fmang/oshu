@@ -85,13 +85,13 @@ struct game_screen {
 };
 
 /* Defined in play.c */
-extern struct oshu::game_screen play_screen;
+extern oshu::game_screen play_screen;
 
 /* Defined in pause.c */
-extern struct oshu::game_screen pause_screen;
+extern oshu::game_screen pause_screen;
 
 /* Defined in score.c */
-extern struct oshu::game_screen score_screen;
+extern oshu::game_screen score_screen;
 
 /** \} */
 

@@ -95,7 +95,7 @@ struct arc {
  *
  * \return 0 on success, -1 if the arc computation failed.
  */
-int build_arc(oshu::point a, oshu::point b, oshu::point c, struct oshu::arc *arc);
+int build_arc(oshu::point a, oshu::point b, oshu::point c, oshu::arc *arc);
 
 /**
  * A Bézier path, made up of one or many Bézier segments.
@@ -230,9 +230,9 @@ enum path_type {
 struct path {
 	enum oshu::path_type type;
 	union {
-		struct oshu::line line; /**< For #oshu::LINEAR_PATH. */
-		struct oshu::arc arc; /**< For #oshu::PERFECT_PATH. */
-		struct oshu::bezier bezier; /**< For #oshu::BEZIER_PATH. */
+		oshu::line line; /**< For #oshu::LINEAR_PATH. */
+		oshu::arc arc; /**< For #oshu::PERFECT_PATH. */
+		oshu::bezier bezier; /**< For #oshu::BEZIER_PATH. */
 	};
 };
 
@@ -246,7 +246,7 @@ struct path {
  * In most case, this function will shrink the path, because the actual length
  * is greater than the one specified in the beatmap.
  */
-void normalize_path(struct oshu::path *path, double length);
+void normalize_path(oshu::path *path, double length);
 
 /**
  * Express the path in floating t-coordinates.
@@ -286,7 +286,7 @@ void normalize_path(struct oshu::path *path, double length);
  * defined in the C standard library, by 2.
  *
  */
-oshu::point path_at(struct oshu::path *path, double t);
+oshu::point path_at(oshu::path *path, double t);
 
 /**
  * Compute the smallest box such that the path fits in.
@@ -300,7 +300,7 @@ oshu::point path_at(struct oshu::path *path, double t);
  * 2. ∀t imag(top_left) ≤ imag(at(t)) ≤ imag(bottom_right)
  *
  */
-void path_bounding_box(struct oshu::path *path, oshu::point *top_left, oshu::point *bottom_right);
+void path_bounding_box(oshu::path *path, oshu::point *top_left, oshu::point *bottom_right);
 
 /** \} */
 

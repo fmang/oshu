@@ -37,7 +37,7 @@ class game_base;
  *
  * Show the beatmap's metadata and difficulty information.
  */
-void welcome(struct oshu::game_base *game);
+void welcome(oshu::game_base *game);
 
 /**
  * Show the state of the game (paused/playing) and the current song position.
@@ -49,14 +49,14 @@ void welcome(struct oshu::game_base *game);
  * glitches. If you write `foo\rx`, you get `xoo`. This is the reason the
  * Paused string literal has an extra space.
  */
-void print_state(struct oshu::game_base *game);
+void print_state(oshu::game_base *game);
 
 /**
  * Congratulate the user when the beatmap is over.
  *
  * Show the number of good hits and bad hits.
  */
-void congratulate(struct oshu::game_base *game);
+void congratulate(oshu::game_base *game);
 
 /** \} */
 

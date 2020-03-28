@@ -144,7 +144,7 @@ struct view {
  * - `v(logical width / 2) = physical width / 2`
  *
  */
-void resize_view(struct oshu::view *view, oshu::size size);
+void resize_view(oshu::view *view, oshu::size size);
 
 /**
  * Scale the coordinate system.
@@ -164,7 +164,7 @@ void resize_view(struct oshu::view *view, oshu::size size);
  * - `v(logical width) = physical width`
  *
  */
-void scale_view(struct oshu::view *view, double factor);
+void scale_view(oshu::view *view, double factor);
 
 /**
  * Scale and resize the view while preserving the aspect ratio.
@@ -178,7 +178,7 @@ void scale_view(struct oshu::view *view, double factor);
  * - The view is not cut:
  *   `0 ≤ v(0) ≤ v(logical width) ≤ physical width`
  */
-void fit_view(struct oshu::view *view, oshu::size size);
+void fit_view(oshu::view *view, oshu::size size);
 
 /**
  * Reset the display's view to the identity view.
@@ -187,7 +187,7 @@ void fit_view(struct oshu::view *view, oshu::size size);
  *
  * The resulting view is stored in the display's #oshu::display::view attribute.
  */
-void reset_view(struct oshu::display *display);
+void reset_view(oshu::display *display);
 
 /**
  * Project a point from logical coordinates to physical coordinates.
@@ -196,7 +196,7 @@ void reset_view(struct oshu::display *display);
  *
  * \sa oshu::unproject
  */
-oshu::point project(struct oshu::view *view, oshu::point p);
+oshu::point project(oshu::view *view, oshu::point p);
 
 /**
  * Unproject a point from physical coordinates to logical coordinates.
@@ -206,7 +206,7 @@ oshu::point project(struct oshu::view *view, oshu::point p);
  * From the definition of the view, `v(p) = z p + o`,
  * we deduce `p = (v(p) - o) / z`.
  */
-oshu::point unproject(struct oshu::view *view, oshu::point p);
+oshu::point unproject(oshu::view *view, oshu::point p);
 
 /** \} */
 

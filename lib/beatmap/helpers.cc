@@ -8,7 +8,7 @@
 
 #include "beatmap/beatmap.h"
 
-double oshu::hit_end_time(struct oshu::hit *hit)
+double oshu::hit_end_time(oshu::hit *hit)
 {
 	if (hit->type & oshu::SLIDER_HIT)
 		return hit->time + hit->slider.duration * hit->slider.repeat;
@@ -16,7 +16,7 @@ double oshu::hit_end_time(struct oshu::hit *hit)
 		return hit->time;
 }
 
-oshu::point oshu::end_point(struct oshu::hit *hit)
+oshu::point oshu::end_point(oshu::hit *hit)
 {
 	if (hit->type & oshu::SLIDER_HIT)
 		return oshu::path_at(&hit->slider.path, hit->slider.repeat);

@@ -10,7 +10,7 @@
 
 #include <SDL2/SDL_image.h>
 
-int oshu::load_texture(struct oshu::display *display, const char *filename, struct oshu::texture *texture)
+int oshu::load_texture(oshu::display *display, const char *filename, oshu::texture *texture)
 {
 	texture->texture = IMG_LoadTexture(display->renderer, filename);
 	if (!texture->texture) {
@@ -24,7 +24,7 @@ int oshu::load_texture(struct oshu::display *display, const char *filename, stru
 	return 0;
 }
 
-void oshu::destroy_texture(struct oshu::texture *texture)
+void oshu::destroy_texture(oshu::texture *texture)
 {
 	if (texture->texture) {
 		SDL_DestroyTexture(texture->texture);
@@ -32,7 +32,7 @@ void oshu::destroy_texture(struct oshu::texture *texture)
 	}
 }
 
-void oshu::draw_scaled_texture(struct oshu::display *display, struct oshu::texture *texture, oshu::point p, double ratio)
+void oshu::draw_scaled_texture(oshu::display *display, oshu::texture *texture, oshu::point p, double ratio)
 {
 	oshu::point top_left = oshu::project(&display->view, p - texture->origin * ratio);
 	oshu::size size = texture->size * ratio * display->view.zoom;
@@ -43,7 +43,7 @@ void oshu::draw_scaled_texture(struct oshu::display *display, struct oshu::textu
 	SDL_RenderCopy(display->renderer, texture->texture, NULL, &dest);
 }
 
-void oshu::draw_texture(struct oshu::display *display, struct oshu::texture *texture, oshu::point p)
+void oshu::draw_texture(oshu::display *display, oshu::texture *texture, oshu::point p)
 {
 	oshu::draw_scaled_texture(display, texture, p, 1.);
 }

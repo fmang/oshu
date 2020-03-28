@@ -41,7 +41,7 @@ static void log_av_error(int rc)
  *
  * \return 0 on success, -1 on error.
  */
-static int next_page(struct oshu::stream *stream)
+static int next_page(oshu::stream *stream)
 {
 	int rc;
 	AVPacket packet;
@@ -74,7 +74,7 @@ static int next_page(struct oshu::stream *stream)
  * When the end of file is reached, or when an error occurs, set
  * #oshu::stream::finished to true.
  */
-static int next_frame(struct oshu::stream *stream)
+static int next_frame(oshu::stream *stream)
 {
 	for (;;) {
 		int rc = avcodec_receive_frame(stream->decoder, stream->frame);
@@ -134,7 +134,7 @@ static int convert_frame(struct SwrContext *converter, AVFrame *frame, int index
 	return rc;
 }
 
-int oshu::read_stream(struct oshu::stream *stream, float *samples, int nb_samples)
+int oshu::read_stream(oshu::stream *stream, float *samples, int nb_samples)
 {
 	int left = nb_samples;
 	while (left > 0 && !stream->finished) {
@@ -158,7 +158,7 @@ int oshu::read_stream(struct oshu::stream *stream, float *samples, int nb_sample
  * Log some helpful information about the decoded audio stream.
  * Meant for debugging more than anything else.
  */
-static void dump_stream_info(struct oshu::stream *stream)
+static void dump_stream_info(oshu::stream *stream)
 {
 	oshu_log_info("============ Audio information ============");
 	oshu_log_info("            Codec: %s.", stream->codec->long_name);
@@ -176,7 +176,7 @@ static void dump_stream_info(struct oshu::stream *stream)
  *
  * \return 0 on success, -1 on error.
  */
-static int open_demuxer(const char *url, struct oshu::stream *stream)
+static int open_demuxer(const char *url, oshu::stream *stream)
 {
 	int rc = avformat_open_input(&stream->demuxer, url, NULL, NULL);
 	if (rc < 0) {
@@ -215,7 +215,7 @@ fail:
  *
  * \return 0 on success, and a negative ffmpeg error code on failure.
  */
-static int open_decoder(struct oshu::stream *stream)
+static int open_decoder(oshu::stream *stream)
 {
 	stream->decoder = avcodec_alloc_context3(stream->codec);
 	int rc = avcodec_parameters_to_context(
@@ -250,7 +250,7 @@ fail:
  *
  * The output sample rate must be defined in #oshu::stream::sample_rate.
  */
-static int open_converter(struct oshu::stream *stream)
+static int open_converter(oshu::stream *stream)
 {
 	assert (channels == 2);
 	stream->converter = swr_alloc_set_opts(
@@ -278,7 +278,7 @@ static int open_converter(struct oshu::stream *stream)
 	return 0;
 }
 
-int oshu::open_stream(const char *url, struct oshu::stream *stream)
+int oshu::open_stream(const char *url, oshu::stream *stream)
 {
 	/*
 	 * av_register_all() got deprecated in lavf 58.9.100
@@ -305,7 +305,7 @@ fail:
 	return -1;
 }
 
-void oshu::close_stream(struct oshu::stream *stream)
+void oshu::close_stream(oshu::stream *stream)
 {
 	/* the av routines set the pointers to NULL */
 	if (stream->frame)
@@ -318,7 +318,7 @@ void oshu::close_stream(struct oshu::stream *stream)
 		swr_free(&stream->converter);
 }
 
-int oshu::seek_stream(struct oshu::stream *stream, double target)
+int oshu::seek_stream(oshu::stream *stream, double target)
 {
 	if (target < 0.) {
 		target = 0.;

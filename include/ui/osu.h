@@ -44,56 +44,56 @@ struct osu_ui : public widget {
 	 *
 	 * There are as many textures as there are colors in the beatmap.
 	 */
-	struct oshu::texture *circles {};
+	oshu::texture *circles {};
 	/**
 	 * Full-size approach circle.
 	 *
 	 * Its size is the `radius + approach_size` from the beatmap.
 	 */
-	struct oshu::texture approach_circle {};
+	oshu::texture approach_circle {};
 	/**
 	 * The slider ball and its tolerance circle.
 	 */
-	struct oshu::texture slider_ball {};
+	oshu::texture slider_ball {};
 	/**
 	 * Symbol to indicate a note was successfully hit.
 	 *
 	 * A green circle.
 	 */
-	struct oshu::texture good_mark {};
+	oshu::texture good_mark {};
 	/**
 	 * Symbol for early hits.
 	 *
 	 * A yellow half-circle, on the left.
 	 */
-	struct oshu::texture early_mark {};
+	oshu::texture early_mark {};
 	/**
 	 * Symbol for early hits.
 	 *
 	 * A yellow half-circle, on the right.
 	 */
-	struct oshu::texture late_mark {};
+	oshu::texture late_mark {};
 	/**
 	 * Symbol to indicate a note was missed.
 	 *
 	 * A red X.
 	 */
-	struct oshu::texture bad_mark {};
+	oshu::texture bad_mark {};
 	/**
 	 * Symbol to indicate a note was skipped.
 	 *
 	 * A blue triangle pointing right.
 	 */
-	struct oshu::texture skip_mark {};
+	oshu::texture skip_mark {};
 	/**
 	 * Little tick mark for the dotted line between two consecutive hits.
 	 */
-	struct oshu::texture connector {};
+	oshu::texture connector {};
 	/**
 	 * Use a fancy software cursor for the osu!standard mode, because the
 	 * mouse is a central part of the gameplay.
 	 */
-	struct oshu::cursor_widget cursor {};
+	oshu::cursor_widget cursor {};
 };
 
 /**
@@ -116,7 +116,7 @@ int osu_paint_resources(oshu::osu_ui&);
  *
  * Slider textures are freed with #oshu::osu_free_resources.
  */
-int osu_paint_slider(oshu::osu_ui&, struct oshu::hit *hit);
+int osu_paint_slider(oshu::osu_ui&, oshu::hit *hit);
 
 /**
  * Free the dynamic resources of the game mode.
@@ -132,7 +132,7 @@ void osu_free_resources(oshu::osu_ui&);
  * It is the caller's responsibility to reset the view, preferably such that
  * the #oshu::osu_view/#oshu::reset_view pairing looks obvious.
  */
-void osu_view(struct oshu::display *display);
+void osu_view(oshu::display *display);
 
 /** \} */
 

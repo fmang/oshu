@@ -102,7 +102,7 @@ static int focus(double *t, int n)
  *
  * \sa focus
  */
-static void bezier_map(struct oshu::bezier *path, double *t, int *degree, oshu::point **control_points)
+static void bezier_map(oshu::bezier *path, double *t, int *degree, oshu::point **control_points)
 {
 	int segment = focus(t, path->segment_count);
 	*degree = path->indices[segment+1] - path->indices[segment] - 1;
@@ -119,7 +119,7 @@ static void bezier_map(struct oshu::bezier *path, double *t, int *degree, oshu::
  * super high-degree Bézier curves on some beatmaps, and the factorial was at
  * its limits.
  */
-static oshu::point bezier_at(struct oshu::bezier *path, double t)
+static oshu::point bezier_at(oshu::bezier *path, double t)
 {
 	int degree;
 	oshu::point *points;
@@ -153,7 +153,7 @@ static oshu::point bezier_at(struct oshu::bezier *path, double t)
  * The memory reallocation implies the memory must have been dynamically
  * allocated. You won't be able to grow a static path.
  */
-static int grow_bezier(struct oshu::bezier *bezier, double extension)
+static int grow_bezier(oshu::bezier *bezier, double extension)
 {
 	assert (bezier->segment_count >= 1);
 	assert (bezier->indices != NULL);
@@ -211,7 +211,7 @@ static int grow_bezier(struct oshu::bezier *bezier, double extension)
  *    Finally, let `anchors[j] = (1-k) * t_i + k * t_(i+1)`.
  *
  */
-void normalize_bezier(struct oshu::bezier *bezier, double target_length)
+void normalize_bezier(oshu::bezier *bezier, double target_length)
 {
 	/* 1. Prepare the field. */
 	int n = 64;  /* arbitrary */
@@ -266,7 +266,7 @@ begin:
  *
  * \sa normalize_bezier
  */
-static double l_to_t(struct oshu::bezier *bezier, double l)
+static double l_to_t(oshu::bezier *bezier, double l)
 {
 	int n = sizeof(bezier->anchors) / sizeof(*bezier->anchors) - 1;
 	int i = focus(&l, n);
@@ -277,7 +277,7 @@ static double l_to_t(struct oshu::bezier *bezier, double l)
  * Every point on a Bézier line is an average of all the control points, so
  * it's safe to compute the bounding box of the polyline defined by them.
  */
-void bezier_bounding_box(struct oshu::bezier *bezier, oshu::point *top_left, oshu::point *bottom_right)
+void bezier_bounding_box(oshu::bezier *bezier, oshu::point *top_left, oshu::point *bottom_right)
 {
 	assert (bezier->segment_count > 0);
 	*top_left = *bottom_right = bezier->control_points[0];
@@ -291,12 +291,12 @@ void bezier_bounding_box(struct oshu::bezier *bezier, oshu::point *top_left, osh
 /**
  * Simple weighted average of the starting point and end point.
  */
-static oshu::point line_at(struct oshu::line *line, double t)
+static oshu::point line_at(oshu::line *line, double t)
 {
 	return (1 - t) * line->start + t * line->end;
 }
 
-static void normalize_line(struct oshu::line *line, double target_length)
+static void normalize_line(oshu::line *line, double target_length)
 {
 	double actual_length = std::abs(line->start - line->end);
 	assert (target_length > 0);
@@ -305,7 +305,7 @@ static void normalize_line(struct oshu::line *line, double target_length)
 	line->end = line->start + (line->end - line->start) * factor;
 }
 
-void line_bounding_box(struct oshu::line *line, oshu::point *top_left, oshu::point *bottom_right)
+void line_bounding_box(oshu::line *line, oshu::point *top_left, oshu::point *bottom_right)
 {
 	*top_left = *bottom_right = line->start;
 	extend_box(line->start, top_left, bottom_right);
@@ -314,7 +314,7 @@ void line_bounding_box(struct oshu::line *line, oshu::point *top_left, oshu::poi
 
 /* Perfect circle arcs ********************************************************/
 
-static oshu::point arc_at(struct oshu::arc *arc, double t)
+static oshu::point arc_at(oshu::arc *arc, double t)
 {
 	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
 	return arc->center + std::polar(arc->radius, angle);
@@ -344,7 +344,7 @@ int arc_center(oshu::point a, oshu::point b, oshu::point c, oshu::point *center)
 	return 0;
 }
 
-int oshu::build_arc(oshu::point a, oshu::point b, oshu::point c, struct oshu::arc *arc)
+int oshu::build_arc(oshu::point a, oshu::point b, oshu::point c, oshu::arc *arc)
 {
 	if (arc_center(a, b, c, &arc->center) < 0)
 		return -1;
@@ -361,7 +361,7 @@ int oshu::build_arc(oshu::point a, oshu::point b, oshu::point c, struct oshu::ar
 	return 0;
 }
 
-static void normalize_arc(struct oshu::arc *arc, double target_length)
+static void normalize_arc(oshu::arc *arc, double target_length)
 {
 	double target_angle = target_length / arc->radius;
 	double diff = copysign(target_angle, arc->end_angle - arc->start_angle);
@@ -377,7 +377,7 @@ static void normalize_arc(struct oshu::arc *arc, double target_length)
  * Then, add the two extremities of the arc, and, for any side of the circle
  * reached, extend the box.
  */
-void arc_bounding_box(struct oshu::arc *arc, oshu::point *top_left, oshu::point *bottom_right)
+void arc_bounding_box(oshu::arc *arc, oshu::point *top_left, oshu::point *bottom_right)
 {
 	double min = arc->start_angle < arc->end_angle ? arc->start_angle : arc->end_angle;
 	double max = arc->start_angle > arc->end_angle ? arc->start_angle : arc->end_angle;
@@ -408,7 +408,7 @@ void arc_bounding_box(struct oshu::arc *arc, oshu::point *top_left, oshu::point 
 
 /* Generic interface **********************************************************/
 
-void oshu::normalize_path(struct oshu::path *path, double length)
+void oshu::normalize_path(oshu::path *path, double length)
 {
 	switch (path->type) {
 	case oshu::LINEAR_PATH:
@@ -422,7 +422,7 @@ void oshu::normalize_path(struct oshu::path *path, double length)
 	}
 }
 
-oshu::point oshu::path_at(struct oshu::path *path, double t)
+oshu::point oshu::path_at(oshu::path *path, double t)
 {
 	/* map t from ℝ to [0,1] */
 	t = fabs(remainder(t, 2.));
@@ -443,7 +443,7 @@ oshu::point oshu::path_at(struct oshu::path *path, double t)
 	return 0;
 }
 
-void oshu::path_bounding_box(struct oshu::path *path, oshu::point *top_left, oshu::point *bottom_right)
+void oshu::path_bounding_box(oshu::path *path, oshu::point *top_left, oshu::point *bottom_right)
 {
 	switch (path->type) {
 	case oshu::LINEAR_PATH:

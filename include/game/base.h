@@ -64,10 +64,10 @@ public:
 	 * \todo
 	 * Take the beatmap by reference when the game state is constructed.
 	 */
-	struct oshu::beatmap beatmap {};
-	struct oshu::audio audio {};
-	struct oshu::sound_library library {};
-	struct oshu::clock clock {};
+	oshu::beatmap beatmap {};
+	oshu::audio audio {};
+	oshu::sound_library library {};
+	oshu::clock clock {};
 	int autoplay {};
 	bool paused {};
 	/**
@@ -89,7 +89,7 @@ public:
 	 * With the two sentinels in the beatmap's hits linked list, this
 	 * cursor is never null, even after the last hit was played.
 	 */
-	struct oshu::hit *hit_cursor {};
+	oshu::hit *hit_cursor {};
 };
 
 /**
@@ -112,14 +112,14 @@ public:
  *
  * \sa oshu::look_hit_up
  */
-struct oshu::hit* look_hit_back(struct oshu::game_base *game, double offset);
+oshu::hit* look_hit_back(oshu::game_base *game, double offset);
 
 /**
  * Find the last hit object before *now + offset*.
  *
  * This is analogous to #oshu::look_hit_back.
  */
-struct oshu::hit* look_hit_up(struct oshu::game_base *game, double offset);
+oshu::hit* look_hit_up(oshu::game_base *game, double offset);
 
 /**
  * Return the next relevant hit.
@@ -129,12 +129,12 @@ struct oshu::hit* look_hit_up(struct oshu::game_base *game, double offset);
  * The final null hit is considered relevant in order to ensure this function
  * always return something.
  */
-struct oshu::hit* next_hit(struct oshu::game_base *game);
+oshu::hit* next_hit(oshu::game_base *game);
 
 /**
  * Like #oshu::next_hit, but in the other direction.
  */
-struct oshu::hit* previous_hit(struct oshu::game_base *game);
+oshu::hit* previous_hit(oshu::game_base *game);
 
 /** \} */
 

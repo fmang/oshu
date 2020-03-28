@@ -25,11 +25,11 @@ oshu::osu_game::osu_game(const char *beatmap_path)
  *
  * If two hit objects overlap, yield the oldest unclicked one.
  */
-static struct oshu::hit* find_hit(struct oshu::osu_game *game, oshu::point p)
+static oshu::hit* find_hit(oshu::osu_game *game, oshu::point p)
 {
-	struct oshu::hit *start = oshu::look_hit_back(game, game->beatmap.difficulty.approach_time);
+	oshu::hit *start = oshu::look_hit_back(game, game->beatmap.difficulty.approach_time);
 	double max_time = game->clock.now + game->beatmap.difficulty.approach_time;
-	for (struct oshu::hit *hit = start; hit->time <= max_time; hit = hit->next) {
+	for (oshu::hit *hit = start; hit->time <= max_time; hit = hit->next) {
 		if (!(hit->type & (oshu::CIRCLE_HIT | oshu::SLIDER_HIT)))
 			continue;
 		if (hit->state != oshu::INITIAL_HIT)
@@ -46,7 +46,7 @@ static struct oshu::hit* find_hit(struct oshu::osu_game *game, oshu::point p)
  * It is unlikely that once a slider is marked as good or missed, it will ever
  * be shown once again. The main exception is when the user seeks.
  */
-static void jettison_hit(struct oshu::hit *hit)
+static void jettison_hit(oshu::hit *hit)
 {
 	if (hit->texture) {
 		oshu::destroy_texture(hit->texture);
@@ -59,9 +59,9 @@ static void jettison_hit(struct oshu::hit *hit)
  * Release the held slider, either because the held key is released, or because
  * a new slider is activated (somehow).
  */
-static void release_slider(struct oshu::osu_game *game)
+static void release_slider(oshu::osu_game *game)
 {
-	struct oshu::hit *hit = game->current_slider;
+	oshu::hit *hit = game->current_slider;
 	if (!hit)
 		return;
 	assert (hit->type & oshu::SLIDER_HIT);
@@ -81,9 +81,9 @@ static void release_slider(struct oshu::osu_game *game)
  *
  * When the last one is reached, release the slider.
  */
-static void sonorize_slider(struct oshu::osu_game *game)
+static void sonorize_slider(oshu::osu_game *game)
 {
-	struct oshu::hit *hit = game->current_slider;
+	oshu::hit *hit = game->current_slider;
 	if (!hit)
 		return;
 	assert (hit->type & oshu::SLIDER_HIT);
@@ -111,7 +111,7 @@ int oshu::osu_game::check()
 	/* Ensure the mouse follows the slider. */
 	sonorize_slider(this); /* < may release the slider! */
 	if (this->current_slider && mouse) {
-		struct oshu::hit *hit = this->current_slider;
+		oshu::hit *hit = this->current_slider;
 		double t = (this->clock.now - hit->time) / hit->slider.duration;
 		oshu::point ball = oshu::path_at(&hit->slider.path, t);
 		oshu::point m = mouse->position();
@@ -125,7 +125,7 @@ int oshu::osu_game::check()
 	/* Mark dead notes as missed. */
 	double left_wall = this->clock.now - this->beatmap.difficulty.leniency;
 	while (this->hit_cursor->time < left_wall) {
-		struct oshu::hit *hit = this->hit_cursor;
+		oshu::hit *hit = this->hit_cursor;
 		if (!(hit->type & (oshu::CIRCLE_HIT | oshu::SLIDER_HIT))) {
 			hit->state = oshu::UNKNOWN_HIT;
 		} else if (hit->state == oshu::INITIAL_HIT) {
@@ -146,7 +146,7 @@ int oshu::osu_game::check()
  * The key is the held key, relevant only for sliders. In autoplay mode, it's
  * value doesn't matter.
  */
-static void activate_hit(struct oshu::osu_game *game, struct oshu::hit *hit, enum oshu::finger key)
+static void activate_hit(oshu::osu_game *game, oshu::hit *hit, enum oshu::finger key)
 {
 	if (hit->type & oshu::SLIDER_HIT) {
 		release_slider(game);
@@ -186,7 +186,7 @@ int oshu::osu_game::press(enum oshu::finger key)
 	if (!mouse)
 		return 0;
 	oshu::point m = mouse->position();
-	struct oshu::hit *hit = find_hit(this, m);
+	oshu::hit *hit = find_hit(this, m);
 	if (!hit)
 		return 0;
 	if (fabs(hit->time - this->clock.now) < this->beatmap.difficulty.leniency) {

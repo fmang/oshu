@@ -169,7 +169,7 @@ struct display {
 	 * When the window is resized, make sure you reset it with
 	 * #oshu::reset_view and recreate your view from it.
 	 */
-	struct oshu::view view;
+	oshu::view view;
 	/**
 	 * Bitmap of visual features, defined in #oshu::visual_feature.
 	 *

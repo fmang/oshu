@@ -92,7 +92,7 @@ struct texture {
  *
  * Log an error and return -1 on failure.
  */
-int load_texture(struct oshu::display *display, const char *filename, struct oshu::texture *texture);
+int load_texture(oshu::display *display, const char *filename, oshu::texture *texture);
 
 /**
  * Destroy an SDL texture with `SDL_DestroyTexture`.
@@ -103,7 +103,7 @@ int load_texture(struct oshu::display *display, const char *filename, struct osh
  * It is safe to destroy a texture more than once, or destroy a
  * null-initialized texture object.
  */
-void destroy_texture(struct oshu::texture *texture);
+void destroy_texture(oshu::texture *texture);
 
 /**
  * Draw a texture at the specified position.
@@ -114,7 +114,7 @@ void destroy_texture(struct oshu::texture *texture);
  * The logical size of the texture is preserved, according to the display's
  * current view.
  */
-void draw_texture(struct oshu::display *display, struct oshu::texture *texture, oshu::point p);
+void draw_texture(oshu::display *display, oshu::texture *texture, oshu::point p);
 
 /**
  * Draw a texture with a customizable scale factor.
@@ -126,7 +126,7 @@ void draw_texture(struct oshu::display *display, struct oshu::texture *texture, 
  * The texture is scaled relative to its origin, preserving the property that
  * *p* always represents the same texture pixel (the origin), for any ratio.
  */
-void draw_scaled_texture(struct oshu::display *display, struct oshu::texture *texture, oshu::point p, double ratio);
+void draw_scaled_texture(oshu::display *display, oshu::texture *texture, oshu::point p, double ratio);
 
 /** \} */
 

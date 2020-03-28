@@ -58,7 +58,7 @@ static int update(oshu::shell &w)
 	return 0;
 }
 
-static void draw_pause(struct oshu::display *display)
+static void draw_pause(oshu::display *display)
 {
 	const double size = 100;
 	const double thickness = 40;

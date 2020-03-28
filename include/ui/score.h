@@ -24,8 +24,8 @@ struct display;
  */
 
 struct score_frame {
-	struct oshu::display *display;
-	struct oshu::beatmap *beatmap;
+	oshu::display *display;
+	oshu::beatmap *beatmap;
 	int good;
 	int bad;
 };
@@ -38,7 +38,7 @@ struct score_frame {
  * Maybe in a future version, this widget could be permanently shown and
  * updated on every action.
  */
-int create_score_frame(struct oshu::display *display, struct oshu::beatmap *beatmap, struct oshu::score_frame *frame);
+int create_score_frame(oshu::display *display, oshu::beatmap *beatmap, oshu::score_frame *frame);
 
 /**
  * Show the score frame.
@@ -47,14 +47,14 @@ int create_score_frame(struct oshu::display *display, struct oshu::beatmap *beat
  *
  * The opacity argument lets you fade in the bar with #oshu::fade_in.
  */
-void show_score_frame(struct oshu::score_frame *frame, double opacity);
+void show_score_frame(oshu::score_frame *frame, double opacity);
 
 /**
  * Destroy a score frame.
  *
  * In fact, it does nothing, but is there for consistency.
  */
-void destroy_score_frame(struct oshu::score_frame *frame);
+void destroy_score_frame(oshu::score_frame *frame);
 
 /** \} */
 

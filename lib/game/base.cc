@@ -16,7 +16,7 @@
 
 #include <SDL2/SDL_image.h>
 
-static int open_beatmap(const char *beatmap_path, struct oshu::game_base *game)
+static int open_beatmap(const char *beatmap_path, oshu::game_base *game)
 {
 	if (oshu::load_beatmap(beatmap_path, &game->beatmap) < 0) {
 		oshu_log_error("no beatmap, aborting");
@@ -31,7 +31,7 @@ static int open_beatmap(const char *beatmap_path, struct oshu::game_base *game)
 	return 0;
 }
 
-static int open_audio(struct oshu::game_base *game)
+static int open_audio(oshu::game_base *game)
 {
 	assert (game->beatmap.audio_filename != NULL);
 	if (oshu::open_audio(game->beatmap.audio_filename, &game->audio) < 0) {

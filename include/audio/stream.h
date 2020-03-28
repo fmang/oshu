@@ -167,7 +167,7 @@ struct stream {
  *
  * \sa oshu::close_stream
  */
-int open_stream(const char *url, struct oshu::stream *stream);
+int open_stream(const char *url, oshu::stream *stream);
 
 /**
  * Read *nb_samples* float samples from an audio stream.
@@ -186,7 +186,7 @@ int open_stream(const char *url, struct oshu::stream *stream);
  *
  * \sa oshu::stream::finished
  */
-int read_stream(struct oshu::stream *stream, float *samples, int nb_samples);
+int read_stream(oshu::stream *stream, float *samples, int nb_samples);
 
 /**
  * Seek the stream to the specifed target position in seconds.
@@ -202,12 +202,12 @@ int read_stream(struct oshu::stream *stream, float *samples, int nb_samples);
  * There's often some kind of audio distortion glitch right after seeking.
  *
  */
-int seek_stream(struct oshu::stream *stream, double target);
+int seek_stream(oshu::stream *stream, double target);
 
 /**
  * Close an audio stream, and free everything we can.
  */
-void close_stream(struct oshu::stream *stream);
+void close_stream(oshu::stream *stream);
 
 /** \} */
 

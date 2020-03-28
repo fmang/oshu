@@ -27,7 +27,7 @@ static const char *osu_file_header = "osu file format v";
  * This is especially handy for the difficulty section where many values are
  * not 0 by default.
  */
-static const struct oshu::beatmap default_beatmap = {
+static const oshu::beatmap default_beatmap = {
 	.version = 0,
 	.audio_filename = nullptr,
 	.audio_lead_in = 0,
@@ -404,7 +404,7 @@ static int process_section(struct parser_state *parser)
 
 static int process_general(struct parser_state *parser)
 {
-	struct oshu::beatmap *beatmap = parser->beatmap;
+	oshu::beatmap *beatmap = parser->beatmap;
 	int rc;
 	enum token key;
 	int i;
@@ -503,7 +503,7 @@ static int parse_sample_set(struct parser_state *parser, enum oshu::sample_set_f
 
 static int process_metadata(struct parser_state *parser)
 {
-	struct oshu::metadata *meta = &parser->beatmap->metadata;
+	oshu::metadata *meta = &parser->beatmap->metadata;
 	enum token key;
 	if (parse_key(parser, &key) < 0)
 		return -1;
@@ -528,7 +528,7 @@ static int process_metadata(struct parser_state *parser)
 
 static int process_difficulty(struct parser_state *parser)
 {
-	struct oshu::difficulty *difficulty = &parser->beatmap->difficulty;
+	oshu::difficulty *difficulty = &parser->beatmap->difficulty;
 	enum token key;
 	double value;
 	if (parse_key(parser, &key) < 0)
@@ -604,7 +604,7 @@ skip:
  */
 static int process_timing_point(struct parser_state *parser)
 {
-	struct oshu::timing_point *timing;
+	oshu::timing_point *timing;
 	if (parse_timing_point(parser, &timing) < 0)
 		return -1;
 	if (parser->last_timing_point && timing->offset < parser->last_timing_point->offset) {
@@ -621,7 +621,7 @@ static int process_timing_point(struct parser_state *parser)
 	return 0;
 }
 
-static int parse_timing_point(struct parser_state *parser, struct oshu::timing_point **timing)
+static int parse_timing_point(struct parser_state *parser, oshu::timing_point **timing)
 {
 	int value;
 	*timing = (oshu::timing_point*) calloc(1, sizeof(**timing));
@@ -723,7 +723,7 @@ static int process_color_combo(struct parser_state *parser)
 	}
 
 	/* Parse everything else. */
-	struct oshu::color *color;
+	oshu::color *color;
 	consume_spaces(parser);
 	if (consume_char(parser, ':') < 0)
 		return -1;
@@ -743,7 +743,7 @@ static int process_color_combo(struct parser_state *parser)
 	return 0;
 }
 
-static int parse_color(struct parser_state *parser, struct oshu::color **color)
+static int parse_color(struct parser_state *parser, oshu::color **color)
 {
 	*color = (oshu::color*) calloc(1, sizeof(**color));
 	assert (color != NULL);
@@ -802,12 +802,12 @@ static void validate_colors(struct parser_state *parser)
  * results on further calls, assuming you'd never seek to a point before the
  * last seek.
  */
-static struct oshu::timing_point* seek_timing_point(double offset, struct parser_state *parser)
+static oshu::timing_point* seek_timing_point(double offset, struct parser_state *parser)
 {
 	if (parser->current_timing_point == NULL)
 		parser->current_timing_point = parser->beatmap->timing_points;
 	/* update the parser state as we loop */
-	struct oshu::timing_point **tp = &parser->current_timing_point;
+	oshu::timing_point **tp = &parser->current_timing_point;
 	for (; *tp && (*tp)->next; *tp = (*tp)->next) {
 		if ((*tp)->next->offset > offset)
 			break;
@@ -829,7 +829,7 @@ static struct oshu::timing_point* seek_timing_point(double offset, struct parser
  * - What if the initial hit has a combo skip?
  * - What if the combo skip is non-zero but the new combo flag is unset?
  */
-static void compute_hit_combo(struct parser_state *parser, struct oshu::hit *hit)
+static void compute_hit_combo(struct parser_state *parser, oshu::hit *hit)
 {
 	assert (parser->last_hit != NULL);
 	if (parser->last_hit->time < 0.) {
@@ -858,11 +858,11 @@ static void compute_hit_combo(struct parser_state *parser, struct oshu::hit *hit
  * Therefore, we need to re-process the slider's sounds after the hit is
  * completely parser.
  */
-static void fill_slider_additions(struct oshu::hit *hit)
+static void fill_slider_additions(oshu::hit *hit)
 {
 	assert (hit->type & oshu::SLIDER_HIT);
 	for (int i = 0; i <= hit->slider.repeat; ++i) {
-		struct oshu::hit_sound *s = &hit->slider.sounds[i];
+		oshu::hit_sound *s = &hit->slider.sounds[i];
 		s->additions |= oshu::NORMAL_SOUND;
 		if (!s->sample_set)
 			s->sample_set = hit->sound.sample_set;
@@ -875,7 +875,7 @@ static void fill_slider_additions(struct oshu::hit *hit)
 
 static int process_hit_object(struct parser_state *parser)
 {
-	struct oshu::hit *hit;
+	oshu::hit *hit;
 	if (parse_hit_object(parser, &hit) < 0)
 		return -1;
 	compute_hit_combo(parser, hit);
@@ -900,7 +900,7 @@ static int process_hit_object(struct parser_state *parser)
  * Consumes:
  * `288,256,8538,2,0,P|254:261|219:255,1,70,8|0,0:0|0:0,0:0:0:0:`
  */
-static int parse_hit_object(struct parser_state *parser, struct oshu::hit **hit)
+static int parse_hit_object(struct parser_state *parser, oshu::hit **hit)
 {
 	*hit = (oshu::hit*) calloc(1, sizeof(**hit));
 	assert (*hit != NULL);
@@ -945,7 +945,7 @@ fail:
  * Consumes:
  * `288,256,8538,2,0`
  */
-static int parse_common_hit(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_common_hit(struct parser_state *parser, oshu::hit *hit)
 {
 	double x, y;
 	if (parse_double_sep(parser, &x, ',') < 0)
@@ -977,7 +977,7 @@ static int parse_common_hit(struct parser_state *parser, struct oshu::hit *hit)
  * Some sliders are shorter and omit the slider additions, like that:
  * `160,76,142685,6,0,B|156:120|116:152,1,70,8|0`
  */
-static int parse_slider(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_slider(struct parser_state *parser, oshu::hit *hit)
 {
 	char type;
 	if (parse_char(parser, &type) < 0)
@@ -1032,9 +1032,9 @@ static int parse_point(struct parser_state *parser, oshu::point *p)
  * \todo
  * Parse polyline paths, like `L|X:Y|X:Y`.
  */
-static int parse_linear_slider(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_linear_slider(struct parser_state *parser, oshu::hit *hit)
 {
-	struct oshu::path *path = &hit->slider.path;
+	oshu::path *path = &hit->slider.path;
 	path->type = oshu::LINEAR_PATH;
 	path->line.start = hit->p;
 	if (parse_point(parser, &path->line.end) < 0)
@@ -1051,7 +1051,7 @@ static int parse_linear_slider(struct parser_state *parser, struct oshu::hit *hi
  * Consumes:
  * `396:140|448:80'
  */
-static int parse_perfect_slider(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_perfect_slider(struct parser_state *parser, oshu::hit *hit)
 {
 	oshu::point a, b, c;
 	a = hit->p;
@@ -1092,7 +1092,7 @@ static int parse_perfect_slider(struct parser_state *parser, struct oshu::hit *h
  * \todo
  * Reclaim the unused memory in the indices aray.
  */
-static int parse_bezier_slider(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_bezier_slider(struct parser_state *parser, oshu::hit *hit)
 {
 	int count = 2;
 	for (char *c = parser->input; *c != '\0' && *c != ','; ++c) {
@@ -1101,7 +1101,7 @@ static int parse_bezier_slider(struct parser_state *parser, struct oshu::hit *hi
 	}
 
 	hit->slider.path.type = oshu::BEZIER_PATH;
-	struct oshu::bezier *bezier = &hit->slider.path.bezier;
+	oshu::bezier *bezier = &hit->slider.path.bezier;
 	bezier->control_points = (oshu::point*) calloc(count, sizeof(*bezier->control_points));
 	assert (bezier->control_points != NULL);
 	bezier->control_points[0] = hit->p;
@@ -1141,7 +1141,7 @@ fail:
  * Consumes:
  * `4|2,1:2|0:3
  */
-static int parse_slider_additions(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_slider_additions(struct parser_state *parser, oshu::hit *hit)
 {
 	hit->slider.sounds = (oshu::hit_sound*) calloc(hit->slider.repeat + 1, sizeof(*hit->slider.sounds));
 	assert (hit->slider.sounds != NULL);
@@ -1187,7 +1187,7 @@ fail:
  * Consumes:
  * - `16620`
  */
-static int parse_spinner(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_spinner(struct parser_state *parser, oshu::hit *hit)
 {
 	if (parse_double(parser, &hit->spinner.end_time) < 0)
 		return -1;
@@ -1201,7 +1201,7 @@ static int parse_spinner(struct parser_state *parser, struct oshu::hit *hit)
  * Consumes:
  * `16620`
  */
-static int parse_hold_note(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_hold_note(struct parser_state *parser, oshu::hit *hit)
 {
 	if (parse_double(parser, &hit->hold_note.end_time) < 0)
 		return -1;
@@ -1222,7 +1222,7 @@ static int parse_hold_note(struct parser_state *parser, struct oshu::hit *hit)
  * \todo
  * Store the optional filename at the end when present.
  */
-static int parse_additions(struct parser_state *parser, struct oshu::hit *hit)
+static int parse_additions(struct parser_state *parser, oshu::hit *hit)
 {
 	/* 0. Fill defaults. */
 	hit->sound.sample_set = hit->timing_point->sample_set;
@@ -1284,7 +1284,7 @@ static int parse_additions(struct parser_state *parser, struct oshu::hit *hit)
  * Stop reading the file if the header is incorrect. It's no use printing a
  * mega list of warnings if the file clearly looks nothing like text.
  */
-static int parse_file(FILE *input, const char *name, struct oshu::beatmap *beatmap, bool headers_only)
+static int parse_file(FILE *input, const char *name, oshu::beatmap *beatmap, bool headers_only)
 {
 	struct parser_state parser;
 	memset(&parser, 0, sizeof(parser));
@@ -1315,7 +1315,7 @@ static int parse_file(FILE *input, const char *name, struct oshu::beatmap *beatm
 	}
 	free(line);
 	/* Finalize the hits sequence. */
-	struct oshu::hit *end;
+	oshu::hit *end;
 	end = (oshu::hit*) calloc(1, sizeof(*end));
 	assert (end != NULL);
 	end->time = INFINITY;
@@ -1328,7 +1328,7 @@ static int parse_file(FILE *input, const char *name, struct oshu::beatmap *beatm
  * Initialize the beatmap to its defaults, and add the first unreachable hit
  * object.
  */
-void initialize(struct oshu::beatmap *beatmap)
+void initialize(oshu::beatmap *beatmap)
 {
 	memcpy(beatmap, &default_beatmap, sizeof(*beatmap));
 	beatmap->hits = (oshu::hit*) calloc(1, sizeof(*beatmap->hits));
@@ -1336,7 +1336,7 @@ void initialize(struct oshu::beatmap *beatmap)
 	beatmap->hits->time = -INFINITY;
 }
 
-static int validate_metadata(struct oshu::metadata *meta)
+static int validate_metadata(oshu::metadata *meta)
 {
 	if (!meta->title)
 		return -1;
@@ -1351,7 +1351,7 @@ static int validate_metadata(struct oshu::metadata *meta)
  * Perform a variety of checks on a beatmap file to ensure it was parsed well
  * enough to be played.
  */
-static int validate(struct oshu::beatmap *beatmap)
+static int validate(oshu::beatmap *beatmap)
 {
 	if (!beatmap->audio_filename) {
 		oshu_log_error("no audio file mentionned");
@@ -1364,7 +1364,7 @@ static int validate(struct oshu::beatmap *beatmap)
 	return 0;
 }
 
-static int load_beatmap(const char *path, struct oshu::beatmap *beatmap, bool headers_only)
+static int load_beatmap(const char *path, oshu::beatmap *beatmap, bool headers_only)
 
 {
 	oshu_log_debug("loading beatmap %s", path);
@@ -1396,17 +1396,17 @@ fail:
 	return -1;
 }
 
-int oshu::load_beatmap(const char *path, struct oshu::beatmap *beatmap)
+int oshu::load_beatmap(const char *path, oshu::beatmap *beatmap)
 {
 	return ::load_beatmap(path, beatmap, false);
 }
 
-int oshu::load_beatmap_headers(const char *path, struct oshu::beatmap *beatmap)
+int oshu::load_beatmap_headers(const char *path, oshu::beatmap *beatmap)
 {
 	return ::load_beatmap(path, beatmap, true);
 }
 
-static void free_metadata(struct oshu::metadata *meta)
+static void free_metadata(oshu::metadata *meta)
 {
 	free(meta->title);
 	free(meta->title_unicode);
@@ -1417,7 +1417,7 @@ static void free_metadata(struct oshu::metadata *meta)
 	free(meta->source);
 }
 
-static void free_path(struct oshu::path *path)
+static void free_path(oshu::path *path)
 {
 	if (path->type == oshu::BEZIER_PATH) {
 		free(path->bezier.control_points);
@@ -1425,11 +1425,11 @@ static void free_path(struct oshu::path *path)
 	}
 }
 
-static void free_hits(struct oshu::hit *hits)
+static void free_hits(oshu::hit *hits)
 {
-	struct oshu::hit *current = hits;
+	oshu::hit *current = hits;
 	while (current != NULL) {
-		struct oshu::hit *next = current->next;
+		oshu::hit *next = current->next;
 		if (current->type & oshu::SLIDER_HIT) {
 			free_path(&current->slider.path);
 			free(current->slider.sounds);
@@ -1439,29 +1439,29 @@ static void free_hits(struct oshu::hit *hits)
 	}
 }
 
-static void free_timing_points(struct oshu::timing_point *t)
+static void free_timing_points(oshu::timing_point *t)
 {
-	struct oshu::timing_point *current = t;
+	oshu::timing_point *current = t;
 	while (current != NULL) {
-		struct oshu::timing_point *next = current->next;
+		oshu::timing_point *next = current->next;
 		free(current);
 		current = next;
 	}
 }
 
-static void free_colors(struct oshu::color *colors)
+static void free_colors(oshu::color *colors)
 {
 	if (!colors)
 		return;
-	struct oshu::color *current = colors;
+	oshu::color *current = colors;
 	do {
-		struct oshu::color *next = current->next;
+		oshu::color *next = current->next;
 		free(current);
 		current = next;
 	} while (current != colors);
 }
 
-void oshu::destroy_beatmap(struct oshu::beatmap *beatmap)
+void oshu::destroy_beatmap(oshu::beatmap *beatmap)
 {
 	free(beatmap->audio_filename);
 	free(beatmap->background_filename);

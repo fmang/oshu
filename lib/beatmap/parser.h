@@ -161,7 +161,7 @@ struct parser_state {
 	 *
 	 * Its memory isn't handled by us.
 	 */
-	struct oshu::beatmap *beatmap;
+	oshu::beatmap *beatmap;
 	/**
 	 * The current section.
 	 *
@@ -177,11 +177,11 @@ struct parser_state {
 	/**
 	 * Keep track of the last timing point to build the linked list.
 	 */
-	struct oshu::timing_point *last_timing_point;
+	oshu::timing_point *last_timing_point;
 	/**
 	 * Keep track of the last color to build the circular linked list.
 	 */
-	struct oshu::color *last_color;
+	oshu::color *last_color;
 	/**
 	 * When parsing hit objects, we need to figure out what its timing
 	 * point is, notably to compute slider durations.
@@ -190,7 +190,7 @@ struct parser_state {
 	 * It must not become NULL at the end of the chain, because otherwise
 	 * we're back to the first case and will trigger an infinite loop.
 	 */
-	struct oshu::timing_point *current_timing_point;
+	oshu::timing_point *current_timing_point;
 	/**
 	 * This is the #oshu::timing_point::beat_duration of the last
 	 * non-inherited timing point.
@@ -199,7 +199,7 @@ struct parser_state {
 	/**
 	 * Keep track of the last hit object to build the linked list.
 	 */
-	struct oshu::hit *last_hit;
+	oshu::hit *last_hit;
 };
 
 /**
@@ -243,24 +243,24 @@ static int process_input(P*);
 	static int process_difficulty(P*);
 	static int process_event(P*);
 	static int process_timing_point(P*);
-		static int parse_timing_point(P*, struct oshu::timing_point**);
+		static int parse_timing_point(P*, oshu::timing_point**);
 	static int process_color(P*);
 		static int process_color_combo(P*);
-		static int parse_color(P*, struct oshu::color**);
+		static int parse_color(P*, oshu::color**);
 		static int parse_color_channel(P*, double*);
 		static void validate_colors(P*);
 	static int process_hit_object(P*);
-		static int parse_hit_object(P*, struct oshu::hit**);
-			static int parse_common_hit(P*, struct oshu::hit*);
-			static int parse_slider(P*, struct oshu::hit*);
+		static int parse_hit_object(P*, oshu::hit**);
+			static int parse_common_hit(P*, oshu::hit*);
+			static int parse_slider(P*, oshu::hit*);
 				static int parse_point(P*, oshu::point*);
-				static int parse_linear_slider(P*, struct oshu::hit*);
-				static int parse_perfect_slider(P*, struct oshu::hit*);
-				static int parse_bezier_slider(P*, struct oshu::hit*);
-				static int parse_slider_additions(P*, struct oshu::hit*);
-			static int parse_spinner(P*, struct oshu::hit*);
-			static int parse_hold_note(P*, struct oshu::hit*);
-			static int parse_additions(P*, struct oshu::hit*);
+				static int parse_linear_slider(P*, oshu::hit*);
+				static int parse_perfect_slider(P*, oshu::hit*);
+				static int parse_bezier_slider(P*, oshu::hit*);
+				static int parse_slider_additions(P*, oshu::hit*);
+			static int parse_spinner(P*, oshu::hit*);
+			static int parse_hold_note(P*, oshu::hit*);
+			static int parse_additions(P*, oshu::hit*);
 
 namespace oshu {
 

@@ -42,7 +42,7 @@ struct track {
 	 * This pointer is automatically reset to NULL when the sample is done
 	 * playing.
 	 */
-	struct oshu::sample *sample;
+	oshu::sample *sample;
 	/**
 	 * The position in the #sample buffer, in samples per channel.
 	 *
@@ -71,7 +71,7 @@ struct track {
  *
  * \sa oshu::track
  */
-void start_track(struct oshu::track *track, struct oshu::sample *sample, float volume, int loop);
+void start_track(oshu::track *track, oshu::sample *sample, float volume, int loop);
 
 /**
  * Stop the playback on a track.
@@ -79,7 +79,7 @@ void start_track(struct oshu::track *track, struct oshu::sample *sample, float v
  * It gets useful when a sample is looping, as it wouldn't stop by itself
  * otherwise.
  */
-void stop_track(struct oshu::track *track);
+void stop_track(oshu::track *track);
 
 /**
  * Mix a track on top of an audio stream.
@@ -99,7 +99,7 @@ void stop_track(struct oshu::track *track);
  * when the stream is inactive, or less than *nb_samples* when the sample has
  * reached an end.
  */
-int mix_track(struct oshu::track *track, float *samples, int nb_samples);
+int mix_track(oshu::track *track, float *samples, int nb_samples);
 
 /** \} */
 

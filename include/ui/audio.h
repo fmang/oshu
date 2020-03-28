@@ -30,8 +30,8 @@ struct stream;
  * \sa oshu::show_audio_progress_bar
  */
 struct audio_progress_bar {
-	struct oshu::display *display;
-	struct oshu::stream *stream;
+	oshu::display *display;
+	oshu::stream *stream;
 };
 
 /**
@@ -41,12 +41,12 @@ struct audio_progress_bar {
  *
  * The stream must have a non-zero duration.
  */
-int create_audio_progress_bar(struct oshu::display *display, struct oshu::stream *stream, struct oshu::audio_progress_bar *bar);
+int create_audio_progress_bar(oshu::display *display, oshu::stream *stream, oshu::audio_progress_bar *bar);
 
 /**
  * Display the progress bar at the bottom of the screen.
  */
-void show_audio_progress_bar(struct oshu::audio_progress_bar *bar);
+void show_audio_progress_bar(oshu::audio_progress_bar *bar);
 
 /**
  * Destroy an audio progress bar.
@@ -54,7 +54,7 @@ void show_audio_progress_bar(struct oshu::audio_progress_bar *bar);
  * Today, this is a no-op. It is still provided for interface consistency with
  * the other widgets.
  */
-void destroy_audio_progress_bar(struct oshu::audio_progress_bar *bar);
+void destroy_audio_progress_bar(oshu::audio_progress_bar *bar);
 
 /** \} */
 

@@ -75,12 +75,12 @@ enum sound_shelf_index {
  * These pointers are NULL when no sample is available.
  */
 struct sound_shelf {
-	struct oshu::sample *hit_normal;
-	struct oshu::sample *hit_whistle;
-	struct oshu::sample *hit_finish;
-	struct oshu::sample *hit_clap;
-	struct oshu::sample *slider_slide;
-	struct oshu::sample *slider_whistle;
+	oshu::sample *hit_normal;
+	oshu::sample *hit_whistle;
+	oshu::sample *hit_finish;
+	oshu::sample *hit_clap;
+	oshu::sample *slider_slide;
+	oshu::sample *slider_whistle;
 };
 
 /**
@@ -100,7 +100,7 @@ struct sound_room {
 	 *
 	 * \sa size
 	 */
-	struct oshu::sound_shelf *shelves;
+	oshu::sound_shelf *shelves;
 	/**
 	 * Indices of the shelves.
 	 *
@@ -157,9 +157,9 @@ struct sound_library {
 	 * Format of the samples in the library.
 	 */
 	struct SDL_AudioSpec *format;
-	struct oshu::sound_room normal;
-	struct oshu::sound_room soft;
-	struct oshu::sound_room drum;
+	oshu::sound_room normal;
+	oshu::sound_room soft;
+	oshu::sound_room drum;
 };
 
 /**
@@ -173,12 +173,12 @@ struct sound_library {
  *
  * \sa oshu::close_sound_library
  */
-void open_sound_library(struct oshu::sound_library *library, struct SDL_AudioSpec *format);
+void open_sound_library(oshu::sound_library *library, struct SDL_AudioSpec *format);
 
 /**
  * Delete all the loaded samples from the library.
  */
-void close_sound_library(struct oshu::sound_library *library);
+void close_sound_library(oshu::sound_library *library);
 
 /**
  * Locate a sample on the filesystem and insert it into the library.
@@ -187,7 +187,7 @@ void close_sound_library(struct oshu::sound_library *library);
  *
  * \sa oshu::register_sound
  */
-int register_sample(struct oshu::sound_library *library, enum oshu::sample_set_family set, int index, int type);
+int register_sample(oshu::sound_library *library, enum oshu::sample_set_family set, int index, int type);
 
 /**
  * Load every sample required to play a hit sound effect.
@@ -195,14 +195,14 @@ int register_sample(struct oshu::sound_library *library, enum oshu::sample_set_f
  * \sa oshu::register_sample
  * \sa oshu::populate_library
  */
-void register_sound(struct oshu::sound_library *library, struct oshu::hit_sound *sound);
+void register_sound(oshu::sound_library *library, oshu::hit_sound *sound);
 
 /**
  * Find every sample reference into a beatmap and load them into the library.
  *
  * \sa oshu::register_sound
  */
-void populate_library(struct oshu::sound_library *library, struct oshu::beatmap *beatmap);
+void populate_library(oshu::sound_library *library, oshu::beatmap *beatmap);
 
 /**
  * Play all the samples associated to the hit sound.
@@ -213,7 +213,7 @@ void populate_library(struct oshu::sound_library *library, struct oshu::beatmap 
  *
  * \sa oshu_find_sample
  */
-void play_sound(struct oshu::sound_library *library, struct oshu::hit_sound *sound, struct oshu::audio *audio);
+void play_sound(oshu::sound_library *library, oshu::hit_sound *sound, oshu::audio *audio);
 
 /** \} */
 

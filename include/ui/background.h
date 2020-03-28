@@ -44,7 +44,7 @@ struct background {
 	 * \todo
 	 * Implement the #oshu::SHOW_BACKGROUND flag.
 	 */
-	struct oshu::display *display;
+	oshu::display *display;
 	/**
 	 * The background picture.
 	 *
@@ -57,7 +57,7 @@ struct background {
 	 * When no texture is loaded, #oshu::show_background is a no-op, so you
 	 * can safely assume the background is a valid object.
 	 */
-	struct oshu::texture picture;
+	oshu::texture picture;
 };
 
 /**
@@ -76,7 +76,7 @@ struct background {
  * because the pre-scale algorithm is fancier than that, thanks to cairo.
  *
  */
-int load_background(struct oshu::display *display, const char *filename, struct oshu::background *background);
+int load_background(oshu::display *display, const char *filename, oshu::background *background);
 
 /**
  * Display the background such that it fills the whole screen.
@@ -97,12 +97,12 @@ int load_background(struct oshu::display *display, const char *filename, struct 
  * You may use #oshu::trapezium for the brightness to implement a fading-in
  * fading-out effect.
  */
-void show_background(struct oshu::background *background, double brightness);
+void show_background(oshu::background *background, double brightness);
 
 /**
  * Free the background picture.
  */
-void destroy_background(struct oshu::background *background);
+void destroy_background(oshu::background *background);
 
 /** \} */
 

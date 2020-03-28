@@ -33,8 +33,8 @@ struct texture;
  * upload the texture with #oshu::finish_painting.
  *
  * ```c
- * struct oshu::texture t;
- * struct oshu::painter p;
+ * oshu::texture t;
+ * oshu::painter p;
  * oshu::start_painting(128 + 128 * I, 64 + 64 * I, &p);
  * // call cairo with p->cr
  * oshu::finish_painting(&p, display, &t);
@@ -46,7 +46,7 @@ struct texture;
  */
 
 struct painter {
-	struct oshu::display *display;
+	oshu::display *display;
 	oshu::size size;
 	struct SDL_Surface *destination;
 	cairo_surface_t *surface;
@@ -73,7 +73,7 @@ struct painter {
  *
  * The painter object needs not be initialized before calling this function.
  */
-int start_painting(struct oshu::display *display, oshu::size size, struct oshu::painter *painter);
+int start_painting(oshu::display *display, oshu::size size, oshu::painter *painter);
 
 /**
  * Load the drawn texture onto the GPU as a texture, and free everything else.
@@ -86,7 +86,7 @@ int start_painting(struct oshu::display *display, oshu::size size, struct oshu::
  *
  * You must destroy the texture later with #oshu::destroy_texture.
  */
-int finish_painting(struct oshu::painter *painter, struct oshu::texture *texture);
+int finish_painting(oshu::painter *painter, oshu::texture *texture);
 
 /** \} */
 

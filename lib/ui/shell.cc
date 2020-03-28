@@ -15,7 +15,7 @@
 
 static void set_title(oshu::shell &w)
 {
-	struct oshu::metadata *meta = &w.game.beatmap.metadata;
+	oshu::metadata *meta = &w.game.beatmap.metadata;
 	std::ostringstream title;
 	title << meta->artist << " - " << meta->title << " ♯ " << meta->version << " 𝄞 oshu!";
 	SDL_SetWindowTitle(w.display.window, title.str().c_str());

@@ -52,8 +52,8 @@ static void clip(float *samples, int nb_samples, int channels)
  */
 static void audio_callback(void *userdata, Uint8 *buffer, int len)
 {
-	struct oshu::audio *audio;
-	audio = (struct oshu::audio*) userdata;
+	oshu::audio *audio;
+	audio = (oshu::audio*) userdata;
 	int unit = audio->device_spec.channels * sizeof(float);
 	assert (len % unit == 0);
 	int nb_samples = len / unit;
@@ -80,7 +80,7 @@ static void audio_callback(void *userdata, Uint8 *buffer, int len)
  * Initialize the SDL audio device.
  * \return 0 on success, -1 on error.
  */
-static int open_device(struct oshu::audio *audio)
+static int open_device(oshu::audio *audio)
 {
 	SDL_AudioSpec want;
 	SDL_zero(want);
@@ -101,7 +101,7 @@ static int open_device(struct oshu::audio *audio)
 	return 0;
 }
 
-int oshu::open_audio(const char *url, struct oshu::audio *audio)
+int oshu::open_audio(const char *url, oshu::audio *audio)
 {
 	assert (sizeof(float) == 4);
 	if (oshu::open_stream(url, &audio->music) < 0)
@@ -114,17 +114,17 @@ fail:
 	return -1;
 }
 
-void oshu::play_audio(struct oshu::audio *audio)
+void oshu::play_audio(oshu::audio *audio)
 {
 	SDL_PauseAudioDevice(audio->device_id, 0);
 }
 
-void oshu::pause_audio(struct oshu::audio *audio)
+void oshu::pause_audio(oshu::audio *audio)
 {
 	SDL_PauseAudioDevice(audio->device_id, 1);
 }
 
-void oshu::close_audio(struct oshu::audio *audio)
+void oshu::close_audio(oshu::audio *audio)
 {
 	if (audio->device_id)
 		SDL_CloseAudioDevice(audio->device_id);
@@ -141,13 +141,13 @@ void oshu::close_audio(struct oshu::audio *audio)
  * Make sure you lock the audio device when calling this function, in order to
  * ensure predictable results.
  */
-static struct oshu::track *select_track(struct oshu::audio *audio)
+static oshu::track *select_track(oshu::audio *audio)
 {
 	int max_cursor = 0;
-	struct oshu::track *best_track = &audio->effects[0];
+	oshu::track *best_track = &audio->effects[0];
 	int tracks = sizeof(audio->effects) / sizeof(*audio->effects);
 	for (int i = 0; i < tracks; ++i) {
-		struct oshu::track *c = &audio->effects[i];
+		oshu::track *c = &audio->effects[i];
 		if (c->sample == NULL) {
 			return c;
 		} else if (c->cursor > max_cursor) {
@@ -158,31 +158,31 @@ static struct oshu::track *select_track(struct oshu::audio *audio)
 	return best_track;
 }
 
-void oshu::play_sample(struct oshu::audio *audio, struct oshu::sample *sample, float volume)
+void oshu::play_sample(oshu::audio *audio, oshu::sample *sample, float volume)
 {
 	SDL_LockAudioDevice(audio->device_id);
-	struct oshu::track *track = select_track(audio);
+	oshu::track *track = select_track(audio);
 	if (track->sample != NULL)
 		oshu_log_debug("all the effect tracks are taken, stealing one");
 	oshu::start_track(track, sample, volume, 0);
 	SDL_UnlockAudioDevice(audio->device_id);
 }
 
-void oshu::play_loop(struct oshu::audio *audio, struct oshu::sample *sample, float volume)
+void oshu::play_loop(oshu::audio *audio, oshu::sample *sample, float volume)
 {
 	SDL_LockAudioDevice(audio->device_id);
 	oshu::start_track(&audio->looping, sample, volume, 1);
 	SDL_UnlockAudioDevice(audio->device_id);
 }
 
-void oshu::stop_loop(struct oshu::audio *audio)
+void oshu::stop_loop(oshu::audio *audio)
 {
 	SDL_LockAudioDevice(audio->device_id);
 	oshu::stop_track(&audio->looping);
 	SDL_UnlockAudioDevice(audio->device_id);
 }
 
-int oshu::seek_music(struct oshu::audio *audio, double target)
+int oshu::seek_music(oshu::audio *audio, double target)
 {
 	SDL_LockAudioDevice(audio->device_id);
 	int rc = oshu::seek_stream(&audio->music, target);

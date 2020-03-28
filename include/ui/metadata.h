@@ -34,11 +34,11 @@ struct metadata_frame {
 	/**
 	 * The display storing the textures.
 	 */
-	struct oshu::display *display;
+	oshu::display *display;
 	/**
 	 * The metadata source.
 	 */
-	struct oshu::beatmap *beatmap;
+	oshu::beatmap *beatmap;
 	/**
 	 * The clock points to an ever-increasing continuous time value, in
 	 * seconds. The game clock's #oshu::clock::system is a good fit for this
@@ -55,21 +55,21 @@ struct metadata_frame {
 	 * 2 lines of text: the first with the title, the second with the
 	 * artist name.
 	 */
-	struct oshu::texture ascii;
+	oshu::texture ascii;
 	/**
 	 * Unicode variant of #ascii.
 	 *
 	 * When the Unicode metadata is missing, or identical to the ASCII
 	 * ones, this texture is left null.
 	 */
-	struct oshu::texture unicode;
+	oshu::texture unicode;
 	/**
 	 * Show difficulty information.
 	 *
 	 * The first line is the #oshu::metadata::version, and the second the
 	 * difficulty value in stars.
 	 */
-	struct oshu::texture stars;
+	oshu::texture stars;
 };
 
 /**
@@ -81,7 +81,7 @@ struct metadata_frame {
  *
  * When done, please destroy the frame with #oshu::destroy_metadata_frame.
  */
-int create_metadata_frame(struct oshu::display *display, struct oshu::beatmap *beatmap, double *clock, struct oshu::metadata_frame *frame);
+int create_metadata_frame(oshu::display *display, oshu::beatmap *beatmap, double *clock, oshu::metadata_frame *frame);
 
 /**
  * Display the metadata frame on the configured display with the given opacity.
@@ -95,12 +95,12 @@ int create_metadata_frame(struct oshu::display *display, struct oshu::beatmap *b
  * Every 3.5 second, the display is switched between Unicode and ASCII, with a
  * 0.2-second fade transititon.
  */
-void show_metadata_frame(struct oshu::metadata_frame *frame, double opacity);
+void show_metadata_frame(oshu::metadata_frame *frame, double opacity);
 
 /**
  * Free the allocated textures.
  */
-void destroy_metadata_frame(struct oshu::metadata_frame *frame);
+void destroy_metadata_frame(oshu::metadata_frame *frame);
 
 /** \} */
 

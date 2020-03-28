@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <SDL2/SDL.h>
 
-static void destroy_painter(struct oshu::painter *painter)
+static void destroy_painter(oshu::painter *painter)
 {
 	if (painter->cr) {
 		cairo_destroy(painter->cr);
@@ -28,7 +28,7 @@ static void destroy_painter(struct oshu::painter *painter)
 	}
 }
 
-int oshu::start_painting(struct oshu::display *display, oshu::size size, struct oshu::painter *painter)
+int oshu::start_painting(oshu::display *display, oshu::size size, oshu::painter *painter)
 {
 	cairo_status_t s;
 	memset(painter, 0, sizeof(*painter));
@@ -101,7 +101,7 @@ static void unpremultiply(SDL_Surface *surface)
 	}
 }
 
-int oshu::finish_painting(struct oshu::painter *painter, struct oshu::texture *texture)
+int oshu::finish_painting(oshu::painter *painter, oshu::texture *texture)
 {
 	int rc = 0;
 	unpremultiply(painter->destination);

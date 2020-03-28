@@ -5,9 +5,9 @@
 
 #include "game/base.h"
 
-struct oshu::hit* oshu::look_hit_back(struct oshu::game_base *game, double offset)
+oshu::hit* oshu::look_hit_back(oshu::game_base *game, double offset)
 {
-	struct oshu::hit *hit = game->hit_cursor;
+	oshu::hit *hit = game->hit_cursor;
 	double target = game->clock.now - offset;
 	/* seek backward */
 	while (oshu::hit_end_time(hit) > target)
@@ -19,9 +19,9 @@ struct oshu::hit* oshu::look_hit_back(struct oshu::game_base *game, double offse
 	return hit;
 }
 
-struct oshu::hit* oshu::look_hit_up(struct oshu::game_base *game, double offset)
+oshu::hit* oshu::look_hit_up(oshu::game_base *game, double offset)
 {
-	struct oshu::hit *hit = game->hit_cursor;
+	oshu::hit *hit = game->hit_cursor;
 	double target = game->clock.now + offset;
 	/* seek forward */
 	while (hit->time < target)
@@ -33,9 +33,9 @@ struct oshu::hit* oshu::look_hit_up(struct oshu::game_base *game, double offset)
 	return hit;
 }
 
-struct oshu::hit* oshu::next_hit(struct oshu::game_base *game)
+oshu::hit* oshu::next_hit(oshu::game_base *game)
 {
-	struct oshu::hit *hit = game->hit_cursor;
+	oshu::hit *hit = game->hit_cursor;
 	for (; hit->next; hit = hit->next) {
 		if (hit->type & (oshu::CIRCLE_HIT | oshu::SLIDER_HIT))
 			break;
@@ -43,9 +43,9 @@ struct oshu::hit* oshu::next_hit(struct oshu::game_base *game)
 	return hit;
 }
 
-struct oshu::hit* oshu::previous_hit(struct oshu::game_base *game)
+oshu::hit* oshu::previous_hit(oshu::game_base *game)
 {
-	struct oshu::hit *hit = game->hit_cursor;
+	oshu::hit *hit = game->hit_cursor;
 	if (!hit->previous)
 		return hit;
 	for (hit = hit->previous; hit->previous; hit = hit->previous) {

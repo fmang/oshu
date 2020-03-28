@@ -25,7 +25,7 @@
  * The result is written in *dest*, such that the rectangle covers the whole
  * window while possibly being cropped.
  */
-static void fit(struct oshu::display *display, oshu::size size, SDL_Rect *dest)
+static void fit(oshu::display *display, oshu::size size, SDL_Rect *dest)
 {
 	oshu::size vsize = display->view.size;
 	double window_ratio = oshu::ratio(vsize);;
@@ -76,7 +76,7 @@ static void fit(struct oshu::display *display, oshu::size size, SDL_Rect *dest)
  * \todo
  * Handle cairo errors.
  */
-static int scale_background(struct oshu::display *display, SDL_Surface **pic)
+static int scale_background(oshu::display *display, SDL_Surface **pic)
 {
 	SDL_Rect target_rect;
 	fit(display, oshu::size((*pic)->w, (*pic)->h), &target_rect);
@@ -120,7 +120,7 @@ static int scale_background(struct oshu::display *display, SDL_Surface **pic)
 	return 0;
 }
 
-int oshu::load_background(struct oshu::display *display, const char *filename, struct oshu::background *background)
+int oshu::load_background(oshu::display *display, const char *filename, oshu::background *background)
 {
 	memset(background, 0, sizeof(*background));
 	background->display = display;
@@ -155,14 +155,14 @@ int oshu::load_background(struct oshu::display *display, const char *filename, s
  * When the aspects don't match, crop the picture to ensure the window is
  * filled.
  */
-static void fill_screen(struct oshu::display *display, struct oshu::texture *pic)
+static void fill_screen(oshu::display *display, oshu::texture *pic)
 {
 	SDL_Rect dest;
 	fit(display, pic->size, &dest);
 	SDL_RenderCopy(display->renderer, pic->texture, NULL, &dest);
 }
 
-void oshu::show_background(struct oshu::background *background, double brightness)
+void oshu::show_background(oshu::background *background, double brightness)
 {
 	if (!background->picture.texture)
 		return;
@@ -175,7 +175,7 @@ void oshu::show_background(struct oshu::background *background, double brightnes
 	fill_screen(background->display, &background->picture);
 }
 
-void oshu::destroy_background(struct oshu::background *background)
+void oshu::destroy_background(oshu::background *background)
 {
 	if (!background->display) /* uninitialized background */
 		return;

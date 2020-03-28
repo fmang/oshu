@@ -29,7 +29,7 @@ struct osu_game : public oshu::game_base {
 	 *
 	 * NULL most of the time.
 	 */
-	struct oshu::hit *current_slider {};
+	oshu::hit *current_slider {};
 	/**
 	 * Keyboard key or mouse button associated to the #current_slider.
 	 *

@@ -64,7 +64,7 @@ struct clock {
 	double system;
 };
 
-void initialize_clock(struct oshu::game_base *game);
+void initialize_clock(oshu::game_base *game);
 
 /**
  * Update the game clock.
@@ -83,7 +83,7 @@ void initialize_clock(struct oshu::game_base *game);
  * lead-in phase, because the audio starts when the *now* clock becomes
  * positive, while the audio clock will be null at that moment.
  */
-void update_clock(struct oshu::game_base *game);
+void update_clock(oshu::game_base *game);
 
 /** \} */
 

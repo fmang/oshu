@@ -76,14 +76,14 @@ struct sample {
  *
  * \sa oshu::destroy_sample
  */
-int load_sample(const char *path, struct SDL_AudioSpec *spec, struct oshu::sample *sample);
+int load_sample(const char *path, struct SDL_AudioSpec *spec, oshu::sample *sample);
 
 /**
  * Free the sample's PCM samples buffer.
  *
  * The sample object is left in an unspecified state.
  */
-void destroy_sample(struct oshu::sample *sample);
+void destroy_sample(oshu::sample *sample);
 
 
 /** \} */

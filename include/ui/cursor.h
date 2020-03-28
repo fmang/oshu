@@ -32,7 +32,7 @@ struct cursor_widget {
 	 * It is used both to retrieve the mouse position, and to render the
 	 * cursor.
 	 */
-	struct oshu::display *display;
+	oshu::display *display;
 	/**
 	 * Keep track of the previous positions of the mouse to display a
 	 * fancier cursor, with a trail.
@@ -51,7 +51,7 @@ struct cursor_widget {
 	 * It's a white disc, which is scaled and whose opacity is adjusted for
 	 * the main cursor and all the trailing particles.
 	 */
-	struct oshu::texture mouse;
+	oshu::texture mouse;
 };
 
 /**
@@ -59,7 +59,7 @@ struct cursor_widget {
  *
  * You must free the cursor with #oshu::destroy_cursor.
  */
-int create_cursor(struct oshu::display *display, struct oshu::cursor_widget *cursor);
+int create_cursor(oshu::display *display, oshu::cursor_widget *cursor);
 
 /**
  * Render the cursor on the display it was created on.
@@ -71,7 +71,7 @@ int create_cursor(struct oshu::display *display, struct oshu::cursor_widget *cur
  * Every call to this function update the mouse position history, affecting the
  * cursor trail.
  */
-void show_cursor(struct oshu::cursor_widget *cursor);
+void show_cursor(oshu::cursor_widget *cursor);
 
 /**
  * Free the cursor's texture.
@@ -79,7 +79,7 @@ void show_cursor(struct oshu::cursor_widget *cursor);
  * It is safe to call this function on a destroyed cursor, or on a
  * zero-initialized cursor.
  */
-void destroy_cursor(struct oshu::cursor_widget *cursor);
+void destroy_cursor(oshu::cursor_widget *cursor);
 
 /** \} */
 

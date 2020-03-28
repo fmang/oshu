@@ -13,7 +13,7 @@
 /** Work in stereo. */
 static const int channels = 2;
 
-void oshu::start_track(struct oshu::track *track, struct oshu::sample *sample, float volume, int loop)
+void oshu::start_track(oshu::track *track, oshu::sample *sample, float volume, int loop)
 {
 	if (sample && sample->nb_samples == 0)
 		sample = NULL;
@@ -23,12 +23,12 @@ void oshu::start_track(struct oshu::track *track, struct oshu::sample *sample, f
 	track->loop = loop;
 }
 
-void oshu::stop_track(struct oshu::track *track)
+void oshu::stop_track(oshu::track *track)
 {
 	track->sample = NULL;
 }
 
-int oshu::mix_track(struct oshu::track *track, float *samples, int nb_samples)
+int oshu::mix_track(oshu::track *track, float *samples, int nb_samples)
 {
 	int wanted = nb_samples;
 	while (wanted > 0 && track->sample) {
