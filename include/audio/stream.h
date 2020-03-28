@@ -5,6 +5,18 @@
 
 #pragma once
 
+/*
+ * Forward declaration of the ffmpeg structures to avoid including big headers.
+ */
+struct AVFormatContext;
+struct AVCodec;
+struct AVStream;
+struct AVCodecContext;
+struct AVFrame;
+struct SwrContext;
+
+namespace oshu {
+
 /**
  * \defgroup audio_stream Stream
  * \ingroup audio
@@ -41,15 +53,6 @@
  * \{
  */
 
-/*
- * Forward declaration of the ffmpeg structures to avoid including big headers.
- */
-struct AVFormatContext;
-struct AVCodec;
-struct AVStream;
-struct AVCodecContext;
-struct AVFrame;
-
 /**
  * An audio stream, from its demuxer and decoder to its output device.
  *
@@ -57,7 +60,7 @@ struct AVFrame;
  * #sample_rate when setting up the audio output device, and the
  * #current_timestamp to know the current stream position.
  */
-struct oshu_stream {
+struct stream {
 	/**
 	 * The libavformat demuxer, handling the I/O aspects.
 	 */
@@ -106,7 +109,7 @@ struct oshu_stream {
 	struct SwrContext *converter;
 	/**
 	 * The sample rate of the output stream when read with
-	 * #oshu_read_stream.
+	 * #oshu::read_stream.
 	 *
 	 * It is set by the #converter, and in practice will always be the same
 	 * as the sample rate of the #decoder.
@@ -143,14 +146,14 @@ struct oshu_stream {
 	double current_timestamp;
 	/**
 	 * How many samples per channel of the current #frame we've read using
-	 * #oshu_read_stream. When this number is bigger than the number of
+	 * #oshu::read_stream. When this number is bigger than the number of
 	 * samples per channel in the frame, we must request a new frame.
 	 */
 	int sample_index;
 	/**
 	 * True when the end of the stream is reached.
 	 *
-	 * Set to 1 by #oshu_read_stream when we receive an AVERROR_EOF code
+	 * Set to 1 by #oshu::read_stream when we receive an AVERROR_EOF code
 	 * while trying to read a frame.
 	 */
 	int finished;
@@ -162,9 +165,9 @@ struct oshu_stream {
  * \param url Path or URL to the media you want to play.
  * \param stream A null-initialized stream object.
  *
- * \sa oshu_close_stream
+ * \sa oshu::close_stream
  */
-int oshu_open_stream(const char *url, struct oshu_stream *stream);
+int open_stream(const char *url, struct oshu::stream *stream);
 
 /**
  * Read *nb_samples* float samples from an audio stream.
@@ -181,9 +184,9 @@ int oshu_open_stream(const char *url, struct oshu_stream *stream);
  * means the end of the stream was reached, and further calls to this function
  * will return 0. On error, return -1.
  *
- * \sa oshu_stream::finished
+ * \sa oshu::stream::finished
  */
-int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples);
+int read_stream(struct oshu::stream *stream, float *samples, int nb_samples);
 
 /**
  * Seek the stream to the specifed target position in seconds.
@@ -191,19 +194,21 @@ int oshu_read_stream(struct oshu_stream *stream, float *samples, int nb_samples)
  * If the target is negative, the stream is rewinded to its beginning.
  *
  * To determine the new position of the stream after seeking, use
- * #oshu_stream::current_timestamp.
+ * #oshu::stream::current_timestamp.
  *
- * You should probably use #oshu_seek_music instead.
+ * You should probably use #oshu::seek_music instead.
  *
  * \todo
  * There's often some kind of audio distortion glitch right after seeking.
  *
  */
-int oshu_seek_stream(struct oshu_stream *stream, double target);
+int seek_stream(struct oshu::stream *stream, double target);
 
 /**
  * Close an audio stream, and free everything we can.
  */
-void oshu_close_stream(struct oshu_stream *stream);
+void close_stream(struct oshu::stream *stream);
 
 /** \} */
+
+}

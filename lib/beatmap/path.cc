@@ -18,16 +18,16 @@ static double epsilon = 0.001;
 /**
  * Extend a box so that the point *p* fits in.
  */
-static void extend_box(oshu_point p, oshu_point *top_left, oshu_point *bottom_right)
+static void extend_box(oshu::point p, oshu::point *top_left, oshu::point *bottom_right)
 {
 	if (std::real(p) < std::real(*top_left))
-		*top_left = oshu_point(std::real(p), std::imag(*top_left));
+		*top_left = oshu::point(std::real(p), std::imag(*top_left));
 	if (std::imag(p) < std::imag(*top_left))
-		*top_left = oshu_point(std::real(*top_left), std::imag(p));
+		*top_left = oshu::point(std::real(*top_left), std::imag(p));
 	if (std::real(p) > std::real(*bottom_right))
-		*bottom_right = oshu_point(std::real(p), std::imag(*bottom_right));
+		*bottom_right = oshu::point(std::real(p), std::imag(*bottom_right));
 	if (std::imag(p) > std::imag(*bottom_right))
-		*bottom_right = oshu_point(std::real(*bottom_right), std::imag(p));
+		*bottom_right = oshu::point(std::real(*bottom_right), std::imag(p));
 }
 
 /* Bézier *********************************************************************/
@@ -102,7 +102,7 @@ static int focus(double *t, int n)
  *
  * \sa focus
  */
-static void bezier_map(struct oshu_bezier *path, double *t, int *degree, oshu_point **control_points)
+static void bezier_map(struct oshu::bezier *path, double *t, int *degree, oshu::point **control_points)
 {
 	int segment = focus(t, path->segment_count);
 	*degree = path->indices[segment+1] - path->indices[segment] - 1;
@@ -119,12 +119,12 @@ static void bezier_map(struct oshu_bezier *path, double *t, int *degree, oshu_po
  * super high-degree Bézier curves on some beatmaps, and the factorial was at
  * its limits.
  */
-static oshu_point bezier_at(struct oshu_bezier *path, double t)
+static oshu::point bezier_at(struct oshu::bezier *path, double t)
 {
 	int degree;
-	oshu_point *points;
+	oshu::point *points;
 	bezier_map(path, &t, &degree, &points);
-	oshu_point pp[degree + 1];
+	oshu::point pp[degree + 1];
 	memcpy(pp, points, (degree + 1) * sizeof(*pp));
 
 	/* l is the logical length of pp.
@@ -153,18 +153,18 @@ static oshu_point bezier_at(struct oshu_bezier *path, double t)
  * The memory reallocation implies the memory must have been dynamically
  * allocated. You won't be able to grow a static path.
  */
-static int grow_bezier(struct oshu_bezier *bezier, double extension)
+static int grow_bezier(struct oshu::bezier *bezier, double extension)
 {
 	assert (bezier->segment_count >= 1);
 	assert (bezier->indices != NULL);
 	assert (bezier->control_points != NULL);
 	size_t n = bezier->indices[bezier->segment_count];
 	assert (n >= 2);
-	oshu_point end = bezier->control_points[n - 1];
-	oshu_point before_end = bezier->control_points[n - 2];
+	oshu::point end = bezier->control_points[n - 1];
+	oshu::point before_end = bezier->control_points[n - 2];
 
 	oshu_log_debug("expanding the bezier path by %f pixels", extension);
-	oshu_vector direction = end - before_end;
+	oshu::vector direction = end - before_end;
 	if (std::abs(direction) < epsilon) {
 		oshu_log_warning("cannot grow a bezier path whose end is stationary");
 		return -1;
@@ -174,7 +174,7 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
 	bezier->indices = (int*) realloc(bezier->indices, (bezier->segment_count + 1) * sizeof(*bezier->indices));
 	bezier->indices[bezier->segment_count] = n + 2;
 
-	bezier->control_points = (oshu_point*) realloc(bezier->control_points, (n + 2) * sizeof(*bezier->control_points));
+	bezier->control_points = (oshu::point*) realloc(bezier->control_points, (n + 2) * sizeof(*bezier->control_points));
 	bezier->control_points[n] = end;
 	bezier->control_points[n + 1] = end + direction / std::abs(direction) * extension;
 	return 0;
@@ -183,9 +183,9 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
 /**
  * Approximate the length of the segment and set-up the l-coordinate system.
  *
- * Receives a Bézier path whose #oshu_bezier::segment_count,
- * #oshu_bezier::indices and #oshu_bezier::control_points are filled, and use
- * these data to compute the #oshu_bezier::anchors field.
+ * Receives a Bézier path whose #oshu::bezier::segment_count,
+ * #oshu::bezier::indices and #oshu::bezier::control_points are filled, and use
+ * these data to compute the #oshu::bezier::anchors field.
  *
  * Here are the steps of the normalization process:
  *
@@ -203,7 +203,7 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
  *    `l_n ≥ 1`, which in turns implies that the final curve is cut, the
  *    desired effect.
  *
- * 4. Now, let's compute #oshu_bezier::anchors.
+ * 4. Now, let's compute #oshu::bezier::anchors.
  *    For every anchor index `j`, let `l = j / (# of anchors - 1)`, and find
  *    `i` such that `l_i ≤ l ≤ l_(i+1)`.
  *    Compute `k` such that `l = (1-k) * l_i + k * l_(i+1)`.
@@ -211,7 +211,7 @@ static int grow_bezier(struct oshu_bezier *bezier, double extension)
  *    Finally, let `anchors[j] = (1-k) * t_i + k * t_(i+1)`.
  *
  */
-void normalize_bezier(struct oshu_bezier *bezier, double target_length)
+void normalize_bezier(struct oshu::bezier *bezier, double target_length)
 {
 	/* 1. Prepare the field. */
 	int n = 64;  /* arbitrary */
@@ -221,10 +221,10 @@ void normalize_bezier(struct oshu_bezier *bezier, double target_length)
 begin:
 	/* 2. Compute the length of the path. */
 	length = 0;
-	oshu_point prev = bezier->control_points[0];
+	oshu::point prev = bezier->control_points[0];
 	for (int i = 0; i <= n; i++) {
 		double t = (double) i / n;
-		oshu_point current = bezier_at(bezier, t);
+		oshu::point current = bezier_at(bezier, t);
 		length += std::abs(prev - current);
 		l[i] = length;
 		prev = current;
@@ -266,7 +266,7 @@ begin:
  *
  * \sa normalize_bezier
  */
-static double l_to_t(struct oshu_bezier *bezier, double l)
+static double l_to_t(struct oshu::bezier *bezier, double l)
 {
 	int n = sizeof(bezier->anchors) / sizeof(*bezier->anchors) - 1;
 	int i = focus(&l, n);
@@ -277,7 +277,7 @@ static double l_to_t(struct oshu_bezier *bezier, double l)
  * Every point on a Bézier line is an average of all the control points, so
  * it's safe to compute the bounding box of the polyline defined by them.
  */
-void bezier_bounding_box(struct oshu_bezier *bezier, oshu_point *top_left, oshu_point *bottom_right)
+void bezier_bounding_box(struct oshu::bezier *bezier, oshu::point *top_left, oshu::point *bottom_right)
 {
 	assert (bezier->segment_count > 0);
 	*top_left = *bottom_right = bezier->control_points[0];
@@ -291,12 +291,12 @@ void bezier_bounding_box(struct oshu_bezier *bezier, oshu_point *top_left, oshu_
 /**
  * Simple weighted average of the starting point and end point.
  */
-static oshu_point line_at(struct oshu_line *line, double t)
+static oshu::point line_at(struct oshu::line *line, double t)
 {
 	return (1 - t) * line->start + t * line->end;
 }
 
-static void normalize_line(struct oshu_line *line, double target_length)
+static void normalize_line(struct oshu::line *line, double target_length)
 {
 	double actual_length = std::abs(line->start - line->end);
 	assert (target_length > 0);
@@ -305,7 +305,7 @@ static void normalize_line(struct oshu_line *line, double target_length)
 	line->end = line->start + (line->end - line->start) * factor;
 }
 
-void line_bounding_box(struct oshu_line *line, oshu_point *top_left, oshu_point *bottom_right)
+void line_bounding_box(struct oshu::line *line, oshu::point *top_left, oshu::point *bottom_right)
 {
 	*top_left = *bottom_right = line->start;
 	extend_box(line->start, top_left, bottom_right);
@@ -314,7 +314,7 @@ void line_bounding_box(struct oshu_line *line, oshu_point *top_left, oshu_point 
 
 /* Perfect circle arcs ********************************************************/
 
-static oshu_point arc_at(struct oshu_arc *arc, double t)
+static oshu::point arc_at(struct oshu::arc *arc, double t)
 {
 	double angle = (1 - t) * arc->start_angle + t * arc->end_angle;
 	return arc->center + std::polar(arc->radius, angle);
@@ -325,7 +325,7 @@ static oshu_point arc_at(struct oshu_arc *arc, double t)
  *
  * This code is inspired by the official osu! client's source code.
  */
-int arc_center(oshu_point a, oshu_point b, oshu_point c, oshu_point *center)
+int arc_center(oshu::point a, oshu::point b, oshu::point c, oshu::point *center)
 {
 	double a2 = std::norm(b - c);
 	double b2 = std::norm(a - c);
@@ -344,7 +344,7 @@ int arc_center(oshu_point a, oshu_point b, oshu_point c, oshu_point *center)
 	return 0;
 }
 
-int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *arc)
+int oshu::build_arc(oshu::point a, oshu::point b, oshu::point c, struct oshu::arc *arc)
 {
 	if (arc_center(a, b, c, &arc->center) < 0)
 		return -1;
@@ -361,7 +361,7 @@ int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *ar
 	return 0;
 }
 
-static void normalize_arc(struct oshu_arc *arc, double target_length)
+static void normalize_arc(struct oshu::arc *arc, double target_length)
 {
 	double target_angle = target_length / arc->radius;
 	double diff = copysign(target_angle, arc->end_angle - arc->start_angle);
@@ -377,7 +377,7 @@ static void normalize_arc(struct oshu_arc *arc, double target_length)
  * Then, add the two extremities of the arc, and, for any side of the circle
  * reached, extend the box.
  */
-void arc_bounding_box(struct oshu_arc *arc, oshu_point *top_left, oshu_point *bottom_right)
+void arc_bounding_box(struct oshu::arc *arc, oshu::point *top_left, oshu::point *bottom_right)
 {
 	double min = arc->start_angle < arc->end_angle ? arc->start_angle : arc->end_angle;
 	double max = arc->start_angle > arc->end_angle ? arc->start_angle : arc->end_angle;
@@ -397,10 +397,10 @@ void arc_bounding_box(struct oshu_arc *arc, oshu_point *top_left, oshu_point *bo
 	extend_box(arc_at(arc, 1.), top_left, bottom_right);
 
 	double angle = 0;
-	oshu_vector radius = arc->radius;
+	oshu::vector radius = arc->radius;
 	for (int i = 1; i < 8; ++i) {
 		angle += M_PI / 2.;
-		radius *= oshu_vector(0, 1);
+		radius *= oshu::vector(0, 1);
 		if (min < angle && angle < max)
 			extend_box(arc->center + radius, top_left, bottom_right);
 	}
@@ -408,55 +408,55 @@ void arc_bounding_box(struct oshu_arc *arc, oshu_point *top_left, oshu_point *bo
 
 /* Generic interface **********************************************************/
 
-void oshu_normalize_path(struct oshu_path *path, double length)
+void oshu::normalize_path(struct oshu::path *path, double length)
 {
 	switch (path->type) {
-	case OSHU_LINEAR_PATH:
+	case oshu::LINEAR_PATH:
 		return normalize_line(&path->line, length);
-	case OSHU_PERFECT_PATH:
+	case oshu::PERFECT_PATH:
 		return normalize_arc(&path->arc, length);
-	case OSHU_BEZIER_PATH:
+	case oshu::BEZIER_PATH:
 		return normalize_bezier(&path->bezier, length);
 	default:
 		return;
 	}
 }
 
-oshu_point oshu_path_at(struct oshu_path *path, double t)
+oshu::point oshu::path_at(struct oshu::path *path, double t)
 {
 	/* map t from ℝ to [0,1] */
 	t = fabs(remainder(t, 2.));
 	assert (-epsilon <= t && t <= 1 + epsilon);
 	switch (path->type) {
-	case OSHU_LINEAR_PATH:
+	case oshu::LINEAR_PATH:
 		return line_at(&path->line, t);
-	case OSHU_BEZIER_PATH:
+	case oshu::BEZIER_PATH:
 		t = l_to_t(&path->bezier, t);
 		return bezier_at(&path->bezier, t);
-	case OSHU_PERFECT_PATH:
+	case oshu::PERFECT_PATH:
 		return arc_at(&path->arc, t);
-	case OSHU_CATMULL_PATH:
-		assert (path->type != OSHU_CATMULL_PATH);
+	case oshu::CATMULL_PATH:
+		assert (path->type != oshu::CATMULL_PATH);
 	default:
 		assert (path->type != path->type);
 	}
 	return 0;
 }
 
-void oshu_path_bounding_box(struct oshu_path *path, oshu_point *top_left, oshu_point *bottom_right)
+void oshu::path_bounding_box(struct oshu::path *path, oshu::point *top_left, oshu::point *bottom_right)
 {
 	switch (path->type) {
-	case OSHU_LINEAR_PATH:
+	case oshu::LINEAR_PATH:
 		line_bounding_box(&path->line, top_left, bottom_right);
 		break;
-	case OSHU_BEZIER_PATH:
+	case oshu::BEZIER_PATH:
 		bezier_bounding_box(&path->bezier, top_left, bottom_right);
 		break;
-	case OSHU_PERFECT_PATH:
+	case oshu::PERFECT_PATH:
 		arc_bounding_box(&path->arc, top_left, bottom_right);
 		break;
-	case OSHU_CATMULL_PATH:
-		assert (path->type != OSHU_CATMULL_PATH);
+	case oshu::CATMULL_PATH:
+		assert (path->type != oshu::CATMULL_PATH);
 	default:
 		assert (path->type != path->type);
 	}

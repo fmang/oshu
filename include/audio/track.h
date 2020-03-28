@@ -5,7 +5,9 @@
 
 #pragma once
 
-struct oshu_sample;
+namespace oshu {
+
+struct sample;
 
 /**
  * \defgroup audio_track Track
@@ -28,10 +30,10 @@ struct oshu_sample;
  *
  * Tracks may only play packed stereo float samples.
  *
- * \sa oshu_start_track
- * \sa oshu_stop_track
+ * \sa oshu::start_track
+ * \sa oshu::stop_track
  */
-struct oshu_track {
+struct track {
 	/**
 	 * The sample object the track is going to play.
 	 *
@@ -40,11 +42,11 @@ struct oshu_track {
 	 * This pointer is automatically reset to NULL when the sample is done
 	 * playing.
 	 */
-	struct oshu_sample *sample;
+	struct oshu::sample *sample;
 	/**
 	 * The position in the #sample buffer, in samples per channel.
 	 *
-	 * It is comprised between 0 and #oshu_sample::nb_samples, inclusive.
+	 * It is comprised between 0 and #oshu::sample::nb_samples, inclusive.
 	 */
 	int cursor;
 	/**
@@ -55,7 +57,7 @@ struct oshu_track {
 	float volume;
 	/**
 	 * If true, the sample is looped over and over until
-	 * #oshu_stop_track is called.
+	 * #oshu::stop_track is called.
 	 */
 	int loop;
 };
@@ -67,9 +69,9 @@ struct oshu_track {
  * that is already playing something. Note that any previously playing sample
  * will stop playing.
  *
- * \sa oshu_track
+ * \sa oshu::track
  */
-void oshu_start_track(struct oshu_track *track, struct oshu_sample *sample, float volume, int loop);
+void start_track(struct oshu::track *track, struct oshu::sample *sample, float volume, int loop);
 
 /**
  * Stop the playback on a track.
@@ -77,7 +79,7 @@ void oshu_start_track(struct oshu_track *track, struct oshu_sample *sample, floa
  * It gets useful when a sample is looping, as it wouldn't stop by itself
  * otherwise.
  */
-void oshu_stop_track(struct oshu_track *track);
+void stop_track(struct oshu::track *track);
 
 /**
  * Mix a track on top of an audio stream.
@@ -97,6 +99,8 @@ void oshu_stop_track(struct oshu_track *track);
  * when the stream is inactive, or less than *nb_samples* when the sample has
  * reached an end.
  */
-int oshu_mix_track(struct oshu_track *track, float *samples, int nb_samples);
+int mix_track(struct oshu::track *track, float *samples, int nb_samples);
 
 /** \} */
+
+}

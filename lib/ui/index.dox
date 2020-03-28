@@ -9,7 +9,7 @@
  * - The widget's state is defined with a structure.
  *
  * - The widget is initialized and configured with a `create` function,
- *   returning an int. The first argument is an #oshu_display, and the last one
+ *   returning an int. The first argument is an #oshu::display, and the last one
  *   a *widget*. All the other parameters are widget-specific.
  *
  * - The widget is destroyed with the symmetrical void `destroy` function. Note

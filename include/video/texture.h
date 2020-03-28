@@ -7,8 +7,11 @@
 
 #include "core/geometry.h"
 
-struct oshu_display;
 struct SDL_Texture;
+
+namespace oshu {
+
+struct display;
 
 /**
  * \defgroup video_texture Texture
@@ -18,7 +21,7 @@ struct SDL_Texture;
  * Load and draw accelerated textures.
  *
  * This module provides a wrapper over SDL's texture rendering. Its main
- * benefit is that it integrates with an #oshu_display's view.
+ * benefit is that it integrates with an #oshu::display's view.
  *
  * Assume you need to draw a circle hit object at a given position in game
  * coordinates, this module will let you draw it by specifying only the center
@@ -26,9 +29,9 @@ struct SDL_Texture;
  *
  * Coordinate transformation takes 3 metadata into account:
  *
- * - The #oshu_display's view.
- * - The logical #oshu_texture::size of the texture.
- * - The texture's oshu_texture::origin.
+ * - The #oshu::display's view.
+ * - The logical #oshu::texture::size of the texture.
+ * - The texture's oshu::texture::origin.
  *
  * While the view may change every time the texture is drawn, the latter two
  * properties are well defined at the texture's creation, and thus need not be
@@ -40,10 +43,10 @@ struct SDL_Texture;
 /**
  * Define a texture loaded on the GPU.
  *
- * Load it from a file with #oshu_load_texture or create it using the
- * \ref video_paint module, then destroy it with #oshu_destroy_texture.
+ * Load it from a file with #oshu::load_texture or create it using the
+ * \ref video_paint module, then destroy it with #oshu::destroy_texture.
  */
-struct oshu_texture {
+struct texture {
 	/**
 	 * The final size of the texture, specified in logical units.
 	 *
@@ -63,7 +66,7 @@ struct oshu_texture {
 	 * You are free to change this property at will, but nothing will
 	 * prevent you from breaking the aspect ratio of the texture.
 	 */
-	oshu_size size;
+	oshu::size size;
 	/**
 	 * The origin defines the anchor of the texture when drawing, rather
 	 * than always using the top-left corner.
@@ -74,7 +77,7 @@ struct oshu_texture {
 	 * When drawing a texture at (x, y), it will be drawn such that the
 	 * #origin is at (x, y).
 	 */
-	oshu_point origin;
+	oshu::point origin;
 	/**
 	 * The underlying SDL texture.
 	 */
@@ -89,7 +92,7 @@ struct oshu_texture {
  *
  * Log an error and return -1 on failure.
  */
-int oshu_load_texture(struct oshu_display *display, const char *filename, struct oshu_texture *texture);
+int load_texture(struct oshu::display *display, const char *filename, struct oshu::texture *texture);
 
 /**
  * Destroy an SDL texture with `SDL_DestroyTexture`.
@@ -100,18 +103,18 @@ int oshu_load_texture(struct oshu_display *display, const char *filename, struct
  * It is safe to destroy a texture more than once, or destroy a
  * null-initialized texture object.
  */
-void oshu_destroy_texture(struct oshu_texture *texture);
+void destroy_texture(struct oshu::texture *texture);
 
 /**
  * Draw a texture at the specified position.
  *
  * *p* points at the position of the *origin* of the texture, not at the
- * top-left corner. See #oshu_texture::origin.
+ * top-left corner. See #oshu::texture::origin.
  *
  * The logical size of the texture is preserved, according to the display's
  * current view.
  */
-void oshu_draw_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p);
+void draw_texture(struct oshu::display *display, struct oshu::texture *texture, oshu::point p);
 
 /**
  * Draw a texture with a customizable scale factor.
@@ -123,6 +126,8 @@ void oshu_draw_texture(struct oshu_display *display, struct oshu_texture *textur
  * The texture is scaled relative to its origin, preserving the property that
  * *p* always represents the same texture pixel (the origin), for any ratio.
  */
-void oshu_draw_scaled_texture(struct oshu_display *display, struct oshu_texture *texture, oshu_point p, double ratio);
+void draw_scaled_texture(struct oshu::display *display, struct oshu::texture *texture, oshu::point p, double ratio);
 
 /** \} */
+
+}

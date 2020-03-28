@@ -12,23 +12,23 @@
 
 #include <SDL2/SDL.h>
 
-int oshu_create_score_frame(struct oshu_display *display, struct oshu_beatmap *beatmap, struct oshu_score_frame *frame)
+int oshu::create_score_frame(struct oshu::display *display, struct oshu::beatmap *beatmap, struct oshu::score_frame *frame)
 {
 	memset(frame, 0, sizeof(*frame));
 	frame->display = display;
 	frame->beatmap = beatmap;
 
-	for (struct oshu_hit *hit = beatmap->hits; hit; hit = hit->next) {
-		if (hit->state == OSHU_MISSED_HIT)
+	for (struct oshu::hit *hit = beatmap->hits; hit; hit = hit->next) {
+		if (hit->state == oshu::MISSED_HIT)
 			++frame->bad;
-		else if (hit->state == OSHU_GOOD_HIT)
+		else if (hit->state == oshu::GOOD_HIT)
 			++frame->good;
 	}
 
 	return 0;
 }
 
-void oshu_show_score_frame(struct oshu_score_frame *frame, double opacity)
+void oshu::show_score_frame(struct oshu::score_frame *frame, double opacity)
 {
 	int notes = frame->good + frame->bad;
 	if (notes == 0)
@@ -62,6 +62,6 @@ void oshu_show_score_frame(struct oshu_score_frame *frame, double opacity)
 	SDL_RenderFillRect(frame->display->renderer, &bad);
 }
 
-void oshu_destroy_score_frame(struct oshu_score_frame *frame)
+void oshu::destroy_score_frame(struct oshu::score_frame *frame)
 {
 }

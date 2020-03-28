@@ -44,14 +44,14 @@ namespace oshu {
 /**
  * Gather the key information of a beatmap.
  *
- * To save resources, it uses #oshu_load_beatmap_headers.
+ * To save resources, it uses #oshu::load_beatmap_headers.
  *
  * \todo
  * Reuse the beatmap structure?
  */
 struct beatmap_entry {
 	explicit beatmap_entry(const std::string &path);
-	oshu_mode mode;
+	oshu::mode mode;
 	/**
 	 * Difficulty indicator.
 	 *

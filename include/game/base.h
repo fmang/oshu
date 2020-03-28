@@ -64,17 +64,17 @@ public:
 	 * \todo
 	 * Take the beatmap by reference when the game state is constructed.
 	 */
-	struct oshu_beatmap beatmap {};
-	struct oshu_audio audio {};
-	struct oshu_sound_library library {};
-	struct oshu_clock clock {};
+	struct oshu::beatmap beatmap {};
+	struct oshu::audio audio {};
+	struct oshu::sound_library library {};
+	struct oshu::clock clock {};
 	int autoplay {};
 	bool paused {};
 	/**
 	 * Pointer to the next clickable hit.
 	 *
 	 * Any hit before this cursor has already been dealt with, and its
-	 * state should be anything but #OSHU_INITIAL_HIT.
+	 * state should be anything but #oshu::INITIAL_HIT.
 	 *
 	 * On the contrary, any hit past this cursor is *usually* in its
 	 * initial state, but that's not an absolute necessity. The user might
@@ -84,15 +84,13 @@ public:
 	 * This cursor is mostly here to speed things up. It is technically
 	 * okay for it to always point to the first hit, but the performance
 	 * will suffer. It's ideal position is right at the first *fresh*
-	 * (= #OSHU_INITIAL_HIT) hit object.
+	 * (= #oshu::INITIAL_HIT) hit object.
 	 *
 	 * With the two sentinels in the beatmap's hits linked list, this
 	 * cursor is never null, even after the last hit was played.
 	 */
-	struct oshu_hit *hit_cursor {};
+	struct oshu::hit *hit_cursor {};
 };
-
-}
 
 /**
  * \defgroup game_helpers Helpers
@@ -112,16 +110,16 @@ public:
  *
  * For long notes like sliders, the end time is used, not the start time.
  *
- * \sa oshu_look_hit_up
+ * \sa oshu::look_hit_up
  */
-struct oshu_hit* oshu_look_hit_back(struct oshu::game_base *game, double offset);
+struct oshu::hit* look_hit_back(struct oshu::game_base *game, double offset);
 
 /**
  * Find the last hit object before *now + offset*.
  *
- * This is analogous to #oshu_look_hit_back.
+ * This is analogous to #oshu::look_hit_back.
  */
-struct oshu_hit* oshu_look_hit_up(struct oshu::game_base *game, double offset);
+struct oshu::hit* look_hit_up(struct oshu::game_base *game, double offset);
 
 /**
  * Return the next relevant hit.
@@ -131,11 +129,13 @@ struct oshu_hit* oshu_look_hit_up(struct oshu::game_base *game, double offset);
  * The final null hit is considered relevant in order to ensure this function
  * always return something.
  */
-struct oshu_hit* oshu_next_hit(struct oshu::game_base *game);
+struct oshu::hit* next_hit(struct oshu::game_base *game);
 
 /**
- * Like #oshu_next_hit, but in the other direction.
+ * Like #oshu::next_hit, but in the other direction.
  */
-struct oshu_hit* oshu_previous_hit(struct oshu::game_base *game);
+struct oshu::hit* previous_hit(struct oshu::game_base *game);
 
 /** \} */
+
+}

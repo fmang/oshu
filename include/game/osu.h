@@ -9,6 +9,8 @@
 
 #include <memory>
 
+namespace oshu {
+
 /**
  * \defgroup game_osu Osu
  * \ingroup game
@@ -27,21 +29,23 @@ struct osu_game : public oshu::game_base {
 	 *
 	 * NULL most of the time.
 	 */
-	struct oshu_hit *current_slider {};
+	struct oshu::hit *current_slider {};
 	/**
 	 * Keyboard key or mouse button associated to the #current_slider.
 	 *
 	 * When the #current_slider is NULL, the value of this field is
 	 * irrelevant.
 	 */
-	enum oshu_finger held_key = {};
+	enum oshu::finger held_key = {};
 	std::shared_ptr<oshu::mouse> mouse {};
 
 	int check() override;
 	int check_autoplay() override;
-	int press(enum oshu_finger key) override;
-	int release(enum oshu_finger key) override;
+	int press(enum oshu::finger key) override;
+	int release(enum oshu::finger key) override;
 	int relinquish() override;
 };
 
 /** \} */
+
+}

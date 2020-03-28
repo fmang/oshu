@@ -12,7 +12,7 @@
 
 #include <assert.h>
 
-osu_game::osu_game(const char *beatmap_path)
+oshu::osu_game::osu_game(const char *beatmap_path)
 : oshu::game_base(beatmap_path)
 {
 }
@@ -25,14 +25,14 @@ osu_game::osu_game(const char *beatmap_path)
  *
  * If two hit objects overlap, yield the oldest unclicked one.
  */
-static struct oshu_hit* find_hit(struct osu_game *game, oshu_point p)
+static struct oshu::hit* find_hit(struct oshu::osu_game *game, oshu::point p)
 {
-	struct oshu_hit *start = oshu_look_hit_back(game, game->beatmap.difficulty.approach_time);
+	struct oshu::hit *start = oshu::look_hit_back(game, game->beatmap.difficulty.approach_time);
 	double max_time = game->clock.now + game->beatmap.difficulty.approach_time;
-	for (struct oshu_hit *hit = start; hit->time <= max_time; hit = hit->next) {
-		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT)))
+	for (struct oshu::hit *hit = start; hit->time <= max_time; hit = hit->next) {
+		if (!(hit->type & (oshu::CIRCLE_HIT | oshu::SLIDER_HIT)))
 			continue;
-		if (hit->state != OSHU_INITIAL_HIT)
+		if (hit->state != oshu::INITIAL_HIT)
 			continue;
 		if (std::abs(p - hit->p) <= game->beatmap.difficulty.circle_radius)
 			return hit;
@@ -46,10 +46,10 @@ static struct oshu_hit* find_hit(struct osu_game *game, oshu_point p)
  * It is unlikely that once a slider is marked as good or missed, it will ever
  * be shown once again. The main exception is when the user seeks.
  */
-static void jettison_hit(struct oshu_hit *hit)
+static void jettison_hit(struct oshu::hit *hit)
 {
 	if (hit->texture) {
-		oshu_destroy_texture(hit->texture);
+		oshu::destroy_texture(hit->texture);
 		free(hit->texture);
 		hit->texture = NULL;
 	}
@@ -59,20 +59,20 @@ static void jettison_hit(struct oshu_hit *hit)
  * Release the held slider, either because the held key is released, or because
  * a new slider is activated (somehow).
  */
-static void release_slider(struct osu_game *game)
+static void release_slider(struct oshu::osu_game *game)
 {
-	struct oshu_hit *hit = game->current_slider;
+	struct oshu::hit *hit = game->current_slider;
 	if (!hit)
 		return;
-	assert (hit->type & OSHU_SLIDER_HIT);
-	if (game->clock.now < oshu_hit_end_time(hit) - game->beatmap.difficulty.leniency) {
-		hit->state = OSHU_MISSED_HIT;
+	assert (hit->type & oshu::SLIDER_HIT);
+	if (game->clock.now < oshu::hit_end_time(hit) - game->beatmap.difficulty.leniency) {
+		hit->state = oshu::MISSED_HIT;
 	} else {
-		hit->state = OSHU_GOOD_HIT;
-		oshu_play_sound(&game->library, &hit->slider.sounds[hit->slider.repeat], &game->audio);
+		hit->state = oshu::GOOD_HIT;
+		oshu::play_sound(&game->library, &hit->slider.sounds[hit->slider.repeat], &game->audio);
 	}
 	jettison_hit(hit);
-	oshu_stop_loop(&game->audio);
+	oshu::stop_loop(&game->audio);
 	game->current_slider = NULL;
 }
 
@@ -81,19 +81,19 @@ static void release_slider(struct osu_game *game)
  *
  * When the last one is reached, release the slider.
  */
-static void sonorize_slider(struct osu_game *game)
+static void sonorize_slider(struct oshu::osu_game *game)
 {
-	struct oshu_hit *hit = game->current_slider;
+	struct oshu::hit *hit = game->current_slider;
 	if (!hit)
 		return;
-	assert (hit->type & OSHU_SLIDER_HIT);
+	assert (hit->type & oshu::SLIDER_HIT);
 	int t = (game->clock.now - hit->time) / hit->slider.duration;
 	int prev_t = (game->clock.before - hit->time) / hit->slider.duration;
-	if (game->clock.now > oshu_hit_end_time(hit)) {
+	if (game->clock.now > oshu::hit_end_time(hit)) {
 		release_slider(game);
 	} else if (t > prev_t && prev_t >= 0) {
 		assert (t <= hit->slider.repeat);
-		oshu_play_sound(&game->library, &hit->slider.sounds[t], &game->audio);
+		oshu::play_sound(&game->library, &hit->slider.sounds[t], &game->audio);
 	}
 }
 
@@ -106,30 +106,30 @@ static void sonorize_slider(struct osu_game *game)
  * Also mark sliders as missed if the mouse is too far from where it's supposed
  * to be.
  */
-int osu_game::check()
+int oshu::osu_game::check()
 {
 	/* Ensure the mouse follows the slider. */
 	sonorize_slider(this); /* < may release the slider! */
 	if (this->current_slider && mouse) {
-		struct oshu_hit *hit = this->current_slider;
+		struct oshu::hit *hit = this->current_slider;
 		double t = (this->clock.now - hit->time) / hit->slider.duration;
-		oshu_point ball = oshu_path_at(&hit->slider.path, t);
-		oshu_point m = mouse->position();
+		oshu::point ball = oshu::path_at(&hit->slider.path, t);
+		oshu::point m = mouse->position();
 		if (std::abs(ball - m) > this->beatmap.difficulty.slider_tolerance) {
-			oshu_stop_loop(&this->audio);
+			oshu::stop_loop(&this->audio);
 			this->current_slider = NULL;
-			hit->state = OSHU_MISSED_HIT;
+			hit->state = oshu::MISSED_HIT;
 			jettison_hit(hit);
 		}
 	}
 	/* Mark dead notes as missed. */
 	double left_wall = this->clock.now - this->beatmap.difficulty.leniency;
 	while (this->hit_cursor->time < left_wall) {
-		struct oshu_hit *hit = this->hit_cursor;
-		if (!(hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT))) {
-			hit->state = OSHU_UNKNOWN_HIT;
-		} else if (hit->state == OSHU_INITIAL_HIT) {
-			hit->state = OSHU_MISSED_HIT;
+		struct oshu::hit *hit = this->hit_cursor;
+		if (!(hit->type & (oshu::CIRCLE_HIT | oshu::SLIDER_HIT))) {
+			hit->state = oshu::UNKNOWN_HIT;
+		} else if (hit->state == oshu::INITIAL_HIT) {
+			hit->state = oshu::MISSED_HIT;
 			jettison_hit(hit);
 		}
 		this->hit_cursor = hit->next;
@@ -146,31 +146,31 @@ int osu_game::check()
  * The key is the held key, relevant only for sliders. In autoplay mode, it's
  * value doesn't matter.
  */
-static void activate_hit(struct osu_game *game, struct oshu_hit *hit, enum oshu_finger key)
+static void activate_hit(struct oshu::osu_game *game, struct oshu::hit *hit, enum oshu::finger key)
 {
-	if (hit->type & OSHU_SLIDER_HIT) {
+	if (hit->type & oshu::SLIDER_HIT) {
 		release_slider(game);
-		hit->state = OSHU_SLIDING_HIT;
+		hit->state = oshu::SLIDING_HIT;
 		game->current_slider = hit;
 		game->held_key = key;
-		oshu_play_sound(&game->library, &hit->sound, &game->audio);
-		oshu_play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
-	} else if (hit->type & OSHU_CIRCLE_HIT) {
-		hit->state = OSHU_GOOD_HIT;
-		oshu_play_sound(&game->library, &hit->sound, &game->audio);
+		oshu::play_sound(&game->library, &hit->sound, &game->audio);
+		oshu::play_sound(&game->library, &hit->slider.sounds[0], &game->audio);
+	} else if (hit->type & oshu::CIRCLE_HIT) {
+		hit->state = oshu::GOOD_HIT;
+		oshu::play_sound(&game->library, &hit->sound, &game->audio);
 	} else {
-		hit->state = OSHU_UNKNOWN_HIT;
+		hit->state = oshu::UNKNOWN_HIT;
 	}
 }
 
 /**
  * Automatically activate the sliders on time.
  */
-int osu_game::check_autoplay()
+int oshu::osu_game::check_autoplay()
 {
 	sonorize_slider(this);
 	while (this->hit_cursor->time < this->clock.now) {
-		activate_hit(this, this->hit_cursor, OSHU_UNKNOWN_KEY);
+		activate_hit(this, this->hit_cursor, oshu::UNKNOWN_KEY);
 		this->hit_cursor = this->hit_cursor->next;
 	}
 	return 0;
@@ -181,19 +181,19 @@ int osu_game::check_autoplay()
  *
  * Play a sample depending on what was clicked, and when.
  */
-int osu_game::press(enum oshu_finger key)
+int oshu::osu_game::press(enum oshu::finger key)
 {
 	if (!mouse)
 		return 0;
-	oshu_point m = mouse->position();
-	struct oshu_hit *hit = find_hit(this, m);
+	oshu::point m = mouse->position();
+	struct oshu::hit *hit = find_hit(this, m);
 	if (!hit)
 		return 0;
 	if (fabs(hit->time - this->clock.now) < this->beatmap.difficulty.leniency) {
 		activate_hit(this, hit, key);
 		hit->offset = this->clock.now - hit->time;
 	} else {
-		hit->state = OSHU_MISSED_HIT;
+		hit->state = oshu::MISSED_HIT;
 		jettison_hit(hit);
 	}
 	return 0;
@@ -203,18 +203,18 @@ int osu_game::press(enum oshu_finger key)
  * When the user is holding a slider or a hold note in mania mode, release the
  * thing.
  */
-int osu_game::release(enum oshu_finger key)
+int oshu::osu_game::release(enum oshu::finger key)
 {
 	if (this->held_key == key)
 		release_slider(this);
 	return 0;
 }
 
-int osu_game::relinquish()
+int oshu::osu_game::relinquish()
 {
 	if (this->current_slider) {
-		this->current_slider->state = OSHU_INITIAL_HIT;
-		oshu_stop_loop(&this->audio);
+		this->current_slider->state = oshu::INITIAL_HIT;
+		oshu::stop_loop(&this->audio);
 		this->current_slider = NULL;
 	}
 	return 0;

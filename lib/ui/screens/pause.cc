@@ -22,19 +22,19 @@ static int on_event(oshu::shell &w, union SDL_Event *event)
 		if (event->key.repeat)
 			break;
 		switch (event->key.keysym.sym) {
-		case OSHU_QUIT_KEY:
+		case oshu::QUIT_KEY:
 			w.close();
 			break;
-		case OSHU_PAUSE_KEY:
+		case oshu::PAUSE_KEY:
 			if (game->clock.now > 0 && !game->autoplay)
 				game->rewind(1.);
 			game->unpause();
-			w.screen = &oshu_play_screen;
+			w.screen = &oshu::play_screen;
 			break;
-		case OSHU_REWIND_KEY:
+		case oshu::REWIND_KEY:
 			game->rewind(10.);
 			break;
-		case OSHU_FORWARD_KEY:
+		case oshu::FORWARD_KEY:
 			game->forward(20.);
 			break;
 		}
@@ -54,15 +54,15 @@ static int update(oshu::shell &w)
 {
 	oshu::game_base *game = &w.game;
 	if (!game->paused)
-		w.screen = &oshu_play_screen;
+		w.screen = &oshu::play_screen;
 	return 0;
 }
 
-static void draw_pause(struct oshu_display *display)
+static void draw_pause(struct oshu::display *display)
 {
 	const double size = 100;
 	const double thickness = 40;
-	const oshu_size screen = display->view.size;
+	const oshu::size screen = display->view.size;
 	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 128);
 	SDL_SetRenderDrawBlendMode(display->renderer, SDL_BLENDMODE_BLEND);
 	SDL_Rect bar = {
@@ -80,12 +80,14 @@ static int draw(oshu::shell &w)
 {
 	oshu::game_base *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
-	oshu_show_background(&w.background, 0);
-	oshu_show_metadata_frame(&w.metadata, 1);
-	oshu_show_audio_progress_bar(&w.audio_progress_bar);
+	oshu::show_background(&w.background, 0);
+	oshu::show_metadata_frame(&w.metadata, 1);
+	oshu::show_audio_progress_bar(&w.audio_progress_bar);
 	draw_pause(&w.display);
 	return 0;
 }
+
+namespace oshu {
 
 /**
  * Pause screen: the music stops.
@@ -100,9 +102,11 @@ static int draw(oshu::shell &w)
  * to re-focus.
  *
  */
-struct oshu_game_screen oshu_pause_screen = {
+struct oshu::game_screen pause_screen = {
 	.name = "Paused",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,
 };
+
+}

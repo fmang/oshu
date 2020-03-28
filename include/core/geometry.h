@@ -7,12 +7,16 @@
 
 #include <complex>
 
+namespace oshu {
+
 /**
  * \defgroup core_geometry Geometry
  * \ingroup core
  *
  * \brief
  * Common 2D types.
+ *
+ * \{
  */
 
 /**
@@ -20,21 +24,25 @@
  *
  * The coordinate system is arbitrary.
  */
-using oshu_point = std::complex<double>;
+using point = std::complex<double>;
 
 /**
  * A 2D vector.
  *
- * This is distinct from #oshu_point for readability.
+ * This is distinct from #oshu::point for readability.
  */
-using oshu_vector = std::complex<double>;
+using vector = std::complex<double>;
 
 /**
  * A 2D size.
  */
-using oshu_size = std::complex<double>;
+using size = std::complex<double>;
 
 /**
  * Return the width / height ratio of a size.
  */
-double oshu_ratio(oshu_size size);
+double ratio(oshu::size size);
+
+/* } */
+
+}

@@ -47,19 +47,19 @@ struct game_mode {
 	 * key used by the game module itself, like escape or space to pause, q
 	 * to quit, &c. Same goes for mouse buttons.
 	 *
-	 * If you need the mouse position, use #oshu_get_mouse to have it in
+	 * If you need the mouse position, use #oshu::get_mouse to have it in
 	 * game coordinates.
 	 *
 	 * This callback isn't called when the game is paused or on autoplay.
 	 *
 	 * \sa release
 	 */
-	virtual int press(enum oshu_finger key) = 0;
+	virtual int press(enum oshu::finger key) = 0;
 
 	/**
 	 * See #press.
 	 */
-	virtual int release(enum oshu_finger key) = 0;
+	virtual int release(enum oshu::finger key) = 0;
 
 	/**
 	 * Release any held object, like sliders or hold notes.

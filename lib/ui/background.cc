@@ -25,11 +25,11 @@
  * The result is written in *dest*, such that the rectangle covers the whole
  * window while possibly being cropped.
  */
-static void fit(struct oshu_display *display, oshu_size size, SDL_Rect *dest)
+static void fit(struct oshu::display *display, oshu::size size, SDL_Rect *dest)
 {
-	oshu_size vsize = display->view.size;
-	double window_ratio = oshu_ratio(vsize);;
-	double pic_ratio = oshu_ratio(size);
+	oshu::size vsize = display->view.size;
+	double window_ratio = oshu::ratio(vsize);;
+	double pic_ratio = oshu::ratio(size);
 
 	if (window_ratio > pic_ratio) {
 		/* the window is too wide */
@@ -53,7 +53,7 @@ static void fit(struct oshu_display *display, oshu_size size, SDL_Rect *dest)
  * point to the new scaled surface.
  *
  * First, the resulting image size is computing using the same function as
- * #oshu_show_background. If the resulting size is smaller than the original
+ * #oshu::show_background. If the resulting size is smaller than the original
  * size, do nothing.
  *
  * Then, the image is converted to unpacked RGB: each pixel is made of 4-bytes,
@@ -76,10 +76,10 @@ static void fit(struct oshu_display *display, oshu_size size, SDL_Rect *dest)
  * \todo
  * Handle cairo errors.
  */
-static int scale_background(struct oshu_display *display, SDL_Surface **pic)
+static int scale_background(struct oshu::display *display, SDL_Surface **pic)
 {
 	SDL_Rect target_rect;
-	fit(display, oshu_size((*pic)->w, (*pic)->h), &target_rect);
+	fit(display, oshu::size((*pic)->w, (*pic)->h), &target_rect);
 	if (target_rect.w >= (*pic)->w)
 		return 0; /* don't upscale */
 	double zoom = (double) target_rect.w / (*pic)->w;
@@ -120,11 +120,11 @@ static int scale_background(struct oshu_display *display, SDL_Surface **pic)
 	return 0;
 }
 
-int oshu_load_background(struct oshu_display *display, const char *filename, struct oshu_background *background)
+int oshu::load_background(struct oshu::display *display, const char *filename, struct oshu::background *background)
 {
 	memset(background, 0, sizeof(*background));
 	background->display = display;
-	if (!(display->features & OSHU_SHOW_BACKGROUND))
+	if (!(display->features & oshu::SHOW_BACKGROUND))
 		return 0;
 
 	SDL_Surface *pic = IMG_Load(filename);
@@ -135,7 +135,7 @@ int oshu_load_background(struct oshu_display *display, const char *filename, str
 	if (scale_background(display, &pic) < 0)
 		return -1;
 
-	background->picture.size = oshu_size(pic->w, pic->h);
+	background->picture.size = oshu::size(pic->w, pic->h);
 	background->picture.origin = 0;
 	background->picture.texture = SDL_CreateTextureFromSurface(display->renderer, pic);
 	SDL_FreeSurface(pic);
@@ -155,14 +155,14 @@ int oshu_load_background(struct oshu_display *display, const char *filename, str
  * When the aspects don't match, crop the picture to ensure the window is
  * filled.
  */
-static void fill_screen(struct oshu_display *display, struct oshu_texture *pic)
+static void fill_screen(struct oshu::display *display, struct oshu::texture *pic)
 {
 	SDL_Rect dest;
 	fit(display, pic->size, &dest);
 	SDL_RenderCopy(display->renderer, pic->texture, NULL, &dest);
 }
 
-void oshu_show_background(struct oshu_background *background, double brightness)
+void oshu::show_background(struct oshu::background *background, double brightness)
 {
 	if (!background->picture.texture)
 		return;
@@ -175,11 +175,11 @@ void oshu_show_background(struct oshu_background *background, double brightness)
 	fill_screen(background->display, &background->picture);
 }
 
-void oshu_destroy_background(struct oshu_background *background)
+void oshu::destroy_background(struct oshu::background *background)
 {
 	if (!background->display) /* uninitialized background */
 		return;
-	if (!(background->display->features & OSHU_SHOW_BACKGROUND))
+	if (!(background->display->features & oshu::SHOW_BACKGROUND))
 		return;
-	oshu_destroy_texture(&background->picture);
+	oshu::destroy_texture(&background->picture);
 }

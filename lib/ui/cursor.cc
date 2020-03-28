@@ -11,13 +11,13 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 
-static int paint_cursor(struct oshu_cursor_widget *cursor)
+static int paint_cursor(struct oshu::cursor_widget *cursor)
 {
 	double radius = 14;
-	oshu_size size = oshu_size{1, 1} * radius * 2.;
+	oshu::size size = oshu::size{1, 1} * radius * 2.;
 
-	struct oshu_painter p;
-	oshu_start_painting(cursor->display, size, &p);
+	struct oshu::painter p;
+	oshu::start_painting(cursor->display, size, &p);
 	cairo_translate(p.cr, radius, radius);
 
 	cairo_pattern_t *pattern = cairo_pattern_create_radial(
@@ -33,41 +33,41 @@ static int paint_cursor(struct oshu_cursor_widget *cursor)
 	cairo_fill(p.cr);
 	cairo_pattern_destroy(pattern);
 
-	int rc = oshu_finish_painting(&p, &cursor->mouse);
+	int rc = oshu::finish_painting(&p, &cursor->mouse);
 	cursor->mouse.origin = size / 2.;
 	return rc;
 }
 
-int oshu_create_cursor(struct oshu_display *display, struct oshu_cursor_widget *cursor)
+int oshu::create_cursor(struct oshu::display *display, struct oshu::cursor_widget *cursor)
 {
 	memset(cursor, 0, sizeof(*cursor));
 	cursor->display = display;
 
-	if (!(display->features & OSHU_FANCY_CURSOR))
+	if (!(display->features & oshu::FANCY_CURSOR))
 		return 0;
 
 	int fireflies = sizeof(cursor->history) / sizeof(*cursor->history);
-	oshu_point mouse = oshu_get_mouse(display);
+	oshu::point mouse = oshu::get_mouse(display);
 	for (int i = 0; i < fireflies; ++i)
 		cursor->history[i] = mouse;
 
 	return paint_cursor(cursor);
 }
 
-void oshu_show_cursor(struct oshu_cursor_widget *cursor)
+void oshu::show_cursor(struct oshu::cursor_widget *cursor)
 {
-	if (!(cursor->display->features & OSHU_FANCY_CURSOR))
+	if (!(cursor->display->features & oshu::FANCY_CURSOR))
 		return;
 
 	int fireflies = sizeof(cursor->history) / sizeof(*cursor->history);
 	cursor->offset = (cursor->offset + 1) % fireflies;
-	cursor->history[cursor->offset] = oshu_get_mouse(cursor->display);
+	cursor->history[cursor->offset] = oshu::get_mouse(cursor->display);
 
 	for (int i = 1; i <= fireflies; ++i) {
 		int offset = (cursor->offset + i) % fireflies;
 		double ratio = (double) (i + 1) / (fireflies + 1);
 		SDL_SetTextureAlphaMod(cursor->mouse.texture, ratio * 255);
-		oshu_draw_scaled_texture(
+		oshu::draw_scaled_texture(
 			cursor->display, &cursor->mouse,
 			cursor->history[offset],
 			ratio
@@ -75,12 +75,12 @@ void oshu_show_cursor(struct oshu_cursor_widget *cursor)
 	}
 }
 
-void oshu_destroy_cursor(struct oshu_cursor_widget *cursor)
+void oshu::destroy_cursor(struct oshu::cursor_widget *cursor)
 {
 	if (!cursor->display)
 		return;
-	if (!(cursor->display->features & OSHU_FANCY_CURSOR))
+	if (!(cursor->display->features & oshu::FANCY_CURSOR))
 		return;
 
-	oshu_destroy_texture(&cursor->mouse);
+	oshu::destroy_texture(&cursor->mouse);
 }

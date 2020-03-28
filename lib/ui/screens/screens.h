@@ -8,8 +8,8 @@
 union SDL_Event;
 
 namespace oshu {
+
 struct shell;
-}
 
 /**
  * \defgroup ui_screens Screens
@@ -56,7 +56,7 @@ struct shell;
 /**
  * Define a game screen by its behavior.
  */
-struct oshu_game_screen {
+struct game_screen {
 	/**
 	 * \todo
 	 * Drop it if it's not used.
@@ -85,12 +85,14 @@ struct oshu_game_screen {
 };
 
 /* Defined in play.c */
-extern struct oshu_game_screen oshu_play_screen;
+extern struct oshu::game_screen play_screen;
 
 /* Defined in pause.c */
-extern struct oshu_game_screen oshu_pause_screen;
+extern struct oshu::game_screen pause_screen;
 
 /* Defined in score.c */
-extern struct oshu_game_screen oshu_score_screen;
+extern struct oshu::game_screen score_screen;
 
 /** \} */
+
+}

@@ -7,7 +7,9 @@
 
 #include "beatmap/path.h"
 
-struct oshu_texture;
+namespace oshu {
+
+struct texture;
 
 /** \defgroup beatmap Beatmap
  *
@@ -40,11 +42,11 @@ struct oshu_texture;
  * The value of the constants match the way they're written as integers in the
  * beatmap.
  */
-enum oshu_mode {
-	OSHU_OSU_MODE = 0,
-	OSHU_TAIKO_MODE = 1,
-	OSHU_CATCH_THE_BEAT_MODE = 2,
-	OSHU_MANIA_MODE = 3,
+enum mode {
+	OSU_MODE = 0,
+	TAIKO_MODE = 1,
+	CATCH_THE_BEAT_MODE = 2,
+	MANIA_MODE = 3,
 };
 
 /**
@@ -57,7 +59,7 @@ enum oshu_mode {
  * shiro rightfully said, you'd prefer families because families are good while
  * banks are evil.
  */
-enum oshu_sample_set_family {
+enum sample_set_family {
 	/**
 	 * The beatmap's hit objects often specifiy 0 as the sample set,
 	 * meaning we should use the inherited one.
@@ -65,11 +67,11 @@ enum oshu_sample_set_family {
 	 * However, the parser should in these case replace 0 with the actual
 	 * value, so it should be used in an external module.
 	 */
-	OSHU_NO_SAMPLE_SET = -1,
-	OSHU_AUTO_SAMPLE_SET = 0,
-	OSHU_NORMAL_SAMPLE_SET = 1,
-	OSHU_SOFT_SAMPLE_SET = 2,
-	OSHU_DRUM_SAMPLE_SET = 3,
+	NO_SAMPLE_SET = -1,
+	AUTO_SAMPLE_SET = 0,
+	NORMAL_SAMPLE_SET = 1,
+	SOFT_SAMPLE_SET = 2,
+	DRUM_SAMPLE_SET = 3,
 };
 
 /**
@@ -81,28 +83,28 @@ enum oshu_sample_set_family {
  *
  * They can be OR'd, so you should store them in an *int*.
  */
-enum oshu_sound_type {
+enum sound_type {
 	/**
 	 * The first bit is undocumented, but it stands for Normal according to
 	 * the source code of osu.
 	 *
 	 * 0 means None, so I guess it's a silent note.
 	 */
-	OSHU_NORMAL_SOUND = 1,
-	OSHU_WHISTLE_SOUND = 2,
-	OSHU_FINISH_SOUND = 4,
-	OSHU_CLAP_SOUND = 8,
+	NORMAL_SOUND = 1,
+	WHISTLE_SOUND = 2,
+	FINISH_SOUND = 4,
+	CLAP_SOUND = 8,
 	/**
 	 * OR this with your sound type to make it a hit sound.
 	 *
 	 * Note that it's set to 0, and therefore is theoritically optional.
 	 */
-	OSHU_HIT_SOUND = 0,
+	HIT_SOUND = 0,
 	/**
 	 * OR this with your sound type and you'll make it a sliding slider
 	 * sound.
 	 *
-	 * Looks like only OSHU_NORMAL_SOUND and OSHU_WHISTLE_SOUND may be
+	 * Looks like only oshu::NORMAL_SOUND and oshu::WHISTLE_SOUND may be
 	 * combined with these.
 	 *
 	 * Slider sounds are meant to be looped, unlike hit sounds.
@@ -112,18 +114,18 @@ enum oshu_sound_type {
 	 * used by some beatmaps. It can't be a looping clap, right? Besides,
 	 * there's no such file as `sliderclap.wav`.
 	 */
-	OSHU_SLIDER_SOUND = 0x80,
+	SLIDER_SOUND = 0x80,
 	/**
 	 * AND this with your combined sound type to retrieve the sound type:
-	 * #OSHU_NORMAL_SOUND, #OSHU_WHISTLE_SOUND, #OSHU_FINISH_SOUND,
-	 * #OSHU_CLAP_SOUND.
+	 * #oshu::NORMAL_SOUND, #oshu::WHISTLE_SOUND, #oshu::FINISH_SOUND,
+	 * #oshu::CLAP_SOUND.
 	 */
-	OSHU_SOUND_MASK = 0x7F,
+	SOUND_MASK = 0x7F,
 	/**
 	 * AND this with your combined sound type to retrieve the target hit:
-	 * #OSHU_HIT_SOUND, #OSHU_SLIDER_SOUND.
+	 * #oshu::HIT_SOUND, #oshu::SLIDER_SOUND.
 	 */
-	OSHU_SOUND_TARGET = 0x80,
+	SOUND_TARGET = 0x80,
 };
 
 /**
@@ -135,7 +137,7 @@ enum oshu_sound_type {
  * element's next element is the first element. Keep that in mind when looping
  * over it.
  */
-struct oshu_color {
+struct color {
 	/**
 	 * The identifier of the combo.
 	 *
@@ -146,7 +148,7 @@ struct oshu_color {
 	double red;
 	double green;
 	double blue;
-	struct oshu_color *next;
+	struct oshu::color *next;
 };
 
 /**
@@ -168,7 +170,7 @@ struct oshu_color {
  * The structure provides a #next field to make a linked list *in chronological
  * order* with respect to #offset.
  */
-struct oshu_timing_point {
+struct timing_point {
 	/**
 	 * \brief When the timing point starts, in seconds.
 	 *
@@ -193,7 +195,7 @@ struct oshu_timing_point {
 	/**
 	 * Default sample set to use in that timing section.
 	 */
-	enum oshu_sample_set_family sample_set;
+	enum oshu::sample_set_family sample_set;
 	/**
 	 * Index of the sample set.
 	 *
@@ -228,24 +230,24 @@ struct oshu_timing_point {
 	 *
 	 * NULL for the last item.
 	 */
-	struct oshu_timing_point *next;
+	struct oshu::timing_point *next;
 };
 
 /**
  * Flags defining the type of a hit object.
  *
- * To check if it's a circle, you should use `type & OSHU_CIRCLE_HIT` rather
+ * To check if it's a circle, you should use `type & oshu::CIRCLE_HIT` rather
  * than check for equality, because it will often be combined with
- * #OSHU_NEW_HIT_COMBO.
+ * #oshu::NEW_HIT_COMBO.
  */
-enum oshu_hit_type {
-	OSHU_CIRCLE_HIT = 0b1,
-	OSHU_SLIDER_HIT = 0b10,
-	OSHU_NEW_HIT_COMBO = 0b100,
-	OSHU_SPINNER_HIT = 0b1000,
-	OSHU_COMBO_HIT_MASK = 0b1110000, /**< How many combos to skip. */
-	OSHU_COMBO_HIT_OFFSET = 4, /**< How many bits to shift. */
-	OSHU_HOLD_HIT = 0b10000000, /**< Mania mode only. */
+enum hit_type {
+	CIRCLE_HIT = 0b1,
+	SLIDER_HIT = 0b10,
+	NEW_HIT_COMBO = 0b100,
+	SPINNER_HIT = 0b1000,
+	COMBO_HIT_MASK = 0b1110000, /**< How many combos to skip. */
+	COMBO_HIT_OFFSET = 4, /**< How many bits to shift. */
+	HOLD_HIT = 0b10000000, /**< Mania mode only. */
 };
 
 /**
@@ -255,33 +257,33 @@ enum oshu_hit_type {
  * want to maintain a parallel linked list to keep track of the state of every
  * hit.
  */
-enum oshu_hit_state {
+enum hit_state {
 	/**
 	 * The default state.
 	 *
 	 * The hit has never been clicked not skipped nor anything. This also
 	 * means the user can interact with the hit object.
 	 */
-	OSHU_INITIAL_HIT = 0,
+	INITIAL_HIT = 0,
 	/**
 	 * The slider is currently being held.
 	 *
 	 * Only meaningful for spinners and mania hold notes.
 	 */
-	OSHU_SLIDING_HIT,
+	SLIDING_HIT,
 	/**
 	 * The hit was clicked on time.
 	 */
-	OSHU_GOOD_HIT,
+	GOOD_HIT,
 	/**
 	 * The hit was missed, either because it wasn't clicked at the right
 	 * time, or because it wasn't clicked at all.
 	 */
-	OSHU_MISSED_HIT,
+	MISSED_HIT,
 	/**
 	 * A hit obejct may be skipped when the user seeks forward.
 	 */
-	OSHU_SKIPPED_HIT,
+	SKIPPED_HIT,
 	/**
 	 * Hit objects are marked unknown when the current game mode cannot
 	 * interpret it.
@@ -290,7 +292,7 @@ enum oshu_hit_state {
 	 * other mode than osu. Also spinners in osu mode because they're not
 	 * supported yet.
 	 */
-	OSHU_UNKNOWN_HIT,
+	UNKNOWN_HIT,
 };
 
 /**
@@ -306,11 +308,11 @@ enum oshu_hit_state {
  * simple type. It would be easier to have a structure for 1 sound, and
  * associate a list of sounds to hit objects. The downside is that it would
  * cause a memory indirection, and require more memory. The upside is that the
- * #oshu_hit_sound to filename conversion is easier. As a compromise, if
+ * #oshu::hit_sound to filename conversion is easier. As a compromise, if
  * performance matters, the list can be a structure like the current one, with
  * an iterator to convert the compacted multi-sound pack to simple sounds.
  */
-struct oshu_hit_sound {
+struct hit_sound {
 	/**
 	 * Sample set to use when playing the hit sound.
 	 *
@@ -318,13 +320,13 @@ struct oshu_hit_sound {
 	 * replace that value by the sample set to use, computed from the
 	 * context.
 	 *
-	 * \sa oshu_timing_point::sample_set
+	 * \sa oshu::timing_point::sample_set
 	 */
-	enum oshu_sample_set_family sample_set;
+	enum oshu::sample_set_family sample_set;
 	/**
-	 * Combination of flags from #oshu_sound_type.
+	 * Combination of flags from #oshu::sound_type.
 	 *
-	 * To play the normal sound, #OSHU_NORMAL_SOUND must be enabled.
+	 * To play the normal sound, #oshu::NORMAL_SOUND must be enabled.
 	 *
 	 * The sample set to use for these additions is defined by the
 	 * #additions_set field, while the normal sound's sample set is defined
@@ -336,7 +338,7 @@ struct oshu_hit_sound {
 	 *
 	 * It's similar to #sample_set.
 	 */
-	enum oshu_sample_set_family additions_set;
+	enum oshu::sample_set_family additions_set;
 	/**
 	 * For a given #sample_set family, alternative samples may be used.
 	 *
@@ -350,22 +352,22 @@ struct oshu_hit_sound {
 	/**
 	 * Volume of the sample, from 0 to 100%.
 	 *
-	 * \sa #oshu_timing_point::volume
+	 * \sa #oshu::timing_point::volume
 	 */
 	double volume;
 };
 
 /**
- * Parts of a #oshu_hit specific to slider objects.
+ * Parts of a #oshu::hit specific to slider objects.
  *
  * The most complex part of the slider is its path. The way it should be parsed
- * and represented is explained in #oshu_path.
+ * and represented is explained in #oshu::path.
  */
-struct oshu_slider {
+struct slider {
 	/**
 	 * Path the slider follows.
 	 */
-	struct oshu_path path;
+	struct oshu::path path;
 	/**
 	 * > repeat (Integer) is the number of times a player will go over the
 	 * > slider. A value of 1 will not repeat, 2 will repeat once, 3 twice,
@@ -383,43 +385,43 @@ struct oshu_slider {
 	 * #duration.
 	 *
 	 * It is computed from the pixel length in the beatmap file,
-	 * #oshu_difficulty::slider_multiplier, and
-	 * #oshu_timing_point::beat_duration.
+	 * #oshu::difficulty::slider_multiplier, and
+	 * #oshu::timing_point::beat_duration.
 	 */
 	double duration;
 	/**
 	 * Array of sounds to play over each circle.
 	 *
-	 * #oshu_hit::sound contains the sample for the body of the slider, not
+	 * #oshu::hit::sound contains the sample for the body of the slider, not
 	 * the edges of the slider.
 	 *
 	 * The size of the array is #repeat + 1. A non-repeating slider will
 	 * have 2 sounds. For a repeating slider, it implies the sound for the
 	 * same circle will change every time it is repeated.
 	 */
-	struct oshu_hit_sound *sounds;
+	struct oshu::hit_sound *sounds;
 };
 
 /**
- * Parts of a #oshu_hit specific to spinner objects.
+ * Parts of a #oshu::hit specific to spinner objects.
  */
-struct oshu_spinner {
+struct spinner {
 	/**
 	 * Time in seconds when the spinner ends.
 	 *
-	 * Relative to the song's position, like #oshu_hit::time.
+	 * Relative to the song's position, like #oshu::hit::time.
 	 */
 	double end_time;
 };
 
 /**
- * Parts of a #oshu_hit specific to osu!mania hold note objects.
+ * Parts of a #oshu::hit specific to osu!mania hold note objects.
  */
-struct oshu_hold_note {
+struct hold_note {
 	/**
 	 * Time in seconds when the hold note ends.
 	 *
-	 * Relative to the song's position, like #oshu_hit::time.
+	 * Relative to the song's position, like #oshu::hit::time.
 	 */
 	double end_time;
 };
@@ -437,14 +439,14 @@ struct oshu_hold_note {
  *
  * The structure for a slider is
  * `x,y,time,type,hitSound,sliderType|curvePoints,repeat,pixelLength,edgeHitsounds,edgeAdditions,addition`.
- * See #oshu_slider.
+ * See #oshu::slider.
  *
  * The structure for a spinner is `x,y,time,type,hitSound,endTime,addition`.
- * See #oshu_spinner.
+ * See #oshu::spinner.
  *
  * The structure for a osu!mania hold note is
  * `x,y,time,type,hitSound,endTime:addition`.
- * See #oshu_hold_note.
+ * See #oshu::hold_note.
  *
  * For every type, the addition is structured like
  * `sampleSet:additions:customIndex:sampleVolume:filename`.
@@ -452,13 +454,13 @@ struct oshu_hold_note {
  *
  * For details, look at the corresponding field in this structure.
  */
-struct oshu_hit {
+struct hit {
 	/**
 	 * Coordinates of the hit object in game coordinates.
 	 *
 	 * From (0, 0) for top-left to (512, 384) for bottom-right.
 	 */
-	oshu_point p;
+	oshu::point p;
 	/**
 	 * \brief When the hit object should be clicked, in seconds.
 	 *
@@ -475,7 +477,7 @@ struct oshu_hit {
 	 * Type of the hit object, like circle, slider, spinner, and a few
 	 * extra information.
 	 *
-	 * Combination of flags from #oshu_hit_type.
+	 * Combination of flags from #oshu::hit_type.
 	 */
 	int type;
 	/**
@@ -483,28 +485,28 @@ struct oshu_hit {
 	 *
 	 * Sliders have some more sounds on the edges, don't forget them.
 	 */
-	struct oshu_hit_sound sound;
+	struct oshu::hit_sound sound;
 	/**
 	 * Type-specific properties.
 	 */
 	union {
-		struct oshu_slider slider;
-		struct oshu_spinner spinner;
-		struct oshu_hold_note hold_note;
+		struct oshu::slider slider;
+		struct oshu::spinner spinner;
+		struct oshu::hold_note hold_note;
 	};
 	/**
 	 * \brief Timing point in effect when the hit object should be clicked.
 	 *
 	 * It is used by the parser to compute the duration of sliders, and may
 	 * also be needed by the game or graphics module to handle the slider
-	 * ticks, using the #oshu_timing_point::beat_duration property.
+	 * ticks, using the #oshu::timing_point::beat_duration property.
 	 */
-	struct oshu_timing_point *timing_point;
+	struct oshu::timing_point *timing_point;
 	/**
 	 * \brief Combo identifier.
 	 *
 	 * Starts at 0 at the beginning of the beatmap, and increases at every
-	 * hit object with #OSHU_NEW_HIT_COMBO. Its value may increase by more
+	 * hit object with #oshu::NEW_HIT_COMBO. Its value may increase by more
 	 * than 1 if the hit object specifies a non-zero combo skip.
 	 *
 	 * Two hit objects belong in the same combo if and only if they have
@@ -515,7 +517,7 @@ struct oshu_hit {
 	 * \brief Sequence number of the hit inside its combo.
 	 *
 	 * The first hit object will have the sequence number 1, the next one
-	 * 2, and so on until a hit object's type includes #OSHU_NEW_HIT_COMBO,
+	 * 2, and so on until a hit object's type includes #oshu::NEW_HIT_COMBO,
 	 * which resets the sequence number to 1.
 	 */
 	int combo_seq;
@@ -526,13 +528,13 @@ struct oshu_hit {
 	 * It's closely linked to #combo, and increases in the same way, taking
 	 * into account combo skips.
 	 */
-	struct oshu_color *color;
+	struct oshu::color *color;
 	/**
 	 * Dynamic state of the hit. Whether it was clicked or not.
 	 *
-	 * It should be left to 0 (#OSHU_INITIAL_HIT) by the parser.
+	 * It should be left to 0 (#oshu::INITIAL_HIT) by the parser.
 	 */
-	enum oshu_hit_state state;
+	enum oshu::hit_state state;
 	/**
 	 * Graphical texture for the hit object.
 	 *
@@ -542,28 +544,28 @@ struct oshu_hit {
 	 * \todo
 	 * The GUI module should manage its own texture cache.
 	 */
-	struct oshu_texture *texture;
+	struct oshu::texture *texture;
 	/**
 	 * Pointer to the previous element of the linked list.
 	 *
 	 * NULL if it's the first element.
 	 */
-	struct oshu_hit *previous;
+	struct oshu::hit *previous;
 	/**
 	 * Pointer to the next element of the linked list.
 	 *
 	 * NULL if it's the last element.
 	 */
-	struct oshu_hit *next;
+	struct oshu::hit *next;
 };
 
 /**
  * Tell the time offset, in seconds, when the hit object ends.
  *
- * For a circle, that's the same as #oshu_hit::time, but for a slider, spinner
+ * For a circle, that's the same as #oshu::hit::time, but for a slider, spinner
  * or hold note, it's that offset plus the duration of the hit.
  */
-double oshu_hit_end_time(struct oshu_hit *hit);
+double hit_end_time(struct oshu::hit *hit);
 
 /**
  * Compute the last point of a hit object.
@@ -572,7 +574,7 @@ double oshu_hit_end_time(struct oshu_hit *hit);
  * the position at the end of the slide. If the slider repeats, it may be the
  * same as the starting point though.
  */
-oshu_point oshu_end_point(struct oshu_hit *hit);
+oshu::point end_point(struct oshu::hit *hit);
 
 /**
  * \brief Complete definition of the [Metadata] section.
@@ -585,7 +587,7 @@ oshu_point oshu_end_point(struct oshu_hit *hit);
  *
  * All the strings are encoded in UTF-8.
  */
-struct oshu_metadata {
+struct metadata {
 	/**
 	 * \brief ASCII representation of the title.
 	 *
@@ -654,7 +656,7 @@ struct oshu_metadata {
  * Looks like 5 in the beatmap file usually means average. Higher than 5 is
  * harder, and lower than 5 is easier.
  */
-struct oshu_difficulty {
+struct difficulty {
 	/**
 	 * \brief Radius of the hit object's circles, in pixels.
 	 *
@@ -786,9 +788,9 @@ struct oshu_difficulty {
  *
  * Most string values are dynamically allocated inside this structure. Some
  * linked structures are allocated on the heap too. Make sure you free
- * everything with #oshu_destroy_beatmap.
+ * everything with #oshu::destroy_beatmap.
  */
-struct oshu_beatmap {
+struct beatmap {
 	/**
 	 * The version written in the header of every osu beatmap file.
 	 * Today it's something around 14.
@@ -848,24 +850,24 @@ struct oshu_beatmap {
 	 * sample set, so you must check the hit object first before resorting
 	 * to this variable.
 	 *
-	 * Let's default to #OSHU_SOFT_SAMPLE_SET.
+	 * Let's default to #oshu::SOFT_SAMPLE_SET.
 	 */
-	enum oshu_sample_set_family sample_set;
+	enum oshu::sample_set_family sample_set;
 	/**
 	 * The game mode. Today, only the standard osu! game is supported.
 	 *
 	 * It is written as a number between 0 and 3, and matches the values in
-	 * #oshu_mode.
+	 * #oshu::mode.
 	 */
-	enum oshu_mode mode;
+	enum oshu::mode mode;
 	/**
 	 * \brief [Metadata] section.
 	 */
-	struct oshu_metadata metadata;
+	struct oshu::metadata metadata;
 	/**
 	 * \brief [Difficulty] section.
 	 */
-	struct oshu_difficulty difficulty;
+	struct oshu::difficulty difficulty;
 	/**
 	 * \brief Path to the background picture.
 	 *
@@ -883,15 +885,15 @@ struct oshu_beatmap {
 	 *
 	 * It's a linked list, in chronological order.
 	 */
-	struct oshu_timing_point *timing_points;
+	struct oshu::timing_point *timing_points;
 	/**
 	 * \brief [Colours] section.
 	 *
-	 * It's a circular linked list, as described in #oshu_color.
+	 * It's a circular linked list, as described in #oshu::color.
 	 *
 	 * \sa color_count
 	 */
-	struct oshu_color *colors;
+	struct oshu::color *colors;
 	/**
 	 * Number of colors in the #colors list.
 	 */
@@ -907,7 +909,7 @@ struct oshu_beatmap {
 	 * *next* and *previous* pointers. This lets you ensure your hit cursor
 	 * is never null.
 	 */
-	struct oshu_hit *hits;
+	struct oshu::hit *hits;
 };
 
 /**
@@ -916,7 +918,7 @@ struct oshu_beatmap {
  * On failure, the content of *beatmap* is undefined, but any dynamically
  * allocated internal memory is freed.
  */
-int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap);
+int load_beatmap(const char *path, struct oshu::beatmap *beatmap);
 
 /**
  * Parse the first sections of a beatmap to get the metadata and difficulty
@@ -924,24 +926,26 @@ int oshu_load_beatmap(const char *path, struct oshu_beatmap *beatmap);
  *
  * This function should load the following fields:
  *
- * - #oshu_beatmap::audio_filename,
- * - #oshu_beatmap::background_filename,
- * - #oshu_beatmap::mode,
- * - #oshu_beatmap::metadata,
- * - #oshu_beatmap::difficulty.
+ * - #oshu::beatmap::audio_filename,
+ * - #oshu::beatmap::background_filename,
+ * - #oshu::beatmap::mode,
+ * - #oshu::beatmap::metadata,
+ * - #oshu::beatmap::difficulty.
  *
  * However, because most fields may be missing from the beatmap, you cannot
  * assume they all have non-NULL values.
  *
- * The aim of this function, compared to #oshu_load_beatmap, is not to load the
+ * The aim of this function, compared to #oshu::load_beatmap, is not to load the
  * timing points, colors, and hit objects, which contain most of the beatmap's
  * data.
  */
-int oshu_load_beatmap_headers(const char *path, struct oshu_beatmap *beatmap);
+int load_beatmap_headers(const char *path, struct oshu::beatmap *beatmap);
 
 /**
  * Free any object dynamically allocated inside the beatmap.
  */
-void oshu_destroy_beatmap(struct oshu_beatmap *beatmap);
+void destroy_beatmap(struct oshu::beatmap *beatmap);
 
 /** \} */
+
+}

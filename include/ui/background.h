@@ -7,7 +7,9 @@
 
 #include "video/texture.h"
 
-struct oshu_display;
+namespace oshu {
+
+struct display;
 
 /**
  * \defgroup ui_background Background
@@ -16,7 +18,7 @@ struct oshu_display;
  * \brief
  * Picture background.
  *
- * To enable this module, the #OSHU_SHOW_BACKGROUND flag must be enabled for
+ * To enable this module, the #oshu::SHOW_BACKGROUND flag must be enabled for
  * the display. Otherwise, this module behaves like a stub and does nothing.
  *
  * \{
@@ -32,7 +34,7 @@ struct oshu_display;
  * Depending on the game state, the background can be darkened to make the game
  * objects more visible.
  */
-struct oshu_background {
+struct background {
 	/**
 	 * The display to which the background is attached.
 	 *
@@ -40,9 +42,9 @@ struct oshu_background {
 	 * scaling.
 	 *
 	 * \todo
-	 * Implement the #OSHU_SHOW_BACKGROUND flag.
+	 * Implement the #oshu::SHOW_BACKGROUND flag.
 	 */
-	struct oshu_display *display;
+	struct oshu::display *display;
 	/**
 	 * The background picture.
 	 *
@@ -52,19 +54,19 @@ struct oshu_background {
 	 *
 	 * When the ratio doesn't match, the picture is cropped.
 	 *
-	 * When no texture is loaded, #oshu_show_background is a no-op, so you
+	 * When no texture is loaded, #oshu::show_background is a no-op, so you
 	 * can safely assume the background is a valid object.
 	 */
-	struct oshu_texture picture;
+	struct oshu::texture picture;
 };
 
 /**
  * Load a background picture with SDL2_image.
  *
- * You must free the background with #oshu_destroy_background.
+ * You must free the background with #oshu::destroy_background.
  *
- * On error, returns -1, but the #oshu_background object remains safe to use
- * with #oshu_show_background and #oshu_destroy_background. It is therefore
+ * On error, returns -1, but the #oshu::background object remains safe to use
+ * with #oshu::show_background and #oshu::destroy_background. It is therefore
  * safe to ignore errors here.
  *
  * The background is pre-scaled to avoid keeping a huge texture in video
@@ -74,13 +76,13 @@ struct oshu_background {
  * because the pre-scale algorithm is fancier than that, thanks to cairo.
  *
  */
-int oshu_load_background(struct oshu_display *display, const char *filename, struct oshu_background *background);
+int load_background(struct oshu::display *display, const char *filename, struct oshu::background *background);
 
 /**
  * Display the background such that it fills the whole screen.
  *
  * The size of the screen is determined from the display's current view, so you
- * should always call #oshu_reset_view before this function. Otherwise, expect
+ * should always call #oshu::reset_view before this function. Otherwise, expect
  * black bars or overflows.
  *
  * You should also fill the screen with a solid color in case the background
@@ -92,14 +94,16 @@ int oshu_load_background(struct oshu_display *display, const char *filename, str
  * subjective “anything below that and the background might as well not be
  * there” point.
  *
- * You may use #oshu_trapezium for the brightness to implement a fading-in
+ * You may use #oshu::trapezium for the brightness to implement a fading-in
  * fading-out effect.
  */
-void oshu_show_background(struct oshu_background *background, double brightness);
+void show_background(struct oshu::background *background, double brightness);
 
 /**
  * Free the background picture.
  */
-void oshu_destroy_background(struct oshu_background *background);
+void destroy_background(struct oshu::background *background);
 
 /** \} */
+
+}

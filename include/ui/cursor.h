@@ -8,7 +8,9 @@
 #include "core/geometry.h"
 #include "video/texture.h"
 
-struct oshu_display;
+namespace oshu {
+
+struct display;
 
 /**
  * \defgroup ui_cursor Cursor
@@ -17,20 +19,20 @@ struct oshu_display;
  * \brief
  * Fancy software mouse cursor.
  *
- * To enable this module, the #OSHU_FANCY_CURSOR flag must be enabled for the
+ * To enable this module, the #oshu::FANCY_CURSOR flag must be enabled for the
  * display. Otherwise, this module behaves like a stub and do nothing.
  *
  * \{
  */
 
-struct oshu_cursor_widget {
+struct cursor_widget {
 	/**
 	 * The display associated to the cursor.
 	 *
 	 * It is used both to retrieve the mouse position, and to render the
 	 * cursor.
 	 */
-	struct oshu_display *display;
+	struct oshu::display *display;
 	/**
 	 * Keep track of the previous positions of the mouse to display a
 	 * fancier cursor, with a trail.
@@ -38,7 +40,7 @@ struct oshu_cursor_widget {
 	 * This is a circular array, starting at #offset. The previous is at
 	 * #offset - 1, and so on. When you reach the maximum index, wrap at 0.
 	 */
-	oshu_point history[4];
+	oshu::point history[4];
 	/**
 	 * Index of the most recent point in #history.
 	 */
@@ -49,15 +51,15 @@ struct oshu_cursor_widget {
 	 * It's a white disc, which is scaled and whose opacity is adjusted for
 	 * the main cursor and all the trailing particles.
 	 */
-	struct oshu_texture mouse;
+	struct oshu::texture mouse;
 };
 
 /**
  * Create a cursor for the display, and paint its texture with cairo.
  *
- * You must free the cursor with #oshu_destroy_cursor.
+ * You must free the cursor with #oshu::destroy_cursor.
  */
-int oshu_create_cursor(struct oshu_display *display, struct oshu_cursor_widget *cursor);
+int create_cursor(struct oshu::display *display, struct oshu::cursor_widget *cursor);
 
 /**
  * Render the cursor on the display it was created on.
@@ -69,7 +71,7 @@ int oshu_create_cursor(struct oshu_display *display, struct oshu_cursor_widget *
  * Every call to this function update the mouse position history, affecting the
  * cursor trail.
  */
-void oshu_show_cursor(struct oshu_cursor_widget *cursor);
+void show_cursor(struct oshu::cursor_widget *cursor);
 
 /**
  * Free the cursor's texture.
@@ -77,6 +79,8 @@ void oshu_show_cursor(struct oshu_cursor_widget *cursor);
  * It is safe to call this function on a destroyed cursor, or on a
  * zero-initialized cursor.
  */
-void oshu_destroy_cursor(struct oshu_cursor_widget *cursor);
+void destroy_cursor(struct oshu::cursor_widget *cursor);
 
 /** \} */
+
+}

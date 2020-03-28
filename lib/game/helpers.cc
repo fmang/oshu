@@ -5,23 +5,23 @@
 
 #include "game/base.h"
 
-struct oshu_hit* oshu_look_hit_back(struct oshu::game_base *game, double offset)
+struct oshu::hit* oshu::look_hit_back(struct oshu::game_base *game, double offset)
 {
-	struct oshu_hit *hit = game->hit_cursor;
+	struct oshu::hit *hit = game->hit_cursor;
 	double target = game->clock.now - offset;
 	/* seek backward */
-	while (oshu_hit_end_time(hit) > target)
+	while (oshu::hit_end_time(hit) > target)
 		hit = hit->previous;
 	/* seek forward */
-	while (oshu_hit_end_time(hit) < target)
+	while (oshu::hit_end_time(hit) < target)
 		hit = hit->next;
 	/* here we have the guarantee that hit->time >= target */
 	return hit;
 }
 
-struct oshu_hit* oshu_look_hit_up(struct oshu::game_base *game, double offset)
+struct oshu::hit* oshu::look_hit_up(struct oshu::game_base *game, double offset)
 {
-	struct oshu_hit *hit = game->hit_cursor;
+	struct oshu::hit *hit = game->hit_cursor;
 	double target = game->clock.now + offset;
 	/* seek forward */
 	while (hit->time < target)
@@ -33,23 +33,23 @@ struct oshu_hit* oshu_look_hit_up(struct oshu::game_base *game, double offset)
 	return hit;
 }
 
-struct oshu_hit* oshu_next_hit(struct oshu::game_base *game)
+struct oshu::hit* oshu::next_hit(struct oshu::game_base *game)
 {
-	struct oshu_hit *hit = game->hit_cursor;
+	struct oshu::hit *hit = game->hit_cursor;
 	for (; hit->next; hit = hit->next) {
-		if (hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT))
+		if (hit->type & (oshu::CIRCLE_HIT | oshu::SLIDER_HIT))
 			break;
 	}
 	return hit;
 }
 
-struct oshu_hit* oshu_previous_hit(struct oshu::game_base *game)
+struct oshu::hit* oshu::previous_hit(struct oshu::game_base *game)
 {
-	struct oshu_hit *hit = game->hit_cursor;
+	struct oshu::hit *hit = game->hit_cursor;
 	if (!hit->previous)
 		return hit;
 	for (hit = hit->previous; hit->previous; hit = hit->previous) {
-		if (hit->type & (OSHU_CIRCLE_HIT | OSHU_SLIDER_HIT))
+		if (hit->type & (oshu::CIRCLE_HIT | oshu::SLIDER_HIT))
 			break;
 	}
 	return hit;

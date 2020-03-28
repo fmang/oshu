@@ -22,7 +22,7 @@ static int on_event(oshu::shell &w, union SDL_Event *event)
 		if (event->key.repeat)
 			break;
 		switch (event->key.keysym.sym) {
-		case OSHU_QUIT_KEY:
+		case oshu::QUIT_KEY:
 			w.close();
 			break;
 		}
@@ -47,14 +47,16 @@ static int draw(oshu::shell &w)
 {
 	oshu::game_base *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
-	double end = oshu_hit_end_time(oshu_previous_hit(game));
-	double r = oshu_fade_in(end + 1, end + 2, game->clock.now);
-	oshu_show_background(&w.background, r);
-	oshu_show_audio_progress_bar(&w.audio_progress_bar);
-	oshu_show_metadata_frame(&w.metadata, r);
-	oshu_show_score_frame(&w.score, r);
+	double end = oshu::hit_end_time(oshu::previous_hit(game));
+	double r = oshu::fade_in(end + 1, end + 2, game->clock.now);
+	oshu::show_background(&w.background, r);
+	oshu::show_audio_progress_bar(&w.audio_progress_bar);
+	oshu::show_metadata_frame(&w.metadata, r);
+	oshu::show_score_frame(&w.score, r);
 	return 0;
 }
+
+namespace oshu {
 
 /**
  * Game complete screen.
@@ -62,9 +64,11 @@ static int draw(oshu::shell &w)
  * Once this screen is reached, the only command left is *exit*.
  *
  */
-struct oshu_game_screen oshu_score_screen = {
+struct oshu::game_screen score_screen = {
 	.name = "Finished",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,
 };
+
+}

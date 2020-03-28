@@ -13,13 +13,9 @@
 #include <memory>
 
 namespace oshu {
+
 class game_base;
-}
-
-struct oshu_game_screen;
-
-namespace oshu {
-
+struct game_screen;
 struct widget;
 
 /**
@@ -44,25 +40,25 @@ struct shell {
 	 *
 	 * Both the display and the game must outlive the shell.
 	 */
-	shell(oshu_display&, oshu::game_base&);
+	shell(oshu::display&, oshu::game_base&);
 	~shell();
 	/**
 	 * The window that the shell managed.
 	 *
 	 * A display should not be associated to more than one shell.
 	 */
-	oshu_display &display;
+	oshu::display &display;
 	oshu::game_base &game;
 	/**
 	 * The widget responsible for drawing the main game objects, specific
 	 * to the mode.
 	 */
 	std::unique_ptr<widget> game_view;
-	oshu_game_screen *screen;
-	oshu_background background {};
-	oshu_metadata_frame metadata {};
-	oshu_score_frame score {};
-	oshu_audio_progress_bar audio_progress_bar {};
+	oshu::game_screen *screen;
+	oshu::background background {};
+	oshu::metadata_frame metadata {};
+	oshu::score_frame score {};
+	oshu::audio_progress_bar audio_progress_bar {};
 	/**
 	 * Start the main loop.
 	 */

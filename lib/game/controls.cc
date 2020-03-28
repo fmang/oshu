@@ -7,24 +7,24 @@
 
 #include <SDL2/SDL.h>
 
-enum oshu_finger oshu_translate_key(SDL_Keysym *keysym)
+enum oshu::finger oshu::translate_key(SDL_Keysym *keysym)
 {
 	switch (keysym->scancode) {
 	/* Bottom row, for standard and taiko modes. */
-	case SDL_SCANCODE_Z: return OSHU_LEFT_MIDDLE;
-	case SDL_SCANCODE_X: return OSHU_LEFT_INDEX;
-	case SDL_SCANCODE_C: return OSHU_RIGHT_INDEX;
-	case SDL_SCANCODE_V: return OSHU_RIGHT_MIDDLE;
+	case SDL_SCANCODE_Z: return oshu::LEFT_MIDDLE;
+	case SDL_SCANCODE_X: return oshu::LEFT_INDEX;
+	case SDL_SCANCODE_C: return oshu::RIGHT_INDEX;
+	case SDL_SCANCODE_V: return oshu::RIGHT_MIDDLE;
 	/* Middle row, for mania. */
-	case SDL_SCANCODE_A: return OSHU_LEFT_PINKY;
-	case SDL_SCANCODE_S: return OSHU_LEFT_RING;
-	case SDL_SCANCODE_D: return OSHU_LEFT_MIDDLE;
-	case SDL_SCANCODE_F: return OSHU_LEFT_INDEX;
-	case SDL_SCANCODE_SPACE: return OSHU_THUMBS;
-	case SDL_SCANCODE_J: return OSHU_RIGHT_INDEX;
-	case SDL_SCANCODE_K: return OSHU_RIGHT_MIDDLE;
-	case SDL_SCANCODE_L: return OSHU_RIGHT_RING;
-	case SDL_SCANCODE_SEMICOLON: return OSHU_RIGHT_PINKY;
-	default:             return OSHU_UNKNOWN_KEY;
+	case SDL_SCANCODE_A: return oshu::LEFT_PINKY;
+	case SDL_SCANCODE_S: return oshu::LEFT_RING;
+	case SDL_SCANCODE_D: return oshu::LEFT_MIDDLE;
+	case SDL_SCANCODE_F: return oshu::LEFT_INDEX;
+	case SDL_SCANCODE_SPACE: return oshu::THUMBS;
+	case SDL_SCANCODE_J: return oshu::RIGHT_INDEX;
+	case SDL_SCANCODE_K: return oshu::RIGHT_MIDDLE;
+	case SDL_SCANCODE_L: return oshu::RIGHT_RING;
+	case SDL_SCANCODE_SEMICOLON: return oshu::RIGHT_PINKY;
+	default:             return oshu::UNKNOWN_KEY;
 	}
 }

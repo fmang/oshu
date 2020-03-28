@@ -5,6 +5,8 @@
 
 #pragma once
 
+namespace oshu {
+
 /**
  * \defgroup video_transitions Transitions
  * \ingroup video
@@ -41,14 +43,14 @@
  *       S   E
  * ```
  *
- * \sa oshu_fade_in
+ * \sa oshu::fade_in
  */
-double oshu_fade_out(double start, double end, double t);
+double fade_out(double start, double end, double t);
 
 /**
  * Fading in function.
  *
- * It's pretty much the same as #oshu_fade_out, with the property that
+ * It's pretty much the same as #oshu::fade_out, with the property that
  * `fade_in(s, e, t) = 1 - fade_out(s, e, t)`.
  *
  * Assumes *start < end*.
@@ -63,7 +65,7 @@ double oshu_fade_out(double start, double end, double t);
  *       S   E
  * ```
  */
-double oshu_fade_in(double start, double end, double t);
+double fade_in(double start, double end, double t);
 
 /**
  * Convex isosceles trapezoid function.
@@ -104,7 +106,8 @@ double oshu_fade_in(double start, double end, double t);
  * `transition = (end - start) / 2`, because that won't reflect your intention.
  *
  */
-double oshu_trapezium(double start, double end, double transition, double t);
-
+double trapezium(double start, double end, double transition, double t);
 
 /** \} */
+
+}

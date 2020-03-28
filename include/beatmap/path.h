@@ -7,6 +7,8 @@
 
 #include "core/geometry.h"
 
+namespace oshu {
+
 /**
  * \defgroup beatmap_path Path
  * \ingroup beatmap
@@ -20,7 +22,7 @@
 /**
  * A simple line, with a start point and end point.
  *
- * Used by #OSHU_LINEAR_PATH segments.
+ * Used by #oshu::LINEAR_PATH segments.
  *
  * It's formally the same as a degree 1 Bézier curve, but we'll keep that type
  * to make experiments.
@@ -28,15 +30,15 @@
  * \todo
  * Support polyline paths.
  */
-struct oshu_line {
-	oshu_point start;
-	oshu_point end;
+struct line {
+	oshu::point start;
+	oshu::point end;
 };
 
 /**
  * An arc, defined as a section of a circle.
  *
- * Used by #OSHU_PERFECT_PATH segments.
+ * Used by #oshu::PERFECT_PATH segments.
  *
  * In the beatmaps, these arc are called *perfect* and are defined with 3
  * points. The first point beging the start of the arc, the second one (called
@@ -49,10 +51,10 @@ struct oshu_line {
  * radius, and a pair of angles in radian where 0 is the the rightmost point,
  * like we do in common trigonometry.
  *
- * \sa oshu_build_arc
+ * \sa oshu::build_arc
  */
-struct oshu_arc {
-	oshu_point center;
+struct arc {
+	oshu::point center;
 	double radius;
 	double start_angle;
 	double end_angle;
@@ -61,7 +63,7 @@ struct oshu_arc {
 /**
  * \brief Compute an arc of circle from 3 points.
  *
- * See #oshu_arc to see how arcs are defined in oshu!.
+ * See #oshu::arc to see how arcs are defined in oshu!.
  *
  * In beatmaps, the arcs are defined in a hard to manipulate way, so this
  * function in the geometry module is meant to help the parser generate arcs.
@@ -93,7 +95,7 @@ struct oshu_arc {
  *
  * \return 0 on success, -1 if the arc computation failed.
  */
-int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *arc);
+int build_arc(oshu::point a, oshu::point b, oshu::point c, struct oshu::arc *arc);
 
 /**
  * A Bézier path, made up of one or many Bézier segments.
@@ -101,7 +103,7 @@ int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *ar
  * A Bézier segment is defined by its degree, and a number of control points
  * equal to its degree plus one.
  *
- * Used by #OSHU_BEZIER_PATH segments.
+ * Used by #oshu::BEZIER_PATH segments.
  *
  * For example, a degree 2 Bézier segment (called *quadratic*) has 3 control
  * points.
@@ -133,9 +135,9 @@ int oshu_build_arc(oshu_point a, oshu_point b, oshu_point c, struct oshu_arc *ar
  * and 1, and represents how far the point is from the start. For example,
  * l=1/2 means that the point is at the middle of the curve, as opposed to
  * t=1/2 which means, for quadratic curves, that the point is closest to the
- * middle control point. See #oshu_normalize_path.
+ * middle control point. See #oshu::normalize_path.
  */
-struct oshu_bezier {
+struct bezier {
 	/**
 	 * How many segments the Bézier path contains.
 	 */
@@ -150,7 +152,7 @@ struct oshu_bezier {
 	 * This implies the *n*th segment has `indexes[n+1] - indexes[n]`
 	 * points, and that its degree is `indexes[n+1] - indexes[n] - 1`.
 	 *
-	 * To reuse the example in #oshu_bezier, since all the segments are
+	 * To reuse the example in #oshu::bezier, since all the segments are
 	 * quadratic, the indices are [0, 3, 6, 9].
 	 *
 	 * The size of the indices array must be *segment_count + 1*.
@@ -180,7 +182,7 @@ struct oshu_bezier {
 	 *
 	 * For the normalization process, it must be dynamically allocated.
 	 */
-	oshu_point *control_points;
+	oshu::point *control_points;
 	/**
 	 * Translation map from l-coordinates to t-coordinates.
 	 *
@@ -190,7 +192,7 @@ struct oshu_bezier {
 	 * For any point such that i / n ≤ l ≤ (i + 1) / n, compute a weighted
 	 * average between anchors[i] and anchors[i+1].
 	 *
-	 * \sa oshu_normalize_path
+	 * \sa oshu::normalize_path
 	 */
 	double anchors[64];
 };
@@ -200,37 +202,37 @@ struct oshu_bezier {
  *
  * Their value is the letter that appears in the beatmaps to identify the type.
  */
-enum oshu_path_type {
-	OSHU_LINEAR_PATH = 'L',
-	OSHU_PERFECT_PATH = 'P',
-	OSHU_BEZIER_PATH = 'B',
-	OSHU_CATMULL_PATH = 'C',
+enum path_type {
+	LINEAR_PATH = 'L',
+	PERFECT_PATH = 'P',
+	BEZIER_PATH = 'B',
+	CATMULL_PATH = 'C',
 };
 
 /**
- * The linear paths (#OSHU_LINEAR_PATH) are the simplest and only have 2
- * points. See #oshu_line.
+ * The linear paths (#oshu::LINEAR_PATH) are the simplest and only have 2
+ * points. See #oshu::line.
  *
- * Perfect paths (#OSHU_PERFECT_PATH) are bits of circle and have 3 points.
+ * Perfect paths (#oshu::PERFECT_PATH) are bits of circle and have 3 points.
  * The 3 non-aligned points define a circle in a unique way. The perfect path
  * is the part of that circle that starts with the first point, passes through
- * the second point, and ends at the third point. See #oshu_arc.
+ * the second point, and ends at the third point. See #oshu::arc.
  *
- * Bézier paths (#OSHU_BEZIER_PATH) have 2 to an arbitrary large number of
+ * Bézier paths (#oshu::BEZIER_PATH) have 2 to an arbitrary large number of
  * control points. A 2-point Bézier path is nothing but a linear path. A
  * 3-point Bézier path is a quadratic curve, also called a parabola. Things get
  * interesting with the 4-point cubic Bézier curve, which is the one you see in
- * most painting tools. See #oshu_bezier.
+ * most painting tools. See #oshu::bezier.
  *
- * Catmull paths (#OSHU_CATMULL_PATH) are officially deprecated, but we should
+ * Catmull paths (#oshu::CATMULL_PATH) are officially deprecated, but we should
  * support them someday in order to support old beatmaps.
  */
-struct oshu_path {
-	enum oshu_path_type type;
+struct path {
+	enum oshu::path_type type;
 	union {
-		struct oshu_line line; /**< For #OSHU_LINEAR_PATH. */
-		struct oshu_arc arc; /**< For #OSHU_PERFECT_PATH. */
-		struct oshu_bezier bezier; /**< For #OSHU_BEZIER_PATH. */
+		struct oshu::line line; /**< For #oshu::LINEAR_PATH. */
+		struct oshu::arc arc; /**< For #oshu::PERFECT_PATH. */
+		struct oshu::bezier bezier; /**< For #oshu::BEZIER_PATH. */
 	};
 };
 
@@ -244,7 +246,7 @@ struct oshu_path {
  * In most case, this function will shrink the path, because the actual length
  * is greater than the one specified in the beatmap.
  */
-void oshu_normalize_path(struct oshu_path *path, double length);
+void normalize_path(struct oshu::path *path, double length);
 
 /**
  * Express the path in floating t-coordinates.
@@ -284,7 +286,7 @@ void oshu_normalize_path(struct oshu_path *path, double length);
  * defined in the C standard library, by 2.
  *
  */
-oshu_point oshu_path_at(struct oshu_path *path, double t);
+oshu::point path_at(struct oshu::path *path, double t);
 
 /**
  * Compute the smallest box such that the path fits in.
@@ -298,6 +300,8 @@ oshu_point oshu_path_at(struct oshu_path *path, double t);
  * 2. ∀t imag(top_left) ≤ imag(at(t)) ≤ imag(bottom_right)
  *
  */
-void oshu_path_bounding_box(struct oshu_path *path, oshu_point *top_left, oshu_point *bottom_right);
+void path_bounding_box(struct oshu::path *path, oshu::point *top_left, oshu::point *bottom_right);
 
 /** \} */
+
+}

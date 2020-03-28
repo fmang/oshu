@@ -89,12 +89,12 @@ int run(const char *beatmap_path, int autoplay, int pause)
 	}
 
 	try {
-		osu_game game(beatmap_path);
+		oshu::osu_game game(beatmap_path);
 		game.autoplay = autoplay;
 		if (pause)
 			game.pause();
 
-		oshu_display display;
+		oshu::display display;
 		std::shared_ptr<oshu::shell> shell = std::make_shared<oshu::shell>(display, game);
 		shell->game_view = std::make_unique<oshu::osu_ui>(&display, game);
 		current_shell = shell;

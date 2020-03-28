@@ -8,8 +8,8 @@ int main()
 {
 	int failures = 0;
 	int rc;
-	oshu_beatmap b;
-	rc = oshu_load_beatmap("Kaori Oda - Zero Tokei (Short ver.) (ShogunMoon) [Shining].osu", &b);
+	oshu::beatmap b;
+	rc = oshu::load_beatmap("Kaori Oda - Zero Tokei (Short ver.) (ShogunMoon) [Shining].osu", &b);
 	if (rc < 0) {
 		++failures;
 		goto abort;
@@ -21,6 +21,6 @@ int main()
 	if (failures > 0)
 		std::cerr << "Total: " << failures << " failed tests." << std::endl;
 abort:
-	oshu_destroy_beatmap(&b);
+	oshu::destroy_beatmap(&b);
 	return failures;
 }

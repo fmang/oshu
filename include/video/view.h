@@ -7,7 +7,9 @@
 
 #include "core/geometry.h"
 
-struct oshu_display;
+namespace oshu {
+
+struct display;
 
 /**
  * \defgroup video_view View
@@ -72,7 +74,7 @@ struct oshu_display;
  *                             640px
  * ```
  *
- * The above transformation is performed by #oshu_resize_view.
+ * The above transformation is performed by #oshu::resize_view.
  *
  * When the window grows, this whole viewport is scaled, and not just the game
  * area. The viewport will be zoomed to fit the available space, while
@@ -97,7 +99,7 @@ struct oshu_display;
  *                window width = 640 × zoom
  * ```
  *
- * This is done by #oshu_fit_view.
+ * This is done by #oshu::fit_view.
  *
  * \{
  */
@@ -108,8 +110,8 @@ struct oshu_display;
  * More concretely, this is an affine transformation system, where zoom is the
  * factor and (x, y) the constant. `v(p) = z p + o`
  *
- * Transformation operations on the view like #oshu_resize_view,
- * #oshu_scale_view and #oshu_fit_view are composed on the right:
+ * Transformation operations on the view like #oshu::resize_view,
+ * #oshu::scale_view and #oshu::fit_view are composed on the right:
  * `v(v'(p)) = z (z' p + o') + o = z z' p + z o' + o`
  *
  * For ease of understanding, transformation of views are explained in terms of
@@ -117,10 +119,10 @@ struct oshu_display;
  * coordinates into physical coordinates, so the logical one is the input, and
  * physical one the output.
  */
-struct oshu_view {
+struct view {
 	double zoom;
-	oshu_point origin;
-	oshu_size size;
+	oshu::point origin;
+	oshu::size size;
 };
 
 /**
@@ -142,7 +144,7 @@ struct oshu_view {
  * - `v(logical width / 2) = physical width / 2`
  *
  */
-void oshu_resize_view(struct oshu_view *view, oshu_size size);
+void resize_view(struct oshu::view *view, oshu::size size);
 
 /**
  * Scale the coordinate system.
@@ -162,7 +164,7 @@ void oshu_resize_view(struct oshu_view *view, oshu_size size);
  * - `v(logical width) = physical width`
  *
  */
-void oshu_scale_view(struct oshu_view *view, double factor);
+void scale_view(struct oshu::view *view, double factor);
 
 /**
  * Scale and resize the view while preserving the aspect ratio.
@@ -176,34 +178,36 @@ void oshu_scale_view(struct oshu_view *view, double factor);
  * - The view is not cut:
  *   `0 ≤ v(0) ≤ v(logical width) ≤ physical width`
  */
-void oshu_fit_view(struct oshu_view *view, oshu_size size);
+void fit_view(struct oshu::view *view, oshu::size size);
 
 /**
  * Reset the display's view to the identity view.
  *
  * The size of the window is automatically retrieved from the SDL window.
  *
- * The resulting view is stored in the display's #oshu_display::view attribute.
+ * The resulting view is stored in the display's #oshu::display::view attribute.
  */
-void oshu_reset_view(struct oshu_display *display);
+void reset_view(struct oshu::display *display);
 
 /**
  * Project a point from logical coordinates to physical coordinates.
  *
  * Applies the affine transformation: `v(p) = z p + o`.
  *
- * \sa oshu_unproject
+ * \sa oshu::unproject
  */
-oshu_point oshu_project(struct oshu_view *view, oshu_point p);
+oshu::point project(struct oshu::view *view, oshu::point p);
 
 /**
  * Unproject a point from physical coordinates to logical coordinates.
  *
- * This is the opposite operation of #oshu_project.
+ * This is the opposite operation of #oshu::project.
  *
  * From the definition of the view, `v(p) = z p + o`,
  * we deduce `p = (v(p) - o) / z`.
  */
-oshu_point oshu_unproject(struct oshu_view *view, oshu_point p);
+oshu::point unproject(struct oshu::view *view, oshu::point p);
 
 /** \} */
+
+}

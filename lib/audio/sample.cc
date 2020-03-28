@@ -19,7 +19,7 @@ static const int channels = 2;
  *
  * Trust me, your ears don't want you to overlap two incompatible streams.
  */
-static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, struct oshu_sample *sample)
+static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, struct oshu::sample *sample)
 {
 	SDL_AudioCVT converter;
 	int rc = SDL_BuildAudioCVT(&converter,
@@ -51,7 +51,7 @@ static int convert_audio(SDL_AudioSpec *device_spec, SDL_AudioSpec *wav_spec, st
 	return 0;
 }
 
-int oshu_load_sample(const char *path, SDL_AudioSpec *spec, struct oshu_sample *sample)
+int oshu::load_sample(const char *path, SDL_AudioSpec *spec, struct oshu::sample *sample)
 {
 	assert (spec->format == AUDIO_F32);
 	assert (spec->channels == channels);
@@ -66,11 +66,11 @@ int oshu_load_sample(const char *path, SDL_AudioSpec *spec, struct oshu_sample *
 	sample->nb_samples = sample->size / (channels * sizeof(*sample->samples));
 	return 0;
 fail:
-	oshu_destroy_sample(sample);
+	oshu::destroy_sample(sample);
 	return -1;
 }
 
-void oshu_destroy_sample(struct oshu_sample *sample)
+void oshu::destroy_sample(struct oshu::sample *sample)
 {
 	if (sample->samples) {
 		SDL_FreeWAV((Uint8*) sample->samples);

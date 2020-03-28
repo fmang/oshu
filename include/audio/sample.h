@@ -9,6 +9,8 @@
 
 struct SDL_AudioSpec;
 
+namespace oshu {
+
 /**
  * \defgroup audio_sample Sample
  * \ingroup audio
@@ -21,11 +23,11 @@ struct SDL_AudioSpec;
  * with a PCM sample.
  *
  * If need be, samples could be loaded using the audio stream module and
- * slurped into memory through #oshu_read_stream. However, since samples are
+ * slurped into memory through #oshu::read_stream. However, since samples are
  * always WAV anyway, let's start with a naive implementation using SDL's
  * procedures.
  *
- * To play samples, you must use tracks. See #oshu_track.
+ * To play samples, you must use tracks. See #oshu::track.
  *
  * \{
  */
@@ -36,12 +38,12 @@ struct SDL_AudioSpec;
  * For consistency accross the audio modules, samples are always stored as
  * packed 32-bit floats. The sample rate is defined when loading the sample.
  *
- * \sa oshu_load_sample
- * \sa oshu_destroy_sample
+ * \sa oshu::load_sample
+ * \sa oshu::destroy_sample
  */
-struct oshu_sample {
+struct sample {
 	/**
-	 * The PCM samples, as described in #oshu_sample.
+	 * The PCM samples, as described in #oshu::sample.
 	 *
 	 * The array should contain exactly #size bytes.
 	 */
@@ -66,22 +68,24 @@ struct oshu_sample {
  * required. Note that this means the sample will be specific to that stream
  * only.
  *
- * On failure, you may, but are not required to, call #oshu_destroy_sample.
+ * On failure, you may, but are not required to, call #oshu::destroy_sample.
  *
  * \param path Path to the WAV file to load.
  * \param spec Target format of the sample. Must be stereo float samples.
- * \param sample An allocated #oshu_sample, initialized or not.
+ * \param sample An allocated #oshu::sample, initialized or not.
  *
- * \sa oshu_destroy_sample
+ * \sa oshu::destroy_sample
  */
-int oshu_load_sample(const char *path, struct SDL_AudioSpec *spec, struct oshu_sample *sample);
+int load_sample(const char *path, struct SDL_AudioSpec *spec, struct oshu::sample *sample);
 
 /**
  * Free the sample's PCM samples buffer.
  *
  * The sample object is left in an unspecified state.
  */
-void oshu_destroy_sample(struct oshu_sample *sample);
+void destroy_sample(struct oshu::sample *sample);
 
 
 /** \} */
+
+}

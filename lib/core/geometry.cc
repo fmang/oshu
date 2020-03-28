@@ -5,7 +5,7 @@
 
 #include "core/geometry.h"
 
-double oshu_ratio(oshu_size size)
+double oshu::ratio(oshu::size size)
 {
 	return std::real(size) / std::imag(size);
 }

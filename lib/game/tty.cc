@@ -21,10 +21,10 @@ void print_dual(const char *ascii, const char *unicode)
 		printf("  Unknown\n");
 }
 
-void oshu_welcome(struct oshu::game_base *game)
+void oshu::welcome(struct oshu::game_base *game)
 {
-	struct oshu_beatmap *beatmap = &game->beatmap;
-	struct oshu_metadata *meta = &beatmap->metadata;
+	struct oshu::beatmap *beatmap = &game->beatmap;
+	struct oshu::metadata *meta = &beatmap->metadata;
 	printf("\n");
 	print_dual(meta->title, meta->title_unicode);
 	print_dual(meta->artist, meta->artist_unicode);
@@ -53,7 +53,7 @@ void oshu_welcome(struct oshu::game_base *game)
  * \todo
  * This function should be deleted once the window can display the time.
  */
-void oshu_print_state(struct oshu::game_base *game)
+void oshu::print_state(struct oshu::game_base *game)
 {
 	if (!isatty(fileno(stdout)))
 		return;
@@ -70,17 +70,17 @@ void oshu_print_state(struct oshu::game_base *game)
 	fflush(stdout);
 }
 
-void oshu_congratulate(struct oshu::game_base *game)
+void oshu::congratulate(struct oshu::game_base *game)
 {
 	/* Clear the status line. */
 	printf("\r                                        \r");
 	/* Compute the score. */
 	int good = 0;
 	int missed = 0;
-	for (struct oshu_hit *hit = game->beatmap.hits; hit; hit = hit->next) {
-		if (hit->state == OSHU_MISSED_HIT)
+	for (struct oshu::hit *hit = game->beatmap.hits; hit; hit = hit->next) {
+		if (hit->state == oshu::MISSED_HIT)
 			missed++;
-		else if (hit->state == OSHU_GOOD_HIT)
+		else if (hit->state == oshu::GOOD_HIT)
 			good++;
 	}
 	double rate = (double) good / (good + missed);

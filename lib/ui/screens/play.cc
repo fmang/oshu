@@ -25,38 +25,38 @@ static int on_event(oshu::shell &w, union SDL_Event *event)
 		if (event->key.repeat)
 			break;
 		switch (event->key.keysym.sym) {
-		case OSHU_PAUSE_KEY:
+		case oshu::PAUSE_KEY:
 			game->pause();
-			w.screen = &oshu_pause_screen;
+			w.screen = &oshu::pause_screen;
 			break;
-		case OSHU_REWIND_KEY:
+		case oshu::REWIND_KEY:
 			game->rewind(10.);
 			break;
-		case OSHU_FORWARD_KEY:
+		case oshu::FORWARD_KEY:
 			game->forward(20.);
 			break;
 		default:
 			if (!game->autoplay) {
-				enum oshu_finger key = oshu_translate_key(&event->key.keysym);
-				if (key != OSHU_UNKNOWN_KEY)
+				enum oshu::finger key = oshu::translate_key(&event->key.keysym);
+				if (key != oshu::UNKNOWN_KEY)
 					game->press(key);
 			}
 		}
 		break;
 	case SDL_KEYUP:
 		if (!game->autoplay) {
-			enum oshu_finger key = oshu_translate_key(&event->key.keysym);
-			if (key != OSHU_UNKNOWN_KEY)
+			enum oshu::finger key = oshu::translate_key(&event->key.keysym);
+			if (key != oshu::UNKNOWN_KEY)
 				game->release(key);
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 		if (!game->autoplay)
-			game->press(OSHU_LEFT_BUTTON);
+			game->press(oshu::LEFT_BUTTON);
 		break;
 	case SDL_MOUSEBUTTONUP:
 		if (!game->autoplay)
-			game->release(OSHU_LEFT_BUTTON);
+			game->release(oshu::LEFT_BUTTON);
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event) {
@@ -64,7 +64,7 @@ static int on_event(oshu::shell &w, union SDL_Event *event)
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 			if (!game->autoplay && game->hit_cursor->next) {
 				game->pause();
-				w.screen = &oshu_pause_screen;
+				w.screen = &oshu::pause_screen;
 			}
 			break;
 		case SDL_WINDOWEVENT_CLOSE:
@@ -89,11 +89,11 @@ static void check_end(oshu::shell &w)
 	if (game->hit_cursor->next)
 		return;
 	const double delay = game->beatmap.difficulty.leniency + game->beatmap.difficulty.approach_time;
-	if (game->clock.now > oshu_hit_end_time(game->hit_cursor->previous) + delay) {
-		oshu_reset_view(&w.display);
-		oshu_create_score_frame(&w.display, &game->beatmap, &w.score);
-		oshu_congratulate(game);
-		w.screen = &oshu_score_screen;
+	if (game->clock.now > oshu::hit_end_time(game->hit_cursor->previous) + delay) {
+		oshu::reset_view(&w.display);
+		oshu::create_score_frame(&w.display, &game->beatmap, &w.score);
+		oshu::congratulate(game);
+		w.screen = &oshu::score_screen;
 	}
 }
 
@@ -101,11 +101,11 @@ static int update(oshu::shell &w)
 {
 	oshu::game_base *game = &w.game;
 	if (game->paused) {
-		w.screen = &oshu_pause_screen;
+		w.screen = &oshu::pause_screen;
 		return 0;
 	}
 	if (game->clock.now >= 0)
-		oshu_play_audio(&game->audio);
+		oshu::play_audio(&game->audio);
 	if (game->autoplay)
 		game->check_autoplay();
 	else
@@ -143,27 +143,29 @@ static int update(oshu::shell &w)
 static void draw_background(oshu::shell &w)
 {
 	oshu::game_base *game = &w.game;
-	double break_start = oshu_hit_end_time(oshu_previous_hit(game));
-	double break_end = oshu_next_hit(game)->time;
+	double break_start = oshu::hit_end_time(oshu::previous_hit(game));
+	double break_end = oshu::next_hit(game)->time;
 	double now = game->clock.now;
 	double ratio = 0.;
 	if (break_end - break_start > 6.)
-		ratio = oshu_trapezium(break_start + 1, break_end - 1, 1, now);
-	oshu_show_background(&w.background, ratio);
+		ratio = oshu::trapezium(break_start + 1, break_end - 1, 1, now);
+	oshu::show_background(&w.background, ratio);
 }
 
 static int draw(oshu::shell &w)
 {
 	oshu::game_base *game = &w.game;
-	if (w.display.features & OSHU_FANCY_CURSOR)
+	if (w.display.features & oshu::FANCY_CURSOR)
 		SDL_ShowCursor(SDL_DISABLE);
 	draw_background(w);
-	oshu_show_metadata_frame(&w.metadata, oshu_fade_out(5, 6, game->clock.system));
-	oshu_show_audio_progress_bar(&w.audio_progress_bar);
+	oshu::show_metadata_frame(&w.metadata, oshu::fade_out(5, 6, game->clock.system));
+	oshu::show_audio_progress_bar(&w.audio_progress_bar);
 	if (w.game_view)
 		w.game_view->draw();
 	return 0;
 }
+
+namespace oshu {
 
 /**
  * The standard in-play game screen.
@@ -174,9 +176,11 @@ static int draw(oshu::shell &w)
  * This screen relies heavily on the game mode.
  *
  */
-struct oshu_game_screen oshu_play_screen = {
+struct oshu::game_screen play_screen = {
 	.name = "Playing",
 	.on_event = on_event,
 	.update = update,
 	.draw = draw,
 };
+
+}

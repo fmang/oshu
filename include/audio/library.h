@@ -9,10 +9,12 @@
 
 #include <string>
 
-struct oshu_audio;
-struct oshu_sample;
-
 struct SDL_AudioSpec;
+
+namespace oshu {
+
+struct audio;
+struct sample;
 
 /**
  * \defgroup audio_library Library
@@ -56,7 +58,7 @@ struct SDL_AudioSpec;
  * \{
  */
 
-enum oshu_sound_shelf_index {
+enum sound_shelf_index {
 	/**
 	 * Fallback shelf when a sample is missing from a custom shelf.
 	 *
@@ -64,7 +66,7 @@ enum oshu_sound_shelf_index {
 	 * the skin. It is different from shelf 1 which uses the sample files
 	 * in the beatmap directory.
 	 */
-	OSHU_DEFAULT_SHELF = 0,
+	DEFAULT_SHELF = 0,
 };
 
 /**
@@ -72,13 +74,13 @@ enum oshu_sound_shelf_index {
  *
  * These pointers are NULL when no sample is available.
  */
-struct oshu_sound_shelf {
-	struct oshu_sample *hit_normal;
-	struct oshu_sample *hit_whistle;
-	struct oshu_sample *hit_finish;
-	struct oshu_sample *hit_clap;
-	struct oshu_sample *slider_slide;
-	struct oshu_sample *slider_whistle;
+struct sound_shelf {
+	struct oshu::sample *hit_normal;
+	struct oshu::sample *hit_whistle;
+	struct oshu::sample *hit_finish;
+	struct oshu::sample *hit_clap;
+	struct oshu::sample *slider_slide;
+	struct oshu::sample *slider_whistle;
 };
 
 /**
@@ -89,7 +91,7 @@ struct oshu_sound_shelf {
  *
  * More concretely, a room is a dynamically-sized array of shelves.
  */
-struct oshu_sound_room {
+struct sound_room {
 	/**
 	 * Location of the shelves.
 	 *
@@ -98,7 +100,7 @@ struct oshu_sound_room {
 	 *
 	 * \sa size
 	 */
-	struct oshu_sound_shelf *shelves;
+	struct oshu::sound_shelf *shelves;
 	/**
 	 * Indices of the shelves.
 	 *
@@ -133,9 +135,9 @@ struct oshu_sound_room {
  *
  * The library is composed of 3 rooms, one per sample set family.
  *
- * \sa oshu_sample_set_family
+ * \sa oshu::sample_set_family
  */
-struct oshu_sound_library {
+struct sound_library {
 	/**
 	 * Path to the skin directory, containing the samples.
 	 *
@@ -155,9 +157,9 @@ struct oshu_sound_library {
 	 * Format of the samples in the library.
 	 */
 	struct SDL_AudioSpec *format;
-	struct oshu_sound_room normal;
-	struct oshu_sound_room soft;
-	struct oshu_sound_room drum;
+	struct oshu::sound_room normal;
+	struct oshu::sound_room soft;
+	struct oshu::sound_room drum;
 };
 
 /**
@@ -169,48 +171,50 @@ struct oshu_sound_library {
  *
  * The library object must be zero-initalized.
  *
- * \sa oshu_close_sound_library
+ * \sa oshu::close_sound_library
  */
-void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format);
+void open_sound_library(struct oshu::sound_library *library, struct SDL_AudioSpec *format);
 
 /**
  * Delete all the loaded samples from the library.
  */
-void oshu_close_sound_library(struct oshu_sound_library *library);
+void close_sound_library(struct oshu::sound_library *library);
 
 /**
  * Locate a sample on the filesystem and insert it into the library.
  *
- * *type* is an OR'd combination of #oshu_sound_type.
+ * *type* is an OR'd combination of #oshu::sound_type.
  *
- * \sa oshu_register_sounds
+ * \sa oshu::register_sound
  */
-int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type);
+int register_sample(struct oshu::sound_library *library, enum oshu::sample_set_family set, int index, int type);
 
 /**
  * Load every sample required to play a hit sound effect.
  *
- * \sa oshu_register_sample
- * \sa oshu_populate_library
+ * \sa oshu::register_sample
+ * \sa oshu::populate_library
  */
-void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound);
+void register_sound(struct oshu::sound_library *library, struct oshu::hit_sound *sound);
 
 /**
  * Find every sample reference into a beatmap and load them into the library.
  *
- * \sa oshu_register_sounds
+ * \sa oshu::register_sound
  */
-void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap);
+void populate_library(struct oshu::sound_library *library, struct oshu::beatmap *beatmap);
 
 /**
  * Play all the samples associated to the hit sound.
  *
  * If one of the required samples wasn't found, it is ignored.
  *
- * If the sound is for a slider, its sample is looped until you call #oshu_stop_loop.
+ * If the sound is for a slider, its sample is looped until you call #oshu::stop_loop.
  *
  * \sa oshu_find_sample
  */
-void oshu_play_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio);
+void play_sound(struct oshu::sound_library *library, struct oshu::hit_sound *sound, struct oshu::audio *audio);
 
 /** \} */
+
+}

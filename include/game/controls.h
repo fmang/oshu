@@ -11,6 +11,8 @@
 
 struct SDL_Keysym;
 
+namespace oshu {
+
 /**
  * \defgroup game_controls Controls
  * \ingroup game
@@ -46,16 +48,16 @@ struct SDL_Keysym;
  * Keys on the left hand are negative, while keys on the right hand are
  * positive, making it easy to test which hand a constant belongs to.
  */
-enum oshu_finger {
-	OSHU_LEFT_PINKY = -4,
-	OSHU_LEFT_RING = -3,
-	OSHU_LEFT_MIDDLE = -2,
-	OSHU_LEFT_INDEX = -1,
-	OSHU_THUMBS = 0,
-	OSHU_RIGHT_INDEX = 1,
-	OSHU_RIGHT_MIDDLE = 2,
-	OSHU_RIGHT_RING = 3,
-	OSHU_RIGHT_PINKY = 4,
+enum finger {
+	LEFT_PINKY = -4,
+	LEFT_RING = -3,
+	LEFT_MIDDLE = -2,
+	LEFT_INDEX = -1,
+	THUMBS = 0,
+	RIGHT_INDEX = 1,
+	RIGHT_MIDDLE = 2,
+	RIGHT_RING = 3,
+	RIGHT_PINKY = 4,
 	/**
 	 * Playing with the mouse is discouraged, but if you really wanna be
 	 * able to catch the clicks, this is for you. In particular, it is nice
@@ -66,11 +68,11 @@ enum oshu_finger {
 	 * modes, however, have no business knowing that, and should handle
 	 * clicks like keys.
 	 */
-	OSHU_LEFT_BUTTON = -5,
+	LEFT_BUTTON = -5,
 	/**
-	 * See #OSHU_LEFT_BUTTON.
+	 * See #oshu::LEFT_BUTTON.
 	 */
-	OSHU_RIGHT_BUTTON = 5,
+	RIGHT_BUTTON = 5,
 	/**
 	 * Special value when a key couldn't be translated.
 	 *
@@ -83,17 +85,17 @@ enum oshu_finger {
 	 * (who knows?) you should have a sane default case for keys your
 	 * module doesn't handle, if relevant.
 	 */
-        OSHU_UNKNOWN_KEY = -100,
+        UNKNOWN_KEY = -100,
 };
 
 /**
- * Translate an SDL keysym to its finger in #oshu_finger.
+ * Translate an SDL keysym to its finger in #oshu::finger.
  *
  * The physical key code is used for the translation, to guarantee layout agnosticity.
  *
- * If the key doesn't match a finger, return #OSHU_UNKNOWN_KEY.
+ * If the key doesn't match a finger, return #oshu::UNKNOWN_KEY.
  */
-enum oshu_finger oshu_translate_key(struct SDL_Keysym *keysym);
+enum oshu::finger translate_key(struct SDL_Keysym *keysym);
 
 /**
  * Map functions to SDL keycodes.
@@ -103,25 +105,16 @@ enum oshu_finger oshu_translate_key(struct SDL_Keysym *keysym);
  *
  * Compare the keys with `SDL_Event.key.keysym.sym`.
  */
-enum oshu_control_key {
-	OSHU_QUIT_KEY = SDLK_q,
-	OSHU_PAUSE_KEY = SDLK_ESCAPE,
-	OSHU_REWIND_KEY = SDLK_PAGEUP,
-	OSHU_FORWARD_KEY = SDLK_PAGEDOWN,
+enum control_key {
+	QUIT_KEY = SDLK_q,
+	PAUSE_KEY = SDLK_ESCAPE,
+	REWIND_KEY = SDLK_PAGEUP,
+	FORWARD_KEY = SDLK_PAGEDOWN,
 };
-
-/** \} */
-
-namespace oshu {
-
-/**
- * \ingroup game_controls
- * \{
- */
 
 struct mouse {
 	virtual ~mouse() = default;
-	virtual oshu_point position() = 0;
+	virtual oshu::point position() = 0;
 };
 
 /** \} */

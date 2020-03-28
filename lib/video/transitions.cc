@@ -7,7 +7,7 @@
 
 #include <assert.h>
 
-double oshu_fade_out(double start, double end, double t)
+double oshu::fade_out(double start, double end, double t)
 {
 	assert (end > start);
 	if (t < start)
@@ -18,7 +18,7 @@ double oshu_fade_out(double start, double end, double t)
 		return 0;
 }
 
-double oshu_fade_in(double start, double end, double t)
+double oshu::fade_in(double start, double end, double t)
 {
 	assert (end > start);
 	if (t < start)
@@ -29,7 +29,7 @@ double oshu_fade_in(double start, double end, double t)
 		return 1;
 }
 
-double oshu_trapezium(double start, double end, double transition, double t)
+double oshu::trapezium(double start, double end, double transition, double t)
 {
 	double ratio = 0.;
 	if (t <= start)

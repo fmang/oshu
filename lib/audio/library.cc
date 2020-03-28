@@ -21,7 +21,7 @@
 /**
  * Determine the directory of the skin to use.
  *
- * See #oshu_sound_library::skin_directory for details.
+ * See #oshu::sound_library::skin_directory for details.
  */
 static std::string skin_directory()
 {
@@ -46,23 +46,23 @@ static std::string skin_directory()
 	return OSHU_SKINS_DIRECTORY "/" OSHU_DEFAULT_SKIN;
 }
 
-void oshu_open_sound_library(struct oshu_sound_library *library, struct SDL_AudioSpec *format)
+void oshu::open_sound_library(struct oshu::sound_library *library, struct SDL_AudioSpec *format)
 {
 	library->skin_directory = skin_directory();
 	oshu_log_debug("using skin directory %s", library->skin_directory.c_str());
 	library->format = format;
 }
 
-static void free_sample(struct oshu_sample **sample)
+static void free_sample(struct oshu::sample **sample)
 {
 	if (*sample) {
-		oshu_destroy_sample(*sample);
+		oshu::destroy_sample(*sample);
 		free(*sample);
 		*sample = NULL;
 	}
 }
 
-static void free_shelf(struct oshu_sound_shelf *shelf)
+static void free_shelf(struct oshu::sound_shelf *shelf)
 {
 	free_sample(&shelf->hit_normal);
 	free_sample(&shelf->hit_whistle);
@@ -72,7 +72,7 @@ static void free_shelf(struct oshu_sound_shelf *shelf)
 	free_sample(&shelf->slider_whistle);
 }
 
-static void free_room(struct oshu_sound_room *room)
+static void free_room(struct oshu::sound_room *room)
 {
 	if (room->shelves) {
 		for (int i = 0; i < room->size; ++i)
@@ -84,7 +84,7 @@ static void free_room(struct oshu_sound_room *room)
 	room->indices = NULL;
 }
 
-void oshu_close_sound_library(struct oshu_sound_library *library)
+void oshu::close_sound_library(struct oshu::sound_library *library)
 {
 	free_room(&library->normal);
 	free_room(&library->soft);
@@ -96,7 +96,7 @@ void oshu_close_sound_library(struct oshu_sound_library *library)
  *
  * Return NULL if the shelf wasn't found.
  */
-static struct oshu_sound_shelf* find_shelf(struct oshu_sound_room *room, int index)
+static struct oshu::sound_shelf* find_shelf(struct oshu::sound_room *room, int index)
 {
 	for (int i = 0; i < room->size; ++i) {
 		if (room->indices[i] == index)
@@ -114,13 +114,13 @@ static struct oshu_sound_shelf* find_shelf(struct oshu_sound_room *room, int ind
  * After calling this function, you are guaranteed that there is the capacity
  * for at least one new shelf (i.e. `room->size < room->capacity`).
  */
-static void grow_room(struct oshu_sound_room *room)
+static void grow_room(struct oshu::sound_room *room)
 {
 	assert (room->size <= room->capacity);
 	if (room->size < room->capacity)
 		return;
 	room->capacity += 8;
-	room->shelves = (oshu_sound_shelf*) realloc(room->shelves, room->capacity * sizeof(*room->shelves));
+	room->shelves = (oshu::sound_shelf*) realloc(room->shelves, room->capacity * sizeof(*room->shelves));
 	assert (room->shelves != NULL);
 	room->indices = (int*) realloc(room->indices, room->capacity * sizeof(*room->indices));
 	assert (room->indices != NULL);
@@ -131,7 +131,7 @@ static void grow_room(struct oshu_sound_room *room)
  *
  * Return the pointer to the new shelf.
  */
-static struct oshu_sound_shelf* new_shelf(struct oshu_sound_room *room, int index)
+static struct oshu::sound_shelf* new_shelf(struct oshu::sound_room *room, int index)
 {
 	grow_room(room);
 	int position = room->size++;
@@ -145,12 +145,12 @@ static struct oshu_sound_shelf* new_shelf(struct oshu_sound_room *room, int inde
  *
  * If the room wasnn't found, return NULL.
  */
-static struct oshu_sound_room* get_room(struct oshu_sound_library *library, enum oshu_sample_set_family set)
+static struct oshu::sound_room* get_room(struct oshu::sound_library *library, enum oshu::sample_set_family set)
 {
 	switch (set) {
-	case OSHU_NORMAL_SAMPLE_SET: return &library->normal;
-	case OSHU_SOFT_SAMPLE_SET:   return &library->soft;
-	case OSHU_DRUM_SAMPLE_SET:   return &library->drum;
+	case oshu::NORMAL_SAMPLE_SET: return &library->normal;
+	case oshu::SOFT_SAMPLE_SET:   return &library->soft;
+	case oshu::DRUM_SAMPLE_SET:   return &library->drum;
 	default:
 		oshu_log_debug("unknown sample set %d", (int) set);
 		return NULL;
@@ -162,15 +162,15 @@ static struct oshu_sound_room* get_room(struct oshu_sound_library *library, enum
  *
  * If the sample wasnn't found because its type doesn't exist, return NULL.
  */
-static struct oshu_sample** get_sample(struct oshu_sound_shelf *shelf, int type)
+static struct oshu::sample** get_sample(struct oshu::sound_shelf *shelf, int type)
 {
 	switch (type) {
-	case OSHU_HIT_SOUND|OSHU_NORMAL_SOUND:  return &shelf->hit_normal;
-	case OSHU_HIT_SOUND|OSHU_WHISTLE_SOUND: return &shelf->hit_whistle;
-	case OSHU_HIT_SOUND|OSHU_FINISH_SOUND:  return &shelf->hit_finish;
-	case OSHU_HIT_SOUND|OSHU_CLAP_SOUND:    return &shelf->hit_clap;
-	case OSHU_SLIDER_SOUND|OSHU_NORMAL_SOUND:  return &shelf->slider_slide;
-	case OSHU_SLIDER_SOUND|OSHU_WHISTLE_SOUND: return &shelf->slider_whistle;
+	case oshu::HIT_SOUND|oshu::NORMAL_SOUND:  return &shelf->hit_normal;
+	case oshu::HIT_SOUND|oshu::WHISTLE_SOUND: return &shelf->hit_whistle;
+	case oshu::HIT_SOUND|oshu::FINISH_SOUND:  return &shelf->hit_finish;
+	case oshu::HIT_SOUND|oshu::CLAP_SOUND:    return &shelf->hit_clap;
+	case oshu::SLIDER_SOUND|oshu::NORMAL_SOUND:  return &shelf->slider_slide;
+	case oshu::SLIDER_SOUND|oshu::WHISTLE_SOUND: return &shelf->slider_whistle;
 	default:
 		oshu_log_debug("unknown sample type %d", (int) type);
 		return NULL;
@@ -186,14 +186,14 @@ static struct oshu_sample** get_sample(struct oshu_sound_shelf *shelf, int type)
  *
  * If the set or type is invalid, return an empty string.
  */
-static std::string make_sample_file_name(enum oshu_sample_set_family set, int index, int type)
+static std::string make_sample_file_name(enum oshu::sample_set_family set, int index, int type)
 {
 	/* Set name. */
 	const char *set_name;
 	switch (set) {
-	case OSHU_NORMAL_SAMPLE_SET: set_name = "normal"; break;
-	case OSHU_SOFT_SAMPLE_SET:   set_name = "soft"; break;
-	case OSHU_DRUM_SAMPLE_SET:   set_name = "drum"; break;
+	case oshu::NORMAL_SAMPLE_SET: set_name = "normal"; break;
+	case oshu::SOFT_SAMPLE_SET:   set_name = "soft"; break;
+	case oshu::DRUM_SAMPLE_SET:   set_name = "drum"; break;
 	default:
 		oshu_log_debug("unknown sample set %d", (int) set);
 		return {};
@@ -201,12 +201,12 @@ static std::string make_sample_file_name(enum oshu_sample_set_family set, int in
 	/* Type name. */
 	const char *type_name;
 	switch (type) {
-	case OSHU_HIT_SOUND|OSHU_NORMAL_SOUND:  type_name = "hitnormal"; break;
-	case OSHU_HIT_SOUND|OSHU_WHISTLE_SOUND: type_name = "hitwhistle"; break;
-	case OSHU_HIT_SOUND|OSHU_FINISH_SOUND:  type_name = "hitfinish"; break;
-	case OSHU_HIT_SOUND|OSHU_CLAP_SOUND:    type_name = "hitclap"; break;
-	case OSHU_SLIDER_SOUND|OSHU_NORMAL_SOUND:  type_name = "sliderslide"; break;
-	case OSHU_SLIDER_SOUND|OSHU_WHISTLE_SOUND: type_name = "sliderwhistle"; break;
+	case oshu::HIT_SOUND|oshu::NORMAL_SOUND:  type_name = "hitnormal"; break;
+	case oshu::HIT_SOUND|oshu::WHISTLE_SOUND: type_name = "hitwhistle"; break;
+	case oshu::HIT_SOUND|oshu::FINISH_SOUND:  type_name = "hitfinish"; break;
+	case oshu::HIT_SOUND|oshu::CLAP_SOUND:    type_name = "hitclap"; break;
+	case oshu::SLIDER_SOUND|oshu::NORMAL_SOUND:  type_name = "sliderslide"; break;
+	case oshu::SLIDER_SOUND|oshu::WHISTLE_SOUND: type_name = "sliderwhistle"; break;
 	default:
 		oshu_log_debug("unknown sample type %d", (int) set);
 		return {};
@@ -229,7 +229,7 @@ static std::string make_sample_file_name(enum oshu_sample_set_family set, int in
  *
  * If no suitable sample file was found, an empty string is returned.
  */
-static std::string locate_sample(oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type)
+static std::string locate_sample(oshu::sound_library *library, enum oshu::sample_set_family set, int index, int type)
 {
 	std::string filename = make_sample_file_name(set, index, type);
 	if (filename.empty())
@@ -247,17 +247,17 @@ static std::string locate_sample(oshu_sound_library *library, enum oshu_sample_s
 	return {};
 }
 
-int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type)
+int oshu::register_sample(struct oshu::sound_library *library, enum oshu::sample_set_family set, int index, int type)
 {
-	struct oshu_sound_room *room = get_room(library, set);
+	struct oshu::sound_room *room = get_room(library, set);
 	if (!room)
 		return -1;
-	struct oshu_sound_shelf *shelf = find_shelf(room, index);
+	struct oshu::sound_shelf *shelf = find_shelf(room, index);
 	if (!shelf)
 		shelf = new_shelf(room, index);
 	if (!shelf)
 		return -1;
-	struct oshu_sample **sample = get_sample(shelf, type);
+	struct oshu::sample **sample = get_sample(shelf, type);
 	if (!sample)
 		return -1;
 	if (*sample) /* already loaded */
@@ -266,51 +266,51 @@ int oshu_register_sample(struct oshu_sound_library *library, enum oshu_sample_se
 	if (path.empty())
 		return -1;
 	oshu_log_debug("registering %s", path.c_str());
-	*sample = (oshu_sample*) calloc(1, sizeof(**sample));
+	*sample = (oshu::sample*) calloc(1, sizeof(**sample));
 	assert (*sample != NULL);
 	assert (library->format != NULL);
-	int rc = oshu_load_sample(path.c_str(), library->format, *sample);
+	int rc = oshu::load_sample(path.c_str(), library->format, *sample);
 	if (rc < 0)
 		oshu_log_debug("continuing the process with an empty sample");
 	return 0;
 }
 
-void oshu_register_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound)
+void oshu::register_sound(struct oshu::sound_library *library, struct oshu::hit_sound *sound)
 {
-	int target = sound->additions & OSHU_SOUND_TARGET;
-	if (sound->additions & OSHU_NORMAL_SOUND)
-		oshu_register_sample(library, sound->sample_set, sound->index, target | OSHU_NORMAL_SOUND);
-	if (sound->additions & OSHU_WHISTLE_SOUND)
-		oshu_register_sample(library, sound->additions_set, sound->index, target | OSHU_WHISTLE_SOUND);
-	if (sound->additions & OSHU_FINISH_SOUND)
-		oshu_register_sample(library, sound->additions_set, sound->index, target | OSHU_FINISH_SOUND);
-	if (sound->additions & OSHU_CLAP_SOUND)
-		oshu_register_sample(library, sound->additions_set, sound->index, target | OSHU_CLAP_SOUND);
+	int target = sound->additions & oshu::SOUND_TARGET;
+	if (sound->additions & oshu::NORMAL_SOUND)
+		oshu::register_sample(library, sound->sample_set, sound->index, target | oshu::NORMAL_SOUND);
+	if (sound->additions & oshu::WHISTLE_SOUND)
+		oshu::register_sample(library, sound->additions_set, sound->index, target | oshu::WHISTLE_SOUND);
+	if (sound->additions & oshu::FINISH_SOUND)
+		oshu::register_sample(library, sound->additions_set, sound->index, target | oshu::FINISH_SOUND);
+	if (sound->additions & oshu::CLAP_SOUND)
+		oshu::register_sample(library, sound->additions_set, sound->index, target | oshu::CLAP_SOUND);
 }
 
-static void populate_default(struct oshu_sound_library *library, enum oshu_sample_set_family set)
+static void populate_default(struct oshu::sound_library *library, enum oshu::sample_set_family set)
 {
-	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_HIT_SOUND|OSHU_NORMAL_SOUND);
-	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_HIT_SOUND|OSHU_WHISTLE_SOUND);
-	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_HIT_SOUND|OSHU_FINISH_SOUND);
-	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_HIT_SOUND|OSHU_CLAP_SOUND);
-	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_SLIDER_SOUND|OSHU_NORMAL_SOUND);
-	oshu_register_sample(library, set, OSHU_DEFAULT_SHELF, OSHU_SLIDER_SOUND|OSHU_WHISTLE_SOUND);
+	oshu::register_sample(library, set, oshu::DEFAULT_SHELF, oshu::HIT_SOUND|oshu::NORMAL_SOUND);
+	oshu::register_sample(library, set, oshu::DEFAULT_SHELF, oshu::HIT_SOUND|oshu::WHISTLE_SOUND);
+	oshu::register_sample(library, set, oshu::DEFAULT_SHELF, oshu::HIT_SOUND|oshu::FINISH_SOUND);
+	oshu::register_sample(library, set, oshu::DEFAULT_SHELF, oshu::HIT_SOUND|oshu::CLAP_SOUND);
+	oshu::register_sample(library, set, oshu::DEFAULT_SHELF, oshu::SLIDER_SOUND|oshu::NORMAL_SOUND);
+	oshu::register_sample(library, set, oshu::DEFAULT_SHELF, oshu::SLIDER_SOUND|oshu::WHISTLE_SOUND);
 }
 
-void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatmap *beatmap)
+void oshu::populate_library(struct oshu::sound_library *library, struct oshu::beatmap *beatmap)
 {
 	int start = SDL_GetTicks();
 	oshu_log_debug("loading the sample library");
-	populate_default(library, OSHU_NORMAL_SAMPLE_SET);
-	populate_default(library, OSHU_SOFT_SAMPLE_SET);
-	populate_default(library, OSHU_DRUM_SAMPLE_SET);
-	for (struct oshu_hit *hit = beatmap->hits; hit; hit = hit->next) {
-		if (hit->type & OSHU_SLIDER_HIT) {
+	populate_default(library, oshu::NORMAL_SAMPLE_SET);
+	populate_default(library, oshu::SOFT_SAMPLE_SET);
+	populate_default(library, oshu::DRUM_SAMPLE_SET);
+	for (struct oshu::hit *hit = beatmap->hits; hit; hit = hit->next) {
+		if (hit->type & oshu::SLIDER_HIT) {
 			for (int i = 0; i <= hit->slider.repeat; ++i)
-				oshu_register_sound(library, &hit->slider.sounds[i]);
+				oshu::register_sound(library, &hit->slider.sounds[i]);
 		}
-		oshu_register_sound(library, &hit->sound);
+		oshu::register_sound(library, &hit->sound);
 	}
 	int end = SDL_GetTicks();
 	oshu_log_debug("done loading the library in %.3f seconds", (end - start) / 1000.);
@@ -322,22 +322,22 @@ void oshu_populate_library(struct oshu_sound_library *library, struct oshu_beatm
  * If the wanted sample couldn't be found, return a sane replacement or, in the
  * worst case scenario, NULL.
  *
- * \sa oshu_play_sound
+ * \sa oshu::play_sound
  */
-struct oshu_sample* find_sample(struct oshu_sound_library *library, enum oshu_sample_set_family set, int index, int type)
+struct oshu::sample* find_sample(struct oshu::sound_library *library, enum oshu::sample_set_family set, int index, int type)
 {
-	struct oshu_sample **sample {nullptr};
-	struct oshu_sound_room *room = get_room(library, set);
+	struct oshu::sample **sample {nullptr};
+	struct oshu::sound_room *room = get_room(library, set);
 	if (!room)
 		return NULL;
-	struct oshu_sound_shelf *shelf = find_shelf(room, index);
+	struct oshu::sound_shelf *shelf = find_shelf(room, index);
 	if (!shelf)
 		goto round2;
 	sample = get_sample(shelf, type);
 	if (sample && *sample)
 		return *sample;
 round2:
-	shelf = find_shelf(room, OSHU_DEFAULT_SHELF);
+	shelf = find_shelf(room, oshu::DEFAULT_SHELF);
 	if (!shelf)
 		return NULL;
 	sample = get_sample(shelf, type);
@@ -346,25 +346,25 @@ round2:
 	return *sample;
 }
 
-static void try_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio, enum oshu_sound_type flag)
+static void try_sound(struct oshu::sound_library *library, struct oshu::hit_sound *sound, struct oshu::audio *audio, enum oshu::sound_type flag)
 {
 	if (sound->additions & flag) {
-		int target = sound->additions & OSHU_SOUND_TARGET;
-		oshu_sample_set_family set = (flag == OSHU_NORMAL_SOUND) ? sound->sample_set : sound->additions_set;
-		struct oshu_sample *sample = find_sample(library, set, sound->index, target | flag);
+		int target = sound->additions & oshu::SOUND_TARGET;
+		oshu::sample_set_family set = (flag == oshu::NORMAL_SOUND) ? sound->sample_set : sound->additions_set;
+		struct oshu::sample *sample = find_sample(library, set, sound->index, target | flag);
 		if (!sample)
 			return;
-		else if (sound->additions & OSHU_SLIDER_SOUND)
-			oshu_play_loop(audio, sample, sound->volume);
+		else if (sound->additions & oshu::SLIDER_SOUND)
+			oshu::play_loop(audio, sample, sound->volume);
 		else
-			oshu_play_sample(audio, sample, sound->volume);
+			oshu::play_sample(audio, sample, sound->volume);
 	}
 }
 
-void oshu_play_sound(struct oshu_sound_library *library, struct oshu_hit_sound *sound, struct oshu_audio *audio)
+void oshu::play_sound(struct oshu::sound_library *library, struct oshu::hit_sound *sound, struct oshu::audio *audio)
 {
-	try_sound(library, sound, audio, OSHU_NORMAL_SOUND);
-	try_sound(library, sound, audio, OSHU_WHISTLE_SOUND);
-	try_sound(library, sound, audio, OSHU_FINISH_SOUND);
-	try_sound(library, sound, audio, OSHU_CLAP_SOUND);
+	try_sound(library, sound, audio, oshu::NORMAL_SOUND);
+	try_sound(library, sound, audio, oshu::WHISTLE_SOUND);
+	try_sound(library, sound, audio, oshu::FINISH_SOUND);
+	try_sound(library, sound, audio, oshu::CLAP_SOUND);
 }

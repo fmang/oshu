@@ -20,7 +20,7 @@
 
 static const double padding = 10;
 
-static PangoLayout* setup_layout(struct oshu_painter *p)
+static PangoLayout* setup_layout(struct oshu::painter *p)
 {
 	cairo_set_operator(p->cr, CAIRO_OPERATOR_SOURCE);
 
@@ -41,11 +41,11 @@ static PangoLayout* setup_layout(struct oshu_painter *p)
  * \todo
  * Handle errors.
  */
-static int paint_stars(struct oshu_metadata_frame *frame)
+static int paint_stars(struct oshu::metadata_frame *frame)
 {
-	oshu_size size {360, 60};
-	struct oshu_painter p;
-	oshu_start_painting(frame->display, size, &p);
+	oshu::size size {360, 60};
+	struct oshu::painter p;
+	oshu::start_painting(frame->display, size, &p);
 
 	const char *sky = " ★ ★ ★ ★ ★ ★ ★ ★ ★ ★";
 	int stars = frame->beatmap->difficulty.overall_difficulty;
@@ -54,7 +54,7 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 	int star_length = strlen(sky) / 10;
 	std::string difficulty (sky, star_length * stars);
 
-	struct oshu_metadata *meta = &frame->beatmap->metadata;
+	struct oshu::metadata *meta = &frame->beatmap->metadata;
 	const char *version = meta->version;
 	assert (version != NULL);
 	std::ostringstream os;
@@ -70,8 +70,8 @@ static int paint_stars(struct oshu_metadata_frame *frame)
 	pango_cairo_show_layout(p.cr, layout);
 	g_object_unref(layout);
 
-	struct oshu_texture *texture = &frame->stars;
-	int rc = oshu_finish_painting(&p, texture);
+	struct oshu::texture *texture = &frame->stars;
+	int rc = oshu::finish_painting(&p, texture);
 	texture->origin = std::real(size);
 	return rc;
 }
@@ -80,13 +80,13 @@ static int paint_stars(struct oshu_metadata_frame *frame)
  * \todo
  * Handle errors.
  */
-static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
+static int paint_metadata(struct oshu::metadata_frame *frame, int unicode)
 {
-	oshu_size size {640, 60};
-	struct oshu_painter p;
-	oshu_start_painting(frame->display, size, &p);
+	oshu::size size {640, 60};
+	struct oshu::painter p;
+	oshu::start_painting(frame->display, size, &p);
 
-	struct oshu_metadata *meta = &frame->beatmap->metadata;
+	struct oshu::metadata *meta = &frame->beatmap->metadata;
 	const char *title = unicode ? meta->title_unicode : meta->title;
 	const char *artist = unicode ? meta->artist_unicode : meta->artist;
 	std::ostringstream os;
@@ -101,8 +101,8 @@ static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
 	pango_cairo_show_layout(p.cr, layout);
 	g_object_unref(layout);
 
-	struct oshu_texture *texture = unicode ? &frame->unicode : &frame->ascii;
-	int rc = oshu_finish_painting(&p, texture);
+	struct oshu::texture *texture = unicode ? &frame->unicode : &frame->ascii;
+	int rc = oshu::finish_painting(&p, texture);
 	texture->origin = 0;
 	return rc;
 }
@@ -111,9 +111,9 @@ static int paint_metadata(struct oshu_metadata_frame *frame, int unicode)
  * \todo
  * Handle errors.
  */
-static int paint(struct oshu_metadata_frame *frame)
+static int paint(struct oshu::metadata_frame *frame)
 {
-	struct oshu_metadata *meta = &frame->beatmap->metadata;
+	struct oshu::metadata *meta = &frame->beatmap->metadata;
 	int title_difference = meta->title && meta->title_unicode && strcmp(meta->title, meta->title_unicode);
 	int artist_difference = meta->artist && meta->artist_unicode && strcmp(meta->artist, meta->artist_unicode);
 
@@ -125,7 +125,7 @@ static int paint(struct oshu_metadata_frame *frame)
 	return 0;
 }
 
-int oshu_create_metadata_frame(struct oshu_display *display, struct oshu_beatmap *beatmap, double *clock, struct oshu_metadata_frame *frame)
+int oshu::create_metadata_frame(struct oshu::display *display, struct oshu::beatmap *beatmap, double *clock, struct oshu::metadata_frame *frame)
 {
 	memset(frame, 0, sizeof(*frame));
 	frame->display = display;
@@ -134,7 +134,7 @@ int oshu_create_metadata_frame(struct oshu_display *display, struct oshu_beatmap
 	return paint(frame);
 }
 
-void oshu_show_metadata_frame(struct oshu_metadata_frame *frame, double opacity)
+void oshu::show_metadata_frame(struct oshu::metadata_frame *frame, double opacity)
 {
 	SDL_Rect back = {
 		.x = 0,
@@ -154,17 +154,17 @@ void oshu_show_metadata_frame(struct oshu_metadata_frame *frame, double opacity)
 	if (progression > .9 && has_unicode)
 		transition = 1. - (progression - .9) * 10.;
 
-	struct oshu_texture *meta = unicode ? &frame->unicode : &frame->ascii;
+	struct oshu::texture *meta = unicode ? &frame->unicode : &frame->ascii;
 	SDL_SetTextureAlphaMod(meta->texture, opacity * transition * 255);
-	oshu_draw_texture(frame->display, meta, 0);
+	oshu::draw_texture(frame->display, meta, 0);
 
 	SDL_SetTextureAlphaMod(frame->stars.texture, opacity * 255);
-	oshu_draw_texture(frame->display, &frame->stars, std::real(frame->display->view.size));
+	oshu::draw_texture(frame->display, &frame->stars, std::real(frame->display->view.size));
 }
 
-void oshu_destroy_metadata_frame(struct oshu_metadata_frame *frame)
+void oshu::destroy_metadata_frame(struct oshu::metadata_frame *frame)
 {
-	oshu_destroy_texture(&frame->ascii);
-	oshu_destroy_texture(&frame->unicode);
-	oshu_destroy_texture(&frame->stars);
+	oshu::destroy_texture(&frame->ascii);
+	oshu::destroy_texture(&frame->unicode);
+	oshu::destroy_texture(&frame->stars);
 }

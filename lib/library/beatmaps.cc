@@ -19,8 +19,8 @@ namespace oshu {
 beatmap_entry::beatmap_entry(const std::string &path)
 : path(path)
 {
-	oshu_beatmap beatmap;
-	int rc = oshu_load_beatmap_headers(path.c_str(), &beatmap);
+	oshu::beatmap beatmap;
+	int rc = oshu::load_beatmap_headers(path.c_str(), &beatmap);
 	if (rc < 0)
 		throw std::runtime_error("could not load beatmap " + path);
 	mode = beatmap.mode;
@@ -28,7 +28,7 @@ beatmap_entry::beatmap_entry(const std::string &path)
 	title = beatmap.metadata.title;
 	artist = beatmap.metadata.artist;
 	version = beatmap.metadata.version;
-	oshu_destroy_beatmap(&beatmap);
+	oshu::destroy_beatmap(&beatmap);
 }
 
 static bool osu_file(const char *filename)
@@ -62,7 +62,7 @@ static void find_entries(const std::string &path, beatmap_set &set)
 				std::ostringstream os;
 				os << path << "/" << entry->d_name;
 				beatmap_entry entry (os.str());
-				if (entry.mode != OSHU_OSU_MODE)
+				if (entry.mode != oshu::OSU_MODE)
 					oshu::debug_log() << "skipping " << path << ": unsupported mode" << std::endl;
 				else
 					set.entries.push_back(std::move(entry));

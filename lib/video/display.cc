@@ -20,7 +20,7 @@
  * to have a wider window. It's just that the extra width will be nothing but
  * margin. It may fit the background better though.
  */
-static oshu_size get_default_window_size()
+static oshu::size get_default_window_size()
 {
 	int width, height;
 	char *value = getenv("OSHU_WINDOW_SIZE");
@@ -44,12 +44,12 @@ static oshu_size get_default_window_size()
 		oshu_log_warning("it's unlikely you have a screen bigger than 4K");
 		goto invalid;
 	} else {
-		return oshu_size(width, height);
+		return oshu::size(width, height);
 	}
 invalid:
 	oshu_log_warning("rejected OSHU_WINDOW_SIZE value %s, defaulting to 960x720", value);
 def:
-	return oshu_size{960, 720};
+	return oshu::size{960, 720};
 }
 
 /**
@@ -60,17 +60,17 @@ int get_features()
 {
 	char *value = getenv("OSHU_QUALITY");
 	if (!value || !*value) { /* null or empty */
-		return OSHU_DEFAULT_QUALITY;
+		return oshu::DEFAULT_QUALITY;
 	} else if (!strcmp(value, "high")) {
-		return OSHU_HIGH_QUALITY;
+		return oshu::HIGH_QUALITY;
 	} else if (!strcmp(value, "medium")) {
-		return OSHU_MEDIUM_QUALITY;
+		return oshu::MEDIUM_QUALITY;
 	} else if (!strcmp(value, "low")) {
-		return OSHU_LOW_QUALITY;
+		return oshu::LOW_QUALITY;
 	} else {
 		oshu_log_warning("invalid OSHU_QUALITY value: %s", value);
 		oshu_log_warning("supported quality levels are: low, medium, high");
-		return OSHU_DEFAULT_QUALITY;
+		return oshu::DEFAULT_QUALITY;
 	}
 }
 
@@ -80,14 +80,14 @@ int get_features()
  * The default window size, 960x720 is arbitrary but proportional the the game
  * area. It's just a saner default for most screens.
  */
-int create_window(struct oshu_display *display)
+int create_window(struct oshu::display *display)
 {
 	memset(display, 0, sizeof(*display));
 	display->features = get_features();
-	oshu_size window_size = get_default_window_size();
-	if (display->features & OSHU_LINEAR_SCALING)
+	oshu::size window_size = get_default_window_size();
+	if (display->features & oshu::LINEAR_SCALING)
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	display->frame_duration = 1. / ((display->features|OSHU_60FPS) ? 60. : 30.);
+	display->frame_duration = 1. / ((display->features|oshu::SIXTY_FPS) ? 60. : 30.);
 	display->window = SDL_CreateWindow(
 		"oshu!",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -98,7 +98,7 @@ int create_window(struct oshu_display *display)
 		goto fail;
 	display->renderer = SDL_CreateRenderer(
 		display->window, -1,
-		(display->features & OSHU_HARDWARE_ACCELERATION) ? 0 : SDL_RENDERER_SOFTWARE
+		(display->features & oshu::HARDWARE_ACCELERATION) ? 0 : SDL_RENDERER_SOFTWARE
 	);
 	if (display->renderer == NULL)
 		goto fail;
@@ -108,7 +108,7 @@ fail:
 	return -1;
 }
 
-static void close_display(oshu_display *display)
+static void close_display(oshu::display *display)
 {
 	if (display->renderer) {
 		SDL_DestroyRenderer(display->renderer);
@@ -124,23 +124,23 @@ static void close_display(oshu_display *display)
  * The default window size is read from the OSHU_WINDOW_SIZE environment
  * variable. More details at #get_default_window_size.
  */
-oshu_display::oshu_display()
+oshu::display::display()
 {
 	if (create_window(this) < 0) {
 		close_display(this);
 		throw std::runtime_error("could not open display");
 	}
-	oshu_reset_view(this);
+	oshu::reset_view(this);
 }
 
-oshu_display::~oshu_display()
+oshu::display::~display()
 {
 	close_display(this);
 }
 
-oshu_point oshu_get_mouse(struct oshu_display *display)
+oshu::point oshu::get_mouse(struct oshu::display *display)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	return oshu_unproject(&display->view, oshu_point(x, y));
+	return oshu::unproject(&display->view, oshu::point(x, y));
 }

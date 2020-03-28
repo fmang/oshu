@@ -6,7 +6,7 @@
  * Definition of the highest-level audio module.
  *
  * \todo
- * Rename this file to engine.h after renaming #oshu_audio.
+ * Rename this file to engine.h after renaming #oshu::audio.
  */
 
 #pragma once
@@ -16,6 +16,8 @@
 #include "audio/track.h"
 
 #include <SDL2/SDL.h>
+
+namespace oshu {
 
 /** \defgroup audio Audio
  *
@@ -84,45 +86,45 @@
  * 	rankdir=LR
  * 	node [shape=rect]
  *
- * 	track1 [label="oshu_track"]
- * 	track2 [label="oshu_track"]
- * 	track3 [label="oshu_track"]
- * 	sample1 [label="oshu_sample"]
- * 	sample2 [label="oshu_sample"]
+ * 	track1 [label="oshu::track"]
+ * 	track2 [label="oshu::track"]
+ * 	track3 [label="oshu::track"]
+ * 	sample1 [label="oshu::sample"]
+ * 	sample2 [label="oshu::sample"]
  * 	"float*" [shape=none]
  * 	"music.mp3" [shape=none]
  * 	"hit.wav" [shape=none]
  * 	"clap.wav" [shape=none]
  *
- * 	"music.mp3" -> "oshu_stream" [label="oshu_open_stream"]
- * 	"oshu_stream" -> "float*" [label="oshu_read_stream"]
- * 	"hit.wav" -> sample1 [label="oshu_load_sample"]
- * 	"clap.wav" -> sample2 [label="oshu_load_sample"]
- * 	sample1 -> track1 [label="oshu_start_track"]
- * 	sample1 -> track2 [label="oshu_start_track"]
- * 	sample2 -> track3 [label="oshu_start_track"]
- * 	track1 -> "float*" [label="oshu_mix_track"]
- * 	track2 -> "float*" [label="oshu_mix_track"]
- * 	track3 -> "float*" [label="oshu_mix_track"]
+ * 	"music.mp3" -> "oshu::stream" [label="oshu::open_stream"]
+ * 	"oshu::stream" -> "float*" [label="oshu::read_stream"]
+ * 	"hit.wav" -> sample1 [label="oshu::load_sample"]
+ * 	"clap.wav" -> sample2 [label="oshu::load_sample"]
+ * 	sample1 -> track1 [label="oshu::start_track"]
+ * 	sample1 -> track2 [label="oshu::start_track"]
+ * 	sample2 -> track3 [label="oshu::start_track"]
+ * 	track1 -> "float*" [label="oshu::mix_track"]
+ * 	track2 -> "float*" [label="oshu::mix_track"]
+ * 	track3 -> "float*" [label="oshu::mix_track"]
  * 	"float*" -> "SDL"
  * }
  * \enddot
  *
  * ## Use
  *
- * To use this module, open streams using #oshu_open_audio, and play them using
- * #oshu_play_audio. When you're done, close your streams with
- * #oshu_pause_audio. Also make sure you initialized SDL with the audio
+ * To use this module, open streams using #oshu::open_audio, and play them using
+ * #oshu::play_audio. When you're done, close your streams with
+ * #oshu::pause_audio. Also make sure you initialized SDL with the audio
  * sub-module.
  *
  * ```c
  * SDL_Init(SDL_AUDIO|...);
- * struct oshu_audio audio;
+ * struct oshu::audio audio;
  * memset(&audio, 0, sizeof(audio));
- * oshu_open_audio("file.ogg", &audio);
- * oshu_play_audio(&audio);
+ * oshu::open_audio("file.ogg", &audio);
+ * oshu::play_audio(&audio);
  * do_things();
- * oshu_close_audio(&audio);
+ * oshu::close_audio(&audio);
  * ```
  *
  * ## Limitations
@@ -156,11 +158,11 @@
  * \todo
  * Rename this to oshu::audio::engine.
  */
-struct oshu_audio {
+struct audio {
 	/**
 	 * The background music.
 	 */
-	struct oshu_stream music;
+	struct oshu::stream music;
 	/**
 	 * Tracks for playing sound effects on top of the music.
 	 *
@@ -169,17 +171,17 @@ struct oshu_audio {
 	 * When the need for looping samples arise, it would be smart to
 	 * dedicate a track for them.
 	 *
-	 * \sa oshu_play_sample
+	 * \sa oshu::play_sample
 	 */
-	struct oshu_track effects[16];
+	struct oshu::track effects[16];
 	/**
 	 * Special track for the looping sample.
 	 *
 	 * As you can see, only one loop is supported.
 	 *
-	 * \sa oshu_play_loop
+	 * \sa oshu::play_loop
 	 */
-	struct oshu_track looping;
+	struct oshu::track looping;
 	/**
 	 * A device ID returned by SDL, and required by most SDL audio
 	 * functions.
@@ -189,7 +191,7 @@ struct oshu_audio {
 	 * Contains the sample rate, format, and channel layout of the audio
 	 * output device.
 	 *
-	 * This is useful for loading samples with #oshu_load_sample.
+	 * This is useful for loading samples with #oshu::load_sample.
 	 */
 	SDL_AudioSpec device_spec;
 };
@@ -198,13 +200,13 @@ struct oshu_audio {
  * Open a file and initialize everything needed to play it.
  *
  * \param url Path or URL to the audio file to play.
- * \param audio Null-initialized #oshu_audio object.
+ * \param audio Null-initialized #oshu::audio object.
  *
  * \return 0 on success. On error, -1 is returned and everything is freed.
  *
  * \sa oshu_audio_close
  */
-int oshu_open_audio(const char *url, struct oshu_audio *audio);
+int open_audio(const char *url, struct oshu::audio *audio);
 
 /**
  * Start playing!
@@ -212,17 +214,17 @@ int oshu_open_audio(const char *url, struct oshu_audio *audio);
  * The SDL plays audio in a separate thread, so you need not worry about
  * calling this function regularily or anything. Don't bother, it's magic!
  *
- * \sa oshu_pause_audio
+ * \sa oshu::pause_audio
  */
-void oshu_play_audio(struct oshu_audio *audio);
+void play_audio(struct oshu::audio *audio);
 
 /**
  * Pause the stream.
  *
- * Calling #oshu_play_audio will resume the audio playback where it was
+ * Calling #oshu::play_audio will resume the audio playback where it was
  * left playing.
  */
-void oshu_pause_audio(struct oshu_audio *audio);
+void pause_audio(struct oshu::audio *audio);
 
 /**
  * Play a sample on top of the background music.
@@ -232,7 +234,7 @@ void oshu_pause_audio(struct oshu_audio *audio);
  * reached because all the effects tracks are used, the playback of one of
  * the samples is stopped to play the new sample.
  */
-void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, float volume);
+void play_sample(struct oshu::audio *audio, struct oshu::sample *sample, float volume);
 
 /**
  * Play a looping sample.
@@ -240,21 +242,21 @@ void oshu_play_sample(struct oshu_audio *audio, struct oshu_sample *sample, floa
  * Currently, only one looping sample may be played at a time. Calling this
  * function cancels any other looping sample.
  *
- * \sa oshu_play_sample
- * \sa oshu_stop_loop
+ * \sa oshu::play_sample
+ * \sa oshu::stop_loop
  */
-void oshu_play_loop(struct oshu_audio *audio, struct oshu_sample *sample, float volume);
+void play_loop(struct oshu::audio *audio, struct oshu::sample *sample, float volume);
 
 /**
  * Seek the music stream to the specifed target position in seconds.
  *
- * See #oshu_seek_stream for details.
+ * See #oshu::seek_stream for details.
  *
- * It is similar to #oshu_seek_stream, with the different that this function
+ * It is similar to #oshu::seek_stream, with the different that this function
  * locks the audio thread, and stops all the currently playing sound effects,
  * which is definitely what you want.
  */
-int oshu_seek_music(struct oshu_audio *audio, double target);
+int seek_music(struct oshu::audio *audio, double target);
 
 /**
  * Stop the looping sample.
@@ -263,13 +265,15 @@ int oshu_seek_music(struct oshu_audio *audio, double target);
  * future, if more looping samples are supported, this function's prototype
  * would change.
  *
- * \sa oshu_play_loop
+ * \sa oshu::play_loop
  */
-void oshu_stop_loop(struct oshu_audio *audio);
+void stop_loop(struct oshu::audio *audio);
 
 /**
  * Close the audio stream and free everything associated to it.
  */
-void oshu_close_audio(struct oshu_audio *audio);
+void close_audio(struct oshu::audio *audio);
 
 /** \} */
+
+}
