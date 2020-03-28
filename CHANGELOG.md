@@ -1,6 +1,14 @@
 Changelog
 =========
 
+2.0.1 - 2020-03-29
+------------------
+
+Lots of refactoring, and a few bug fixes:
+
+- Fix some display glitches in the console status bar.
+- Fix broken handling of empty WAV samples.
+
 2.0.0 - 2018-03-21
 ------------------
 
