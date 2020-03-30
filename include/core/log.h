@@ -44,7 +44,7 @@
  * shown to everyone, except to inspect the cause of a failure. Use this
  * freely.
  */
-#define oshu_log_debug(...)    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "[" __FILE__ "] " __VA_ARGS__)
+#define oshu_log_debug(...)    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, __VA_ARGS__)
 
 /**
  * Informational messages are things that we'd like the techniest users to see,
