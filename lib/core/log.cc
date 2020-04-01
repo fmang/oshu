@@ -36,7 +36,7 @@ static std::ostream devnull {nullptr};
 
 std::ostream& logger(log_level priority)
 {
-	if (log_priority >= oshu::log_priority)
+	if (priority >= oshu::log_priority)
 		return std::clog;
 	else
 		return devnull;
