@@ -66,7 +66,7 @@ struct texture {
 	 * You are free to change this property at will, but nothing will
 	 * prevent you from breaking the aspect ratio of the texture.
 	 */
-	oshu::size size;
+	oshu::size size = 0;
 	/**
 	 * The origin defines the anchor of the texture when drawing, rather
 	 * than always using the top-left corner.
@@ -77,11 +77,11 @@ struct texture {
 	 * When drawing a texture at (x, y), it will be drawn such that the
 	 * #origin is at (x, y).
 	 */
-	oshu::point origin;
+	oshu::point origin = 0;
 	/**
 	 * The underlying SDL texture.
 	 */
-	struct SDL_Texture *texture;
+	struct SDL_Texture *texture = nullptr;
 };
 
 /**

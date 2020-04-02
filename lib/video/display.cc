@@ -56,7 +56,7 @@ def:
  * Return the enabled visual features reading the OSHU_QUALITY environment
  * variable.
  */
-int get_features()
+static int get_features()
 {
 	char *value = getenv("OSHU_QUALITY");
 	if (!value || !*value) { /* null or empty */
@@ -80,9 +80,8 @@ int get_features()
  * The default window size, 960x720 is arbitrary but proportional the the game
  * area. It's just a saner default for most screens.
  */
-int create_window(oshu::display *display)
+static int create_window(oshu::display *display)
 {
-	memset(display, 0, sizeof(*display));
 	display->features = get_features();
 	oshu::size window_size = get_default_window_size();
 	if (display->features & oshu::LINEAR_SCALING)

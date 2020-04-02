@@ -127,7 +127,7 @@ static int paint(oshu::metadata_frame *frame)
 
 int oshu::create_metadata_frame(oshu::display *display, oshu::beatmap *beatmap, double *clock, oshu::metadata_frame *frame)
 {
-	memset(frame, 0, sizeof(*frame));
+	*frame = {};
 	frame->display = display;
 	frame->beatmap = beatmap;
 	frame->clock = clock;

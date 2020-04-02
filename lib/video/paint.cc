@@ -31,7 +31,7 @@ static void destroy_painter(oshu::painter *painter)
 int oshu::start_painting(oshu::display *display, oshu::size size, oshu::painter *painter)
 {
 	cairo_status_t s;
-	memset(painter, 0, sizeof(*painter));
+	*painter = {};
 	painter->display = display;
 	painter->size = size;
 

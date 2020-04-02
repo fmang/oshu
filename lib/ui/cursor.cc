@@ -40,7 +40,7 @@ static int paint_cursor(oshu::cursor_widget *cursor)
 
 int oshu::create_cursor(oshu::display *display, oshu::cursor_widget *cursor)
 {
-	memset(cursor, 0, sizeof(*cursor));
+	*cursor = {};
 	cursor->display = display;
 
 	if (!(display->features & oshu::FANCY_CURSOR))

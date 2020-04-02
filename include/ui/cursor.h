@@ -32,7 +32,7 @@ struct cursor_widget {
 	 * It is used both to retrieve the mouse position, and to render the
 	 * cursor.
 	 */
-	oshu::display *display;
+	oshu::display *display = nullptr;
 	/**
 	 * Keep track of the previous positions of the mouse to display a
 	 * fancier cursor, with a trail.
@@ -40,11 +40,11 @@ struct cursor_widget {
 	 * This is a circular array, starting at #offset. The previous is at
 	 * #offset - 1, and so on. When you reach the maximum index, wrap at 0.
 	 */
-	oshu::point history[4];
+	oshu::point history[4] = {};
 	/**
 	 * Index of the most recent point in #history.
 	 */
-	int offset;
+	int offset = 0;
 	/**
 	 * The software mouse cursor picture.
 	 *

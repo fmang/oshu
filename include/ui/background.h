@@ -44,7 +44,7 @@ struct background {
 	 * \todo
 	 * Implement the #oshu::SHOW_BACKGROUND flag.
 	 */
-	oshu::display *display;
+	oshu::display *display = nullptr;
 	/**
 	 * The background picture.
 	 *

@@ -46,11 +46,11 @@ struct texture;
  */
 
 struct painter {
-	oshu::display *display;
-	oshu::size size;
-	struct SDL_Surface *destination;
-	cairo_surface_t *surface;
-	cairo_t *cr;
+	oshu::display *display = nullptr;
+	oshu::size size = 0;
+	struct SDL_Surface *destination = nullptr;
+	cairo_surface_t *surface = nullptr;
+	cairo_t *cr = nullptr;
 };
 
 /**

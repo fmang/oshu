@@ -156,13 +156,13 @@ struct display {
 	/**
 	 * The one and only SDL game window.
 	 */
-	struct SDL_Window *window;
+	struct SDL_Window *window = nullptr;
 	/**
 	 * The renderer for displaying accelerated graphics.
 	 *
 	 * It must be freed after the textures, but before the window.
 	 */
-	struct SDL_Renderer *renderer;
+	struct SDL_Renderer *renderer = nullptr;
 	/**
 	 * The current view, used to project coordinates when drawing.
 	 *
@@ -176,7 +176,7 @@ struct display {
 	 * It is by default loaded from the `OSHU_QUALITY` environment
 	 * variable, using the values defined by #oshu::quality_level.
 	 */
-	int features;
+	int features = 0;
 	/**
 	 * How long a frame should last in seconds.
 	 *
@@ -185,7 +185,7 @@ struct display {
 	 * Its value depends on whether the #SIXTY_FPS is enabled or not. If
 	 * it isn't, then the game runs at 30 FPS.
 	 */
-	double frame_duration;
+	double frame_duration = 0.0333;
 };
 
 

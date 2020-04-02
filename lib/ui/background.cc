@@ -122,7 +122,7 @@ static int scale_background(oshu::display *display, SDL_Surface **pic)
 
 int oshu::load_background(oshu::display *display, const char *filename, oshu::background *background)
 {
-	memset(background, 0, sizeof(*background));
+	*background = {};
 	background->display = display;
 	if (!(display->features & oshu::SHOW_BACKGROUND))
 		return 0;

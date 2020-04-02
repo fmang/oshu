@@ -34,11 +34,11 @@ struct metadata_frame {
 	/**
 	 * The display storing the textures.
 	 */
-	oshu::display *display;
+	oshu::display *display = nullptr;
 	/**
 	 * The metadata source.
 	 */
-	oshu::beatmap *beatmap;
+	oshu::beatmap *beatmap = nullptr;
 	/**
 	 * The clock points to an ever-increasing continuous time value, in
 	 * seconds. The game clock's #oshu::clock::system is a good fit for this
@@ -46,7 +46,7 @@ struct metadata_frame {
 	 *
 	 * This clock determines which of #ascii and #unicode is displayed.
 	 */
-	double *clock;
+	double *clock = nullptr;
 	/**
 	 * The ASCII metadata.
 	 *
