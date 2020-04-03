@@ -140,18 +140,14 @@ static void connect_hits(oshu::osu_ui &view, oshu::hit *a, oshu::hit *b)
 
 namespace oshu {
 
-/**
- * \todo
- * Handle errors.
- */
 osu_ui::osu_ui(oshu::display *display, oshu::osu_game &game)
 : display(display), game(game)
 {
 	assert (display != nullptr);
 	oshu::osu_view(display);
-	int rc = oshu::osu_paint_resources(*this);
+	oshu::osu_paint_resources(*this);
 	if (oshu::create_cursor(display, &cursor) < 0)
-		rc = -1;
+		throw std::runtime_error("could not create cursor");
 	oshu::reset_view(display);
 	mouse = std::make_shared<osu_mouse>(display);
 	game.mouse = mouse;

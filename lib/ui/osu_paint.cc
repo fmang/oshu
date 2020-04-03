@@ -335,7 +335,7 @@ static int paint_connector(oshu::osu_ui &view)
  * \todo
  * Handle errors.
  */
-int oshu::osu_paint_resources(oshu::osu_ui &view)
+void oshu::osu_paint_resources(oshu::osu_ui &view)
 {
 	oshu::game_base *game = &view.game;
 	int start = SDL_GetTicks();
@@ -365,7 +365,6 @@ int oshu::osu_paint_resources(oshu::osu_ui &view)
 
 	int end = SDL_GetTicks();
 	oshu_log_debug("done generating the common textures in %.3f seconds", (end - start) / 1000.);
-	return 0;
 }
 
 void oshu::osu_free_resources(oshu::osu_ui &view)

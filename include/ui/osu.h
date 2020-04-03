@@ -103,7 +103,7 @@ struct osu_ui : public widget {
  *
  * Sliders are not painted. Instead, you must call #oshu::osu_paint_slider.
  */
-int osu_paint_resources(oshu::osu_ui&);
+void osu_paint_resources(oshu::osu_ui&);
 
 /**
  * Paint a slider.
