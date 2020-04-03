@@ -45,7 +45,6 @@ shell::~shell()
 
 static void draw(shell &w)
 {
-	oshu::game_base *game = &w.game;
 	SDL_SetRenderDrawColor(w.display.renderer, 0, 0, 0, 255);
 	SDL_RenderClear(w.display.renderer);
 	w.screen->draw(w);

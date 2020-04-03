@@ -50,7 +50,6 @@ static void draw_hit_mark(oshu::osu_ui &view, oshu::hit *hit)
 
 static void draw_hit_circle(oshu::osu_ui &view, oshu::hit *hit)
 {
-	oshu::game_base *game = &view.game;
 	oshu::display *display = view.display;
 	if (hit->state == oshu::INITIAL_HIT) {
 		assert (hit->color != NULL);
@@ -86,7 +85,6 @@ static void draw_slider(oshu::osu_ui &view, oshu::hit *hit)
 
 static void draw_hit(oshu::osu_ui &view, oshu::hit *hit)
 {
-	oshu::game_base *game = &view.game;
 	if (hit->type & oshu::SLIDER_HIT)
 		draw_slider(view, hit);
 	else if (hit->type & oshu::CIRCLE_HIT)

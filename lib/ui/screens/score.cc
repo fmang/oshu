@@ -16,7 +16,6 @@
 
 static int on_event(oshu::shell &w, union SDL_Event *event)
 {
-	oshu::game_base *game = &w.game;
 	switch (event->type) {
 	case SDL_KEYDOWN:
 		if (event->key.repeat)

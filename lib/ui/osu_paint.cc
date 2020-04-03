@@ -314,7 +314,6 @@ static int paint_skip_mark(oshu::osu_ui &view)
 
 static int paint_connector(oshu::osu_ui &view)
 {
-	oshu::game_base *game = &view.game;
 	double radius = 3;
 	oshu::size size = oshu::size{1, 1} * radius * 2.;
 

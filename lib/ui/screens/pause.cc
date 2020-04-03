@@ -78,7 +78,6 @@ static void draw_pause(oshu::display *display)
 
 static int draw(oshu::shell &w)
 {
-	oshu::game_base *game = &w.game;
 	SDL_ShowCursor(SDL_ENABLE);
 	oshu::show_background(&w.background, 0);
 	oshu::show_metadata_frame(&w.metadata, 1);
