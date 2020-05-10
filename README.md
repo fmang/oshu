@@ -36,9 +36,10 @@ a mini-osu.
 Getting started
 ---------------
 
-First, you need to download a few beatmaps from osu's website.
-See https://osu.ppy.sh/beatmaps/packs to get packs, or
-https://osu.ppy.sh/beatmapsets for a finer selection.
+First, you need to download beatmaps. The official beatmap source is
+https://osu.ppy.sh/beatmapsets, but it requires that you create an account from
+the official osu! game. If you don’t have an account, you may use a mirror like
+https://bloodcat.com/osu/.
 
 The beatmaps are distributed as *.osz* files, which are disguised ZIP files.
 You need to extract using *unzip* or a similar tool. Rename them to *.zip* if
