@@ -282,6 +282,42 @@ void bezier_bounding_box(oshu::bezier *bezier, oshu::point *top_left, oshu::poin
 		extend_box(bezier->control_points[i], top_left, bottom_right);
 }
 
+/* Catmull ********************************************************************/
+
+/**
+ * Expand Catmull paths into their Bézier representation.
+ */
+static void expand_catmull(oshu::path *path)
+{
+	oshu::bezier *bezier = &path->bezier;
+	std::vector<oshu::point> anchors;
+	anchors.reserve(bezier->control_points.size() + 2);
+	anchors.push_back(bezier->control_points[0]);
+	std::copy(path->bezier.control_points.begin(), path->bezier.control_points.end(), std::back_inserter(anchors));
+	anchors.push_back(2.0 * anchors[anchors.size() - 1] - anchors[anchors.size() - 2]);
+
+	path->type = oshu::BEZIER_PATH;
+	auto segment_count = bezier->control_points.size();
+	bezier->indices.clear();
+	bezier->control_points.clear();
+	bezier->control_points.reserve(4 * segment_count);
+	bezier->indices.reserve(segment_count + 1);
+
+	for (size_t i = 0; i < segment_count; i++) {
+		oshu::point &p0 = anchors[i+1];
+		oshu::point &p1 = anchors[i+2];
+		oshu::point m0 = p1 - anchors[i];
+		oshu::point m1 = anchors[i+3] - p0;
+
+		bezier->control_points.emplace_back(p0);
+		bezier->control_points.emplace_back(p0 + m0/6.0);
+		bezier->control_points.emplace_back(p1 - m1/6.0);
+		bezier->control_points.emplace_back(p1);
+		bezier->indices.push_back(4*i);
+	}
+	bezier->indices.push_back(4*segment_count);
+}
+
 /* Lines **********************************************************************/
 
 /**
@@ -444,6 +480,9 @@ void oshu::normalize_path(oshu::path *path, double length)
 		return normalize_line(&path->line, length);
 	case oshu::PERFECT_PATH:
 		return normalize_arc(&path->arc, length);
+	case oshu::CATMULL_PATH:
+		expand_catmull(path);
+		[[fallthrough]];
 	case oshu::BEZIER_PATH:
 		return normalize_bezier(&path->bezier, length);
 	default:

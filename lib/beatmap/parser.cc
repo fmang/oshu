@@ -1002,6 +1002,7 @@ static int parse_slider(struct parser_state *parser, oshu::hit *hit)
 	switch (type) {
 	case oshu::LINEAR_PATH:  rc = parse_linear_slider(parser, hit); break;
 	case oshu::PERFECT_PATH: rc = parse_perfect_slider(parser, hit); break;
+	case oshu::CATMULL_PATH: rc = parse_catmull_slider(parser, hit); break;
 	case oshu::BEZIER_PATH:  rc = parse_bezier_slider(parser, hit); break;
 	default:
 		parser_error(parser, "unknown slider type");
@@ -1098,6 +1099,21 @@ static int parse_perfect_slider(struct parser_state *parser, oshu::hit *hit)
 		hit->slider.path.line.points.push_back(a);
 		hit->slider.path.line.points.push_back(c);
 	}
+	return 0;
+}
+
+static int parse_catmull_slider(struct parser_state *parser, oshu::hit *hit)
+{
+	oshu::path *path = &hit->slider.path;
+	oshu::point point;
+	path->type = oshu::CATMULL_PATH;
+	new (&path->bezier) oshu::bezier();
+	path->bezier.control_points.push_back(hit->p);
+        do {
+		if (parse_point(parser, &point) < 0)
+			return -1;
+		path->bezier.control_points.push_back(point);
+        } while (parse_slider__more_points(parser));
 	return 0;
 }
 

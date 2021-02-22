@@ -256,6 +256,7 @@ static int process_input(P*);
 				static int parse_point(P*, oshu::point*);
 				static int parse_linear_slider(P*, oshu::hit*);
 				static int parse_perfect_slider(P*, oshu::hit*);
+				static int parse_catmull_slider(P*, oshu::hit*);
 				static int parse_bezier_slider(P*, oshu::hit*);
 				static int parse_slider_additions(P*, oshu::hit*);
 			static int parse_spinner(P*, oshu::hit*);
