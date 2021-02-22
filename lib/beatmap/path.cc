@@ -250,7 +250,7 @@ begin:
 		while (!(my_l <= l[i + 1]) && i < n - 1)
 			i++;
 		assert (l[i] <= my_l);
-		double k = (my_l - l[i]) / (l[i+1] - l[i]);
+		double k = (l[i+1] != l[i]) ? (my_l - l[i]) / (l[i+1] - l[i]) : 0;
 		bezier->anchors[j] = (1. - k) * i / n + k * (i + 1.) / n;
 	}
 }
