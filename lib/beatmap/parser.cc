@@ -1233,6 +1233,9 @@ static int parse_additions(struct parser_state *parser, oshu::hit *hit)
 		return 0;
 	if (consume_char(parser, ',') < 0)
 		return - 1;
+	/* Legacy formats */
+	if (*parser->input == '\0')
+		return 0;
 	int value;
 	/* 1. Sample set. */
 	if (parse_int(parser, &value) < 0)
