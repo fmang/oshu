@@ -626,12 +626,16 @@ static int parse_timing_point(struct parser_state *parser, oshu::timing_point **
 	int value;
 	*timing = (oshu::timing_point*) calloc(1, sizeof(**timing));
 	assert (timing != NULL);
+	/* 0. Defaults. */
+	(*timing)->meter = 4;
+	(*timing)->sample_set = parser->beatmap->sample_set;
+	(*timing)->volume = 1.0;
 	/* 1. Timing offset. */
 	if (parse_double_sep(parser, &(*timing)->offset, ',') < 0)
 		goto fail;
 	(*timing)->offset /= 1000.;
 	/* 2. Beat duration, in milliseconds. */
-	if (parse_double_sep(parser, &(*timing)->beat_duration, ',') < 0)
+	if (parse_double(parser, &(*timing)->beat_duration) < 0)
 		goto fail;
 	if ((*timing)->beat_duration > 0.) {
 		(*timing)->beat_duration /= 1000.;
@@ -646,6 +650,11 @@ static int parse_timing_point(struct parser_state *parser, oshu::timing_point **
 		parser_error(parser, "invalid beat duration %f", (*timing)->beat_duration);
 		goto fail;
 	}
+	if (*parser->input == '\0')
+		goto end;
+	else if (consume_char(parser, ',') < 0)
+		goto fail;
+
 	/* 3. Number of beats per measure. */
 	if (parse_int_sep(parser, &(*timing)->meter, ',') < 0)
 		goto fail;
@@ -658,9 +667,13 @@ static int parse_timing_point(struct parser_state *parser, oshu::timing_point **
 		goto fail;
 	(*timing)->sample_set = value ? (oshu::sample_set_family) value : parser->beatmap->sample_set;
 	/* 5. Looks like this is the sample set index. */
-	if (parse_int_sep(parser, &value, ',') < 0)
+	if (parse_int(parser, &value) < 0)
 		goto fail;
 	(*timing)->sample_index = value;
+	if (*parser->input == '\0')
+		goto end;
+	else if (consume_char(parser, ',') < 0)
+		goto fail;
 	/* 6. Volume, from 0 to 100%. */
 	if (parse_int_sep(parser, &value, ',') < 0)
 		goto fail;
@@ -675,6 +688,7 @@ static int parse_timing_point(struct parser_state *parser, oshu::timing_point **
 	/* 8. Kiai mode. */
 	if (parse_int(parser, &(*timing)->kiai) < 0)
 		goto fail;
+end:
 	return 0;
 fail:
 	free(*timing);
