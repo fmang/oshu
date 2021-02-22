@@ -79,8 +79,10 @@ static int paint_circle(oshu::osu_ui &view, oshu::color *color, oshu::texture *t
 static void build_path(cairo_t *cr, oshu::slider *slider)
 {
 	if (slider->path.type == oshu::LINEAR_PATH) {
-		cairo_move_to(cr, std::real(slider->path.line.start), std::imag(slider->path.line.start));
-		cairo_line_to(cr, std::real(slider->path.line.end), std::imag(slider->path.line.end));
+		auto& points = slider->path.line.points;
+		cairo_move_to(cr, std::real(points.at(0)), std::imag(points.at(0)));
+		for (size_t i = 1; i < points.size(); i++)
+			cairo_line_to(cr, std::real(points[i]), std::imag(points[i]));
 	} else if (slider->path.type == oshu::PERFECT_PATH) {
 		oshu::arc *arc = &slider->path.arc;
 		if (arc->start_angle < arc->end_angle)

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "core/geometry.h"
+#include <vector>
 
 namespace oshu {
 
@@ -26,13 +27,23 @@ namespace oshu {
  *
  * It's formally the same as a degree 1 Bézier curve, but we'll keep that type
  * to make experiments.
- *
- * \todo
- * Support polyline paths.
  */
 struct line {
-	oshu::point start;
-	oshu::point end;
+	/**
+	 * The points of the polyline.
+	 */
+	std::vector<oshu::point> points;
+	/**
+	 * \brief The relative walking distance to the points.
+	 *
+	 * More concretely, 0 = distance[0] <= distance[1] ... <= distance[n-1] = 1,
+	 * where `n` is the number of points is the fraction of the slider, that has
+	 * been walked, if the slider is at `points[i]` for `0 <= i < n`.
+	 *
+	 * This helps dividing the line into segments while preserving the length
+	 * of each segment.
+	 */
+	std::vector<double> distance;
 };
 
 /**

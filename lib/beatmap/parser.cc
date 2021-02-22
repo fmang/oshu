@@ -1037,22 +1037,34 @@ static int parse_point(struct parser_state *parser, oshu::point *p)
 	return 0;
 }
 
+static bool parse_slider__more_points(struct parser_state *parser)
+{
+	if (*parser->input == '|') {
+		consume_char(parser, '|');
+		return true;
+	}
+	else
+		return false;
+}
+
 /**
  * Build a linear path.
  *
  * Consumes:
- * `168:88`
+ * `168:88[|...]`
  *
- * \todo
- * Parse polyline paths, like `L|X:Y|X:Y`.
  */
 static int parse_linear_slider(struct parser_state *parser, oshu::hit *hit)
 {
 	oshu::path *path = &hit->slider.path;
+	oshu::point point;
 	path->type = oshu::LINEAR_PATH;
-	path->line.start = hit->p;
-	if (parse_point(parser, &path->line.end) < 0)
-		return -1;
+	path->line.points.push_back(hit->p);
+	do {
+		if (parse_point(parser, &point) < 0)
+			return -1;
+		path->line.points.push_back(point);
+	} while (parse_slider__more_points(parser));
 	return 0;
 }
 
@@ -1080,8 +1092,8 @@ static int parse_perfect_slider(struct parser_state *parser, oshu::hit *hit)
 	if (oshu::build_arc(a, b, c, &hit->slider.path.arc) < 0) {
 		oshu_log_debug("degenerate perfect arc slider, turning it into a line");
 		hit->slider.path.type = oshu::LINEAR_PATH;
-		hit->slider.path.line.start = a;
-		hit->slider.path.line.end = c;
+		hit->slider.path.line.points.push_back(a);
+		hit->slider.path.line.points.push_back(c);
 	}
 	return 0;
 }

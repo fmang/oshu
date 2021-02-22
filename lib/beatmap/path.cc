@@ -8,6 +8,8 @@
 #include "core/log.h"
 
 #include <assert.h>
+#include <algorithm>
+#include <numeric>
 
 /**
  * When we get a value under this in our computation, we'll assume the value is
@@ -293,23 +295,56 @@ void bezier_bounding_box(oshu::bezier *bezier, oshu::point *top_left, oshu::poin
  */
 static oshu::point line_at(oshu::line *line, double t)
 {
-	return (1 - t) * line->start + t * line->end;
+	size_t i = 0, n = line->points.size();
+	auto& ts = line->distance;
+	while (t > ts[i+1] && i < n - 1)
+		i++;
+	oshu::point& start = line->points[i];
+	oshu::point& end = line->points[i+1];
+	double u = (ts[i] != ts[i+1]) ? (t - ts[i]) / (ts[i+1] - ts[i]) : 0;
+	return (1 - u) * start + u * end;
 }
 
 static void normalize_line(oshu::line *line, double target_length)
 {
-	double actual_length = std::abs(line->start - line->end);
+	assert (line->points.size() >= 2);
 	assert (target_length > 0);
-	assert (actual_length > 0);
-	double factor = target_length / actual_length;
-	line->end = line->start + (line->end - line->start) * factor;
+	double actual_length = 0.0;
+	for (auto i = 0; i < line->points.size() - 1; i++) {
+		line->distance.push_back(actual_length);
+		actual_length += std::abs(line->points[i] - line->points[i+1]);
+		if (actual_length > target_length) {
+			oshu::point direction = (line->points[i+1] - line->points[i]);
+			double shrink_by = actual_length - target_length;
+			direction /= std::abs(direction);
+			line->points[i+1] -= shrink_by * direction;
+			line->points.resize(i+2);
+			actual_length = target_length;
+		}
+	}
+	if (actual_length < target_length) {
+		auto n = line->points.size();
+		oshu::point direction = (line->points[n-1] - line->points[n-2]);
+		if (std::abs(direction) < epsilon)
+			oshu_log_warning("cannot grow a line, whose end is stationary");
+		else {
+			double grow_by = target_length - actual_length;
+			direction /= std::abs(direction);
+			line->points[n-1] += grow_by * direction;
+			actual_length = target_length;
+		}
+	}
+	line->distance.push_back(actual_length);
+
+	std::transform(line->distance.begin(), line->distance.end(), line->distance.begin(),
+	               [actual_length](double x){ return x / actual_length; });
 }
 
 void line_bounding_box(oshu::line *line, oshu::point *top_left, oshu::point *bottom_right)
 {
-	*top_left = *bottom_right = line->start;
-	extend_box(line->start, top_left, bottom_right);
-	extend_box(line->end, top_left, bottom_right);
+	*top_left = *bottom_right = line->points.at(0);
+	std::for_each(line->points.begin() + 1, line->points.end(),
+		      [&](auto p){ extend_box(p, top_left, bottom_right); });
 }
 
 /* Perfect circle arcs ********************************************************/
