@@ -946,6 +946,12 @@ int load_beatmap_headers(const char *path, oshu::beatmap *beatmap);
  */
 void destroy_beatmap(oshu::beatmap *beatmap);
 
+/**
+ * Return a numeric value between 0 (no hits) and 1 (perfect) based on the
+ * player's hit/miss ratio.
+ */
+double score(oshu::beatmap *beatmap);
+
 /** \} */
 
 }

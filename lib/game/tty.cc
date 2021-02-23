@@ -74,22 +74,13 @@ void oshu::congratulate(oshu::game_base *game)
 {
 	/* Clear the status line. */
 	printf("\r                                        \r");
-	/* Compute the score. */
-	int good = 0;
-	int missed = 0;
-	for (oshu::hit *hit = game->beatmap.hits; hit; hit = hit->next) {
-		if (hit->state == oshu::MISSED_HIT)
-			missed++;
-		else if (hit->state == oshu::GOOD_HIT)
-			good++;
-	}
-	double rate = (double) good / (good + missed);
+	double score = oshu::score(&game->beatmap);
+        if (std::isnan(score)) return;
+
+        int score_color = 0;
+        if (score >= 0.9) score_color = 32;
+        else if (score < 0.5) score_color = 31;
 	printf(
-		"  \033[1mScore:\033[0m\n"
-		"  \033[%dm%3d\033[0m good\n"
-		"  \033[%dm%3d\033[0m miss\n"
-		"\n",
-		rate >= 0.9 ? 32 : 0, good,
-		rate < 0.5  ? 31 : 0, missed
-	);
+		"  \033[1mScore: \033[%dm%3.2f\033[0m%%\n\n",
+		score_color, score * 100);
 }

@@ -17,23 +17,13 @@ int oshu::create_score_frame(oshu::display *display, oshu::beatmap *beatmap, osh
 	memset(frame, 0, sizeof(*frame));
 	frame->display = display;
 	frame->beatmap = beatmap;
-
-	for (oshu::hit *hit = beatmap->hits; hit; hit = hit->next) {
-		if (hit->state == oshu::MISSED_HIT)
-			++frame->bad;
-		else if (hit->state == oshu::GOOD_HIT)
-			++frame->good;
-	}
-
+	frame->score = oshu::score(beatmap);
 	return 0;
 }
 
 void oshu::show_score_frame(oshu::score_frame *frame, double opacity)
 {
-	int notes = frame->good + frame->bad;
-	if (notes == 0)
-		return;
-
+	if (std::isnan(frame->score)) return;
 	SDL_SetRenderDrawBlendMode(frame->display->renderer, SDL_BLENDMODE_BLEND);
 
 	SDL_Rect bar = {
@@ -46,7 +36,7 @@ void oshu::show_score_frame(oshu::score_frame *frame, double opacity)
 	SDL_Rect good = {
 		.x = bar.x,
 		.y = bar.y,
-		.w = (int) ((double) frame->good / notes * bar.w),
+		.w = (int) ((double) frame->score * bar.w),
 		.h = bar.h,
 	};
 	SDL_SetRenderDrawColor(frame->display->renderer, 0, 255, 0, 196 * opacity);

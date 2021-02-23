@@ -26,8 +26,7 @@ struct display;
 struct score_frame {
 	oshu::display *display;
 	oshu::beatmap *beatmap;
-	int good;
-	int bad;
+	double score;
 };
 
 /**
