@@ -1059,6 +1059,7 @@ static int parse_linear_slider(struct parser_state *parser, oshu::hit *hit)
 	oshu::path *path = &hit->slider.path;
 	oshu::point point;
 	path->type = oshu::LINEAR_PATH;
+	new (&path->line) oshu::line();
 	path->line.points.push_back(hit->p);
 	do {
 		if (parse_point(parser, &point) < 0)
@@ -1091,7 +1092,9 @@ static int parse_perfect_slider(struct parser_state *parser, oshu::hit *hit)
 	hit->slider.path.type = oshu::PERFECT_PATH;
 	if (oshu::build_arc(a, b, c, &hit->slider.path.arc) < 0) {
 		oshu_log_debug("degenerate perfect arc slider, turning it into a line");
+		hit->slider.path.arc.~arc();
 		hit->slider.path.type = oshu::LINEAR_PATH;
+		new (&hit->slider.path.line) oshu::line();
 		hit->slider.path.line.points.push_back(a);
 		hit->slider.path.line.points.push_back(c);
 	}
@@ -1128,14 +1131,11 @@ static int parse_bezier_slider(struct parser_state *parser, oshu::hit *hit)
 
 	hit->slider.path.type = oshu::BEZIER_PATH;
 	oshu::bezier *bezier = &hit->slider.path.bezier;
-	bezier->control_points = (oshu::point*) calloc(count, sizeof(*bezier->control_points));
-	assert (bezier->control_points != NULL);
-	bezier->control_points[0] = hit->p;
-
-	int index = 0;
-	bezier->indices = (int*) calloc(count, sizeof(*bezier->indices));
-	assert (bezier->indices != NULL);
-	bezier->indices[index] = 0;
+	new (bezier) oshu::bezier();
+	bezier->control_points.reserve(count);
+	bezier->indices.reserve(count);
+	bezier->control_points.push_back(hit->p);
+	bezier->indices.push_back(0);
 
 	oshu::point prev = bezier->control_points[0];
 	for (int i = 1; i < count; i++) {
@@ -1144,19 +1144,17 @@ static int parse_bezier_slider(struct parser_state *parser, oshu::hit *hit)
 		oshu::point p;
 		if (parse_point(parser, &p) < 0)
 			goto fail;
-		bezier->control_points[i] = p;
+		bezier->control_points.push_back(p);
 		if (p == prev)
-			bezier->indices[++index] = i;
+			bezier->indices.push_back(i);
 		prev = p;
 	}
-	bezier->indices[++index] = count;
-	bezier->segment_count = index;
+	bezier->indices.push_back(count);
+	bezier->indices.shrink_to_fit();
 	return 0;
 fail:
-	free(bezier->control_points);
-	bezier->control_points = NULL;
-	free(bezier->indices);
-	bezier->indices = NULL;
+	bezier->control_points.clear();
+	bezier->indices.clear();
 	return -1;
 }
 
@@ -1448,10 +1446,13 @@ static void free_metadata(oshu::metadata *meta)
 
 static void free_path(oshu::path *path)
 {
-	if (path->type == oshu::BEZIER_PATH) {
-		free(path->bezier.control_points);
-		free(path->bezier.indices);
-	}
+	/* Explicitly invoke the destructor. */
+	if (path->type == oshu::BEZIER_PATH)
+		path->bezier.~bezier();
+	else if (path->type == oshu::LINEAR_PATH)
+		path->line.~line();
+	else if (path->type == oshu::PERFECT_PATH)
+		path->arc.~arc();
 }
 
 static void free_hits(oshu::hit *hits)

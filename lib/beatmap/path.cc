@@ -104,11 +104,13 @@ static int focus(double *t, int n)
  *
  * \sa focus
  */
-static void bezier_map(oshu::bezier *path, double *t, int *degree, oshu::point **control_points)
+static void bezier_map(oshu::bezier *path, double *t, std::vector<oshu::point>& control_points)
 {
-	int segment = focus(t, path->segment_count);
-	*degree = path->indices[segment+1] - path->indices[segment] - 1;
-	*control_points = path->control_points + path->indices[segment];
+	int segment = focus(t, path->indices.size() - 1);
+	auto start = path->control_points.begin() + path->indices[segment];
+	auto end = path->control_points.begin() + path->indices[segment+1];
+	control_points.reserve(path->indices[segment+1] - path->indices[segment]);
+	std::copy(start, end, std::back_inserter(control_points));
 }
 
 /**
@@ -123,16 +125,14 @@ static void bezier_map(oshu::bezier *path, double *t, int *degree, oshu::point *
  */
 static oshu::point bezier_at(oshu::bezier *path, double t)
 {
-	int degree;
-	oshu::point *points;
-	bezier_map(path, &t, &degree, &points);
-	oshu::point pp[degree + 1];
-	memcpy(pp, points, (degree + 1) * sizeof(*pp));
+	std::vector<oshu::point> points;
+	bezier_map(path, &t, points);
+	oshu::point *pp = points.data();
 
 	/* l is the logical length of pp.
 	 * It begins with all the points, and drops one point at every
 	 * iteration. We stop when only 1 point is left */
-	for (int l = (degree + 1); l > 1; --l) {
+	for (int l = points.size(); l > 1; --l) {
 		for (int j = 0; j < (l - 1); ++j)
 			pp[j] = (1. - t) * pp[j] + t * pp[j+1];
 	}
@@ -157,10 +157,7 @@ static oshu::point bezier_at(oshu::bezier *path, double t)
  */
 static int grow_bezier(oshu::bezier *bezier, double extension)
 {
-	assert (bezier->segment_count >= 1);
-	assert (bezier->indices != NULL);
-	assert (bezier->control_points != NULL);
-	size_t n = bezier->indices[bezier->segment_count];
+	size_t n = bezier->indices.back();
 	assert (n >= 2);
 	oshu::point end = bezier->control_points[n - 1];
 	oshu::point before_end = bezier->control_points[n - 2];
@@ -172,13 +169,10 @@ static int grow_bezier(oshu::bezier *bezier, double extension)
 		return -1;
 	}
 
-	bezier->segment_count++;
-	bezier->indices = (int*) realloc(bezier->indices, (bezier->segment_count + 1) * sizeof(*bezier->indices));
-	bezier->indices[bezier->segment_count] = n + 2;
-
-	bezier->control_points = (oshu::point*) realloc(bezier->control_points, (n + 2) * sizeof(*bezier->control_points));
-	bezier->control_points[n] = end;
-	bezier->control_points[n + 1] = end + direction / std::abs(direction) * extension;
+	bezier->indices.push_back(n + 2);
+	bezier->control_points.reserve(n + 2);
+	bezier->control_points.push_back(end);
+	bezier->control_points.emplace_back(end + direction / std::abs(direction) * extension);
 	return 0;
 }
 
@@ -246,7 +240,7 @@ begin:
 
 	/* 4. Set up the anchors. */
 	int i = 0;
-	int num_anchors = sizeof(bezier->anchors) / sizeof(*bezier->anchors);
+	size_t num_anchors = bezier->anchors.size();
 	for (int j = 0; j < num_anchors; j++) {
 		double my_l = (double) j / (num_anchors - 1);
 		while (!(my_l <= l[i + 1]) && i < n - 1)
@@ -270,7 +264,7 @@ begin:
  */
 static double l_to_t(oshu::bezier *bezier, double l)
 {
-	int n = sizeof(bezier->anchors) / sizeof(*bezier->anchors) - 1;
+	int n = bezier->anchors.size() - 1;
 	int i = focus(&l, n);
 	return (1. - l) * bezier->anchors[i] + l * bezier->anchors[i + 1];
 }
@@ -281,9 +275,9 @@ static double l_to_t(oshu::bezier *bezier, double l)
  */
 void bezier_bounding_box(oshu::bezier *bezier, oshu::point *top_left, oshu::point *bottom_right)
 {
-	assert (bezier->segment_count > 0);
+	assert (bezier->indices.size() > 0);
 	*top_left = *bottom_right = bezier->control_points[0];
-	int count = bezier->indices[bezier->segment_count];
+	int count = bezier->indices.back();
 	for (int i = 0; i < count; ++i)
 		extend_box(bezier->control_points[i], top_left, bottom_right);
 }

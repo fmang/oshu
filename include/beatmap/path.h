@@ -7,6 +7,7 @@
 
 #include "core/geometry.h"
 #include <vector>
+#include <array>
 
 namespace oshu {
 
@@ -150,30 +151,25 @@ int build_arc(oshu::point a, oshu::point b, oshu::point c, oshu::arc *arc);
  */
 struct bezier {
 	/**
-	 * How many segments the Bézier path contains.
-	 */
-	int segment_count;
-	/**
 	 * \brief Starting position of each segment in control points array.
 	 *
 	 * More concretely, the *n*th segment of the path starts at
-	 * `control_points[indexes[n]]` and finishes at
-	 * `control_points[indexes[n+1] - 1]`, where *0 ≤ n < segment_count*.
+	 * `control_points[indices[n]]` and finishes at
+	 * `control_points[indices[n+1] - 1]`.
 	 *
 	 * This implies the *n*th segment has `indexes[n+1] - indexes[n]`
 	 * points, and that its degree is `indexes[n+1] - indexes[n] - 1`.
+	 * It also implies, that the number of segments is `indices.size() - 1`.
 	 *
 	 * To reuse the example in #oshu::bezier, since all the segments are
 	 * quadratic, the indices are [0, 3, 6, 9].
-	 *
-	 * The size of the indices array must be *segment_count + 1*.
 	 *
 	 * For the normalization process, it must be dynamically allocated.
 	 *
 	 * \sa segment_count
 	 * \sa control_points
 	 */
-	int *indices;
+	std::vector<int> indices;
 	/**
 	 * \brief The array of all control points, all segments combined.
 	 *
@@ -189,11 +185,9 @@ struct bezier {
 	 * To identify the segments these points belong to, you need to use the
 	 * #indices array.
 	 *
-	 * Its length is specified in `indices[segment_count]`.
-	 *
 	 * For the normalization process, it must be dynamically allocated.
 	 */
-	oshu::point *control_points;
+	std::vector<oshu::point> control_points;
 	/**
 	 * Translation map from l-coordinates to t-coordinates.
 	 *
@@ -205,7 +199,7 @@ struct bezier {
 	 *
 	 * \sa oshu::normalize_path
 	 */
-	double anchors[64];
+	std::array<double, 64> anchors;
 };
 
 /**
