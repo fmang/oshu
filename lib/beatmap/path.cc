@@ -293,7 +293,8 @@ static void expand_catmull(oshu::path *path)
 	std::vector<oshu::point> anchors;
 	anchors.reserve(bezier->control_points.size() + 2);
 	anchors.push_back(bezier->control_points[0]);
-	std::copy(path->bezier.control_points.begin(), path->bezier.control_points.end(), std::back_inserter(anchors));
+	std::copy(bezier->control_points.begin(), bezier->control_points.end(), std::back_inserter(anchors));
+	anchors.push_back(2.0 * anchors[anchors.size() - 1] - anchors[anchors.size() - 2]);
 	anchors.push_back(2.0 * anchors[anchors.size() - 1] - anchors[anchors.size() - 2]);
 
 	path->type = oshu::BEZIER_PATH;
