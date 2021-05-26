@@ -1,12 +1,9 @@
 Contributing
 ============
 
-Because the project is really young, please join the \#oshu IRC channel on
-[chat.freenode.net](https://freenode.net/kb/answer/chat) if you'd like to
-contribute. Someone is probably already working on your idea, and most likely
-myself :)
-
-You may also open issues on [GitHub][] or contact me directly by mail.
+The project is mostly dormant, but not dead. If you wish to contribute or
+maintain the project, please send me an email at fmang+oshu at mg0.fr, or open
+an issue on [GitHub][].
 
 [GitHub]: https://github.com/fmang/oshu/
 
@@ -48,9 +45,9 @@ Pull requests are always welcome, but you should follow a few rules:
 
 5. Communicate your intentions.
 
-   If you have an idea, come talk about it on IRC, or open an issue on GitHub
-   to get feedback. That's the best way to ensure your work won't cause
-   conflicts, or stray off topic.
+   If you have an idea, please do open an issue on GitHub to get feedback.
+   That's the best way to ensure your work won't cause conflicts, or stray off
+   topic.
 
 
 Technical choices
