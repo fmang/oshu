@@ -8,6 +8,7 @@
 
 extern "C" {
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 #include <libavutil/opt.h>
 #include <libswresample/swresample.h>
 }
@@ -192,7 +193,7 @@ static int open_demuxer(const char *url, oshu::stream *stream)
 		stream->demuxer,
 		AVMEDIA_TYPE_AUDIO,
 		-1, -1,
-		&stream->codec,
+		(const AVCodec**)&stream->codec,
 		0
 	);
 	if (rc < 0 || stream->codec == NULL) {
