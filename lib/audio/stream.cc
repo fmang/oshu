@@ -193,7 +193,11 @@ static int open_demuxer(const char *url, oshu::stream *stream)
 		stream->demuxer,
 		AVMEDIA_TYPE_AUDIO,
 		-1, -1,
+#if (LIBAVFORMAT_VERSION_MAJOR < 59)
+		&stream->codec,
+#else
 		(const AVCodec**)&stream->codec,
+#endif
 		0
 	);
 	if (rc < 0 || stream->codec == NULL) {
