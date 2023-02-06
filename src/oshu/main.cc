@@ -34,6 +34,7 @@ enum option_values {
 	OPT_PAUSE = 0x10001,
 	OPT_VERBOSE = 'v',
 	OPT_VERSION = 0x10002,
+	OPT_SFX_VOLUME = 0x10003,
 };
 
 static struct option options[] = {
@@ -42,6 +43,7 @@ static struct option options[] = {
 	{"pause", no_argument, 0, OPT_PAUSE},
 	{"verbose", no_argument, 0, OPT_VERBOSE},
 	{"version", no_argument, 0, OPT_VERSION},
+	{"sfx-volume", required_argument, 0, OPT_SFX_VOLUME},
 	{0, 0, 0, 0},
 };
 
@@ -59,6 +61,7 @@ static const char *help =
 	"  --version           Output version information.\n"
 	"  --autoplay          Perform a perfect run.\n"
 	"  --pause             Start the game paused.\n"
+	"  --sfx-volume        Changes the sound effects volume.\n"
 	"\n"
 	"Check the man page oshu(1) for details.\n"
 ;
@@ -79,7 +82,7 @@ static void signal_handler(int signum)
 		w->close();
 }
 
-int run(const char *beatmap_path, int autoplay, int pause)
+int run(const char *beatmap_path, int autoplay, int pause, int sfx_volume)
 {
 	int rc = 0;
 
@@ -91,6 +94,7 @@ int run(const char *beatmap_path, int autoplay, int pause)
 	try {
 		oshu::osu_game game(beatmap_path);
 		game.autoplay = autoplay;
+		game.sfx_volume = sfx_volume;
 		if (pause)
 			game.pause();
 
@@ -112,6 +116,7 @@ int main(int argc, char **argv)
 {
 	int autoplay = 0;
 	int pause = 0;
+	int sfx_volume = 100;
 
 	for (;;) {
 		int c = getopt_long(argc, argv, flags, options, NULL);
@@ -134,6 +139,15 @@ int main(int argc, char **argv)
 		case OPT_VERSION:
 			fputs(version, stdout);
 			return 0;
+		case OPT_SFX_VOLUME:
+			sfx_volume = atoi(optarg);
+			if(!( (0 <= sfx_volume) && (sfx_volume <= 100) )) {
+				/* TODO: Make a clearer error message? */
+				fputs("`--sfx-volume' argument isn't in [0..100] exiting!\n", stderr);
+				return 1;
+			} else {
+				break;
+			}
 		default:
 			fputs(usage, stderr);
 			return 2;
@@ -170,7 +184,7 @@ int main(int argc, char **argv)
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
-	if (run(beatmap_file, autoplay, pause) < 0) {
+	if (run(beatmap_file, autoplay, pause, sfx_volume) < 0) {
 		if (!isatty(fileno(stdout)))
 			SDL_ShowSimpleMessageBox(
 				SDL_MESSAGEBOX_ERROR,
