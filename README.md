@@ -76,7 +76,7 @@ First of all, make sure you have the required dependencies. These things are so
 common that I may assure you they're in your distribution's official
 repositories.
 
-- CMake 3.9,
+- CMake 3.25,
 - a C++14 compiler,
 - pkg-config,
 - SDL2 ≥ 2.0.5,
