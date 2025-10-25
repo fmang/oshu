@@ -1,12 +1,17 @@
 Changelog
 =========
 
+2.0.3 - 2025-10-25
+------------------
+
+- ffmpeg 7 compatibility. Patch from the termux project.
+
 2.0.2 - 2022-03-07
 ------------------
 
 - Add support to more path types in the beatmap (thanks to Leo Prikler).
 - New scoring model based on the hit/miss ratio (thanks again to Leo Prikler).
-- ffmpeg 5.0 compability (thanks to @lanodan).
+- ffmpeg 5.0 compatibility (thanks to @lanodan).
 
 2.0.1 - 2020-03-29
 ------------------
