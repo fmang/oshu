@@ -69,6 +69,7 @@ public:
 	oshu::sound_library library {};
 	oshu::clock clock {};
 	int autoplay {};
+	int sfx_volume {};
 	bool paused {};
 	/**
 	 * Pointer to the next clickable hit.
